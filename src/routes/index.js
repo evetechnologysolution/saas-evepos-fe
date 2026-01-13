@@ -36,6 +36,22 @@ export default function Router() {
             </GuestGuard>
           ),
         },
+        {
+          path: 'register',
+          element: (
+            <GuestGuard>
+              <Register />
+            </GuestGuard>
+          ),
+        },
+        {
+          path: 'konfirmasi',
+          element: (
+            <GuestGuard>
+              <RegisterEmailConfirm />
+            </GuestGuard>
+          ),
+        },
       ],
     },
     {
@@ -820,6 +836,8 @@ const BlogCategory = Loadable(lazy(() => import('../pages/category/TableCategory
 
 // Login
 const Login = Loadable(lazy(() => import('../pages/auth/Login')));
+const Register = Loadable(lazy(() => import('../pages/registerv2/screen')));
+const RegisterEmailConfirm = Loadable(lazy(() => import('../pages/registerv2/screen_emailconfirm')));
 
 // Dashboard
 const Dashboard = Loadable(lazy(() => import('../pages/dashboard/Dashboard')));
@@ -877,8 +895,12 @@ const LibraryPromotion = Loadable(lazy(() => import('../pages/library/promotion/
 const LibraryPromotionCreate = Loadable(lazy(() => import('../pages/library/promotion/LibraryPromotionCreate')));
 const LibraryPromotionEdit = Loadable(lazy(() => import('../pages/library/promotion/LibraryPromotionEdit')));
 const LibrarySpecialPromotion = Loadable(lazy(() => import('../pages/library/promotion-special/LibraryPromotion')));
-const LibrarySpecialPromotionCreate = Loadable(lazy(() => import('../pages/library/promotion-special/LibraryPromotionCreate')));
-const LibrarySpecialPromotionEdit = Loadable(lazy(() => import('../pages/library/promotion-special/LibraryPromotionEdit')));
+const LibrarySpecialPromotionCreate = Loadable(
+  lazy(() => import('../pages/library/promotion-special/LibraryPromotionCreate'))
+);
+const LibrarySpecialPromotionEdit = Loadable(
+  lazy(() => import('../pages/library/promotion-special/LibraryPromotionEdit'))
+);
 const LibraryVoucher = Loadable(lazy(() => import('../pages/library/voucher/LibraryVoucher')));
 const LibraryVoucherCreate = Loadable(lazy(() => import('../pages/library/voucher/LibraryVoucherCreate')));
 const LibraryVoucherEdit = Loadable(lazy(() => import('../pages/library/voucher/LibraryVoucherEdit')));
