@@ -1,0 +1,53 @@
+.task-card {
+    background: #fdf7ef;
+    box-shadow: 6px 6px 5px gray;
+    width: 490px;
+    height: 300px;
+    padding: 5px;
+
+    &-title {
+        height: 60px;
+        width: 100%;
+        position: relative;
+    }
+
+    &-row {
+        height: 30px;
+        width: 100%;
+        position: relative;
+    }
+
+    &-redline {
+        width: 100%;
+        background-color: red;
+        height: 4px;
+    }
+
+    &-blueline {
+        width: 100%;
+        background-color: steelblue;
+        height: 2px;
+    }
+
+    &-hole {
+        width: 20px;
+        height: 20px;
+        background-color: #D0F2FF;
+        box-shadow: rgb(208, 242, 255) 0 0 0 0, inset 2px 3px 3px gray;
+        border-radius: 50%;
+        position: absolute;
+        left: 8px;
+
+        &:nth-child(1) {
+            top: 5%;
+        }
+
+        &:nth-child(2) {
+            top: 45%;
+        }
+        
+        &:nth-child(3) {
+            bottom: 5%;
+        }
+    }
+}

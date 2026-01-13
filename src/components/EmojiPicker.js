@@ -1,0 +1,105 @@
+import PropTypes from "prop-types";
+import { useState } from "react";
+import Picker from "@emoji-mart/react";
+import data from "@emoji-mart/data";
+// @mui
+import { styled } from "@mui/material/styles";
+import { Box, IconButton, ClickAwayListener } from "@mui/material";
+// utils
+import cssStyles from "../utils/cssStyles";
+//
+import Iconify from "./Iconify";
+
+// ----------------------------------------------------------------------
+
+const RootStyle = styled(Box)({
+  position: "relative",
+});
+
+const PickerStyle = styled("div")(({ theme }) => ({
+  bottom: 40,
+  overflow: "hidden",
+  position: "absolute",
+  left: theme.spacing(-2),
+  boxShadow: theme.customShadows.z20,
+  borderRadius: Number(theme.shape.borderRadius) * 2,
+  "& .emoji-mart": {
+    border: "none",
+    backgroundColor: theme.palette.background.paper,
+  },
+  "& .emoji-mart-anchor": {
+    color: theme.palette.text.disabled,
+    "&:hover, &:focus, &.emoji-mart-anchor-selected": {
+      color: theme.palette.text.primary,
+    },
+  },
+  "& .emoji-mart-bar": { borderColor: theme.palette.divider },
+  "& .emoji-mart-search input": {
+    backgroundColor: "transparent",
+    color: theme.palette.text.primary,
+    borderColor: theme.palette.grey[500_32],
+    "&::placeholder": {
+      ...theme.typography.body2,
+      color: theme.palette.text.disabled,
+    },
+  },
+  "& .emoji-mart-search-icon svg": {
+    opacity: 1,
+    fill: theme.palette.text.disabled,
+  },
+  "& .emoji-mart-category-label span": {
+    ...theme.typography.subtitle2,
+    ...cssStyles().bgBlur({ color: theme.palette.background.paper }),
+    color: theme.palette.text.primary,
+  },
+  "& .emoji-mart-title-label": { color: theme.palette.text.primary },
+  "& .emoji-mart-category .emoji-mart-emoji:hover:before": {
+    backgroundColor: theme.palette.action.selected,
+  },
+  "& .emoji-mart-emoji": { outline: "none" },
+  "& .emoji-mart-preview-name": {
+    color: theme.palette.text.primary,
+  },
+  "& .emoji-mart-preview-shortname, .emoji-mart-preview-emoticon": {
+    color: theme.palette.text.secondary,
+  },
+}));
+
+// ----------------------------------------------------------------------
+
+EmojiPicker.propTypes = {
+  disabled: PropTypes.bool,
+  value: PropTypes.string,
+  setValue: PropTypes.func,
+  alignRight: PropTypes.bool,
+};
+
+export default function EmojiPicker({ disabled, value, setValue, alignRight = false, ...other }) {
+  const [emojiPickerState, setEmojiPicker] = useState(false);
+
+  const handleSelectEmoji = (emoji) => {
+    setValue(value + emoji.native);
+  };
+
+  return (
+    <ClickAwayListener onClickAway={() => setEmojiPicker(false)}>
+      <RootStyle {...other}>
+        <PickerStyle
+          sx={{
+            ...(alignRight && {
+              right: -2,
+              left: "auto !important",
+            }),
+          }}
+        >
+          {emojiPickerState && (
+            <Picker data={data} onEmojiSelect={handleSelectEmoji} theme="light" />
+          )}
+        </PickerStyle>
+        <IconButton disabled={disabled} size="small" onClick={() => setEmojiPicker(!emojiPickerState)}>
+          <Iconify icon={"eva:smiling-face-fill"} width={20} height={20} />
+        </IconButton>
+      </RootStyle>
+    </ClickAwayListener>
+  );
+}
