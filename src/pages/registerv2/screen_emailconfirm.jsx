@@ -7,6 +7,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'src/utils/axios';
 import { useSnackbar } from 'notistack';
+import { setSession } from 'src/utils/jwt';
 import useSettings from '../../hooks/useSettings';
 // components
 import Page from '../../components/Page';
@@ -48,17 +49,18 @@ export default function RegisterEmailConfirm() {
       if (!token) return;
 
       try {
-        await axios.post('/auth-tenant/register/verify', { token });
+        const res = await axios.post('/auth-tenant/register/verify', { token });
+        setSession(res.data.accessToken);
 
         enqueueSnackbar('Email berhasil diverifikasi!', {
           variant: 'success',
           autoHideDuration: 5000,
         });
 
-        // // Redirect to login after showing success message
-        // setTimeout(() => {
-        //   navigate('/auth/login', { replace: true });
-        // }, 1500);
+        // Redirect to login after showing success message
+        setTimeout(() => {
+          navigate('/auth/login', { replace: true });
+        }, 1500);
       } catch (error) {
         const errorMessage = error?.message || 'Token tidak valid atau sudah kedaluwarsa';
 

@@ -73,12 +73,13 @@ function AuthProvider({ children }) {
 
   // **Menggunakan useMutation untuk register**
   const registerMutation = useMutation(
-    async ({ email, username, phone, password }) => {
+    async ({ email, username, phone, password, baseUrl }) => {
       const response = await axios.post('/auth-tenant/register', {
         email,
         password,
         username,
         phone,
+        baseUrl,
       });
       const { accessToken, user } = response.data;
       // setSession(accessToken);

@@ -55,9 +55,9 @@ export default function Router() {
         {
           path: 'informasi-usaha',
           element: (
-            <GuestGuard>
+            <AuthGuard>
               <BusinessInformation />
-            </GuestGuard>
+            </AuthGuard>
           ),
         },
       ],
@@ -83,7 +83,10 @@ export default function Router() {
         {
           path: 'app',
           element: (
-            <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+            <RoleBasedGuard
+              hasContent
+              // roles={['Super Admin', 'Admin']}
+            >
               <Dashboard />
             </RoleBasedGuard>
           ),

@@ -8,7 +8,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Stack, Alert, IconButton, InputAdornment, Typography, Box } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // hooks
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
 import useIsMountedRef from '../../../hooks/useIsMountedRef';
 // components
@@ -20,6 +20,7 @@ import { FormProvider, RHFTextField } from '../../../components/hook-form';
 
 export default function LoginForm() {
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const isMountedRef = useIsMountedRef();
 
@@ -50,7 +51,12 @@ export default function LoginForm() {
   const onSubmit = async (data) => {
     try {
       // await login(data.username, data.password);
-      await login({ username: data.username, password: data.password });
+      const response = await login({ username: data.username, password: data.password });
+      if (response?.tenantRef?.status === 'pending') {
+        navigate('/auth/informasi-usaha');
+      } else {
+        navigate('/dashboard/app');
+      }
     } catch (error) {
       // console.error(error);
 

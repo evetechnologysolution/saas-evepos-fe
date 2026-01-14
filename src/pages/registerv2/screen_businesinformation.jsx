@@ -9,6 +9,10 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMemo } from 'react';
 import { LoadingButton } from '@mui/lab';
+import useAuth from 'src/hooks/useAuth';
+import axios from 'src/utils/axios';
+import { useSnackbar } from 'notistack';
+import { useNavigate } from 'react-router';
 import useSettings from '../../hooks/useSettings';
 // components
 import Page from '../../components/Page';
@@ -36,15 +40,17 @@ const ContentStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 export default function RegisterEmailConfirm() {
   const { themeStretch } = useSettings();
+  const auth = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
+
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: schema.getDefault(),
   });
   const {
-    setError,
-    setValue,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
     watch,
   } = methods;
 
@@ -59,9 +65,13 @@ export default function RegisterEmailConfirm() {
 
   const onSubmit = async (data) => {
     try {
-      console.log('Form Data:', data);
-    } catch (error) {
-      console.log('Error:', error);
+      await axios.patch(`/tenant/complete/${auth.user?.tenantRef?._id}`, data);
+      enqueueSnackbar('Data berhasil disimpan', { variant: 'success' });
+      navigate('/dashboard/app');
+    } catch (err) {
+      const message = err?.response?.data?.message || err?.message || 'Terjadi kesalahan, coba lagi';
+
+      enqueueSnackbar(message, { variant: 'error' });
     }
   };
 

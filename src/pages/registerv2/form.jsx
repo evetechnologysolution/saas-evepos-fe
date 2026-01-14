@@ -46,7 +46,13 @@ export default function RegisterForm() {
   const onSubmit = async (data) => {
     try {
       const { username, password, whatsapp, email } = data;
-      const response = await register({ username, password, phone: whatsapp, email });
+      const response = await register({
+        username,
+        password,
+        phone: whatsapp,
+        email,
+        baseUrl: 'http://localhost:3060/',
+      });
       navigate(`/auth/konfirmasi?email=${response.email}`);
     } catch (error) {
       setValue('password', '');
