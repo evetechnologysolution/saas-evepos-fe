@@ -52,6 +52,14 @@ export default function Router() {
             </GuestGuard>
           ),
         },
+        {
+          path: 'informasi-usaha',
+          element: (
+            <GuestGuard>
+              <BusinessInformation />
+            </GuestGuard>
+          ),
+        },
       ],
     },
     {
@@ -838,6 +846,7 @@ const BlogCategory = Loadable(lazy(() => import('../pages/category/TableCategory
 const Login = Loadable(lazy(() => import('../pages/auth/Login')));
 const Register = Loadable(lazy(() => import('../pages/registerv2/screen')));
 const RegisterEmailConfirm = Loadable(lazy(() => import('../pages/registerv2/screen_emailconfirm')));
+const BusinessInformation = Loadable(lazy(() => import('../pages/registerv2/screen_businesinformation')));
 
 // Dashboard
 const Dashboard = Loadable(lazy(() => import('../pages/dashboard/Dashboard')));
