@@ -51,7 +51,7 @@ export default function RegisterForm() {
         password,
         phone: whatsapp,
         email,
-        baseUrl: 'http://localhost:3060/',
+        // baseUrl: 'http://localhost:3060/',
       });
       navigate(`/auth/konfirmasi?email=${response.email}`);
     } catch (error) {
