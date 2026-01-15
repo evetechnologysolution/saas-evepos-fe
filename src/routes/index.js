@@ -36,6 +36,46 @@ export default function Router() {
             </GuestGuard>
           ),
         },
+        {
+          path: 'register',
+          element: (
+            <GuestGuard>
+              <Register />
+            </GuestGuard>
+          ),
+        },
+        {
+          path: 'lupa-password',
+          element: (
+            <GuestGuard>
+              <ForgotPassword />
+            </GuestGuard>
+          ),
+        },
+        {
+          path: 'reset-password',
+          element: (
+            <GuestGuard>
+              <ResetPassword />
+            </GuestGuard>
+          ),
+        },
+        {
+          path: 'konfirmasi',
+          element: (
+            <GuestGuard>
+              <RegisterEmailConfirm />
+            </GuestGuard>
+          ),
+        },
+        {
+          path: 'informasi-usaha',
+          element: (
+            <AuthGuard>
+              <BusinessInformation />
+            </AuthGuard>
+          ),
+        },
       ],
     },
     {
@@ -59,7 +99,10 @@ export default function Router() {
         {
           path: 'app',
           element: (
-            <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+            <RoleBasedGuard
+              hasContent
+              // roles={['Super Admin', 'Admin']}
+            >
               <Dashboard />
             </RoleBasedGuard>
           ),
@@ -820,6 +863,11 @@ const BlogCategory = Loadable(lazy(() => import('../pages/category/TableCategory
 
 // Login
 const Login = Loadable(lazy(() => import('../pages/auth/Login')));
+const Register = Loadable(lazy(() => import('../pages/registerv2/screen')));
+const RegisterEmailConfirm = Loadable(lazy(() => import('../pages/registerv2/screen_emailconfirm')));
+const BusinessInformation = Loadable(lazy(() => import('../pages/registerv2/screen_businesinformation')));
+const ForgotPassword = Loadable(lazy(() => import('../pages/registerv2/screen_forgotpassword')));
+const ResetPassword = Loadable(lazy(() => import('../pages/registerv2/screen_resetpassword')));
 
 // Dashboard
 const Dashboard = Loadable(lazy(() => import('../pages/dashboard/Dashboard')));
@@ -877,8 +925,12 @@ const LibraryPromotion = Loadable(lazy(() => import('../pages/library/promotion/
 const LibraryPromotionCreate = Loadable(lazy(() => import('../pages/library/promotion/LibraryPromotionCreate')));
 const LibraryPromotionEdit = Loadable(lazy(() => import('../pages/library/promotion/LibraryPromotionEdit')));
 const LibrarySpecialPromotion = Loadable(lazy(() => import('../pages/library/promotion-special/LibraryPromotion')));
-const LibrarySpecialPromotionCreate = Loadable(lazy(() => import('../pages/library/promotion-special/LibraryPromotionCreate')));
-const LibrarySpecialPromotionEdit = Loadable(lazy(() => import('../pages/library/promotion-special/LibraryPromotionEdit')));
+const LibrarySpecialPromotionCreate = Loadable(
+  lazy(() => import('../pages/library/promotion-special/LibraryPromotionCreate'))
+);
+const LibrarySpecialPromotionEdit = Loadable(
+  lazy(() => import('../pages/library/promotion-special/LibraryPromotionEdit'))
+);
 const LibraryVoucher = Loadable(lazy(() => import('../pages/library/voucher/LibraryVoucher')));
 const LibraryVoucherCreate = Loadable(lazy(() => import('../pages/library/voucher/LibraryVoucherCreate')));
 const LibraryVoucherEdit = Loadable(lazy(() => import('../pages/library/voucher/LibraryVoucherEdit')));

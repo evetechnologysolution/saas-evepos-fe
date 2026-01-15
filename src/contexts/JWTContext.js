@@ -1,11 +1,11 @@
-import PropTypes from "prop-types";
-import { createContext } from "react";
-import { useQuery, useMutation, useQueryClient } from "react-query";
-import axios from "../utils/axios";
+import PropTypes from 'prop-types';
+import { createContext } from 'react';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
+import axios from '../utils/axios';
 import {
   // isValidToken,
-  setSession
-} from "../utils/jwt";
+  setSession,
+} from '../utils/jwt';
 
 // ----------------------------------------------------------------------
 
@@ -23,14 +23,14 @@ function AuthProvider({ children }) {
 
   // **Menggunakan useQuery untuk inisialisasi user**
   const { data: user, isLoading } = useQuery(
-    "authUser",
+    'authUser',
     async () => {
-      const accessToken = localStorage.getItem("accessToken");
+      const accessToken = localStorage.getItem('accessToken');
 
       // if (accessToken && isValidToken(accessToken)) {
       if (accessToken) {
         setSession(accessToken);
-        const response = await axios.get("/auth/my-account");
+        const response = await axios.get('/auth/my-account');
         return response.data.user;
       }
 
@@ -46,14 +46,14 @@ function AuthProvider({ children }) {
   // **Menggunakan useMutation untuk login**
   const loginMutation = useMutation(
     async ({ username, password }) => {
-      const response = await axios.post("/auth/login", { username, password });
+      const response = await axios.post('/auth/login', { username, password });
       const { accessToken, user } = response.data;
       setSession(accessToken);
       return user;
     },
     {
       onSuccess: (user) => {
-        queryClient.setQueryData("authUser", user); // Update cache authUser
+        queryClient.setQueryData('authUser', user); // Update cache authUser
       },
     }
   );
@@ -66,27 +66,28 @@ function AuthProvider({ children }) {
     },
     {
       onSuccess: () => {
-        queryClient.setQueryData("authUser", null); // Reset user cache
+        queryClient.setQueryData('authUser', null); // Reset user cache
       },
     }
   );
 
   // **Menggunakan useMutation untuk register**
   const registerMutation = useMutation(
-    async ({ email, password, firstName, lastName }) => {
-      const response = await axios.post("/auth/register", {
+    async ({ email, username, phone, password, baseUrl }) => {
+      const response = await axios.post('/auth-tenant/register', {
         email,
         password,
-        firstName,
-        lastName,
+        username,
+        phone,
+        baseUrl,
       });
       const { accessToken, user } = response.data;
-      setSession(accessToken);
+      // setSession(accessToken);
       return user;
     },
     {
       onSuccess: (user) => {
-        queryClient.setQueryData("authUser", user); // Update cache authUser
+        queryClient.setQueryData('authUser', user); // Update cache authUser
       },
     }
   );

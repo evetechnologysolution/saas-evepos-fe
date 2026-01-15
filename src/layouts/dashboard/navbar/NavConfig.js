@@ -43,7 +43,7 @@ export const useNavConfig = () => {
           title: 'Dashboard',
           path: PATH_DASHBOARD.app,
           icon: ICONS.dashboard,
-          roles: ['Super Admin', 'Admin'],
+          roles: [''],
         },
         {
           title: 'POS',
@@ -62,7 +62,7 @@ export const useNavConfig = () => {
           path: PATH_DASHBOARD.cashier.delivery,
           icon: ICONS.delivery,
           roles: ['Super Admin', 'Cashier'],
-          total: ctx?.allNotif?.backlogDelivery || 0
+          total: ctx?.allNotif?.backlogDelivery || 0,
         },
         {
           title: 'PickUp',
@@ -87,7 +87,7 @@ export const useNavConfig = () => {
           path: PATH_DASHBOARD.chat.root,
           icon: ICONS.chat,
           roles: ['Super Admin', 'Cashier'],
-          total: ctx?.allNotif?.unreadMessage || 0
+          total: ctx?.allNotif?.unreadMessage || 0,
         },
         {
           title: 'Track History',
@@ -124,7 +124,7 @@ export const useNavConfig = () => {
           path: PATH_DASHBOARD.postCard.root,
           icon: ICONS.member,
           roles: ['Super Admin', 'Cashier'],
-          total: ctx?.allNotif?.newPostcard || 0
+          total: ctx?.allNotif?.newPostcard || 0,
         },
         {
           title: 'Print Count',
