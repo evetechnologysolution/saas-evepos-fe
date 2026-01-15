@@ -95,31 +95,30 @@ export default function RegisterEmailConfirm() {
 
   // Handle resend verification email
   const handleResend = useCallback(async () => {
-    console.log('UNDER DEVELOPMENT');
-    // if (disabled || resending || !email) return;
+    if (disabled || resending || !email) return;
 
-    // setResending(true);
-    // try {
-    //   await axios.post('/auth-tenant/register/resend-verification', { email });
+    setResending(true);
+    try {
+      await axios.post('/auth-tenant/register/resend-verify', { email });
 
-    //   enqueueSnackbar('Email verifikasi berhasil dikirim ulang! Silakan cek inbox Anda.', {
-    //     variant: 'success',
-    //     autoHideDuration: 4000,
-    //   });
+      enqueueSnackbar('Email verifikasi berhasil dikirim ulang! Silakan cek inbox Anda.', {
+        variant: 'success',
+        autoHideDuration: 4000,
+      });
 
-    //   // Reset counter and disable button
-    //   setCounter(RESEND_COOLDOWN);
-    //   setDisabled(true);
-    // } catch (error) {
-    //   const errorMessage = error.response?.data?.message || 'Gagal mengirim email. Silakan coba lagi.';
+      // Reset counter and disable button
+      setCounter(RESEND_COOLDOWN);
+      setDisabled(true);
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Gagal mengirim email. Silakan coba lagi.';
 
-    //   enqueueSnackbar(errorMessage, {
-    //     variant: 'error',
-    //     autoHideDuration: 4000,
-    //   });
-    // } finally {
-    //   setResending(false);
-    // }
+      enqueueSnackbar(errorMessage, {
+        variant: 'error',
+        autoHideDuration: 4000,
+      });
+    } finally {
+      setResending(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disabled, resending, email, enqueueSnackbar]);
 

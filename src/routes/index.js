@@ -45,6 +45,22 @@ export default function Router() {
           ),
         },
         {
+          path: 'lupa-password',
+          element: (
+            <GuestGuard>
+              <ForgotPassword />
+            </GuestGuard>
+          ),
+        },
+        {
+          path: 'reset-password',
+          element: (
+            <GuestGuard>
+              <ResetPassword />
+            </GuestGuard>
+          ),
+        },
+        {
           path: 'konfirmasi',
           element: (
             <GuestGuard>
@@ -850,6 +866,8 @@ const Login = Loadable(lazy(() => import('../pages/auth/Login')));
 const Register = Loadable(lazy(() => import('../pages/registerv2/screen')));
 const RegisterEmailConfirm = Loadable(lazy(() => import('../pages/registerv2/screen_emailconfirm')));
 const BusinessInformation = Loadable(lazy(() => import('../pages/registerv2/screen_businesinformation')));
+const ForgotPassword = Loadable(lazy(() => import('../pages/registerv2/screen_forgotpassword')));
+const ResetPassword = Loadable(lazy(() => import('../pages/registerv2/screen_resetpassword')));
 
 // Dashboard
 const Dashboard = Loadable(lazy(() => import('../pages/dashboard/Dashboard')));

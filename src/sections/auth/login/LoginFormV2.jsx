@@ -94,7 +94,7 @@ export default function LoginForm() {
           }}
         />
 
-        <Link to="/#" style={{ textDecoration: 'none' }}>
+        <Link to="/auth/lupa-password" style={{ textDecoration: 'none' }}>
           <Typography variant="body1" fontWeight={600} color="#5274D9">
             Lupa kata sandi?
           </Typography>
