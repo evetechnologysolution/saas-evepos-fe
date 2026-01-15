@@ -347,25 +347,25 @@ export default function Router() {
             {
               path: 'category',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryCategory />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                <LibraryCategory />
+                // </RoleBasedGuard>
               ),
             },
             {
               path: 'category/new',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryCategoryCreate />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                <LibraryCategoryCreate />
+                // </RoleBasedGuard>
               ),
             },
             {
               path: 'category/:id/edit',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryCategoryEdit />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                <LibraryCategoryEdit />
+                // </RoleBasedGuard>
               ),
             },
             {
