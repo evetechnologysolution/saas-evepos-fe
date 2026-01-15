@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 /* eslint-disable react/jsx-boolean-value */
-import React, { useState, forwardRef } from 'react';
+import React, { useState, forwardRef, useEffect } from 'react';
 import {
   Box,
   Checkbox,
@@ -23,6 +23,9 @@ import { FormProvider, RHFRadioGroup, RHFSelect, RHFSelectMultiple, RHFTextField
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
+import { handleMutationFeedback } from 'src/utils/mutationfeedback';
+import { useSnackbar } from 'notistack';
+import axios from 'src/utils/axios';
 import { product_category, customer_needed } from './mock';
 import schema from './schema';
 
@@ -30,10 +33,17 @@ const Transition = forwardRef((props, ref) => <Slide direction="up" ref={ref} {.
 
 export default function AlertNewUser() {
   const auth = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
 
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const closeDialog = () => setOpen(false);
+
+  useEffect(() => {
+    if (!auth?.user?.tenantRef?.hasSurvey) {
+      setOpen(true);
+    }
+  }, [auth]);
 
   const methods = useForm({
     resolver: yupResolver(schema),
@@ -43,14 +53,20 @@ export default function AlertNewUser() {
 
   const {
     handleSubmit,
-    control,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
     watch,
   } = methods;
 
-  const usedOtherAppBefore = watch('usedOtherAppBefore');
+  const usedOtherAppBefore = watch('hasUsed');
 
-  const onSubmit = async (data) => {};
+  const onSubmit = async (data) => {
+    await handleMutationFeedback(axios.post('/survey', data), {
+      successMsg: 'Berhasil! Dashboard akan diatur sesuai preferensimu.',
+      errorMsg: 'Gagal menyimpan data!',
+      onSuccess: () => closeDialog(),
+      enqueueSnackbar,
+    });
+  };
 
   const features = [
     {
@@ -220,7 +236,7 @@ export default function AlertNewUser() {
                     <Typography variant="body2" fontWeight={500} gutterBottom>
                       Apa jenis produk Anda?
                     </Typography>
-                    <RHFSelect name="businessSector" label="Pilih" SelectProps={{ native: false }}>
+                    <RHFSelect name="productType" label="Pilih" SelectProps={{ native: false }}>
                       {product_category.map((result, index) => (
                         <MenuItem value={result.value} key={index}>
                           {result.name}
@@ -234,7 +250,7 @@ export default function AlertNewUser() {
                       Apa yang Anda butuhkan di Evepos?
                     </Typography>
                     <RHFSelectMultiple
-                      name="needs"
+                      name="requiredFeatures"
                       label="Pilih"
                       placeholder="Pilih kebutuhan Anda"
                       options={customer_needed}
@@ -253,7 +269,7 @@ export default function AlertNewUser() {
                       Apakah Anda pernah menggunakan aplikasi lain sebelumnya?
                     </Typography>
                     <RHFRadioGroup
-                      name="usedOtherAppBefore"
+                      name="hasUsed"
                       options={[
                         { value: true, label: 'Ya' },
                         { value: false, label: 'Tidak' },
@@ -261,7 +277,7 @@ export default function AlertNewUser() {
                     />
                   </FormControl>
 
-                  {usedOtherAppBefore === true && (
+                  {usedOtherAppBefore === 'true' && (
                     <Box>
                       <Typography variant="body2" fontWeight={500} gutterBottom>
                         Nama aplikasi
@@ -279,11 +295,11 @@ export default function AlertNewUser() {
                       Dari manakah Anda mengetahui Evepos?
                     </Typography>
                     <RHFRadioGroup
-                      name="referralSource"
+                      name="source"
                       options={[
                         { value: 'google', label: 'Google' },
-                        { value: 'rekan_partner', label: 'Rekan/Partner Bisnis' },
-                        { value: 'lainnya', label: 'Lainnya' },
+                        { value: 'referral', label: 'Rekan/Partner Bisnis' },
+                        { value: 'other', label: 'Lainnya' },
                       ]}
                     />
                   </FormControl>
