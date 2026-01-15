@@ -33,7 +33,6 @@ import AlertNewUser from './modalinformation';
 // ----------------------------------------------------------------------
 
 export default function Dashboard() {
-  const theme = useTheme();
   const { themeStretch } = useSettings();
 
   const [filterRevenue, setFilterRevenue] = useState(null);

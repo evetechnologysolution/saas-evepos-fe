@@ -11,19 +11,19 @@ const Schema = Yup.object().shape({
       otherwise: (schema) => schema.notRequired(),
     }),
 
-  needs: Yup.array().of(Yup.string()).min(1, 'Select at least one option').required().default([]),
+  requiredFeatures: Yup.array().of(Yup.string()).min(1, 'Select at least one option').required().default([]),
 
-  usedOtherAppBefore: Yup.boolean().required(),
+  hasUsed: Yup.boolean().required(),
 
   otherAppName: Yup.string()
     .nullable()
-    .when('usedOtherAppBefore', {
+    .when('hasUsed', {
       is: true,
       then: (schema) => schema.required('Please specify the previous app').max(100),
       otherwise: (schema) => schema.notRequired(),
     }),
 
-  sourceInfo: Yup.string().oneOf(['google', 'referral', 'other']).required('Please choose where you heard about us'),
+  source: Yup.string().oneOf(['google', 'referral', 'other']).required('Please choose where you heard about us'),
 });
 
 export default Schema;
