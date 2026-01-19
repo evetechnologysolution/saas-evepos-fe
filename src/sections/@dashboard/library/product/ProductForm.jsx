@@ -96,7 +96,7 @@ export default function ProductForm({ isEdit, currentData }) {
       productionPrice: currentData?.productionPrice || 0,
       productionNotes: currentData?.productionNotes || '',
       category: currentData?.category || null,
-      // subcategory: currentData?.subcategory || null,
+      subcategory: currentData?.subcategory || null,
       unit: currentData?.unit || 'pcs',
       listNumber: currentData?.listNumber || '',
       extraNotes: currentData?.extraNotes || false,
@@ -306,7 +306,7 @@ export default function ProductForm({ isEdit, currentData }) {
                 ))}
               </RHFSelect>
 
-              {/* <RHFSelect
+              <RHFSelect
                 name="subcategory"
                 label="Subcategory"
                 placeholder="Subcategory"
@@ -340,7 +340,7 @@ export default function ProductForm({ isEdit, currentData }) {
                     {item?.name}
                   </MenuItem>
                 ))}
-              </RHFSelect> */}
+              </RHFSelect>
 
               <NumericFormat
                 customInput={RHFTextField}
