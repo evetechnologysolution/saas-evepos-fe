@@ -57,19 +57,19 @@ root.render(
       <HelmetProvider>
         <ReduxProvider store={store}>
           <PersistGate loading={null} persistor={persistor}>
-            {/* <MainContextProvider> */}
-            {/* <CashierContextProvider> */}
-            {/* <DashboardContextProvider> */}
-            <SettingsProvider>
-              <CollapseDrawerProvider>
-                <BrowserRouter>
-                  <App />
-                </BrowserRouter>
-              </CollapseDrawerProvider>
-            </SettingsProvider>
-            {/* </DashboardContextProvider> */}
-            {/* </CashierContextProvider> */}
-            {/* </MainContextProvider> */}
+            <MainContextProvider>
+              {/* <CashierContextProvider> */}
+              {/* <DashboardContextProvider> */}
+              <SettingsProvider>
+                <CollapseDrawerProvider>
+                  <BrowserRouter>
+                    <App />
+                  </BrowserRouter>
+                </CollapseDrawerProvider>
+              </SettingsProvider>
+              {/* </DashboardContextProvider> */}
+              {/* </CashierContextProvider> */}
+            </MainContextProvider>
           </PersistGate>
         </ReduxProvider>
       </HelmetProvider>

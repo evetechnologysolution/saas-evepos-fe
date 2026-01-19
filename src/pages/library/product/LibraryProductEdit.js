@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 // @mui
-import { Container } from '@mui/material';
+import { Box, CircularProgress, Container } from '@mui/material';
 import axios from '../../../utils/axios';
 // routes
 import { PATH_DASHBOARD } from '../../../routes/paths';
@@ -12,48 +12,40 @@ import Page from '../../../components/Page';
 import HeaderBreadcrumbs from '../../../components/HeaderBreadcrumbs';
 // sections
 import ProductForm from '../../../sections/@dashboard/library/product/ProductForm';
+import useProduct from './service/useProduct';
 
 // ----------------------------------------------------------------------
 
 export default function LibraryProductEdit() {
-    const { themeStretch } = useSettings();
+  const { themeStretch } = useSettings();
+  const { pathname } = useLocation();
+  const { getById } = useProduct();
+  const { id = '' } = useParams();
 
-    const { pathname } = useLocation();
+  const { data: productById, isLoading: loadingProductById } = getById(id);
 
-    const isEdit = pathname.includes('edit');
+  const isEdit = pathname.includes('edit');
 
-    const { id = '' } = useParams();
-
-    const [currentData, setCurrentData] = useState({});
-
-    useEffect(() => {
-        const getData = async () => {
-            try {
-                await axios.get(`/products/${id}`).then((response) => {
-                    setCurrentData(response.data);
-                });
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        getData();
-    }, [id]);
-
-    return (
-        <Page title="Product: Edit">
-            <Container maxWidth={themeStretch ? false : 'xl'}>
-                <HeaderBreadcrumbs
-                    heading='Edit Product'
-                    links={[
-                        { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                        { name: 'Library', href: PATH_DASHBOARD.library.root },
-                        { name: 'Product', href: PATH_DASHBOARD.library.product },
-                        { name: 'Edit' },
-                    ]}
-                />
-
-                <ProductForm isEdit={isEdit} currentData={currentData} />
-            </Container>
-        </Page>
-    );
+  return (
+    <Page title="Product: Edit">
+      <Container maxWidth={themeStretch ? false : 'xl'}>
+        <HeaderBreadcrumbs
+          heading="Edit Product"
+          links={[
+            { name: 'Dashboard', href: PATH_DASHBOARD.root },
+            { name: 'Library', href: PATH_DASHBOARD.library.root },
+            { name: 'Product', href: PATH_DASHBOARD.library.product },
+            { name: 'Edit' },
+          ]}
+        />
+        {loadingProductById ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <ProductForm isEdit={isEdit} currentData={productById} />
+        )}
+      </Container>
+    </Page>
+  );
 }
