@@ -1,71 +1,71 @@
-import PropTypes from "prop-types";
-import React, { createContext, useState, useEffect } from "react";
-import { useQuery, useQueryClient } from "react-query";
-import axios from "../utils/axios";
+import PropTypes from 'prop-types';
+import React, { createContext, useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from 'react-query';
+import axios from '../utils/axios';
 import {
   // sortByDate,
-  sortByName
-} from "../utils/getData";
+  sortByName,
+} from '../utils/getData';
 
 export const mainContext = createContext({
   socket: null,
-  setSocket: () => { },
+  setSocket: () => {},
   allNotif: null,
   product: [],
-  createProduct: () => { },
-  updateProduct: () => { },
-  deleteProduct: () => { },
+  createProduct: () => {},
+  updateProduct: () => {},
+  deleteProduct: () => {},
   category: [],
-  createCategory: () => { },
-  updateCategory: () => { },
-  deleteCategory: () => { },
+  createCategory: () => {},
+  updateCategory: () => {},
+  deleteCategory: () => {},
   subcategory: [],
-  createSubcategory: () => { },
-  updateSubcategory: () => { },
-  deleteSubcategory: () => { },
+  createSubcategory: () => {},
+  updateSubcategory: () => {},
+  deleteSubcategory: () => {},
   variant: [],
-  createVariant: () => { },
-  updateVariant: () => { },
-  deleteVariant: () => { },
+  createVariant: () => {},
+  updateVariant: () => {},
+  deleteVariant: () => {},
   currentPromo: [],
   detailPromo: [],
-  setDetailPromo: () => { },
-  getDetailPromo: () => { },
-  createPromotion: () => { },
-  updatePromotion: () => { },
-  deletePromotion: () => { },
-  createUserList: () => { },
-  updateUserList: () => { },
-  deleteUserList: () => { },
+  setDetailPromo: () => {},
+  getDetailPromo: () => {},
+  createPromotion: () => {},
+  updatePromotion: () => {},
+  deletePromotion: () => {},
+  createUserList: () => {},
+  updateUserList: () => {},
+  deleteUserList: () => {},
   currentAccount: {},
-  setCurrentAccount: () => { },
+  setCurrentAccount: () => {},
   businessInformation: {},
-  updatePersonalInformation: () => { },
-  updateBusinessInformation: () => { },
-  updatePassword: () => { },
+  updatePersonalInformation: () => {},
+  updateBusinessInformation: () => {},
+  updatePassword: () => {},
   receiptHeader: {},
-  updateReceiptHeader: () => { },
+  updateReceiptHeader: () => {},
   existCash: {},
-  setExistCash: () => { },
-  getExistCash: () => { },
-  createCash: () => { },
-  closeCash: () => { },
-  deleteCash: () => { },
+  setExistCash: () => {},
+  getExistCash: () => {},
+  createCash: () => {},
+  closeCash: () => {},
+  deleteCash: () => {},
   generalSettings: {},
-  setGeneralSettings: () => { },
-  getGeneralSettings: () => { },
-  saveGeneralSettings: () => { },
+  setGeneralSettings: () => {},
+  getGeneralSettings: () => {},
+  saveGeneralSettings: () => {},
   generalPerfume: {},
-  setGeneralPerfume: () => { },
-  getGeneralPerfume: () => { },
-  saveGeneralPerfume: () => { },
+  setGeneralPerfume: () => {},
+  getGeneralPerfume: () => {},
+  saveGeneralPerfume: () => {},
 });
 
 const MainContextProvider = ({ children }) => {
   const client = useQueryClient();
   const [socket, setSocket] = useState(null);
 
-  const [currentAccount, setCurrentAccount] = useState(process.env.REACT_APP_ACCOUNT_TYPE || "basic");
+  const [currentAccount, setCurrentAccount] = useState(process.env.REACT_APP_ACCOUNT_TYPE || 'basic');
   const [detailPromo, setDetailPromo] = useState({});
 
   const [existCash, setExistCash] = useState({});
@@ -73,12 +73,11 @@ const MainContextProvider = ({ children }) => {
   const [generalSettings, setGeneralSettings] = useState({});
   const [generalPerfume, setGeneralPerfume] = useState({});
 
-
-  // Fetch notification 
+  // Fetch notification
   const { data: allNotif } = useQuery(
-    ["allNotif"],
+    ['allNotif'],
     async () => {
-      const res = await axios.get("/notification/all");
+      const res = await axios.get('/notification/all');
       return res.data;
     },
     {
@@ -86,94 +85,94 @@ const MainContextProvider = ({ children }) => {
     }
   );
 
-  // Fetch product data 
+  // Fetch product data
   const { data: product = [] } = useQuery(
-    ["allProduct"],
+    ['allProduct'],
     async () => {
-      const res = await axios.get("/products");
-      return res.data;
+      const res = await axios.get('/product');
+      return res.data?.docs;
     },
     {
       refetchOnWindowFocus: false, // Prevents refetch on window focus
     }
   );
 
-  // Fetch category data 
+  // Fetch category data
   const { data: category = [] } = useQuery(
-    ["allCategory"],
+    ['allCategory'],
     async () => {
-      const res = await axios.get("/categories");
-      return res.data;
+      const res = await axios.get('/category');
+      return res.data?.docs;
     },
     {
-      refetchOnWindowFocus: false
+      refetchOnWindowFocus: false,
     }
   );
 
-  // Fetch subcategory data 
+  // Fetch subcategory data
   const { data: subcategory = [] } = useQuery(
-    ["allSubcategory"],
+    ['allSubcategory'],
     async () => {
-      const res = await axios.get("/subcategories");
-      return res.data;
+      const res = await axios.get('/subcategory');
+      return res.data?.docs;
     },
     {
-      refetchOnWindowFocus: false
+      refetchOnWindowFocus: false,
     }
   );
 
-  // Fetch variant data 
+  // Fetch variant data
   const { data: variant = [] } = useQuery(
-    ["allVariant"],
+    ['allVariant'],
     async () => {
-      const res = await axios.get("/variants");
+      const res = await axios.get('/variant');
       return sortByName(res.data);
     },
     {
-      refetchOnWindowFocus: false
+      refetchOnWindowFocus: false,
     }
   );
 
-  // Fetch promotion available data 
+  // Fetch promotion available data
   const { data: currentPromo = [] } = useQuery(
-    ["allCurrentPromotion"],
+    ['allCurrentPromotion'],
     async () => {
-      const res = await axios.get("/promotions/available");
+      const res = await axios.get('/promotions/available');
       return res.data;
     },
     {
-      refetchOnWindowFocus: false
+      refetchOnWindowFocus: false,
     }
   );
 
-  // Fetch receipt setting data 
+  // Fetch receipt setting data
   const { data: receiptHeader = {} } = useQuery(
-    ["receiptHeader"],
+    ['receiptHeader'],
     async () => {
-      const res = await axios.get("/receipt-setting");
+      const res = await axios.get('/receipt-setting');
       return res.data;
     },
     {
-      refetchOnWindowFocus: false
+      refetchOnWindowFocus: false,
     }
   );
 
-  // Fetch receipt setting data 
+  // Fetch receipt setting data
   const { data: businessInformation = {} } = useQuery(
-    ["businessInformation"],
+    ['businessInformation'],
     async () => {
-      const res = await axios.get("/informations");
+      const res = await axios.get('/informations');
       return res.data;
     },
     {
-      refetchOnWindowFocus: false
+      refetchOnWindowFocus: false,
     }
   );
 
   const createProduct = async (data) => {
     try {
-      await axios.post("/products", data);
-      client.invalidateQueries("allProduct");
+      await axios.post('/products', data);
+      client.invalidateQueries('allProduct');
     } catch (error) {
       console.error(error);
     }
@@ -182,7 +181,7 @@ const MainContextProvider = ({ children }) => {
   const updateProduct = async (data, newData) => {
     try {
       await axios.patch(`/products/${data._id}`, newData);
-      client.invalidateQueries("allProduct");
+      client.invalidateQueries('allProduct');
     } catch (error) {
       console.error(error);
     }
@@ -191,7 +190,7 @@ const MainContextProvider = ({ children }) => {
   const deleteProduct = async (id) => {
     try {
       await axios.delete(`/products/${id}`);
-      client.invalidateQueries("allProduct");
+      client.invalidateQueries('allProduct');
     } catch (error) {
       console.error(error);
     }
@@ -209,9 +208,9 @@ const MainContextProvider = ({ children }) => {
 
   const createPromotion = async (data) => {
     try {
-      await axios.post("/promotions", data);
-      client.invalidateQueries("allProduct");
-      client.invalidateQueries("allCurrentPromotion");
+      await axios.post('/promotions', data);
+      client.invalidateQueries('allProduct');
+      client.invalidateQueries('allCurrentPromotion');
     } catch (error) {
       console.error(error);
     }
@@ -220,8 +219,8 @@ const MainContextProvider = ({ children }) => {
   const updatePromotion = async (id, newData) => {
     try {
       await axios.patch(`/promotions/${id}`, newData);
-      client.invalidateQueries("allProduct");
-      client.invalidateQueries("allCurrentPromotion");
+      client.invalidateQueries('allProduct');
+      client.invalidateQueries('allCurrentPromotion');
     } catch (error) {
       console.error(error);
     }
@@ -230,8 +229,8 @@ const MainContextProvider = ({ children }) => {
   const deletePromotion = async (id) => {
     try {
       await axios.delete(`/promotions/${id}`);
-      client.invalidateQueries("allProduct");
-      client.invalidateQueries("allCurrentPromotion");
+      client.invalidateQueries('allProduct');
+      client.invalidateQueries('allCurrentPromotion');
     } catch (error) {
       console.error(error);
     }
@@ -239,8 +238,8 @@ const MainContextProvider = ({ children }) => {
 
   const createCategory = async (data) => {
     try {
-      await axios.post("/categories", data);
-      client.invalidateQueries("allCategory");
+      await axios.post('/categories', data);
+      client.invalidateQueries('allCategory');
     } catch (error) {
       console.error(error);
     }
@@ -249,7 +248,7 @@ const MainContextProvider = ({ children }) => {
   const updateCategory = async (data, newData) => {
     try {
       await axios.patch(`/categories/${data._id}`, newData);
-      client.invalidateQueries("allCategory");
+      client.invalidateQueries('allCategory');
     } catch (error) {
       console.error(error);
     }
@@ -258,7 +257,7 @@ const MainContextProvider = ({ children }) => {
   const deleteCategory = async (id) => {
     try {
       await axios.delete(`/categories/${id}`);
-      client.invalidateQueries("allCategory");
+      client.invalidateQueries('allCategory');
     } catch (error) {
       console.error(error);
     }
@@ -266,8 +265,8 @@ const MainContextProvider = ({ children }) => {
 
   const createSubcategory = async (data) => {
     try {
-      await axios.post("/subcategories", data);
-      client.invalidateQueries("allSubcategory");
+      await axios.post('/subcategories', data);
+      client.invalidateQueries('allSubcategory');
     } catch (error) {
       console.error(error);
     }
@@ -276,7 +275,7 @@ const MainContextProvider = ({ children }) => {
   const updateSubcategory = async (data, newData) => {
     try {
       await axios.patch(`/subcategories/${data._id}`, newData);
-      client.invalidateQueries("allSubcategory");
+      client.invalidateQueries('allSubcategory');
     } catch (error) {
       console.error(error);
     }
@@ -285,7 +284,7 @@ const MainContextProvider = ({ children }) => {
   const deleteSubcategory = async (id) => {
     try {
       await axios.delete(`/subcategories/${id}`);
-      client.invalidateQueries("allSubcategory");
+      client.invalidateQueries('allSubcategory');
     } catch (error) {
       console.error(error);
     }
@@ -293,10 +292,10 @@ const MainContextProvider = ({ children }) => {
 
   const createVariant = async (data) => {
     try {
-      await axios.post("/variants", data);
-      client.invalidateQueries("allVariant");
-      client.invalidateQueries("allProduct");
-      client.invalidateQueries("allCurrentPromotion");
+      await axios.post('/variants', data);
+      client.invalidateQueries('allVariant');
+      client.invalidateQueries('allProduct');
+      client.invalidateQueries('allCurrentPromotion');
     } catch (error) {
       console.error(error);
     }
@@ -305,9 +304,9 @@ const MainContextProvider = ({ children }) => {
   const updateVariant = async (id, newData) => {
     try {
       await axios.patch(`/variants/${id}`, newData);
-      client.invalidateQueries("allVariant");
-      client.invalidateQueries("allProduct");
-      client.invalidateQueries("allCurrentPromotion");
+      client.invalidateQueries('allVariant');
+      client.invalidateQueries('allProduct');
+      client.invalidateQueries('allCurrentPromotion');
     } catch (error) {
       console.error(error);
     }
@@ -316,9 +315,9 @@ const MainContextProvider = ({ children }) => {
   const deleteVariant = async (id) => {
     try {
       await axios.delete(`/variants/${id}`);
-      client.invalidateQueries("allVariant");
-      client.invalidateQueries("allProduct");
-      client.invalidateQueries("allCurrentPromotion");
+      client.invalidateQueries('allVariant');
+      client.invalidateQueries('allProduct');
+      client.invalidateQueries('allCurrentPromotion');
     } catch (error) {
       console.error(error);
     }
@@ -327,7 +326,7 @@ const MainContextProvider = ({ children }) => {
   // for user list
   const createUserList = async (data) => {
     try {
-      await axios.post("/users", data);
+      await axios.post('/users', data);
     } catch (error) {
       console.error(error);
     }
@@ -351,8 +350,8 @@ const MainContextProvider = ({ children }) => {
 
   const updateBusinessInformation = async (data) => {
     try {
-      await axios.post("/informations/save", data);
-      client.invalidateQueries("businessInformation");
+      await axios.post('/informations/save', data);
+      client.invalidateQueries('businessInformation');
     } catch (error) {
       console.error(error);
     }
@@ -377,18 +376,17 @@ const MainContextProvider = ({ children }) => {
 
   const updateReceiptHeader = async (data) => {
     try {
-      await axios.post("/receipt-setting/save", data);
-      client.invalidateQueries("receiptHeader");
+      await axios.post('/receipt-setting/save', data);
+      client.invalidateQueries('receiptHeader');
     } catch (error) {
       console.error(error);
     }
   };
 
-
   // for open & close cash cashier
   const getExistCash = async () => {
     try {
-      await axios.get("/cash-balance/exist").then((response) => {
+      await axios.get('/cash-balance/exist').then((response) => {
         setExistCash(response.data);
       });
     } catch (error) {
@@ -398,16 +396,16 @@ const MainContextProvider = ({ children }) => {
 
   const createCash = async (data) => {
     try {
-      const response = await axios.post("/cash-balance/", data);
+      const response = await axios.post('/cash-balance/', data);
       if (response.status === 200) {
         if (data.cashOut) {
           const objExpense = {
             date: new Date(),
             code: 8, // pengeluaran outlet
             description: data.title,
-            amount: data.cashOut
+            amount: data.cashOut,
           };
-          await axios.post("/expense/", objExpense);
+          await axios.post('/expense/', objExpense);
         }
         getExistCash();
       }
@@ -418,7 +416,7 @@ const MainContextProvider = ({ children }) => {
 
   const closeCash = async (data) => {
     try {
-      await axios.post("/cash-balance/close", data).then((response) => {
+      await axios.post('/cash-balance/close', data).then((response) => {
         if (response.status === 200) {
           getExistCash();
         }
@@ -439,7 +437,7 @@ const MainContextProvider = ({ children }) => {
   // for other setting
   const getGeneralSettings = async () => {
     try {
-      await axios.get("/settings/").then((response) => {
+      await axios.get('/settings/').then((response) => {
         setGeneralSettings(response.data);
       });
     } catch (error) {
@@ -449,7 +447,7 @@ const MainContextProvider = ({ children }) => {
 
   const saveGeneralSettings = async (data) => {
     try {
-      await axios.post("/settings/", data).then((response) => {
+      await axios.post('/settings/', data).then((response) => {
         if (response.status === 200) {
           getGeneralSettings();
         }
@@ -462,7 +460,7 @@ const MainContextProvider = ({ children }) => {
   // for perfume
   const getGeneralPerfume = async () => {
     try {
-      await axios.get("/variants?perfume=yes").then((response) => {
+      await axios.get('/variants?perfume=yes').then((response) => {
         setGeneralPerfume(response.data[0]);
       });
     } catch (error) {
@@ -472,7 +470,7 @@ const MainContextProvider = ({ children }) => {
 
   const saveGeneralPerfume = async (data) => {
     try {
-      await axios.post("/variants/perfume/", data).then((response) => {
+      await axios.post('/variants/perfume/', data).then((response) => {
         if (response.status === 200) {
           getGeneralPerfume();
         }
@@ -485,11 +483,7 @@ const MainContextProvider = ({ children }) => {
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        await Promise.all([
-          getExistCash(),
-          getGeneralSettings(),
-          getGeneralPerfume()
-        ]);
+        await Promise.all([getExistCash(), getGeneralSettings(), getGeneralPerfume()]);
       } catch (err) {
         console.error(err);
       }

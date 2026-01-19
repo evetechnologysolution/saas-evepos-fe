@@ -323,25 +323,25 @@ export default function Router() {
             {
               path: 'product',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryProduct />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                <LibraryProduct />
+                // </RoleBasedGuard>
               ),
             },
             {
               path: 'product/new',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryProductCreate />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                <LibraryProductCreate />
+                // </RoleBasedGuard>
               ),
             },
             {
               path: 'product/:id/edit',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryProductEdit />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                <LibraryProductEdit />
+                // </RoleBasedGuard>
               ),
             },
             {

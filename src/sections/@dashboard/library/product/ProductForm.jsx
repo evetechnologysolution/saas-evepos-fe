@@ -1,30 +1,45 @@
-import PropTypes from "prop-types";
-import * as Yup from "yup";
-import { useState, useEffect, useContext, useCallback, useMemo } from "react";
-import { useSnackbar } from "notistack";
-import { useNavigate } from "react-router-dom";
+/* eslint-disable react/prop-types */
+import PropTypes from 'prop-types';
+import { useState, useEffect, useContext, useCallback, useMemo } from 'react';
+import { useSnackbar } from 'notistack';
+import { useNavigate } from 'react-router-dom';
 // form
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
-import { LoadingButton } from "@mui/lab";
-import { styled, Card, Grid, Stack, Typography, InputAdornment, MenuItem, Divider, Button, FormControlLabel, Switch } from "@mui/material";
-import { NumericFormat } from "react-number-format";
+import { LoadingButton } from '@mui/lab';
+import {
+  styled,
+  Card,
+  Grid,
+  Stack,
+  Typography,
+  InputAdornment,
+  MenuItem,
+  Divider,
+  Button,
+  FormControlLabel,
+  Switch,
+  CircularProgress,
+  Box,
+} from '@mui/material';
+import { NumericFormat } from 'react-number-format';
 // routes
-import { PATH_DASHBOARD } from "../../../../routes/paths";
+import { handleMutationFeedback } from 'src/utils/mutationfeedback';
+import { PATH_DASHBOARD } from '../../../../routes/paths';
 // components
-import Iconify from "../../../../components/Iconify";
+import Iconify from '../../../../components/Iconify';
 import {
   FormProvider,
   RHFTextField,
-  // RHFEditor,
   RHFSelect,
   RHFUploadSingleFile,
   RHFSwitch,
-} from "../../../../components/hook-form";
+} from '../../../../components/hook-form';
 // context
-import { mainContext } from "../../../../contexts/MainContext";
-
+import { mainContext } from '../../../../contexts/MainContext';
+import schema from '../../../../pages/library/product/schema';
+import useProduct from '../../../../pages/library/product/service/useProduct';
 // ----------------------------------------------------------------------
 
 ProductForm.propTypes = {
@@ -34,67 +49,56 @@ ProductForm.propTypes = {
 
 const CustomSwitch = styled(Switch)(({ theme }) => ({
   padding: 8,
-  "& .MuiSwitch-switchBase": {
-    "&.Mui-checked": {
-      color: "#fff",
-      "& + .MuiSwitch-track": {
+  '& .MuiSwitch-switchBase': {
+    '&.Mui-checked': {
+      color: '#fff',
+      '& + .MuiSwitch-track': {
         opacity: 1,
       },
     },
   },
-  "& .MuiSwitch-thumb": {
-    boxShadow: "0 2px 4px 0 rgb(0 35 11 / 20%)",
+  '& .MuiSwitch-thumb': {
+    boxShadow: '0 2px 4px 0 rgb(0 35 11 / 20%)',
     width: 16,
     height: 16,
     margin: 2,
-    transition: theme.transitions.create(["width"], {
+    transition: theme.transitions.create(['width'], {
       duration: 200,
     }),
   },
-  "& .MuiSwitch-track": {
+  '& .MuiSwitch-track': {
     borderRadius: 22 / 2,
     opacity: 1,
-    boxSizing: "border-box",
+    boxSizing: 'border-box',
   },
 }));
 
 export default function ProductForm({ isEdit, currentData }) {
   const navigate = useNavigate();
+  const { create, update, list } = useProduct();
 
   const ctx = useContext(mainContext);
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const selectedList = ctx.product || [];
-  const [loading, setLoading] = useState(false);
-
-  const NewDataSchema = Yup.object().shape({
-    id: Yup.string(),
-    name: Yup.string().required("Name is required"),
-    image: Yup.string(),
-    // price: Yup.number().moreThan(0, "Price is required"),
-    price: Yup.number(),
-    description: Yup.string(),
-    category: Yup.string().required("Category is required"),
-    subcategory: Yup.string().required("Subcategory is required"),
-    unit: Yup.string().required("Unit is required"),
-    listNumber: Yup.string(),
+  const { data: selectedList, isLoading } = list({
+    page: 1,
+    perPage: 100,
   });
 
   const defaultValues = useMemo(
     () => ({
-      id: currentData?._id || "",
-      name: currentData?.name || "",
-      image: currentData?.image || "",
+      id: currentData?._id || '',
+      name: currentData?.name || '',
+      image: currentData?.image || '',
       price: currentData?.price || 0,
-      description: currentData?.description || "",
+      description: currentData?.description || '',
       productionPrice: currentData?.productionPrice || 0,
-      productionNotes: currentData?.productionNotes || "",
-      category: currentData?.category || "",
-      subcategory: currentData?.subcategory || "",
-      unit: currentData?.unit || "pcs",
-      listNumber: currentData?.listNumber || "",
-      isLaundryBag: currentData?.isLaundryBag || false,
+      productionNotes: currentData?.productionNotes || '',
+      category: currentData?.category || null,
+      // subcategory: currentData?.subcategory || null,
+      unit: currentData?.unit || 'pcs',
+      listNumber: currentData?.listNumber || '',
       extraNotes: currentData?.extraNotes || false,
       isRecommended: currentData?.isRecommended || false,
       isAvailable: currentData?.isAvailable || false,
@@ -104,18 +108,23 @@ export default function ProductForm({ isEdit, currentData }) {
   );
 
   const methods = useForm({
-    resolver: yupResolver(NewDataSchema),
+    resolver: yupResolver(schema),
     defaultValues,
   });
 
-  const { reset, watch, getValues, setValue, handleSubmit } = methods;
+  const {
+    reset,
+    watch,
+    getValues,
+    setValue,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = methods;
 
   const values = watch();
 
-  const defaultVariant = { variantRef: "", isMandatory: true, isMultiple: false };
+  const defaultVariant = { variantRef: '', isMandatory: true, isMultiple: false };
 
-  // list of variant
-  // const [variantList, setVariantList] = useState([defaultVariant]);
   const [variantList, setVariantList] = useState([]);
 
   const handleVariantChange = (e, index) => {
@@ -147,14 +156,6 @@ export default function ProductForm({ isEdit, currentData }) {
     setVariantList(list);
   };
 
-  const checkKiloan = (id = "") => {
-    if (id) {
-      const check = ctx?.category?.find((item) => item?._id === id && item?.name?.toLowerCase() === "kiloan");
-      return check || false
-    };
-    return false;
-  }
-
   useEffect(() => {
     if (isEdit && currentData) {
       reset(defaultValues);
@@ -172,7 +173,7 @@ export default function ProductForm({ isEdit, currentData }) {
 
       if (file) {
         setValue(
-          "image",
+          'image',
           Object.assign(file, {
             preview: URL.createObjectURL(file),
           })
@@ -182,41 +183,51 @@ export default function ProductForm({ isEdit, currentData }) {
     [setValue]
   );
 
-  const onSubmit = async () => {
+  const onSubmit = async (data) => {
     try {
-      setLoading(true);
       const formData = new FormData();
-      formData.append("name", values.name);
-      formData.append("price", values.price);
-      formData.append("productionPrice", values.productionPrice);
-      formData.append("productionNotes", values.productionNotes);
-      formData.append("category", values.category);
-      formData.append("subcategory", values.subcategory);
-      formData.append("description", values.description);
-      formData.append("unit", values.unit);
-      formData.append("variantString", JSON.stringify(variantList));
-      formData.append("listNumber", Number(values.listNumber));
-      formData.append("image", values.image);
-      formData.append("isLaundryBag", values.isLaundryBag);
-      formData.append("extraNotes", values.extraNotes);
-      formData.append("isRecommended", values.isRecommended);
 
-      if (isEdit) {
-        if (checkKiloan(values.category) && currentData.amountKg <= 1) {
-          formData.append("amountKg", 1);
-        }
-        formData.append("isAvailable", values.isAvailable);
-        await ctx.updateProduct({ _id: currentData._id }, formData);
-      } else {
-        formData.append("amountKg", checkKiloan(values.category) ? 1 : 0);
-        await ctx.createProduct(formData);
+      // field dasar
+      formData.append('name', data.name);
+      formData.append('price', data.price);
+      formData.append('productionPrice', data.productionPrice);
+      formData.append('productionNotes', data.productionNotes || '');
+      formData.append('description', data.description || '');
+      formData.append('unit', data.unit);
+
+      // relasi
+      formData.append('category', data.category || '');
+      // formData.append('subcategory', data.subcategory || '');
+
+      // boolean
+      formData.append('isAvailable', data.isAvailable);
+      formData.append('extraNotes', data.extraNotes);
+      formData.append('isRecommended', data.isRecommended);
+
+      // number
+      formData.append('listNumber', Number(data.listNumber));
+
+      // variant => stringify, karena form-data tidak bisa array object langsung
+      formData.append('variantString', JSON.stringify(data.variant || []));
+
+      // image (string URL / File / null)
+      if (data.image instanceof File) {
+        formData.append('image', data.image);
       }
-      reset();
-      enqueueSnackbar(!isEdit ? "Create success!" : "Update success!");
-      navigate(PATH_DASHBOARD.library.product);
-    } catch (error) {
-      setLoading(false);
-      console.error(error);
+
+      // create atau update
+      const mutation = isEdit
+        ? update.mutateAsync({ id: currentData._id, payload: formData })
+        : create.mutateAsync(formData);
+
+      await handleMutationFeedback(mutation, {
+        successMsg: isEdit ? 'Produk berhasil diperbarui!' : 'Produk berhasil ditambahkan!',
+        errorMsg: 'Gagal menyimpan produk!',
+        onSuccess: () => navigate('/dashboard/library/product'),
+        enqueueSnackbar,
+      });
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -240,9 +251,9 @@ export default function ProductForm({ isEdit, currentData }) {
                 InputProps={{
                   startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
                 }}
-                value={getValues("price") === 0 ? "" : getValues("price")}
+                value={getValues('price') === 0 ? '' : getValues('price')}
                 onValueChange={(values) => {
-                  setValue("price", Number(values.value))
+                  setValue('price', Number(values.value));
                 }}
               />
               {/* <div>
@@ -270,9 +281,9 @@ export default function ProductForm({ isEdit, currentData }) {
                   sx={{
                     mx: 1,
                     borderRadius: 0.75,
-                    typography: "body2",
-                    fontStyle: "italic",
-                    color: "text.secondary",
+                    typography: 'body2',
+                    fontStyle: 'italic',
+                    color: 'text.secondary',
                   }}
                   disabled
                 >
@@ -287,7 +298,7 @@ export default function ProductForm({ isEdit, currentData }) {
                       mx: 1,
                       my: 0.5,
                       borderRadius: 0.75,
-                      typography: "body2",
+                      typography: 'body2',
                     }}
                   >
                     {item?.name}
@@ -295,7 +306,7 @@ export default function ProductForm({ isEdit, currentData }) {
                 ))}
               </RHFSelect>
 
-              <RHFSelect
+              {/* <RHFSelect
                 name="subcategory"
                 label="Subcategory"
                 placeholder="Subcategory"
@@ -306,9 +317,9 @@ export default function ProductForm({ isEdit, currentData }) {
                   sx={{
                     mx: 1,
                     borderRadius: 0.75,
-                    typography: "body2",
-                    fontStyle: "italic",
-                    color: "text.secondary",
+                    typography: 'body2',
+                    fontStyle: 'italic',
+                    color: 'text.secondary',
                   }}
                   disabled
                 >
@@ -323,13 +334,13 @@ export default function ProductForm({ isEdit, currentData }) {
                       mx: 1,
                       my: 0.5,
                       borderRadius: 0.75,
-                      typography: "body2",
+                      typography: 'body2',
                     }}
                   >
                     {item?.name}
                   </MenuItem>
                 ))}
-              </RHFSelect>
+              </RHFSelect> */}
 
               <NumericFormat
                 customInput={RHFTextField}
@@ -343,35 +354,30 @@ export default function ProductForm({ isEdit, currentData }) {
                 InputProps={{
                   startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
                 }}
-                value={getValues("productionPrice") === 0 ? "" : getValues("productionPrice")}
+                value={getValues('productionPrice') === 0 ? '' : getValues('productionPrice')}
                 onValueChange={(values) => {
-                  setValue("productionPrice", Number(values.value))
+                  setValue('productionPrice', Number(values.value));
                 }}
               />
 
               {/* <RHFTextField name="productionNotes" label="Production Notes" autoComplete="off" multiline rows={5} /> */}
 
-              <RHFSelect
-                name="unit"
-                label="Unit"
-                placeholder="Unit"
-                SelectProps={{ native: false }}
-              >
+              <RHFSelect name="unit" label="Unit" placeholder="Unit" SelectProps={{ native: false }}>
                 <MenuItem
                   value=""
                   sx={{
                     mx: 1,
                     borderRadius: 0.75,
-                    typography: "body2",
-                    fontStyle: "italic",
-                    color: "text.secondary",
+                    typography: 'body2',
+                    fontStyle: 'italic',
+                    color: 'text.secondary',
                   }}
                   disabled
                 >
                   Select One
                 </MenuItem>
                 <Divider />
-                {["pcs", "kg", "m2", "cup"].map((item, n) => (
+                {['pcs', 'kg', 'm2', 'cup'].map((item, n) => (
                   <MenuItem
                     key={n}
                     value={item}
@@ -379,7 +385,7 @@ export default function ProductForm({ isEdit, currentData }) {
                       mx: 1,
                       my: 0.5,
                       borderRadius: 0.75,
-                      typography: "body2",
+                      typography: 'body2',
                     }}
                   >
                     {item}
@@ -388,24 +394,33 @@ export default function ProductForm({ isEdit, currentData }) {
               </RHFSelect>
 
               <div>
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>List Number</Typography>
-                <Stack
-                  display="grid"
-                  gap={1}
-                  gridTemplateColumns="repeat(auto-fit, 80px)"
-                >
-                  {Array.from({ length: 50 }).map((_, n) => (
-                    <Button
-                      key={n}
-                      variant={values.listNumber === n + 1 ? "contained" : "outlined"}
-                      sx={{ height: 50 }}
-                      onClick={() => setValue("listNumber", n + 1)}
-                      disabled={selectedList?.some(item => item?.listNumber === n + 1) && currentData?.listNumber !== n + 1 ? Boolean(true) : Boolean(false)}
-                    >
-                      {n + 1}
-                    </Button>
-                  ))}
-                </Stack>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                  List Number
+                </Typography>
+                {isLoading ? (
+                  <Box>
+                    <CircularProgress />
+                  </Box>
+                ) : (
+                  <Stack display="grid" gap={1} gridTemplateColumns="repeat(auto-fit, 80px)">
+                    {Array.from({ length: 50 }).map((_, n) => (
+                      <Button
+                        key={n}
+                        variant={values.listNumber === n + 1 ? 'contained' : 'outlined'}
+                        sx={{ height: 50 }}
+                        onClick={() => setValue('listNumber', n + 1)}
+                        disabled={
+                          selectedList?.docs?.some((item) => item?.listNumber === n + 1) &&
+                          currentData?.listNumber !== n + 1
+                            ? Boolean(true)
+                            : Boolean(false)
+                        }
+                      >
+                        {n + 1}
+                      </Button>
+                    ))}
+                  </Stack>
+                )}
               </div>
 
               <Typography variant="subtitle1">List of Variant</Typography>
@@ -415,7 +430,7 @@ export default function ProductForm({ isEdit, currentData }) {
                     name={`variant${index}`}
                     SelectProps={{ native: false }}
                     onChange={(e) => handleVariantChange(e, index)}
-                    value={variant?.variantRef || ""}
+                    value={variant?.variantRef || ''}
                     required
                   >
                     <MenuItem
@@ -423,9 +438,9 @@ export default function ProductForm({ isEdit, currentData }) {
                       sx={{
                         mx: 1,
                         borderRadius: 0.75,
-                        typography: "body2",
-                        fontStyle: "italic",
-                        color: "text.secondary",
+                        typography: 'body2',
+                        fontStyle: 'italic',
+                        color: 'text.secondary',
                       }}
                       disabled
                     >
@@ -440,16 +455,16 @@ export default function ProductForm({ isEdit, currentData }) {
                           mx: 1,
                           my: 0.5,
                           borderRadius: 0.75,
-                          typography: "body2",
+                          typography: 'body2',
                         }}
                       >
-                        <div style={{ display: "flex", flexDirection: "column" }}>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
                           <Typography variant="body2">{item.name}</Typography>
                           <Typography variant="body2" color="primary">
                             {item.options.map((field, i) => (
                               <span key={i}>
                                 {field.name}
-                                {item.options.length > 1 && i !== item.options.length - 1 && ", "}
+                                {item.options.length > 1 && i !== item.options.length - 1 && ', '}
                               </span>
                             ))}
                           </Typography>
@@ -460,7 +475,7 @@ export default function ProductForm({ isEdit, currentData }) {
                   <FormControlLabel
                     name={`isRequired[${index}]`}
                     labelPlacement="start"
-                    sx={{ mx: 0, width: 0.5, justifyContent: "space-between" }}
+                    sx={{ mx: 0, width: 0.5, justifyContent: 'space-between' }}
                     control={
                       <CustomSwitch
                         checked={Boolean(variant.isMandatory)}
@@ -472,7 +487,7 @@ export default function ProductForm({ isEdit, currentData }) {
                         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
                           Mandatory
                         </Typography>
-                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                           Enable for mandatory
                         </Typography>
                       </>
@@ -481,7 +496,7 @@ export default function ProductForm({ isEdit, currentData }) {
                   <FormControlLabel
                     name={`isMultiple[${index}]`}
                     labelPlacement="start"
-                    sx={{ mx: 0, width: 0.5, justifyContent: "space-between" }}
+                    sx={{ mx: 0, width: 0.5, justifyContent: 'space-between' }}
                     control={
                       <CustomSwitch
                         checked={Boolean(variant.isMultiple)}
@@ -493,7 +508,7 @@ export default function ProductForm({ isEdit, currentData }) {
                         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
                           Multiple Select
                         </Typography>
-                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                           Enable for multiple
                         </Typography>
                       </>
@@ -504,9 +519,15 @@ export default function ProductForm({ isEdit, currentData }) {
                       color="error"
                       variant="contained"
                       sx={{
-                        boxShadow: "0", p: 0, minWidth: 30, height: 30, mb: 0.5, bgcolor: "#FFC2B4", color: "red",
-                        "&:hover": {
-                          bgcolor: "#FFC2B4"
+                        boxShadow: '0',
+                        p: 0,
+                        minWidth: 30,
+                        height: 30,
+                        mb: 0.5,
+                        bgcolor: '#FFC2B4',
+                        color: 'red',
+                        '&:hover': {
+                          bgcolor: '#FFC2B4',
                         },
                       }}
                       size="large"
@@ -524,22 +545,6 @@ export default function ProductForm({ isEdit, currentData }) {
               </Stack>
 
               <RHFSwitch
-                name="isLaundryBag"
-                labelPlacement="start"
-                label={
-                  <>
-                    <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                      Laundry Bag Day
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                      Turn on for laundry bag day option
-                    </Typography>
-                  </>
-                }
-                sx={{ mx: 0, width: 1, justifyContent: "space-between" }}
-              />
-
-              <RHFSwitch
                 name="extraNotes"
                 labelPlacement="start"
                 label={
@@ -547,12 +552,12 @@ export default function ProductForm({ isEdit, currentData }) {
                     <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
                       Extra Notes
                     </Typography>
-                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                       Turn off if the product has no extra notes
                     </Typography>
                   </>
                 }
-                sx={{ mx: 0, width: 1, justifyContent: "space-between" }}
+                sx={{ mx: 0, width: 1, justifyContent: 'space-between' }}
               />
 
               <RHFSwitch
@@ -563,12 +568,12 @@ export default function ProductForm({ isEdit, currentData }) {
                     <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
                       Recommended
                     </Typography>
-                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                       Enable this if the product is recommended
                     </Typography>
                   </>
                 }
-                sx={{ mx: 0, width: 1, justifyContent: "space-between" }}
+                sx={{ mx: 0, width: 1, justifyContent: 'space-between' }}
               />
 
               {isEdit && (
@@ -580,20 +585,22 @@ export default function ProductForm({ isEdit, currentData }) {
                       <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
                         Available
                       </Typography>
-                      <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                         Disable this if the product is out of stock
                       </Typography>
                     </>
                   }
-                  sx={{ mx: 0, width: 1, justifyContent: "space-between" }}
+                  sx={{ mx: 0, width: 1, justifyContent: 'space-between' }}
                 />
               )}
             </Stack>
 
             <Stack direction="row" justifyContent="flex-end" sx={{ mt: 3 }} gap={1}>
-              <Button variant="outlined" onClick={() => navigate(PATH_DASHBOARD.library.product)}>Cancel</Button>
-              <LoadingButton type="submit" variant="contained" loading={loading}>
-                {!isEdit ? "New Product" : "Save Changes"}
+              <Button variant="outlined" onClick={() => navigate(PATH_DASHBOARD.library.product)}>
+                Cancel
+              </Button>
+              <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+                {!isEdit ? 'New Product' : 'Save Changes'}
               </LoadingButton>
             </Stack>
           </Grid>

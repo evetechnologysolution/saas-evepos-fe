@@ -13,23 +13,23 @@ import ProductForm from '../../../sections/@dashboard/library/product/ProductFor
 // ----------------------------------------------------------------------
 
 export default function LibraryProductCreate() {
-    const { themeStretch } = useSettings();
+  const { themeStretch } = useSettings();
 
-    return (
-        <Page title="Product: New">
-            <Container maxWidth={themeStretch ? false : 'xl'}>
-                <HeaderBreadcrumbs
-                    heading='New Product'
-                    links={[
-                        { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                        { name: 'Library', href: PATH_DASHBOARD.library.root },
-                        { name: 'Product', href: PATH_DASHBOARD.library.product },
-                        { name: 'New' },
-                    ]}
-                />
+  return (
+    <Page title="Product: New">
+      <Container maxWidth={themeStretch ? false : 'xl'}>
+        <HeaderBreadcrumbs
+          heading="New Product"
+          links={[
+            { name: 'Dashboard', href: PATH_DASHBOARD.root },
+            { name: 'Library', href: PATH_DASHBOARD.library.root },
+            { name: 'Product', href: PATH_DASHBOARD.library.product },
+            { name: 'New' },
+          ]}
+        />
 
-                <ProductForm />
-            </Container>
-        </Page>
-    );
+        <ProductForm />
+      </Container>
+    </Page>
+  );
 }
