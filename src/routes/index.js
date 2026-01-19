@@ -371,25 +371,25 @@ export default function Router() {
             {
               path: 'variant',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryVariant />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                <LibraryVariant />
+                // </RoleBasedGuard>
               ),
             },
             {
               path: 'variant/new',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryVariantCreate />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                <LibraryVariantCreate />
+                // </RoleBasedGuard>
               ),
             },
             {
               path: 'variant/:id/edit',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryVariantEdit />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                <LibraryVariantEdit />
+                // </RoleBasedGuard>
               ),
             },
             {
