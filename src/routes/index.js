@@ -512,25 +512,25 @@ export default function Router() {
             {
               path: '',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <UserList />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                <UserList />
+                // </RoleBasedGuard>
               ),
             },
             {
               path: 'new',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <UserCreate />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                <UserCreate />
+                // </RoleBasedGuard>
               ),
             },
             {
               path: ':id/edit',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <UserEdit />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                <UserEdit />
+                // </RoleBasedGuard>
               ),
             },
           ],
