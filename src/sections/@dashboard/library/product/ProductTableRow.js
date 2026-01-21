@@ -30,7 +30,7 @@ const CustomTableRow = styled(TableRow)(() => ({
 export default function ProductTableRow({ row, onEditRow, onDeleteRow }) {
   const theme = useTheme();
 
-  const { date, name, image, price, category, listNumber, isAvailable, isRecommended, section } = row;
+  const { createdAt, name, image, price, category, listNumber, isAvailable, isRecommended, section } = row;
 
   const showImage = () => {
     if (!image && section === 'Kitchen') {
@@ -40,25 +40,20 @@ export default function ProductTableRow({ row, onEditRow, onDeleteRow }) {
       return defaultBeverage;
     }
     return image;
-  }
+  };
 
   return (
     <CustomTableRow hover>
-      <TableCell align="center">{formatDate2(date)}</TableCell>
+      <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
       <TableCell>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Image
-            disabledEffect
-            alt={name}
-            src={showImage()}
-            sx={{ borderRadius: 1.5, width: 48, height: 48, mr: 2 }}
-          />
+          <Image disabledEffect alt={name} src={showImage()} sx={{ borderRadius: 1.5, width: 48, height: 48, mr: 2 }} />
           <div>
             {isRecommended && (
               <Label
                 variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
-                color='warning'
+                color="warning"
                 sx={{ textTransform: 'capitalize' }}
               >
                 Recomended
@@ -89,14 +84,25 @@ export default function ProductTableRow({ row, onEditRow, onDeleteRow }) {
 
       <TableCell align="center">
         <Stack direction="row" justifyContent="center" gap={1}>
-          <Button title="Edit" variant="contained" sx={{ p: 0, minWidth: 35, height: 35 }} onClick={() => {
-            onEditRow();
-          }}>
+          <Button
+            title="Edit"
+            variant="contained"
+            sx={{ p: 0, minWidth: 35, height: 35 }}
+            onClick={() => {
+              onEditRow();
+            }}
+          >
             <Iconify icon="eva:edit-outline" sx={{ width: 24, height: 24 }} />
           </Button>
-          <Button title="Delete" variant="contained" color="error" sx={{ p: 0, minWidth: 35, height: 35 }} onClick={() => {
-            onDeleteRow();
-          }}>
+          <Button
+            title="Delete"
+            variant="contained"
+            color="error"
+            sx={{ p: 0, minWidth: 35, height: 35 }}
+            onClick={() => {
+              onDeleteRow();
+            }}
+          >
             <Iconify icon="eva:trash-2-outline" sx={{ width: 24, height: 24 }} />
           </Button>
         </Stack>

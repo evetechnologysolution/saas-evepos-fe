@@ -1,7 +1,6 @@
 import { paramCase } from 'change-case';
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { useQuery, useQueryClient } from 'react-query';
 import { useSnackbar } from 'notistack';
 // @mui
 import {
@@ -18,7 +17,6 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import axios from '../../../utils/axios';
 // routes
 import { PATH_DASHBOARD } from '../../../routes/paths';
 // hooks
@@ -33,7 +31,6 @@ import ConfirmDelete from '../../../components/ConfirmDelete';
 // sections
 import { VariantTableToolbar, VariantTableRow } from '../../../sections/@dashboard/library/variant';
 // context
-import { mainContext } from '../../../contexts/MainContext';
 import useVariant from './service/useVariant';
 
 // ----------------------------------------------------------------------

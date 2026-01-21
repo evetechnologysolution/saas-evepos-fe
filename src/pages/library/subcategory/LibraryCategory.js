@@ -1,7 +1,6 @@
 import { paramCase } from 'change-case';
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { useQuery, useQueryClient } from 'react-query';
 import { useSnackbar } from 'notistack';
 // @mui
 import {
@@ -30,39 +29,27 @@ import Scrollbar from '../../../components/Scrollbar';
 import { TableHeadCustom, TableLoading, TableNoData } from '../../../components/table';
 import ConfirmDelete from '../../../components/ConfirmDelete';
 // sections
-import { ProductTableToolbar, ProductTableRow } from '../../../sections/@dashboard/library/product';
-// context
+import { CategoryTableToolbar, CategoryTableRow } from '../../../sections/@dashboard/library/category';
 // utils
-import useProduct from './service/useProduct';
+import useCategory from './service/useCategory';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'date', label: 'Date', align: 'center' },
-  { id: 'name', label: 'Name', align: 'left' },
-  { id: 'price', label: 'Price', align: 'center' },
-  { id: 'category', label: 'Category', align: 'center' },
+  { id: 'name', label: 'Category Name', align: 'left' },
   { id: 'listNumber', label: 'List Number', align: 'center' },
-  { id: 'isAvailable', label: 'Status', align: 'center' },
   { id: '', label: 'Action', align: 'center' },
 ];
 
 // ----------------------------------------------------------------------
 
-export default function LibraryProduct() {
-  const { dense, onChangeDense } = useTable();
-
-  const { list, remove } = useProduct();
+export default function LibraryCategory() {
   const { themeStretch } = useSettings();
-
   const navigate = useNavigate();
-
   const { enqueueSnackbar } = useSnackbar();
-
-  const [selectedId, setSelectedId] = useState('');
-  const [open, setOpen] = useState(false);
-
-  const [search, setSearch] = useState('');
+  const { dense, onChangeDense } = useTable();
+  const { list, remove } = useCategory();
 
   const [controller, setController] = useState({
     page: 0,
@@ -75,6 +62,11 @@ export default function LibraryProduct() {
     perPage: controller.rowsPerPage,
     search: controller.search,
   });
+
+  const [selectedId, setSelectedId] = useState('');
+  const [open, setOpen] = useState(false);
+
+  const [search, setSearch] = useState('');
 
   const handlePageChange = (event, newPage) => {
     setController({
@@ -106,7 +98,7 @@ export default function LibraryProduct() {
   };
 
   const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.library.productEdit(paramCase(id)));
+    navigate(PATH_DASHBOARD.library.subcategoryEdit(paramCase(id)));
   };
 
   const handleDialog = (id) => {
@@ -119,7 +111,7 @@ export default function LibraryProduct() {
 
     remove.mutate(selectedId, {
       onSuccess: () => {
-        enqueueSnackbar('Product deleted!', { variant: 'success' });
+        enqueueSnackbar('Subcategory deleted!', { variant: 'success' });
         setOpen(false);
       },
       onError: (err) => {
@@ -130,11 +122,11 @@ export default function LibraryProduct() {
 
   return (
     <>
-      <Page title="Product">
+      <Page title="Category">
         <Container maxWidth={themeStretch ? false : 'xl'}>
           <Card>
             <Typography variant="h6" mx={1}>
-              Product
+              Sub Category
             </Typography>
 
             <Stack
@@ -146,15 +138,15 @@ export default function LibraryProduct() {
               mb={{ xs: 2, sm: 0 }}
             >
               <div style={{ minWidth: '40%' }}>
-                <ProductTableToolbar filterName={search} onFilterName={handleSearch} onEnter={handleOnKeyPress} />
+                <CategoryTableToolbar filterName={search} onFilterName={handleSearch} onEnter={handleOnKeyPress} />
               </div>
               <Button
                 variant="contained"
                 startIcon={<Iconify icon="eva:plus-fill" />}
                 component={RouterLink}
-                to={PATH_DASHBOARD.library.productCreate}
+                to={PATH_DASHBOARD.library.subcategoryCreate}
               >
-                New Product
+                New Category
               </Button>
             </Stack>
 
@@ -167,7 +159,7 @@ export default function LibraryProduct() {
                     {!isLoading ? (
                       <>
                         {tableData?.docs?.map((row) => (
-                          <ProductTableRow
+                          <CategoryTableRow
                             key={row._id}
                             row={row}
                             onEditRow={() => handleEditRow(row._id)}
@@ -187,7 +179,7 @@ export default function LibraryProduct() {
 
             <Box sx={{ position: 'relative' }}>
               <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
+                rowsPerPageOptions={[1, 5, 10, 25]}
                 component="div"
                 count={tableData?.totalPages}
                 rowsPerPage={controller.rowsPerPage}
