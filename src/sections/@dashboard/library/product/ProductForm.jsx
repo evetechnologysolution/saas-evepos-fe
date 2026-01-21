@@ -197,7 +197,7 @@ export default function ProductForm({ isEdit, currentData }) {
 
       // relasi
       formData.append('category', data.category || '');
-      // formData.append('subcategory', data.subcategory || '');
+      formData.append('subcategory', data.subcategory || '');
 
       // boolean
       formData.append('isAvailable', data.isAvailable);
