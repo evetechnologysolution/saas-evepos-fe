@@ -11,13 +11,13 @@ UserTableToolbar.propTypes = {
   onFilterName: PropTypes.func,
   onFilterRole: PropTypes.func,
   optionsRole: PropTypes.arrayOf(PropTypes.string),
-  onEnter: PropTypes.func
+  onEnter: PropTypes.func,
 };
 
 export default function UserTableToolbar({ filterName, filterRole, onFilterName, onFilterRole, optionsRole, onEnter }) {
   return (
     <Stack spacing={2} direction={{ xs: 'column', sm: 'row' }} sx={{ py: 2.5, px: 1 }}>
-      <TextField
+      {/* <TextField
         fullWidth
         select
         label="Role"
@@ -48,7 +48,7 @@ export default function UserTableToolbar({ filterName, filterRole, onFilterName,
             {option}
           </MenuItem>
         ))}
-      </TextField>
+      </TextField> */}
 
       <TextField
         fullWidth
