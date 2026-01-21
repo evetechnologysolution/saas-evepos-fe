@@ -17,6 +17,13 @@ RoleBasedGuard.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
+function capitalizeFirstLetter(string) {
+  if (typeof string !== 'string' || string.length === 0) {
+    return string;
+  }
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 export default function RoleBasedGuard({ hasContent, roles, children }) {
   // Logic here to get current user role
   const { user } = useAuth();
@@ -24,7 +31,7 @@ export default function RoleBasedGuard({ hasContent, roles, children }) {
   // const currentRole = 'user';
   const currentRole = user?.role; // admin;
 
-  if (typeof roles !== 'undefined' && !roles.includes(currentRole)) {
+  if (typeof roles !== 'undefined' && !roles.includes(capitalizeFirstLetter(currentRole))) {
     return hasContent ? (
       <Container component={MotionContainer} sx={{ textAlign: 'center' }}>
         <m.div variants={varBounce().in}>

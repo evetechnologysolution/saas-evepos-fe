@@ -99,10 +99,7 @@ export default function Router() {
         {
           path: 'app',
           element: (
-            <RoleBasedGuard
-              hasContent
-              // roles={['Super Admin', 'Admin']}
-            >
+            <RoleBasedGuard hasContent roles={['Owner', 'Admin', 'Staff', 'Cashier']}>
               <Dashboard />
             </RoleBasedGuard>
           ),
