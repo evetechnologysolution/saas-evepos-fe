@@ -366,6 +366,18 @@ export default function Router() {
               ),
             },
             {
+              path: 'subcategory',
+              element: <LibrarySubCategory />,
+            },
+            {
+              path: 'subcategory/new',
+              element: <LibrarySubCategoryCreate />,
+            },
+            {
+              path: 'subcategory/:id/edit',
+              element: <LibrarySubCategoryEdit />,
+            },
+            {
               path: 'variant',
               element: (
                 // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
@@ -911,6 +923,9 @@ const LibraryProductEdit = Loadable(lazy(() => import('../pages/library/product/
 const LibraryCategory = Loadable(lazy(() => import('../pages/library/category/LibraryCategory')));
 const LibraryCategoryCreate = Loadable(lazy(() => import('../pages/library/category/LibraryCategoryCreate')));
 const LibraryCategoryEdit = Loadable(lazy(() => import('../pages/library/category/LibraryCategoryEdit')));
+const LibrarySubCategory = Loadable(lazy(() => import('../pages/library/subcategory/LibraryCategory')));
+const LibrarySubCategoryCreate = Loadable(lazy(() => import('../pages/library/subcategory/LibraryCategoryCreate')));
+const LibrarySubCategoryEdit = Loadable(lazy(() => import('../pages/library/subcategory/LibraryCategoryEdit')));
 const LibraryVariant = Loadable(lazy(() => import('../pages/library/variant/LibraryVariant')));
 const LibraryVariantCreate = Loadable(lazy(() => import('../pages/library/variant/LibraryVariantCreate')));
 const LibraryVariantEdit = Loadable(lazy(() => import('../pages/library/variant/LibraryVariantEdit')));

@@ -204,6 +204,7 @@ export const useNavConfig = () => {
           children: [
             // { title: 'banner', path: PATH_DASHBOARD.library.banner },
             { title: 'category', path: PATH_DASHBOARD.library.category },
+            { title: 'sub category', path: PATH_DASHBOARD.library.subcategory },
             { title: 'product', path: PATH_DASHBOARD.library.product },
             { title: 'variant', path: PATH_DASHBOARD.library.variant },
             // { title: 'perfume', path: PATH_DASHBOARD.library.perfume },

@@ -22,11 +22,11 @@ const CustomTableRow = styled(TableRow)(() => ({
 }));
 
 export default function CategoryTableRow({ row, onEditRow, onDeleteRow }) {
-  const { updatedAt, name, listNumber } = row;
+  const { createdAt, name, listNumber } = row;
 
   return (
     <CustomTableRow hover>
-      <TableCell align="center">{formatDate2(updatedAt)}</TableCell>
+      <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
       <TableCell>{name}</TableCell>
 
