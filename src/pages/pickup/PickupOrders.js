@@ -63,7 +63,7 @@ export default function PickupOrders() {
   const [controller, setController] = useState({
     page: 0,
     rowsPerPage: 10,
-    pickup: 'pending',
+    pickupStatus: 'pending',
     search: '',
   });
 
