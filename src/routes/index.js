@@ -127,25 +127,25 @@ export default function Router() {
             {
               path: 'pos',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                  <CashierPos />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                <CashierPos />
+                // </RoleBasedGuard>
               ),
             },
             {
               path: 'orders',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                  <CashierOrders />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                <CashierOrders />
+                // </RoleBasedGuard>
               ),
             },
             {
               path: 'orders/:id/edit',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                  <CashierOrdersEdit />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                <CashierOrdersEdit />
+                // </RoleBasedGuard>
               ),
             },
             {

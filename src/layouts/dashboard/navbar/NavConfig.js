@@ -51,12 +51,12 @@ export const useNavConfig = () => {
           icon: ICONS.pos,
           roles: ['Super Admin', 'Cashier'],
         },
-        // {
-        //   title: 'Orders',
-        //   path: PATH_DASHBOARD.cashier.orders,
-        //   icon: ICONS.order,
-        //   roles: ['Super Admin', 'Cashier'],
-        // },
+        {
+          title: 'Orders',
+          path: PATH_DASHBOARD.cashier.orders,
+          icon: ICONS.order,
+          roles: ['Super Admin', 'Cashier'],
+        },
         // {
         //   title: 'Delivery',
         //   path: PATH_DASHBOARD.cashier.delivery,
@@ -64,12 +64,12 @@ export const useNavConfig = () => {
         //   roles: ['Super Admin', 'Cashier'],
         //   total: ctx?.allNotif?.backlogDelivery || 0,
         // },
-        // {
-        //   title: 'PickUp',
-        //   path: PATH_DASHBOARD.pickup.root,
-        //   icon: ICONS.pickup,
-        //   roles: ['Super Admin', 'Cashier'],
-        // },
+        {
+          title: 'PickUp',
+          path: PATH_DASHBOARD.pickup.root,
+          icon: ICONS.pickup,
+          roles: ['Super Admin', 'Cashier'],
+        },
         // {
         //   title: 'Scan Orders',
         //   path: PATH_DASHBOARD.progressScan,
