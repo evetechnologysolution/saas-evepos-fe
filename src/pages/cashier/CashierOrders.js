@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useQuery, useQueryClient } from 'react-query';
 import { useSnackbar } from 'notistack';
 // @mui
 import {
@@ -17,9 +16,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import axios from '../../utils/axios';
 // hooks
-import useAuth from '../../hooks/useAuth';
 import useSettings from '../../hooks/useSettings';
 import useTable from '../../hooks/useTable';
 // components
@@ -29,6 +26,7 @@ import { TableHeadCustom, TableLoading, TableNoData } from '../../components/tab
 import ConfirmDelete from '../../components/ConfirmDelete';
 // sections
 import { OrdersTableToolbar, OrdersTableRow } from '../../sections/@dashboard/cashier/orders';
+import useOrder from './service/useOrder';
 
 // ----------------------------------------------------------------------
 
@@ -52,19 +50,15 @@ const TABLE_HEAD = [
 
 export default function CashierOrders() {
   const { dense, onChangeDense } = useTable();
-
-  const { user } = useAuth();
   const theme = useTheme();
   const { themeStretch } = useSettings();
   const { enqueueSnackbar } = useSnackbar();
-  const client = useQueryClient();
+  const { list, remove } = useOrder();
 
   const [filterStatus, setFilterStatus] = useState('All');
-  const [countData, setCountData] = useState(0);
   const [search, setSearch] = useState('');
 
   const [selectedId, setSelectedId] = useState('');
-  const [loadingDelete, setLoadingDelete] = useState(false);
   const [open, setOpen] = useState(false);
 
   const [controller, setController] = useState({
@@ -74,32 +68,12 @@ export default function CashierOrders() {
     search: '',
   });
 
-  const getData = async ({ queryKey }) => {
-    const [, params] = queryKey; // Extract query params
-    const queryString = new URLSearchParams(params).toString(); // Build query string
-    try {
-      const res = await axios.get(`/orders?${queryString}`);
-      setCountData(res?.data?.totalDocs || 0);
-      return res.data;
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      throw new Error(error.response?.data?.message || 'Failed to fetch orders');
-    }
-  };
-
-  const { isLoading, data: tableData } = useQuery(
-    [
-      'listOrders',
-      {
-        page: controller.page + 1,
-        perPage: controller.rowsPerPage,
-        // status: user?.role === "Super Admin" ? controller.status : "paid:ne",
-        status: controller.status || '',
-        search: controller.search || '',
-      },
-    ],
-    getData
-  );
+  const { data: tableData, isLoading } = list({
+    page: controller.page + 1,
+    perPage: controller.rowsPerPage,
+    search: controller.search,
+    status: controller.status,
+  });
 
   const handlePageChange = (event, newPage) => {
     setController({
@@ -117,7 +91,7 @@ export default function CashierOrders() {
   };
 
   const handleFilterStatus = (val) => {
-    const fixStatus = val === 'Unpaid' ? 'pending' : val?.toLowerCase();
+    const fixStatus = val;
     setFilterStatus(val);
     setController({
       page: 0,
@@ -147,19 +121,17 @@ export default function CashierOrders() {
     setOpen(!open);
   };
 
-  const handleDelete = async () => {
-    setLoadingDelete(true);
-    if (selectedId) {
-      await axios.delete(`/orders/${selectedId}`);
-      client.invalidateQueries('listOrders');
-      enqueueSnackbar('Delete success!');
-    }
-    handleDialog();
-    setLoadingDelete(false);
-    // get data by current page
-    setController({
-      ...controller,
-      page: controller.page,
+  const handleDelete = () => {
+    if (!selectedId) return;
+
+    remove.mutate(selectedId, {
+      onSuccess: () => {
+        enqueueSnackbar('Order deleted!', { variant: 'success' });
+        setOpen(false);
+      },
+      onError: (err) => {
+        enqueueSnackbar(err?.message || 'Failed to delete', { variant: 'error' });
+      },
     });
   };
 
@@ -237,7 +209,7 @@ export default function CashierOrders() {
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"
-              count={countData}
+              count={tableData?.totalPages}
               rowsPerPage={controller.rowsPerPage}
               page={controller.page}
               onPageChange={handlePageChange}
@@ -253,7 +225,7 @@ export default function CashierOrders() {
         </Card>
       </Container>
 
-      <ConfirmDelete open={open} onClose={handleDialog} onDelete={handleDelete} isLoading={loadingDelete} />
+      <ConfirmDelete open={open} onClose={handleDialog} onDelete={handleDelete} isLoading={remove.isLoading} />
     </Page>
   );
 }
