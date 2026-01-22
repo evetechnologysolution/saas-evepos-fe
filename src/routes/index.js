@@ -127,9 +127,9 @@ export default function Router() {
             {
               path: 'pos',
               element: (
-                // <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                <CashierPos />
-                // </RoleBasedGuard>
+                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                  <CashierPos />
+                </RoleBasedGuard>
               ),
             },
             {
@@ -169,9 +169,9 @@ export default function Router() {
         {
           path: 'pickup',
           element: (
-            <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-              <PickupOrders />
-            </RoleBasedGuard>
+            // <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+            <PickupOrders />
+            // </RoleBasedGuard>
           ),
         },
         {

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import PropTypes from "prop-types";
+import { useState } from 'react';
+import PropTypes from 'prop-types';
 // @mui
 import {
   styled,
@@ -11,18 +11,18 @@ import {
   Button,
   Dialog,
   DialogTitle,
-  DialogContent
-} from "@mui/material";
+  DialogContent,
+} from '@mui/material';
 // hooks
-import useAuth from "../../../../hooks/useAuth";
+import useAuth from '../../../../hooks/useAuth';
 // components
-import Iconify from "../../../../components/Iconify";
-import Label from "../../../../components/Label";
+import Iconify from '../../../../components/Iconify';
+import Label from '../../../../components/Label';
 // utils
-import { formatDate2, numberWithCommas } from "../../../../utils/getData";
-import { maskedPhone } from "../../../../utils/masked";
+import { formatDate2, numberWithCommas } from '../../../../utils/getData';
+import { maskedPhone } from '../../../../utils/masked';
 // context
-import ModalPickup from "./ModalPickup";
+import ModalPickup from './ModalPickup';
 
 // ----------------------------------------------------------------------
 
@@ -31,17 +31,17 @@ OrdersTableRow.propTypes = {
 };
 
 const CustomTableRow = styled(TableRow)(() => ({
-  "&.MuiTableRow-hover:hover": {
+  '&.MuiTableRow-hover:hover': {
     // boxShadow: "inset 8px 0 0 #fff, inset -8px 0 0 #fff",
-    borderRadius: "8px",
+    borderRadius: '8px',
   },
 }));
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-  "& .MuiDialogContent-root": {
+  '& .MuiDialogContent-root': {
     padding: theme.spacing(2),
   },
-  "& .MuiDialogActions-root": {
+  '& .MuiDialogActions-root': {
     padding: theme.spacing(1),
   },
 }));
@@ -57,7 +57,7 @@ const BootstrapDialogTitle = (props) => {
           aria-label="close"
           onClick={onClose}
           sx={{
-            position: "absolute",
+            position: 'absolute',
             right: 8,
             top: 8,
             color: (theme) => theme.palette.grey[500],
@@ -81,12 +81,12 @@ export default function OrdersTableRow({ row }) {
   const {
     _id,
     orderId,
-    date,
+    createdAt,
     paymentDate,
     customer,
     orders,
     orderType,
-    lockerName,
+    notes,
     status,
     discountPrice,
     voucherDiscPrice,
@@ -96,20 +96,20 @@ export default function OrdersTableRow({ row }) {
     cardAccountName,
     cardNumber,
     pickUpStatus,
-    pickupData
+    pickupData,
   } = row;
 
   let statusColor;
-  if (status?.toLowerCase() === "paid") {
-    statusColor = "success";
-  } else if (status?.toLowerCase() === "half paid") {
-    statusColor = "secondary";
-  } else if (status?.toLowerCase() === "pending") {
-    statusColor = "warning";
-  } else if (status?.toLowerCase() === "refund") {
-    statusColor = "default";
+  if (status?.toLowerCase() === 'paid') {
+    statusColor = 'success';
+  } else if (status?.toLowerCase() === 'half paid') {
+    statusColor = 'secondary';
+  } else if (status?.toLowerCase() === 'pending') {
+    statusColor = 'warning';
+  } else if (status?.toLowerCase() === 'refund') {
+    statusColor = 'default';
   } else {
-    statusColor = "error";
+    statusColor = 'error';
   }
 
   const isBagDay = orders.find((row) => row.isLaundryBag);
@@ -119,11 +119,11 @@ export default function OrdersTableRow({ row }) {
   const [openPickup, setOpenPickup] = useState(false);
 
   const showOrderType = () => {
-    if (orderType?.toLowerCase() === "onsite") {
-      return "Onsite";
+    if (orderType?.toLowerCase() === 'onsite') {
+      return 'Onsite';
     }
-    return "Delivery";
-  }
+    return 'Delivery';
+  };
 
   const handlePay = async () => {
     setOpenPickup(true);
@@ -132,13 +132,11 @@ export default function OrdersTableRow({ row }) {
   return (
     <>
       <CustomTableRow hover>
-        <TableCell align="center">
-          {formatDate2(date)}
-        </TableCell>
+        <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
         <TableCell>
           <Stack flexDirection="row" gap={1}>
-            <Label variant="ghost" color={showOrderType() === "Onsite" ? "default" : "info"}>
+            <Label variant="ghost" color={showOrderType() === 'Onsite' ? 'default' : 'info'}>
               {showOrderType()}
             </Label>
             {isBagDay && (
@@ -151,28 +149,31 @@ export default function OrdersTableRow({ row }) {
         </TableCell>
 
         <TableCell align="left">
-          <p>{customer?.name || "-"}</p>
+          <p>{customer?.name || '-'}</p>
           {customer?.phone && (
             <p>
-              {!customer?.phone?.includes("EM") ?
-                maskedPhone(user?.role === "Super Admin", customer?.phone) || "-"
-                : "-"
-              }
+              {!customer?.phone?.includes('EM')
+                ? maskedPhone(user?.role === 'Super Admin', customer?.phone) || '-'
+                : '-'}
             </p>
           )}
         </TableCell>
 
         <TableCell>
-          {orders[0].qty === 0 && orders[0]?.category?.toLowerCase() === "kiloan"
-            ? <span>{orders[0].name} <em style={{ color: "red" }}>{"(Belum ditimbang)"}</em></span>
-            : `x ${orders[0].qty}${orders[0]?.category?.toLowerCase() === "kiloan" ? "kg" : ""} ${orders[0].name}`
-          }
-          {orders[0].variant.length > 0 && orders[0].variant.map((item, i) => (
-            <span key={i}>
-              <br />
-              <em>{`${item.name} : ${item.option} ${item.qty > 1 ? `(x${item.qty})` : ""}`}</em>
+          {orders[0].qty === 0 && orders[0]?.category?.toLowerCase() === 'kiloan' ? (
+            <span>
+              {orders[0].name} <em style={{ color: 'red' }}>{'(Belum ditimbang)'}</em>
             </span>
-          ))}
+          ) : (
+            `x ${orders[0].qty}${orders[0]?.category?.toLowerCase() === 'kiloan' ? 'kg' : ''} ${orders[0].name}`
+          )}
+          {orders[0].variant.length > 0 &&
+            orders[0].variant.map((item, i) => (
+              <span key={i}>
+                <br />
+                <em>{`${item.name} : ${item.option} ${item.qty > 1 ? `(x${item.qty})` : ''}`}</em>
+              </span>
+            ))}
           {orders[0].notes && (
             <span>
               <br />
@@ -196,35 +197,35 @@ export default function OrdersTableRow({ row }) {
         </TableCell>
 
         <TableCell align="left">
-          {pickUpStatus !== "pending" ? (
+          {pickUpStatus !== 'pending' ? (
             <>
               <p>{pickupData?.by || customer.name}</p>
               <p>{formatDate2(pickupData?.date || paymentDate)}</p>
             </>
-          ) : "-"}
+          ) : (
+            '-'
+          )}
         </TableCell>
 
-        <TableCell align="center">
-          {lockerName || "-"}
-        </TableCell>
+        <TableCell align="center">{notes || '-'}</TableCell>
 
         <TableCell align="center">
-          <Label variant="ghost" color={statusColor} sx={{ textTransform: "capitalize" }}>
-            {status === "pending" ? "unpaid" : status}
+          <Label variant="ghost" color={statusColor} sx={{ textTransform: 'capitalize' }}>
+            {status === 'pending' ? 'unpaid' : status}
           </Label>
         </TableCell>
 
         <TableCell align="center">
           {discountPrice > 0 || voucherDiscPrice > 0 ? (
             <>
-              <span style={{ textDecoration: "line-through", color: "red", opacity: 0.7 }}>
+              <span style={{ textDecoration: 'line-through', color: 'red', opacity: 0.7 }}>
                 Rp. {numberWithCommas(billedAmount + voucherDiscPrice + discountPrice)}
               </span>
               <br />
               Rp. {numberWithCommas(billedAmount)}
             </>
           ) : (
-            <span style={{ color: status?.toLowerCase() === "refund" ? "red" : "#212B36" }}>
+            <span style={{ color: status?.toLowerCase() === 'refund' ? 'red' : '#212B36' }}>
               Rp. {numberWithCommas(billedAmount)}
             </span>
           )}
@@ -232,9 +233,9 @@ export default function OrdersTableRow({ row }) {
 
         <TableCell align="center">
           <div>
-            {payment || "-"}
-            {payment === "Card" && (
-              <div style={{ fontSize: "13px" }}>
+            {payment || '-'}
+            {payment === 'Card' && (
+              <div style={{ fontSize: '13px' }}>
                 {cardBankName}
                 <br />
                 {cardAccountName}
@@ -246,13 +247,14 @@ export default function OrdersTableRow({ row }) {
         </TableCell>
 
         <TableCell align="center">
-          {pickUpStatus !== "completed" ? (
+          {pickUpStatus !== 'completed' ? (
             <Button type="button" variant="contained" onClick={() => handlePay()}>
-              {status === "paid" ? "PickUp" : "Pay & PickUp"}
+              {status === 'paid' ? 'PickUp' : 'Pay & PickUp'}
             </Button>
-          ) : "-"}
+          ) : (
+            '-'
+          )}
         </TableCell>
-
       </CustomTableRow>
 
       <BootstrapDialog
@@ -265,13 +267,13 @@ export default function OrdersTableRow({ row }) {
         <BootstrapDialogTitle
           id="customized-dialog-title"
           onClose={() => setOpen(false)}
-          style={{ borderBottom: "1px solid #ccc" }}
+          style={{ borderBottom: '1px solid #ccc' }}
         >
           Detail
         </BootstrapDialogTitle>
         <DialogContent dividers>
-          <table style={{ width: "100%" }}>
-            <thead style={{ color: "#6c757d!important", fontSize: "0.9rem" }}>
+          <table style={{ width: '100%' }}>
+            <thead style={{ color: '#6c757d!important', fontSize: '0.9rem' }}>
               <tr>
                 <th align="left">ITEMS</th>
                 <th>QUANTITY</th>
@@ -279,22 +281,23 @@ export default function OrdersTableRow({ row }) {
                 <th> </th>
               </tr>
             </thead>
-            <tbody style={{ fontSize: "0.85rem" }}>
+            <tbody style={{ fontSize: '0.85rem' }}>
               {orders.map((item, i) => {
                 let originPrice = item.price;
                 if (item.isLaundryBag) {
-                  originPrice += item.discountLaundryBag
+                  originPrice += item.discountLaundryBag;
                 }
                 return (
                   <tr key={i}>
-                    <td style={{ padding: "0.2rem 0" }}>
+                    <td style={{ padding: '0.2rem 0' }}>
                       {item.name}
-                      {item.variant.length > 0 && item.variant.map((field, v) => (
-                        <span key={v}>
-                          <br />
-                          <em>{`${field.name} : ${field.option} ${field.qty > 1 ? `(x${field.qty})` : ""}`}</em>
-                        </span>
-                      ))}
+                      {item.variant.length > 0 &&
+                        item.variant.map((field, v) => (
+                          <span key={v}>
+                            <br />
+                            <em>{`${field.name} : ${field.option} ${field.qty > 1 ? `(x${field.qty})` : ''}`}</em>
+                          </span>
+                        ))}
                       {item.notes && (
                         <span>
                           <br />
@@ -304,21 +307,31 @@ export default function OrdersTableRow({ row }) {
                       {item.isLaundryBag && item.discountLaundryBag && (
                         <span>
                           <br />
-                          <em>Laundry Bag Day : {`(-Rp. ${numberWithCommas(Math.round(item.discountLaundryBag * item.qty))})`}</em>
+                          <em>
+                            Laundry Bag Day :{' '}
+                            {`(-Rp. ${numberWithCommas(Math.round(item.discountLaundryBag * item.qty))})`}
+                          </em>
                         </span>
                       )}
                     </td>
                     <td align="center">
-                      {item.qty === 0 && item?.category?.toLowerCase() === "kiloan"
-                        ? <em style={{ color: "red" }}>{"(Belum ditimbang)"}</em>
-                        : `x ${item.qty}${item?.category?.toLowerCase() === "kiloan" ? "kg" : ""}`
-                      }
+                      {item.qty === 0 && item?.category?.toLowerCase() === 'kiloan' ? (
+                        <em style={{ color: 'red' }}>{'(Belum ditimbang)'}</em>
+                      ) : (
+                        `x ${item.qty}${item?.category?.toLowerCase() === 'kiloan' ? 'kg' : ''}`
+                      )}
                     </td>
                     <td align="right">
                       <span
                         style={{
-                          color: item.promotionType === 1 || item.promotionType === 2 || item.isLaundryBag ? "red" : "#212B36",
-                          textDecoration: item.promotionType === 1 || item.promotionType === 2 || item.isLaundryBag ? "line-through" : "none"
+                          color:
+                            item.promotionType === 1 || item.promotionType === 2 || item.isLaundryBag
+                              ? 'red'
+                              : '#212B36',
+                          textDecoration:
+                            item.promotionType === 1 || item.promotionType === 2 || item.isLaundryBag
+                              ? 'line-through'
+                              : 'none',
                         }}
                       >
                         Rp. {numberWithCommas(Math.round(item.qty * originPrice))}
@@ -326,38 +339,48 @@ export default function OrdersTableRow({ row }) {
                       {item.isLaundryBag && item.discountLaundryBag && (
                         <>
                           <br />
-                          <span style={{ textDecoration: (item.promotionType === 1 && item.isLaundryBag) ? "line-through" : "none" }}>Rp. {numberWithCommas(Math.round(item.qty * item.price))}</span>
+                          <span
+                            style={{
+                              textDecoration: item.promotionType === 1 && item.isLaundryBag ? 'line-through' : 'none',
+                            }}
+                          >
+                            Rp. {numberWithCommas(Math.round(item.qty * item.price))}
+                          </span>
                           <br />
                         </>
                       )}
                       {item.promotionType === 1 && (
                         <>
                           <br />
-                          <span>Rp. {numberWithCommas(Math.round(item.qty * item.price) - (Math.round(item.qty * item.price) * item.discountAmount) / 100)}</span>
+                          <span>
+                            Rp.{' '}
+                            {numberWithCommas(
+                              Math.round(item.qty * item.price) -
+                                (Math.round(item.qty * item.price) * item.discountAmount) / 100
+                            )}
+                          </span>
                           <br />
                         </>
                       )}
                       {item.promotionType === 2 && (
                         <>
                           <br />
-                          <span>Rp. {numberWithCommas(Math.round(item.qty * item.price) - Math.round(item.discountAmount))}</span>
+                          <span>
+                            Rp. {numberWithCommas(Math.round(item.qty * item.price) - Math.round(item.discountAmount))}
+                          </span>
                           <br />
                         </>
                       )}
                     </td>
                   </tr>
-                )
+                );
               })}
             </tbody>
           </table>
         </DialogContent>
       </BootstrapDialog>
 
-      <ModalPickup
-        open={openPickup}
-        onClose={() => setOpenPickup(false)}
-        data={row}
-      />
+      <ModalPickup open={openPickup} onClose={() => setOpenPickup(false)} data={row} />
     </>
   );
 }

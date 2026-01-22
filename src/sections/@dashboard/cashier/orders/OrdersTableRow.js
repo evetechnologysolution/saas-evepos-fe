@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useState, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { paramCase } from 'change-case';
@@ -100,13 +101,9 @@ BootstrapDialogTitle.propTypes = {
 
 export default function OrdersTableRow({ row, local, closeLocal, onDeleteRow }) {
   const ctx = useContext(cashierContext);
-
   const { user } = useAuth();
-
   const { enqueueSnackbar } = useSnackbar();
-
   const navigate = useNavigate();
-
   const client = useQueryClient();
 
   const {
@@ -536,7 +533,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
               onClose={handleCloseAction}
               actions={
                 <>
-                  {['Super Admin', 'Cashier', 'Staff'].includes(user?.role) && (
+                  {['admin', 'cashier', 'staff', 'owner'].includes(user?.role?.toLowerCase()) && (
                     <MenuItem
                       disabled={
                         status?.toLowerCase() === 'paid' || status?.toLowerCase() === 'pending'
@@ -566,7 +563,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                     <Iconify icon="solar:printer-outline" sx={{ width: 24, height: 24 }} />
                     Print Nota
                   </MenuItem>
-                  {user?.role === 'Super Admin' && (
+                  {(user?.role?.toLowerCase() === 'admin' || user?.role?.toLowerCase() === 'owner') && (
                     <MenuItem
                       disabled={status?.toLowerCase() === 'paid' && isScan !== true ? Boolean(false) : Boolean(true)}
                       onClick={() => {
@@ -592,7 +589,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                     <Iconify icon="material-symbols:currency-exchange-rounded" sx={{ width: 24, height: 24 }} />
                     Refund
                   </MenuItem>
-                  {user?.role === 'Super Admin' && (
+                  {(user?.role?.toLowerCase() === 'admin' || user?.role?.toLowerCase() === 'owner') && (
                     <MenuItem
                       sx={{ color: 'red' }}
                       disabled={
@@ -620,7 +617,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                     <Iconify icon="fluent:calendar-cancel-24-regular" sx={{ width: 24, height: 24 }} />
                     Cancel Order
                   </MenuItem>
-                  {user?.role === 'Super Admin' && (
+                  {(user?.role?.toLowerCase() === 'admin' || user?.role?.toLowerCase() === 'owner') && (
                     <MenuItem
                       sx={{ color: 'red' }}
                       onClick={() => {
