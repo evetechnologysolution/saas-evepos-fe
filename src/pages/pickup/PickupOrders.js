@@ -71,7 +71,7 @@ export default function PickupOrders() {
     page: controller.page + 1,
     perPage: controller.rowsPerPage,
     search: controller.search,
-    pickup: controller.pickup,
+    pickupStatus: controller.pickup,
   });
 
   const handlePageChange = (event, newPage) => {
