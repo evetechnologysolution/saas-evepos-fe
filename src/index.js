@@ -58,17 +58,17 @@ root.render(
         <ReduxProvider store={store}>
           <PersistGate loading={null} persistor={persistor}>
             <MainContextProvider>
-              {/* <CashierContextProvider> */}
-              {/* <DashboardContextProvider> */}
-              <SettingsProvider>
-                <CollapseDrawerProvider>
-                  <BrowserRouter>
-                    <App />
-                  </BrowserRouter>
-                </CollapseDrawerProvider>
-              </SettingsProvider>
-              {/* </DashboardContextProvider> */}
-              {/* </CashierContextProvider> */}
+              <CashierContextProvider>
+                {/* <DashboardContextProvider> */}
+                <SettingsProvider>
+                  <CollapseDrawerProvider>
+                    <BrowserRouter>
+                      <App />
+                    </BrowserRouter>
+                  </CollapseDrawerProvider>
+                </SettingsProvider>
+                {/* </DashboardContextProvider> */}
+              </CashierContextProvider>
             </MainContextProvider>
           </PersistGate>
         </ReduxProvider>

@@ -1,137 +1,137 @@
-import React, { createContext, useState, useEffect } from "react";
-import PropTypes from "prop-types";
-import { isTuesday } from "date-fns";
-import axios from "../utils/axios";
-import { useLocalStorage } from "../utils/getData";
+import React, { createContext, useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { isTuesday } from 'date-fns';
+import axios from '../utils/axios';
+import { useLocalStorage } from '../utils/getData';
 // dummyData
-import { tableNameData } from "../dummyData";
+import { tableNameData } from '../dummyData';
 
 export const cashierContext = createContext({
   isLaundryBagDay: false,
-  orderDate: "",
-  setOrderDate: () => { },
-  currentOrderID: "",
-  setCurrentOrderID: () => { },
-  displayOrderID: "",
-  setDisplayOrderID: () => { },
+  orderDate: '',
+  setOrderDate: () => {},
+  currentOrderID: '',
+  setCurrentOrderID: () => {},
+  displayOrderID: '',
+  setDisplayOrderID: () => {},
   pax: 1,
-  setPax: () => { },
-  qrKey: "",
-  setQrKey: () => { },
+  setPax: () => {},
+  qrKey: '',
+  setQrKey: () => {},
   savedOrders: [],
-  setSavedOrders: () => { },
+  setSavedOrders: () => {},
   bill: [],
-  setBill: () => { },
+  setBill: () => {},
   splitBill: [],
-  setSplitBill: () => { },
-  savedBillID: "",
-  setSavedBillID: () => { },
+  setSplitBill: () => {},
+  savedBillID: '',
+  setSavedBillID: () => {},
   savedBill: [],
-  setSavedBill: () => { },
-  selectedBill: "",
-  setSelectedBill: () => { },
+  setSavedBill: () => {},
+  selectedBill: '',
+  setSelectedBill: () => {},
   updatedBill: [],
-  setUpdatedBill: () => { },
+  setUpdatedBill: () => {},
   selectedTable: null,
-  setSelectedTable: () => { },
-  orderType: "",
-  setOrderType: () => { },
+  setSelectedTable: () => {},
+  orderType: '',
+  setOrderType: () => {},
   pickupData: {},
-  setPickupData: () => { },
+  setPickupData: () => {},
   customerData: {},
-  setCustomerData: () => { },
-  customerName: "",
-  setCustomerName: () => { },
-  customerPhone: "",
-  setCustomerPhone: () => { },
-  customerNotes: "",
-  setCustomerNotes: () => { },
+  setCustomerData: () => {},
+  customerName: '',
+  setCustomerName: () => {},
+  customerPhone: '',
+  setCustomerPhone: () => {},
+  customerNotes: '',
+  setCustomerNotes: () => {},
   customerNew: false,
-  setCustomerNew: () => { },
+  setCustomerNew: () => {},
   customerScan: false,
-  setCustomerScan: () => { },
+  setCustomerScan: () => {},
   customerPoint: 0,
-  setCustomerPoint: () => { },
-  voucherCode: "",
-  setVoucherCode: () => { },
+  setCustomerPoint: () => {},
+  voucherCode: '',
+  setVoucherCode: () => {},
   // getSavedBill: () => { },
   listTable: [],
-  setListTable: () => { },
+  setListTable: () => {},
   qrdata: [],
-  setQrdata: () => { },
-  getQrdata: () => { },
-  createQrdata: () => { },
-  updateQrdata: () => { },
-  deleteQrdata: () => { },
+  setQrdata: () => {},
+  getQrdata: () => {},
+  createQrdata: () => {},
+  updateQrdata: () => {},
+  deleteQrdata: () => {},
   orders: [],
-  setOrders: () => { },
-  getOrders: () => { },
-  createOrders: () => { },
-  updateOrders: () => { },
-  updatePrintCount: () => { },
-  updatePrintLaundry: () => { },
-  deleteOrders: () => { },
-  createReservation: () => { },
-  updateReservation: () => { },
-  deleteReservation: () => { },
-  paymentMethod: "",
-  setPaymentMethod: () => { },
-  cardNumber: "",
-  setCardNumber: () => { },
-  notes: "",
-  setNotes: () => { },
+  setOrders: () => {},
+  getOrders: () => {},
+  createOrders: () => {},
+  updateOrders: () => {},
+  updatePrintCount: () => {},
+  updatePrintLaundry: () => {},
+  deleteOrders: () => {},
+  createReservation: () => {},
+  updateReservation: () => {},
+  deleteReservation: () => {},
+  paymentMethod: '',
+  setPaymentMethod: () => {},
+  cardNumber: '',
+  setCardNumber: () => {},
+  notes: '',
+  setNotes: () => {},
   dp: 0,
-  setDp: () => { },
+  setDp: () => {},
   deliveryPrice: 0,
-  setDeliveryPrice: () => { },
+  setDeliveryPrice: () => {},
   donation: 0,
-  setDonation: () => { },
+  setDonation: () => {},
   discount: 0,
-  setDiscount: () => { },
+  setDiscount: () => {},
   discountPrice: 0,
-  setDiscountPrice: () => { },
-  discountLabel: "",
-  setDiscountLabel: () => { },
+  setDiscountPrice: () => {},
+  discountLabel: '',
+  setDiscountLabel: () => {},
   voucherDiscPrice: 0,
-  setVoucherDiscPrice: () => { },
+  setVoucherDiscPrice: () => {},
   splitServiceCharge: 0,
-  setSplitServiceCharge: () => { },
+  setSplitServiceCharge: () => {},
   serviceCharge: 0,
-  setServiceCharge: () => { },
+  setServiceCharge: () => {},
   serviceChargePercentage: 0,
-  setServiceChargePercentage: () => { },
+  setServiceChargePercentage: () => {},
   splitTax: 0,
-  setSplitTax: () => { },
+  setSplitTax: () => {},
   tax: 0,
-  setTax: () => { },
+  setTax: () => {},
   taxPercentage: 0,
-  setTaxPercentage: () => { },
+  setTaxPercentage: () => {},
   subtotalPrice: 0,
-  setSubtotalPrice: () => { },
+  setSubtotalPrice: () => {},
   actualPrice: 0,
-  setActualPrice: () => { },
+  setActualPrice: () => {},
   havePaid: 0,
-  setHavePaid: () => { },
+  setHavePaid: () => {},
   totalPrice: 0,
   productionAmount: 0,
-  setProductionAmount: () => { },
+  setProductionAmount: () => {},
   splitAmount: 0,
-  setSplitAmount: () => { },
+  setSplitAmount: () => {},
   amountBill: 0,
-  setAmountBill: () => { },
+  setAmountBill: () => {},
   amountPaid: 0,
-  setAmountPaid: () => { },
+  setAmountPaid: () => {},
   taxSetting: {},
-  setTaxSetting: () => { },
+  setTaxSetting: () => {},
   globalDisc: {},
-  setGlobalDisc: () => { },
-  getGlobalDisc: () => { },
-  updateGlobalDisc: () => { },
+  setGlobalDisc: () => {},
+  getGlobalDisc: () => {},
+  updateGlobalDisc: () => {},
   isSaved: false,
-  setIsSaved: () => { },
+  setIsSaved: () => {},
   isFinished: false,
-  setIsFinished: () => { },
-  handleResetPos: () => { },
+  setIsFinished: () => {},
+  handleResetPos: () => {},
 });
 
 const CashierContextProvider = ({ children }) => {
@@ -139,28 +139,28 @@ const CashierContextProvider = ({ children }) => {
   const today = new Date();
   const isLaundryBagDay = isTuesday(today);
   const [orderDate, setOrderDate] = useState(today);
-  const [currentOrderID, setCurrentOrderID] = useState("");
-  const [displayOrderID, setDisplayOrderID] = useState("");
+  const [currentOrderID, setCurrentOrderID] = useState('');
+  const [displayOrderID, setDisplayOrderID] = useState('');
   const [pax, setPax] = useState(1);
-  const [qrKey, setQrKey] = useState("");
-  const [savedOrders, setSavedOrders] = useLocalStorage("savedOrders", []);
+  const [qrKey, setQrKey] = useState('');
+  const [savedOrders, setSavedOrders] = useLocalStorage('savedOrders', []);
   const [bill, setBill] = useState([]);
   const [splitBill, setSplitBill] = useState([]);
-  const [savedBillID, setSavedBillID] = useState("");
-  const [savedBill, setSavedBill] = useLocalStorage("savedBill", []);
-  const [selectedBill, setSelectedBill] = useState("");
+  const [savedBillID, setSavedBillID] = useState('');
+  const [savedBill, setSavedBill] = useLocalStorage('savedBill', []);
+  const [selectedBill, setSelectedBill] = useState('');
   const [updatedBill, setUpdatedBill] = useState([]);
   const [selectedTable, setSelectedTable] = useState(null);
-  const [orderType, setOrderType] = useState("onsite");
+  const [orderType, setOrderType] = useState('onsite');
   const [pickupData, setPickupData] = useState({});
   const [customerData, setCustomerData] = useState({});
-  const [customerName, setCustomerName] = useState("");
-  const [customerPhone, setCustomerPhone] = useState("");
-  const [customerNotes, setCustomerNotes] = useState("");
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerNotes, setCustomerNotes] = useState('');
   const [customerNew, setCustomerNew] = useState(false);
   const [customerScan, setCustomerScan] = useState(false);
   const [customerPoint, setCustomerPoint] = useState(0);
-  const [voucherCode, setVoucherCode] = useState("");
+  const [voucherCode, setVoucherCode] = useState('');
   const [listTable, setListTable] = useState(tableNameData);
   const [qrdata, setQrdata] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -174,7 +174,7 @@ const CashierContextProvider = ({ children }) => {
   const [discByPrice, setDiscByPrice] = useState(false);
   const [discount, setDiscount] = useState(0);
   const [discountPrice, setDiscountPrice] = useState(0);
-  const [discountLabel, setDiscountLabel] = useState("");
+  const [discountLabel, setDiscountLabel] = useState('');
   const [voucherDiscPrice, setVoucherDiscPrice] = useState(0);
   const [deliveryPrice, setDeliveryPrice] = useState(0);
   const [donation, setDonation] = useState(0);
@@ -203,13 +203,13 @@ const CashierContextProvider = ({ children }) => {
     }, 0);
 
     const sumProductionPrice = bill.reduce((acc, i) => {
-      return acc + (Math.round((i?.productionPrice || 0) * i.qty));
+      return acc + Math.round((i?.productionPrice || 0) * i.qty);
     }, 0);
 
     setProductionAmount(sumProductionPrice);
     let fixDiscPrice = sumPrice * (discount / 100);
     // first wash
-    const isFirst = discountLabel === "FIRST WASH";
+    const isFirst = discountLabel === 'FIRST WASH';
     const minFirstBilled = 40000;
     const maxFirstDiscPrice = 30000;
     const firstDisc = 50;
@@ -229,7 +229,7 @@ const CashierContextProvider = ({ children }) => {
 
     let serviceAmount = 0;
     let taxAmount = 0;
-    const taxFor = orderType?.toLowerCase() === "delivery" ? "delivery" : "onsite";
+    const taxFor = orderType?.toLowerCase() === 'delivery' ? 'delivery' : 'onsite';
 
     if (taxSetting?.serviceCharge?.isActive && taxSetting?.serviceCharge?.orderType.includes(taxFor)) {
       serviceAmount = Math.ceil((taxSetting?.serviceCharge?.percentage * sumPrice) / 100);
@@ -244,13 +244,13 @@ const CashierContextProvider = ({ children }) => {
     }
 
     setSubtotalPrice(sumPrice);
-    setActualPrice(((sumPrice + serviceAmount + taxAmount) - voucherDiscPrice - fixDiscPrice) + deliveryPrice);
+    setActualPrice(sumPrice + serviceAmount + taxAmount - voucherDiscPrice - fixDiscPrice + deliveryPrice);
   }, [bill, orderType, voucherDiscPrice, discount, discountPrice, discByPrice, deliveryPrice, discountLabel]);
 
   // Payment State
-  const [paymentMethod, setPaymentMethod] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [notes, setNotes] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [cardNumber, setCardNumber] = useState('');
+  const [notes, setNotes] = useState('');
   const [splitAmount, setSplitAmount] = useState(0);
   const [amountBill, setAmountBill] = useState(0);
   const [amountPaid, setAmountPaid] = useState(0);
@@ -269,7 +269,7 @@ const CashierContextProvider = ({ children }) => {
   // for Orders
   const getOrders = async () => {
     try {
-      await axios.get("/orders/").then((response) => {
+      await axios.get('/order/').then((response) => {
         setOrders(response.data);
       });
     } catch (error) {
@@ -279,7 +279,7 @@ const CashierContextProvider = ({ children }) => {
 
   const createOrders = async (data, isLocal = false) => {
     try {
-      const res = await axios.post("/orders", data);
+      const res = await axios.post('/order', data);
 
       if (res.status === 200) {
         // refresh order list
@@ -293,7 +293,7 @@ const CashierContextProvider = ({ children }) => {
       return res;
     } catch (error) {
       // console.error(error);
-      console.log("Connection failed, data saved to local storage.");
+      console.log('Connection failed, data saved to local storage.');
 
       if (isLocal === false) {
         setSavedOrders((current) => [...current, data]);
@@ -303,7 +303,7 @@ const CashierContextProvider = ({ children }) => {
 
   const updateOrders = async (id, data) => {
     try {
-      const res = await axios.patch(`/orders/${id}`, data);
+      const res = await axios.patch(`/order/${id}`, data);
 
       if (res.status === 200) {
         // refresh order list
@@ -318,19 +318,19 @@ const CashierContextProvider = ({ children }) => {
         current.map((item) =>
           item._id === id
             ? {
-              ...item,
-              customer: data.customer,
-              orders: data.orders,
-              status: data.status ? data.status : item.status,
-              havePaid: data?.havePaid || 0,
-              discount: data?.discount || 0,
-              discountPrice: data?.discountPrice || 0,
-              voucherDiscPrice: data?.voucherDiscPrice || 0,
-              billedAmount: data.billedAmount,
-              payment: data.payment ? data.payment : item.payment,
-              cardNumber: data.cardNumber ? data.cardNumber : item.cardNumber,
-              notes: data.notes ? data.notes : item.notes,
-            }
+                ...item,
+                customer: data.customer,
+                orders: data.orders,
+                status: data.status ? data.status : item.status,
+                havePaid: data?.havePaid || 0,
+                discount: data?.discount || 0,
+                discountPrice: data?.discountPrice || 0,
+                voucherDiscPrice: data?.voucherDiscPrice || 0,
+                billedAmount: data.billedAmount,
+                payment: data.payment ? data.payment : item.payment,
+                cardNumber: data.cardNumber ? data.cardNumber : item.cardNumber,
+                notes: data.notes ? data.notes : item.notes,
+              }
             : item
         )
       );
@@ -339,7 +339,7 @@ const CashierContextProvider = ({ children }) => {
 
   const updatePrintCount = async (id, data) => {
     try {
-      await axios.patch(`/orders/print-count/${id}`, data);
+      await axios.patch(`/order/print-count/${id}`, data);
     } catch (error) {
       console.error(error);
     }
@@ -347,7 +347,7 @@ const CashierContextProvider = ({ children }) => {
 
   const updatePrintLaundry = async (id, data) => {
     try {
-      await axios.patch(`/orders/print-laundry/${id}`, data);
+      await axios.patch(`/order/print-laundry/${id}`, data);
     } catch (error) {
       console.error(error);
     }
@@ -355,7 +355,7 @@ const CashierContextProvider = ({ children }) => {
 
   const deleteOrders = async (id) => {
     try {
-      await axios.delete(`/orders/${id}`);
+      await axios.delete(`/order/${id}`);
     } catch (error) {
       console.error(error);
     }
@@ -364,7 +364,7 @@ const CashierContextProvider = ({ children }) => {
   // for reservation
   const createReservation = async (data) => {
     try {
-      await axios.post("/reservations/create", data);
+      await axios.post('/reservations/create', data);
     } catch (error) {
       console.error(error);
     }
@@ -389,7 +389,7 @@ const CashierContextProvider = ({ children }) => {
   // for Qrdata
   const getQrdata = async () => {
     try {
-      await axios.get("/qrdata").then((response) => {
+      await axios.get('/qrdata').then((response) => {
         setQrdata(response.data);
       });
     } catch (error) {
@@ -400,7 +400,7 @@ const CashierContextProvider = ({ children }) => {
   const createQrdata = async (data) => {
     let res;
     try {
-      await axios.post("/qrdata/create", data).then((response) => {
+      await axios.post('/qrdata/create', data).then((response) => {
         if (response.status === 200) {
           getQrdata();
           res = response;
@@ -434,7 +434,7 @@ const CashierContextProvider = ({ children }) => {
 
   const getTaxSetting = async () => {
     try {
-      await axios.get("/tax").then((response) => {
+      await axios.get('/tax').then((response) => {
         setTaxSetting(response.data);
       });
     } catch (error) {
@@ -444,27 +444,27 @@ const CashierContextProvider = ({ children }) => {
 
   const updateTaxSetting = async (data) => {
     try {
-      await axios.post("/tax", data);
+      await axios.post('/tax', data);
       getTaxSetting();
     } catch (error) {
       console.error(error);
     }
   };
 
-  const getGlobalDisc = async () => {
-    try {
-      await axios.get("/discount/data").then((response) => {
-        setGlobalDisc(response.data);
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // const getGlobalDisc = async () => {
+  //   try {
+  //     await axios.get('/discount/data').then((response) => {
+  //       setGlobalDisc(response.data);
+  //     });
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   const updateGlobalDisc = async (data) => {
     try {
-      await axios.post("/discount", data);
-      getGlobalDisc();
+      await axios.post('/discount', data);
+      // getGlobalDisc();
     } catch (error) {
       console.error(error);
     }
@@ -472,27 +472,27 @@ const CashierContextProvider = ({ children }) => {
 
   useEffect(() => {
     getTaxSetting();
-    getGlobalDisc();
+    // getGlobalDisc();
   }, []);
 
   const handleResetAfterSave = () => {
     setOrderDate(new Date());
-    setCurrentOrderID("");
-    setDisplayOrderID("");
+    setCurrentOrderID('');
+    setDisplayOrderID('');
     setPax(1);
-    setQrKey("");
+    setQrKey('');
     setBill([]);
     setSplitBill([]);
-    setSavedBillID("");
+    setSavedBillID('');
     setSelectedTable(null);
-    setOrderType("onsite");
+    setOrderType('onsite');
     setDp(0);
     setDeliveryPrice(0);
     setDonation(0);
     setDiscByPrice(false);
     setDiscount(0);
     setDiscountPrice(0);
-    setDiscountLabel("");
+    setDiscountLabel('');
     setVoucherDiscPrice(0);
     setSplitServiceCharge(0);
     setServiceCharge(0);
@@ -505,20 +505,20 @@ const CashierContextProvider = ({ children }) => {
     setHavePaid(0);
     setProductionAmount(0);
     setSplitAmount(0);
-    setPaymentMethod("");
+    setPaymentMethod('');
     setAmountBill(0);
     setAmountPaid(0);
-    setCardNumber("");
-    setNotes("");
+    setCardNumber('');
+    setNotes('');
     setPickupData({});
     setCustomerData({});
-    setCustomerName("");
-    setCustomerPhone("");
-    setCustomerNotes("");
+    setCustomerName('');
+    setCustomerPhone('');
+    setCustomerNotes('');
     setCustomerNew(false);
     setCustomerScan(false);
     setCustomerPoint(0);
-    setVoucherCode("");
+    setVoucherCode('');
   };
 
   const handleResetPos = () => {
@@ -652,7 +652,7 @@ const CashierContextProvider = ({ children }) => {
         updateTaxSetting,
         globalDisc,
         setGlobalDisc,
-        getGlobalDisc,
+        // getGlobalDisc,
         updateGlobalDisc,
         isSaved,
         setIsSaved,

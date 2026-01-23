@@ -209,7 +209,7 @@ export default function CashierOrders() {
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"
-              count={tableData?.totalPages}
+              count={Number(tableData?.totalPages || 0)}
               rowsPerPage={controller.rowsPerPage}
               page={controller.page}
               onPageChange={handlePageChange}
