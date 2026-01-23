@@ -49,13 +49,13 @@ export const useNavConfig = () => {
           title: 'POS',
           path: PATH_DASHBOARD.cashier.pos,
           icon: ICONS.pos,
-          roles: ['Super Admin', 'Cashier'],
+          roles: ['Admin', 'Owner'],
         },
         {
           title: 'Orders',
           path: PATH_DASHBOARD.cashier.orders,
           icon: ICONS.order,
-          roles: ['Super Admin', 'Cashier'],
+          roles: ['Owner', 'Staff', 'Admin'],
         },
         // {
         //   title: 'Delivery',
@@ -68,7 +68,7 @@ export const useNavConfig = () => {
           title: 'PickUp',
           path: PATH_DASHBOARD.pickup.root,
           icon: ICONS.pickup,
-          roles: ['Super Admin', 'Cashier'],
+          roles: ['Owner', 'Staff', 'Admin'],
         },
         // {
         //   title: 'Scan Orders',

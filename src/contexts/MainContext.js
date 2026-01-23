@@ -74,16 +74,16 @@ const MainContextProvider = ({ children }) => {
   const [generalPerfume, setGeneralPerfume] = useState({});
 
   // Fetch notification
-  const { data: allNotif } = useQuery(
-    ['allNotif'],
-    async () => {
-      const res = await axios.get('/notification/all');
-      return res.data;
-    },
-    {
-      refetchOnWindowFocus: false, // Prevents refetch on window focus
-    }
-  );
+  // const { data: allNotif } = useQuery(
+  //   ['allNotif'],
+  //   async () => {
+  //     const res = await axios.get('/notification/all');
+  //     return res.data;
+  //   },
+  //   {
+  //     refetchOnWindowFocus: false, // Prevents refetch on window focus
+  //   }
+  // );
 
   // Fetch product data
   const { data: product = [] } = useQuery(
@@ -133,18 +133,6 @@ const MainContextProvider = ({ children }) => {
     }
   );
 
-  // Fetch promotion available data
-  const { data: currentPromo = [] } = useQuery(
-    ['allCurrentPromotion'],
-    async () => {
-      const res = await axios.get('/promotions/available');
-      return res.data;
-    },
-    {
-      refetchOnWindowFocus: false,
-    }
-  );
-
   // Fetch receipt setting data
   const { data: receiptHeader = {} } = useQuery(
     ['receiptHeader'],
@@ -158,16 +146,16 @@ const MainContextProvider = ({ children }) => {
   );
 
   // Fetch receipt setting data
-  const { data: businessInformation = {} } = useQuery(
-    ['businessInformation'],
-    async () => {
-      const res = await axios.get('/informations');
-      return res.data;
-    },
-    {
-      refetchOnWindowFocus: false,
-    }
-  );
+  // const { data: businessInformation = {} } = useQuery(
+  //   ['businessInformation'],
+  //   async () => {
+  //     const res = await axios.get('/informations');
+  //     return res.data;
+  //   },
+  //   {
+  //     refetchOnWindowFocus: false,
+  //   }
+  // );
 
   const createProduct = async (data) => {
     try {
@@ -198,7 +186,7 @@ const MainContextProvider = ({ children }) => {
 
   const getDetailPromo = async (id) => {
     try {
-      await axios.get(`/promotions/${id}`).then((response) => {
+      await axios.get(`/promotion/${id}`).then((response) => {
         setDetailPromo(response.data);
       });
     } catch (error) {
@@ -208,7 +196,7 @@ const MainContextProvider = ({ children }) => {
 
   const createPromotion = async (data) => {
     try {
-      await axios.post('/promotions', data);
+      await axios.post('/promotion', data);
       client.invalidateQueries('allProduct');
       client.invalidateQueries('allCurrentPromotion');
     } catch (error) {
@@ -218,7 +206,7 @@ const MainContextProvider = ({ children }) => {
 
   const updatePromotion = async (id, newData) => {
     try {
-      await axios.patch(`/promotions/${id}`, newData);
+      await axios.patch(`/promotion/${id}`, newData);
       client.invalidateQueries('allProduct');
       client.invalidateQueries('allCurrentPromotion');
     } catch (error) {
@@ -228,7 +216,7 @@ const MainContextProvider = ({ children }) => {
 
   const deletePromotion = async (id) => {
     try {
-      await axios.delete(`/promotions/${id}`);
+      await axios.delete(`/promotion/${id}`);
       client.invalidateQueries('allProduct');
       client.invalidateQueries('allCurrentPromotion');
     } catch (error) {
@@ -292,7 +280,7 @@ const MainContextProvider = ({ children }) => {
 
   const createVariant = async (data) => {
     try {
-      await axios.post('/variants', data);
+      await axios.post('/variant', data);
       client.invalidateQueries('allVariant');
       client.invalidateQueries('allProduct');
       client.invalidateQueries('allCurrentPromotion');
@@ -303,7 +291,7 @@ const MainContextProvider = ({ children }) => {
 
   const updateVariant = async (id, newData) => {
     try {
-      await axios.patch(`/variants/${id}`, newData);
+      await axios.patch(`/variant/${id}`, newData);
       client.invalidateQueries('allVariant');
       client.invalidateQueries('allProduct');
       client.invalidateQueries('allCurrentPromotion');
@@ -314,7 +302,7 @@ const MainContextProvider = ({ children }) => {
 
   const deleteVariant = async (id) => {
     try {
-      await axios.delete(`/variants/${id}`);
+      await axios.delete(`/variant/${id}`);
       client.invalidateQueries('allVariant');
       client.invalidateQueries('allProduct');
       client.invalidateQueries('allCurrentPromotion');
@@ -437,7 +425,7 @@ const MainContextProvider = ({ children }) => {
   // for other setting
   const getGeneralSettings = async () => {
     try {
-      await axios.get('/settings/').then((response) => {
+      await axios.get('/setting/').then((response) => {
         setGeneralSettings(response.data);
       });
     } catch (error) {
@@ -447,7 +435,7 @@ const MainContextProvider = ({ children }) => {
 
   const saveGeneralSettings = async (data) => {
     try {
-      await axios.post('/settings/', data).then((response) => {
+      await axios.post('/setting/', data).then((response) => {
         if (response.status === 200) {
           getGeneralSettings();
         }
@@ -460,7 +448,7 @@ const MainContextProvider = ({ children }) => {
   // for perfume
   const getGeneralPerfume = async () => {
     try {
-      await axios.get('/variants?perfume=yes').then((response) => {
+      await axios.get('/variant?perfume=yes').then((response) => {
         setGeneralPerfume(response.data[0]);
       });
     } catch (error) {
@@ -470,7 +458,7 @@ const MainContextProvider = ({ children }) => {
 
   const saveGeneralPerfume = async (data) => {
     try {
-      await axios.post('/variants/perfume/', data).then((response) => {
+      await axios.post('/variant/perfume/', data).then((response) => {
         if (response.status === 200) {
           getGeneralPerfume();
         }
@@ -492,11 +480,13 @@ const MainContextProvider = ({ children }) => {
     fetchAll();
   }, []);
 
-  useEffect(() => {
-    if (businessInformation?.accountType) {
-      setCurrentAccount(process.env.REACT_APP_ACCOUNT_TYPE || businessInformation?.accountType);
-    }
-  }, [businessInformation]);
+  // useEffect(() => {
+  //   if (businessInformation?.accountType) {
+  //     setCurrentAccount(process.env.REACT_APP_ACCOUNT_TYPE || businessInformation?.accountType);
+  //   }
+  // }, [businessInformation]);
+
+  const allNotif = null;
 
   return (
     <mainContext.Provider
@@ -520,7 +510,6 @@ const MainContextProvider = ({ children }) => {
         createVariant,
         updateVariant,
         deleteVariant,
-        currentPromo,
         detailPromo,
         setDetailPromo,
         getDetailPromo,
@@ -532,7 +521,7 @@ const MainContextProvider = ({ children }) => {
         deleteUserList,
         currentAccount,
         setCurrentAccount,
-        businessInformation,
+        // businessInformation,
         updateBusinessInformation,
         updatePersonalInformation,
         updatePassword,

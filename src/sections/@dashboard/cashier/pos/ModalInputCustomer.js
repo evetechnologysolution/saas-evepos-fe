@@ -1,6 +1,6 @@
-import React, { useState, useContext, useEffect, useCallback } from "react";
-import PropTypes from "prop-types";
-import debounce from "lodash.debounce";
+import React, { useState, useContext, useEffect, useCallback } from 'react';
+import PropTypes from 'prop-types';
+import debounce from 'lodash.debounce';
 // @mui
 import {
   Alert,
@@ -15,17 +15,17 @@ import {
   IconButton,
   TextField,
   InputAdornment,
-} from "@mui/material";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { MobileDateTimePicker } from "@mui/x-date-pickers/MobileDateTimePicker";
-import axios from "../../../../utils/axios";
-import useAuth from "../../../../hooks/useAuth";
-import Iconify from "../../../../components/Iconify";
-import CustomSwitch from "../../../../components/CustomSwitch";
-import { maskedPhone } from "../../../../utils/masked";
+} from '@mui/material';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { MobileDateTimePicker } from '@mui/x-date-pickers/MobileDateTimePicker';
+import axios from '../../../../utils/axios';
+import useAuth from '../../../../hooks/useAuth';
+import Iconify from '../../../../components/Iconify';
+import CustomSwitch from '../../../../components/CustomSwitch';
+import { maskedPhone } from '../../../../utils/masked';
 // context
-import { cashierContext } from "../../../../contexts/CashierContext";
+import { cashierContext } from '../../../../contexts/CashierContext';
 
 // ----------------------------------------------------------------------
 
@@ -35,10 +35,10 @@ ModalInputCustomer.propTypes = {
 };
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-  "& .MuiDialogContent-root": {
+  '& .MuiDialogContent-root': {
     padding: theme.spacing(2),
   },
-  "& .MuiDialogActions-root": {
+  '& .MuiDialogActions-root': {
     padding: theme.spacing(1),
   },
 }));
@@ -54,7 +54,7 @@ const BootstrapDialogTitle = (props) => {
           aria-label="close"
           onClick={onClose}
           sx={{
-            position: "absolute",
+            position: 'absolute',
             right: 8,
             top: 8,
             color: (theme) => theme.palette.grey[500],
@@ -79,10 +79,10 @@ export default function ModalInputCustomer(props) {
   const [date, setDate] = useState(null);
   const [isNew, setIsNew] = useState(false);
   const [alert, setAlert] = useState(false);
-  const [fullName, setFullName] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [fullName, setFullName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
   const [point, setPoint] = useState(0);
 
   const [members, setMembers] = useState([]);
@@ -95,12 +95,12 @@ export default function ModalInputCustomer(props) {
         const res = await axios.get(`/members?search=${query}`);
         setMembers(res?.data?.docs || []);
       } catch (error) {
-        console.error("Error fetching members:", error);
+        console.error('Error fetching members:', error);
       } finally {
         setLoading(false);
       }
     } else {
-      const res = await axios.get("/members");
+      const res = await axios.get('/members');
       setMembers(res?.data?.docs || []);
     }
   };
@@ -112,11 +112,11 @@ export default function ModalInputCustomer(props) {
   };
 
   const handleChange = (_, val) => {
-    setFullName(val ? val.name : "");
-    setPhone(val ? val.phone : "");
+    setFullName(val ? val.name : '');
+    setPhone(val ? val.phone : '');
     setPoint(val ? val.point : 0);
     if (!val) {
-      debouncedSearch("");
+      debouncedSearch('');
     }
   };
 
@@ -124,10 +124,10 @@ export default function ModalInputCustomer(props) {
     const fetchDefaultMembers = async () => {
       try {
         setLoading(true);
-        const res = await axios.get("/members?perPage=30");
+        const res = await axios.get('/member?perPage=30');
         setMembers(res?.data?.docs || []);
       } catch (error) {
-        console.error("Error fetching default members:", error);
+        console.error('Error fetching default members:', error);
       } finally {
         setLoading(false);
       }
@@ -150,10 +150,10 @@ export default function ModalInputCustomer(props) {
     props.onClose();
     setTimeout(() => {
       setDate(new Date());
-      setFullName("");
-      setFirstName("");
-      setLastName("");
-      setPhone("");
+      setFullName('');
+      setFirstName('');
+      setLastName('');
+      setPhone('');
       setPoint(0);
       setAlert(false);
       setIsNew(false);
@@ -162,16 +162,16 @@ export default function ModalInputCustomer(props) {
 
   const handleCancel = () => {
     if (!ctx.customerName) {
-      ctx.setOrderType("onsite");
+      ctx.setOrderType('onsite');
     }
     handleReset();
   };
 
   const handleSwitch = () => {
-    setFullName("");
-    setFirstName("");
-    setLastName("");
-    setPhone("");
+    setFullName('');
+    setFirstName('');
+    setLastName('');
+    setPhone('');
     setPoint(0);
     setIsNew(!isNew);
     setAlert(false);
@@ -196,7 +196,7 @@ export default function ModalInputCustomer(props) {
     <BootstrapDialog aria-labelledby="customized-dialog-title" fullWidth maxWidth="sm" open={props.open}>
       <BootstrapDialogTitle
         id="customized-dialog-title"
-        sx={{ m: 0, p: 2, borderBottom: "1px solid #ccc" }}
+        sx={{ m: 0, p: 2, borderBottom: '1px solid #ccc' }}
         onClose={handleCancel}
       >
         Input Customer
@@ -219,7 +219,7 @@ export default function ModalInputCustomer(props) {
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   error={!firstName && alert ? Boolean(true) : Boolean(false)}
-                  helperText={!firstName && alert ? "First Name is required" : ""}
+                  helperText={!firstName && alert ? 'First Name is required' : ''}
                 />
                 <TextField
                   name="lastName"
@@ -229,7 +229,7 @@ export default function ModalInputCustomer(props) {
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   error={!lastName && alert ? Boolean(true) : Boolean(false)}
-                  helperText={!lastName && alert ? "Last Name is required" : ""}
+                  helperText={!lastName && alert ? 'Last Name is required' : ''}
                 />
               </>
             ) : (
@@ -249,7 +249,7 @@ export default function ModalInputCustomer(props) {
                     variant="outlined"
                     onChange={onInputSearch}
                     error={!fullName && alert ? Boolean(true) : Boolean(false)}
-                    helperText={!fullName && alert ? "Customer Name is required" : ""}
+                    helperText={!fullName && alert ? 'Customer Name is required' : ''}
                   />
                 )}
                 fullWidth
@@ -257,7 +257,7 @@ export default function ModalInputCustomer(props) {
                 loading={loading}
                 onChange={handleChange}
                 value={fullName || null}
-              // freeSolo
+                // freeSolo
               />
             )}
             <div>
@@ -296,10 +296,10 @@ export default function ModalInputCustomer(props) {
               fullWidth
               autoComplete="off"
               // value={phone}
-              value={!isNew ? (!phone?.includes("EM") ? maskedPhone(user?.role === "Super Admin", phone) : "-") : phone}
-              onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ""))}
+              value={!isNew ? (!phone?.includes('EM') ? maskedPhone(user?.role === 'Super Admin', phone) : '-') : phone}
+              onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
               error={!phone && alert ? Boolean(true) : Boolean(false)}
-              helperText={!phone && alert ? "Phone is required" : ""}
+              helperText={!phone && alert ? 'Phone is required' : ''}
               disabled={isNew ? Boolean(false) : Boolean(true)}
             />
             <Stack justifyContent="center">

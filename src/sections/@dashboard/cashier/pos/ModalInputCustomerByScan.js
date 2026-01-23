@@ -1,8 +1,8 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
+import React, { useState, useContext, useEffect, useRef } from 'react';
 // zxing
-import { BrowserMultiFormatReader } from "@zxing/library";
-import Webcam from "react-webcam";
-import PropTypes from "prop-types";
+import { BrowserMultiFormatReader } from '@zxing/library';
+import Webcam from 'react-webcam';
+import PropTypes from 'prop-types';
 // @mui
 import {
   Alert,
@@ -16,17 +16,17 @@ import {
   TextField,
   Typography,
   InputAdornment,
-} from "@mui/material";
-import { LoadingButton } from "@mui/lab";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { MobileDateTimePicker } from "@mui/x-date-pickers/MobileDateTimePicker";
-import axios from "../../../../utils/axios";
-import useAuth from "../../../../hooks/useAuth";
-import Iconify from "../../../../components/Iconify";
-import { maskedPhone } from "../../../../utils/masked";
+} from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { MobileDateTimePicker } from '@mui/x-date-pickers/MobileDateTimePicker';
+import axios from '../../../../utils/axios';
+import useAuth from '../../../../hooks/useAuth';
+import Iconify from '../../../../components/Iconify';
+import { maskedPhone } from '../../../../utils/masked';
 // context
-import { cashierContext } from "../../../../contexts/CashierContext";
+import { cashierContext } from '../../../../contexts/CashierContext';
 
 // ----------------------------------------------------------------------
 
@@ -36,10 +36,10 @@ ModalScanCustomer.propTypes = {
 };
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-  "& .MuiDialogContent-root": {
+  '& .MuiDialogContent-root': {
     padding: theme.spacing(2),
   },
-  "& .MuiDialogActions-root": {
+  '& .MuiDialogActions-root': {
     padding: theme.spacing(1),
   },
 }));
@@ -55,7 +55,7 @@ const BootstrapDialogTitle = (props) => {
           aria-label="close"
           onClick={onClose}
           sx={{
-            position: "absolute",
+            position: 'absolute',
             right: 8,
             top: 8,
             color: (theme) => theme.palette.grey[500],
@@ -82,9 +82,9 @@ export default function ModalScanCustomer(props) {
   const [alert, setAlert] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [notVerified, setNotVerified] = useState(false);
-  const [memberId, setMemberId] = useState("");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [memberId, setMemberId] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [point, setPoint] = useState(0);
   const [isCameraOpen, setIsCameraOpen] = useState(false); // State untuk menampilkan kamera
   const [intervalId, setIntervalId] = useState(null);
@@ -107,9 +107,9 @@ export default function ModalScanCustomer(props) {
 
         // Trigger event keydown Enter secara programatik
         setTimeout(() => {
-          const enterEvent = new KeyboardEvent("keydown", {
-            key: "Enter",
-            code: "Enter",
+          const enterEvent = new KeyboardEvent('keydown', {
+            key: 'Enter',
+            code: 'Enter',
             keyCode: 13,
             which: 13,
             bubbles: true,
@@ -135,9 +135,7 @@ export default function ModalScanCustomer(props) {
       const imageSrc = webcamRef.current.getScreenshot();
       if (imageSrc) {
         try {
-          const result = await codeReaderRef.current.decodeFromImageUrl(
-            imageSrc
-          );
+          const result = await codeReaderRef.current.decodeFromImageUrl(imageSrc);
           if (result) {
             handleScanSuccess(result.getText());
           }
@@ -158,7 +156,7 @@ export default function ModalScanCustomer(props) {
       try {
         codeReaderRef.current.reset();
       } catch (err) {
-        console.warn("ZXing reset error:", err);
+        console.warn('ZXing reset error:', err);
       }
     }
 
@@ -178,7 +176,7 @@ export default function ModalScanCustomer(props) {
     };
 
     // Add event listener for browser back action
-    window.addEventListener("popstate", handleBackAction);
+    window.addEventListener('popstate', handleBackAction);
 
     // Manipulasi riwayat secara manual saat membuka kamera
     if (isCameraOpen) {
@@ -187,7 +185,7 @@ export default function ModalScanCustomer(props) {
 
     // Cleanup when the component unmounts or camera is closed
     return () => {
-      window.removeEventListener("popstate", handleBackAction);
+      window.removeEventListener('popstate', handleBackAction);
       if (isCameraOpen) {
         handleCloseCamera(); // Ensure camera is closed when leaving the modal
       }
@@ -198,19 +196,19 @@ export default function ModalScanCustomer(props) {
     if (memberId) {
       setLoading(true);
       try {
-        const res = await axios.get(`/members/track?search=${memberId}`);
+        const res = await axios.get(`/member/track?search=${memberId}`);
         if (res?.data) {
           setNotFound(false);
           setNotVerified(!res?.data?.isVerified);
-          setName(res?.data?.isVerified ? res?.data?.name : "");
-          setPhone(res?.data?.isVerified ? res?.data?.phone : "");
+          setName(res?.data?.isVerified ? res?.data?.name : '');
+          setPhone(res?.data?.isVerified ? res?.data?.phone : '');
           setPoint(res?.data?.isVerified ? res?.data?.point : 0);
         }
       } catch (error) {
-        console.error("Error fetching members:", error);
+        console.error('Error fetching members:', error);
         setNotFound(true);
-        setName("");
-        setPhone("");
+        setName('');
+        setPhone('');
         setPoint(0);
       } finally {
         setLoading(false);
@@ -219,7 +217,7 @@ export default function ModalScanCustomer(props) {
   };
 
   const handleOnKeyPress = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleSearch();
     }
   };
@@ -228,9 +226,9 @@ export default function ModalScanCustomer(props) {
     props.onClose();
     setTimeout(() => {
       setDate(new Date());
-      setMemberId("");
-      setName("");
-      setPhone("");
+      setMemberId('');
+      setName('');
+      setPhone('');
       setPoint(0);
       setAlert(false);
       setNotFound(false);
@@ -241,13 +239,13 @@ export default function ModalScanCustomer(props) {
   const handleCancel = () => {
     ctx.setCustomerScan(false);
     if (!ctx.customerName) {
-      ctx.setOrderType("onsite");
+      ctx.setOrderType('onsite');
     }
     handleReset();
   };
 
   const handleSubmit = () => {
-    if (name !== "" && phone !== "") {
+    if (name !== '' && phone !== '') {
       ctx.setOrderDate(date);
       ctx.setCustomerName(name);
       ctx.setCustomerPhone(phone);
@@ -264,7 +262,7 @@ export default function ModalScanCustomer(props) {
     <BootstrapDialog aria-labelledby="customized-dialog-title" fullWidth maxWidth="sm" open={props.open}>
       <BootstrapDialogTitle
         id="customized-dialog-title"
-        sx={{ m: 0, p: 2, borderBottom: "1px solid #ccc" }}
+        sx={{ m: 0, p: 2, borderBottom: '1px solid #ccc' }}
         onClose={handleCancel}
       >
         Input Customer
@@ -316,7 +314,7 @@ export default function ModalScanCustomer(props) {
               }}
               onKeyDown={handleOnKeyPress}
               InputProps={{
-                inputProps: { maxLength: 16 }
+                inputProps: { maxLength: 16 },
               }}
             />
             {/* <LoadingButton variant="contained" loading={loading} onClick={() => handleSearch()}>
@@ -327,7 +325,11 @@ export default function ModalScanCustomer(props) {
             </LoadingButton>
           </Stack>
           {notFound && <Alert severity="warning">Data member tidak ditemukan</Alert>}
-          {notVerified && <Alert severity="error">Belum terdaftar sebagai member, silakan register di <b>evewash.com</b>.</Alert>}
+          {notVerified && (
+            <Alert severity="error">
+              Belum terdaftar sebagai member, silakan register di <b>evewash.com</b>.
+            </Alert>
+          )}
           <Stack flexDirection="row" alignItems="center" gap={2}>
             <TextField
               name="customerName"
@@ -337,7 +339,7 @@ export default function ModalScanCustomer(props) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               error={!name && alert ? Boolean(true) : Boolean(false)}
-              helperText={!name && alert ? "Customer Name is required" : ""}
+              helperText={!name && alert ? 'Customer Name is required' : ''}
               disabled
             />
             <TextField
@@ -345,9 +347,9 @@ export default function ModalScanCustomer(props) {
               label="WA Number"
               fullWidth
               autoComplete="off"
-              value={!phone?.includes("EM") ? maskedPhone(user?.role === "Super Admin", phone) : "-"}
+              value={!phone?.includes('EM') ? maskedPhone(user?.role === 'Super Admin', phone) : '-'}
               error={!phone && alert ? Boolean(true) : Boolean(false)}
-              helperText={!phone && alert ? "Phone is required" : ""}
+              helperText={!phone && alert ? 'Phone is required' : ''}
               disabled
             />
             <Button variant="contained" onClick={() => handleSubmit()}>
@@ -361,16 +363,16 @@ export default function ModalScanCustomer(props) {
       {isCameraOpen && (
         <div
           style={{
-            position: "fixed",
+            position: 'fixed',
             top: 0,
             left: 0,
-            width: "100vw",
-            height: "100vh",
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
             zIndex: 9999,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
           {/* Kamera pakai react-webcam */}
@@ -378,17 +380,17 @@ export default function ModalScanCustomer(props) {
             ref={webcamRef}
             audio={false}
             screenshotFormat="image/jpeg"
-            videoConstraints={{ facingMode: "environment" }}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            videoConstraints={{ facingMode: 'environment' }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
           <IconButton
             onClick={() => handleCloseCamera()}
             style={{
-              position: "absolute",
+              position: 'absolute',
               top: 20,
               right: 20,
-              color: "white",
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              color: 'white',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
               zIndex: 10000,
             }}
           >
@@ -400,24 +402,24 @@ export default function ModalScanCustomer(props) {
             alignItems="center"
             gap={4}
             p={1}
-            sx={{ position: "absolute", inset: 0 }}
+            sx={{ position: 'absolute', inset: 0 }}
           >
-            <div style={{ position: "relative", width: "50vw", height: "50vh" }}>
-              {["top left", "top right", "bottom left", "bottom right"].map((pos, i) => {
-                let bgColor = "#FFFFFF transparent transparent #FFFFFF";
-                if (i === 1) bgColor = "#FFFFFF #FFFFFF transparent transparent";
-                if (i === 2) bgColor = "transparent transparent #FFFFFF #FFFFFF";
-                if (i === 3) bgColor = "transparent #FFFFFF #FFFFFF transparent";
+            <div style={{ position: 'relative', width: '50vw', height: '50vh' }}>
+              {['top left', 'top right', 'bottom left', 'bottom right'].map((pos, i) => {
+                let bgColor = '#FFFFFF transparent transparent #FFFFFF';
+                if (i === 1) bgColor = '#FFFFFF #FFFFFF transparent transparent';
+                if (i === 2) bgColor = 'transparent transparent #FFFFFF #FFFFFF';
+                if (i === 3) bgColor = 'transparent #FFFFFF #FFFFFF transparent';
                 return (
                   <div
                     key={i}
                     style={{
-                      position: "absolute",
-                      [pos.split(" ")[0]]: 0,
-                      [pos.split(" ")[1]]: 0,
-                      width: "2rem",
-                      height: "2rem",
-                      border: "4px solid transparent",
+                      position: 'absolute',
+                      [pos.split(' ')[0]]: 0,
+                      [pos.split(' ')[1]]: 0,
+                      width: '2rem',
+                      height: '2rem',
+                      border: '4px solid transparent',
                       borderColor: bgColor,
                     }}
                   />
@@ -427,31 +429,31 @@ export default function ModalScanCustomer(props) {
               {/* Animasi scan */}
               <div
                 style={{
-                  position: "absolute",
+                  position: 'absolute',
                   top: 0,
                   left: 0,
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  justifyContent: "center",
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  justifyContent: 'center',
                 }}
               >
                 <div
                   style={{
-                    width: "100%",
-                    height: "100%",
-                    background: "rgba(255, 255, 255, 0.1)",
-                    position: "absolute",
+                    width: '100%',
+                    height: '100%',
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    position: 'absolute',
                   }}
                 />
                 <div
                   style={{
-                    width: "100%",
-                    height: "4px",
-                    background: "rgba(255, 255, 255, 0.8)",
-                    position: "absolute",
-                    animation: "scanMove 2s linear infinite",
-                    boxShadow: "0px 0px 10px #FFFFFF",
+                    width: '100%',
+                    height: '4px',
+                    background: 'rgba(255, 255, 255, 0.8)',
+                    position: 'absolute',
+                    animation: 'scanMove 2s linear infinite',
+                    boxShadow: '0px 0px 10px #FFFFFF',
                   }}
                 />
               </div>

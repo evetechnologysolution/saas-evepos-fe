@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import { setHours, setMinutes, setSeconds } from 'date-fns';
 import { useSnackbar } from 'notistack';
 // @mui
 import { Box, Card, Container, Button, Grid, Typography, Stack, Tooltip, Menu, MenuItem } from '@mui/material';
@@ -35,7 +34,7 @@ import { mainContext } from '../../contexts/MainContext';
 // utils
 // import { numberWithCommas, formatDay, randomCustomer } from "../../utils/getData";
 import { generateRandomId } from '../../utils/generateRandom';
-import { numberWithCommas, formatDay, combinedDateTime } from '../../utils/getData';
+import { numberWithCommas, formatDay } from '../../utils/getData';
 import CashierPosProduct from './CashierPosProduct';
 import PrintReceipt from '../../sections/@dashboard/cashier/pos/PrintReceipt';
 
@@ -263,14 +262,15 @@ export default function CashierPos() {
         ctx.setDisplayOrderID(orderId);
 
         let objData = {
-          _id: orderUid,
+          // _id: orderUid,
+          tempId: orderUid,
           // date: combinedDateTime(ctx?.orderDate || new Date()),
-          date: ctx?.orderDate,
+          createdAt: ctx?.orderDate,
           orderId,
           staff: user?.fullname,
           orders: ctx.bill,
           orderType: ctx?.orderType || 'onsite',
-          status: 'Pending',
+          status: 'unpaid',
           serviceChargePercentage: ctx.serviceChargePercentage,
           serviceCharge: ctx.serviceCharge,
           taxPercentage: ctx.taxPercentage,
@@ -328,7 +328,6 @@ export default function CashierPos() {
         }}
       >
         <Container maxWidth={themeStretch ? false : 'xl'}>
-          asdasdasd
           {!ctx.isFinished && (
             <Grid container spacing={3}>
               <Grid item xs={12} md={7} sx={{ height: '71vh' }}>

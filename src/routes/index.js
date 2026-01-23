@@ -99,7 +99,7 @@ export default function Router() {
         {
           path: 'app',
           element: (
-            <RoleBasedGuard hasContent roles={['Owner', 'Admin', 'Staff', 'Cashier']}>
+            <RoleBasedGuard hasContent roles={['owner', 'admin', 'staff', 'cashier']}>
               <Dashboard />
             </RoleBasedGuard>
           ),
@@ -127,7 +127,7 @@ export default function Router() {
             {
               path: 'pos',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                <RoleBasedGuard hasContent roles={['admin', 'owner']}>
                   <CashierPos />
                 </RoleBasedGuard>
               ),
@@ -135,17 +135,17 @@ export default function Router() {
             {
               path: 'orders',
               element: (
-                // <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                <CashierOrders />
-                // </RoleBasedGuard>
+                <RoleBasedGuard hasContent roles={['staff', 'owner']}>
+                  <CashierOrders />
+                </RoleBasedGuard>
               ),
             },
             {
               path: 'orders/:id/edit',
               element: (
-                // <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                <CashierOrdersEdit />
-                // </RoleBasedGuard>
+                <RoleBasedGuard hasContent roles={['staff', 'owner']}>
+                  <CashierOrdersEdit />
+                </RoleBasedGuard>
               ),
             },
             {
@@ -169,9 +169,9 @@ export default function Router() {
         {
           path: 'pickup',
           element: (
-            // <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-            <PickupOrders />
-            // </RoleBasedGuard>
+            <RoleBasedGuard hasContent roles={['staff', 'owner']}>
+              <PickupOrders />
+            </RoleBasedGuard>
           ),
         },
         {

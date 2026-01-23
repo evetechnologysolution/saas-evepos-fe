@@ -110,6 +110,7 @@ export default function OrdersTableRow({ row, local, closeLocal, onDeleteRow }) 
     _id,
     orderId,
     createdAt,
+    date,
     // staff,
     customer,
     customerRef,
@@ -141,7 +142,7 @@ export default function OrdersTableRow({ row, local, closeLocal, onDeleteRow }) 
     statusColor = 'success';
   } else if (status?.toLowerCase() === 'half paid') {
     statusColor = 'secondary';
-  } else if (status?.toLowerCase() === 'pending') {
+  } else if (status?.toLowerCase() === 'unpaid') {
     statusColor = 'warning';
   } else if (status?.toLowerCase() === 'refund') {
     statusColor = 'default';
@@ -254,52 +255,52 @@ Terima kasih telah menggunakan layanan kami 🙏`;
   const handlePay = async () => {
     setLoadingShow(true);
 
-    // ctx.handleResetPos();
-    // ctx.setCurrentOrderID(_id);
-    // ctx.setDisplayOrderID(orderId);
-    // ctx.setBill(orders);
-    // ctx.setOrderDate(createdAt);
-    // if (customer.name) {
-    //   ctx.setCustomerData(customer);
-    //   ctx.setCustomerName(customer.name);
-    //   ctx.setCustomerPhone(customer?.phone || '');
-    //   ctx.setCustomerNotes(customer?.notes || '');
-    //   ctx.setCustomerPoint(customerRef?.point || 0);
-    //   ctx.setCustomerScan(isScan || false);
-    // }
-    // ctx.setOrderType(showOrderType());
-    // if (dp) {
-    //   ctx.setDp(dp);
-    // }
-    // if (serviceCharge) {
-    //   ctx.setServiceCharge(serviceCharge);
-    //   ctx.setServiceChargePercentage(serviceChargePercentage);
-    // }
-    // if (tax) {
-    //   ctx.setTax(tax);
-    //   ctx.setTaxPercentage(taxPercentage);
-    // }
-    // if (discount) {
-    //   ctx.setDiscount(discount);
-    // }
-    // if (discountPrice) {
-    //   ctx.setDiscountPrice(discountPrice);
-    // }
-    // if (discountLabel) {
-    //   ctx.setDiscountLabel(discountLabel);
-    // }
-    // if (voucherCode) {
-    //   ctx.setVoucherCode(voucherCode?.[0] || '');
-    // }
-    // if (voucherDiscPrice) {
-    //   ctx.setVoucherDiscPrice(voucherDiscPrice);
-    // }
-    // if (deliveryPrice) {
-    //   ctx.setDeliveryPrice(deliveryPrice);
-    // }
-    // if (havePaid) {
-    //   ctx.setHavePaid(havePaid);
-    // }
+    ctx.handleResetPos();
+    ctx.setCurrentOrderID(_id);
+    ctx.setDisplayOrderID(orderId);
+    ctx.setBill(orders);
+    ctx.setOrderDate(createdAt || date);
+    if (customer.name) {
+      ctx.setCustomerData(customer);
+      ctx.setCustomerName(customer.name);
+      ctx.setCustomerPhone(customer?.phone || '');
+      ctx.setCustomerNotes(customer?.notes || '');
+      ctx.setCustomerPoint(customerRef?.point || 0);
+      ctx.setCustomerScan(isScan || false);
+    }
+    ctx.setOrderType(showOrderType());
+    if (dp) {
+      ctx.setDp(dp);
+    }
+    if (serviceCharge) {
+      ctx.setServiceCharge(serviceCharge);
+      ctx.setServiceChargePercentage(serviceChargePercentage);
+    }
+    if (tax) {
+      ctx.setTax(tax);
+      ctx.setTaxPercentage(taxPercentage);
+    }
+    if (discount) {
+      ctx.setDiscount(discount);
+    }
+    if (discountPrice) {
+      ctx.setDiscountPrice(discountPrice);
+    }
+    if (discountLabel) {
+      ctx.setDiscountLabel(discountLabel);
+    }
+    if (voucherCode) {
+      ctx.setVoucherCode(voucherCode?.[0] || '');
+    }
+    if (voucherDiscPrice) {
+      ctx.setVoucherDiscPrice(voucherDiscPrice);
+    }
+    if (deliveryPrice) {
+      ctx.setDeliveryPrice(deliveryPrice);
+    }
+    if (havePaid) {
+      ctx.setHavePaid(havePaid);
+    }
 
     setTimeout(() => {
       if (local) {
@@ -322,8 +323,8 @@ Terima kasih telah menggunakan layanan kami 🙏`;
 
   const handleGeneratePoint = async () => {
     setIsLoading(true);
-    await axios.patch(`/orders/generate-point/${_id}`);
-    client.invalidateQueries('listOrders');
+    await axios.patch(`/order/generate-point/${_id}`);
+    client.invalidateQueries('orders');
     setOpenGenerate(false);
     setIsLoading(false);
     enqueueSnackbar(`Generate Point ${orderId || _id} success!`);
@@ -334,14 +335,14 @@ Terima kasih telah menggunakan layanan kami 🙏`;
     const updated = {
       paymentDate: null,
       havePaid: 0,
-      status: 'pending',
+      status: 'unpaid',
       payment: '',
       cardBankName: '',
       cardAccountName: '',
       cardNumber: '',
     };
-    await axios.patch(`/orders/raw/${_id}`, updated);
-    client.invalidateQueries('listOrders');
+    await axios.patch(`/order/raw/${_id}`, updated);
+    client.invalidateQueries('orders');
     setOpenCancelPayment(false);
     setIsLoading(false);
     enqueueSnackbar(`Cancel payment for Order ${orderId || _id} success!`);
@@ -350,7 +351,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
   return (
     <>
       <CustomTableRow hover>
-        <TableCell align="center">{formatDate2(createdAt)}</TableCell>
+        <TableCell align="center">{formatDate2(createdAt || date)}</TableCell>
 
         {!local && (
           <TableCell>
@@ -364,7 +365,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                 </Label>
               )}
             </Stack>
-            {user?.role === 'Super Admin' ? (
+            {user?.role?.toLowerCase() === 'admin' || user?.role?.toLowerCase() === 'owner' ? (
               <Link
                 component="button"
                 variant="subtitle2"
@@ -444,7 +445,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
 
             <TableCell align="center">
               <Label variant="ghost" color={statusColor} sx={{ textTransform: 'capitalize' }}>
-                {status === 'pending' ? 'unpaid' : status}
+                {status === 'unpaid' ? 'unpaid' : status}
               </Label>
             </TableCell>
           </>
@@ -536,7 +537,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                   {['admin', 'cashier', 'staff', 'owner'].includes(user?.role?.toLowerCase()) && (
                     <MenuItem
                       disabled={
-                        status?.toLowerCase() === 'paid' || status?.toLowerCase() === 'pending'
+                        status?.toLowerCase() === 'paid' || status?.toLowerCase() === 'unpaid'
                           ? Boolean(false)
                           : Boolean(true)
                       }
@@ -551,7 +552,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                   )}
                   <MenuItem
                     disabled={
-                      status?.toLowerCase() === 'paid' || status?.toLowerCase() === 'pending'
+                      status?.toLowerCase() === 'paid' || status?.toLowerCase() === 'unpaid'
                         ? Boolean(false)
                         : Boolean(true)
                     }
@@ -577,7 +578,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                   )}
                   <MenuItem
                     disabled={
-                      status?.toLowerCase() === 'paid' && formatDate(createdAt) === formatDate(new Date())
+                      status?.toLowerCase() === 'paid' && formatDate(createdAt || date) === formatDate(new Date())
                         ? Boolean(false)
                         : Boolean(true)
                     }
@@ -593,7 +594,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                     <MenuItem
                       sx={{ color: 'red' }}
                       disabled={
-                        status?.toLowerCase() === 'pending' || status?.toLowerCase() === 'cancel'
+                        status?.toLowerCase() === 'unpaid' || status?.toLowerCase() === 'cancel'
                           ? Boolean(true)
                           : Boolean(false)
                       }
