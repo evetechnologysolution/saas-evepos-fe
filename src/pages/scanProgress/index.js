@@ -4,7 +4,19 @@ import { BrowserMultiFormatReader } from '@zxing/library';
 import Webcam from 'react-webcam';
 import { sumBy } from 'lodash';
 import { useSnackbar } from 'notistack';
-import { Alert, Container, Card, Stack, Typography, Grid, Skeleton, IconButton } from '@mui/material';
+import {
+  Alert,
+  Container,
+  Card,
+  Stack,
+  Typography,
+  Grid,
+  Skeleton,
+  IconButton,
+  Button,
+  CircularProgress,
+  Box,
+} from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import HeaderBreadcrumbs from 'src/components/HeaderBreadcrumbs';
 import Page from 'src/components/Page';
@@ -17,9 +29,13 @@ import axiosInstance from 'src/utils/axios';
 import { formatDate2 } from 'src/utils/getData';
 import { maskedPhone } from 'src/utils/masked';
 import Iconify from 'src/components/Iconify';
+import { Add, EditNote, ModeEdit } from '@mui/icons-material';
 import ModalProgress from './ModalProgress';
 import ModalLocker from './ModalLocker';
 import './scanProgress.scss';
+import ModalAddStatus from './ModalStatus';
+import useStatus from './service/useStatus';
+import ModalNotes from './ModalNotes';
 
 export default function ScanProgress() {
   const options = ['order', 'in progress', 'completed'];
@@ -41,6 +57,14 @@ export default function ScanProgress() {
   const webcamRef = useRef(null);
   const codeReaderRef = useRef(null);
   const inputRef = useRef(null);
+  const [openCreateStatus, setOpenCreateStatus] = useState(false);
+  const { list } = useStatus();
+
+  const { data: listStatus, isLoading: loadingStatus } = list();
+  const [isEdit, setIsEdit] = useState(false);
+  const [submitProgress, setSubmitProgress] = useState(false);
+  const [currentDataEdit, setCurrentDataEdit] = useState(null);
+  const [currentDataProgress, setCurrentDataProgress] = useState(null);
 
   const fetchOrderDetail = async (search) => {
     if (!search) throw new Error('No search term');
@@ -59,6 +83,7 @@ export default function ScanProgress() {
     error,
     isError,
     refetch,
+    isLoading: loadingScanOrders,
   } = useQuery({
     // queryKey: ["detailScanOrders", search], // ketika search berubah, data otomatis di-fetch
     queryKey: ['detailScanOrders'],
@@ -207,19 +232,22 @@ export default function ScanProgress() {
       },
     };
 
-    setLoading(true);
-    setSelectedProgress(val);
-    try {
-      await axiosInstance.post(`/progress/${detail?._id}`, data);
-      await refetch();
-      enqueueSnackbar('Update data success!');
-    } catch (error) {
-      console.error('Submit failed:', error);
-      enqueueSnackbar(error?.message || 'Submit failed');
-    } finally {
-      setLoading(false); // reset loading state
-      setSelectedProgress('');
-    }
+    setSubmitProgress(true);
+    setCurrentDataProgress(data);
+
+    // setLoading(true);
+    // setSelectedProgress(val);
+    // try {
+    //   await axiosInstance.post(`/progress/${detail?._id}`, data);
+    //   await refetch();
+    //   enqueueSnackbar('Update data success!');
+    // } catch (error) {
+    //   console.error('Submit failed:', error);
+    //   enqueueSnackbar(error?.message || 'Submit failed');
+    // } finally {
+    //   setLoading(false); // reset loading state
+    //   setSelectedProgress('');
+    // }
   };
 
   return (
@@ -411,27 +439,61 @@ export default function ScanProgress() {
                     <Typography variant="subtitle2" sx={{ mb: 1.5 }}>
                       Update Proses
                     </Typography>
-                    <Stack flexDirection="row" gap={1.5} flexWrap="wrap">
-                      {options.map((opt, n) => (
-                        <LoadingButton
-                          key={n}
-                          variant="outlined"
-                          onClick={() => {
-                            if (opt !== 'packing / qc') {
-                              handleSubmit(opt);
-                            } else {
-                              handleOpen(opt);
-                            }
-                          }}
-                          sx={{ textTransform: 'capitalize' }}
-                          disabled={!detail?._id || detail?.progressRef?.log?.some((row) => row?.status === opt)}
-                          loading={loading && selectedProgress === opt}
-                          type="button"
-                        >
-                          {opt}
-                        </LoadingButton>
-                      ))}
-                    </Stack>
+                    {loadingStatus ? (
+                      <Box>
+                        <CircularProgress />
+                      </Box>
+                    ) : (
+                      <Stack flexDirection="row" gap={1.5} flexWrap="wrap" justifyContent="space-between">
+                        <Stack flexDirection="row" gap={1.5}>
+                          {!isEdit &&
+                            listStatus?.map((opt, n) => (
+                              <LoadingButton
+                                key={n}
+                                variant="outlined"
+                                onClick={() => {
+                                  handleSubmit(opt.name);
+                                }}
+                                sx={{ textTransform: 'capitalize' }}
+                                disabled={
+                                  !detail?._id ||
+                                  detail?.progressRef?.log?.some((row) => row?.status === opt.name?.toLowerCase())
+                                }
+                                loading={loading && selectedProgress === opt}
+                                type="button"
+                              >
+                                {opt.name}
+                              </LoadingButton>
+                            ))}
+                          {isEdit &&
+                            listStatus?.map((opt, n) => (
+                              <LoadingButton
+                                key={n}
+                                variant="outlined"
+                                onClick={() => {
+                                  setCurrentDataEdit(opt);
+                                  setOpenCreateStatus(true);
+                                }}
+                                sx={{ textTransform: 'capitalize' }}
+                                loading={loading && selectedProgress === opt}
+                                type="button"
+                              >
+                                <span>{opt.name}</span> <ModeEdit sx={{ ml: 1.5 }} />
+                              </LoadingButton>
+                            ))}
+                        </Stack>
+                        <Stack direction="row" gap={1.5}>
+                          <Button onClick={() => setIsEdit(!isEdit)}>
+                            <EditNote sx={{ mr: 1.2 }} />
+                            <span>Edit</span>
+                          </Button>
+                          <Button onClick={() => setOpenCreateStatus(true)} disabled={!!isEdit}>
+                            <Add sx={{ mr: 1.2 }} />
+                            <span>Add Status</span>
+                          </Button>
+                        </Stack>
+                      </Stack>
+                    )}
                   </Stack>
                   <table className="styled-table">
                     <thead>
@@ -455,7 +517,7 @@ export default function ScanProgress() {
                       </tr>
                     </thead>
                     <tbody>
-                      {!isLoading ? (
+                      {!loadingScanOrders ? (
                         detail?.progressRef && detail?.progressRef?.log?.length > 0 ? (
                           detail.progressRef.log
                             .slice()
@@ -521,6 +583,21 @@ export default function ScanProgress() {
         progress={selectedProgress}
         detail={detail}
         refetchData={refetch}
+      />
+
+      <ModalAddStatus
+        open={openCreateStatus}
+        onClose={() => setOpenCreateStatus(false)}
+        isEdit={isEdit}
+        currentData={currentDataEdit}
+      />
+
+      <ModalNotes
+        open={submitProgress}
+        onClose={() => setSubmitProgress(false)}
+        payload={currentDataProgress}
+        id={detail?._id}
+        refetch={refetch}
       />
 
       {isCameraOpen && (
