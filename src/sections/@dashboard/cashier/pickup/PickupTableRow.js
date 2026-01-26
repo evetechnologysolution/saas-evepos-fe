@@ -97,6 +97,7 @@ export default function OrdersTableRow({ row }) {
     cardNumber,
     pickUpStatus,
     pickupData,
+    progressRef,
   } = row;
 
   let statusColor;
@@ -207,11 +208,12 @@ export default function OrdersTableRow({ row }) {
           )}
         </TableCell>
 
-        <TableCell align="center">{notes || '-'}</TableCell>
+        <TableCell align="center">{progressRef?.latestNotes || '-'}</TableCell>
 
         <TableCell align="center">
           <Label variant="ghost" color={statusColor} sx={{ textTransform: 'capitalize' }}>
-            {status === 'unpaid' ? 'unpaid' : status}
+            {/* {status === 'unpaid' ? 'unpaid' : status} */}
+            {progressRef?.latestStatus}
           </Label>
         </TableCell>
 
