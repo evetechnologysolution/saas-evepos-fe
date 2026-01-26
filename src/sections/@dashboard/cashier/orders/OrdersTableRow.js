@@ -564,7 +564,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                     <Iconify icon="solar:printer-outline" sx={{ width: 24, height: 24 }} />
                     Print Nota
                   </MenuItem>
-                  {(user?.role?.toLowerCase() === 'admin' || user?.role?.toLowerCase() === 'owner') && (
+                  {/* {(user?.role?.toLowerCase() === 'admin' || user?.role?.toLowerCase() === 'owner') && (
                     <MenuItem
                       disabled={status?.toLowerCase() === 'paid' && isScan !== true ? Boolean(false) : Boolean(true)}
                       onClick={() => {
@@ -575,7 +575,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                       <Iconify icon="bi:coin" sx={{ width: 24, height: 24 }} />
                       Generate Point
                     </MenuItem>
-                  )}
+                  )} */}
                   <MenuItem
                     disabled={
                       status?.toLowerCase() === 'paid' && formatDate(createdAt || date) === formatDate(new Date())

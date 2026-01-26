@@ -135,7 +135,7 @@ export default function PickupOrders() {
   };
 
   return (
-    <Page title="Orders">
+    <Page title="Pickup Orders">
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <Card>
           <Stack
