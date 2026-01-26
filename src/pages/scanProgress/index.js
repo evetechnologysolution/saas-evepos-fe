@@ -1,37 +1,38 @@
-import { useState, useRef, useEffect } from "react";
-import { useQuery } from "react-query";
-import { BrowserMultiFormatReader } from "@zxing/library";
-import Webcam from "react-webcam";
-import { sumBy } from "lodash";
-import { useSnackbar } from "notistack";
-import { Alert, Container, Card, Stack, Typography, Grid, Skeleton, IconButton } from "@mui/material";
-import { LoadingButton } from "@mui/lab";
-import HeaderBreadcrumbs from "src/components/HeaderBreadcrumbs";
-import Page from "src/components/Page";
-import useAuth from "src/hooks/useAuth";
-import useSettings from "src/hooks/useSettings";
-import { PATH_DASHBOARD } from "src/routes/paths";
-import ScanProgresTableToolbar from "src/sections/@dashboard/scan-progress/ScanProgressToolbar";
-import Label from "src/components/Label";
-import axiosInstance from "src/utils/axios";
-import { formatDate2 } from "src/utils/getData";
-import { maskedPhone } from "src/utils/masked";
-import Iconify from "src/components/Iconify";
-import ModalProgress from "./ModalProgress";
-import ModalLocker from "./ModalLocker";
-import "./scanProgress.scss";
+import { useState, useRef, useEffect } from 'react';
+import { useQuery } from 'react-query';
+import { BrowserMultiFormatReader } from '@zxing/library';
+import Webcam from 'react-webcam';
+import { sumBy } from 'lodash';
+import { useSnackbar } from 'notistack';
+import { Alert, Container, Card, Stack, Typography, Grid, Skeleton, IconButton } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import HeaderBreadcrumbs from 'src/components/HeaderBreadcrumbs';
+import Page from 'src/components/Page';
+import useAuth from 'src/hooks/useAuth';
+import useSettings from 'src/hooks/useSettings';
+import { PATH_DASHBOARD } from 'src/routes/paths';
+import ScanProgresTableToolbar from 'src/sections/@dashboard/scan-progress/ScanProgressToolbar';
+import Label from 'src/components/Label';
+import axiosInstance from 'src/utils/axios';
+import { formatDate2 } from 'src/utils/getData';
+import { maskedPhone } from 'src/utils/masked';
+import Iconify from 'src/components/Iconify';
+import ModalProgress from './ModalProgress';
+import ModalLocker from './ModalLocker';
+import './scanProgress.scss';
 
 export default function ScanProgress() {
-  const options = [
-    "jemput (pick-up)", "kasir (order)", "cuci (wash)", "kering (dry)", "setrika (iron)", "packing / qc", "antar (delivery)"
-  ];
+  const options = ['order', 'in progress', 'completed'];
+  // const options = [
+  //   "jemput (pick-up)", "kasir (order)", "cuci (wash)", "kering (dry)", "setrika (iron)", "packing / qc", "antar (delivery)"
+  // ];
   const { user } = useAuth();
   const { themeStretch } = useSettings();
   const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [detail, setDetail] = useState(null);
-  const [selectedProgress, setSelectedProgress] = useState("");
+  const [selectedProgress, setSelectedProgress] = useState('');
   const [openLocker, setOpenLocker] = useState(false);
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -42,14 +43,14 @@ export default function ScanProgress() {
   const inputRef = useRef(null);
 
   const fetchOrderDetail = async (search) => {
-    if (!search) throw new Error("No search term");
+    if (!search) throw new Error('No search term');
 
     try {
-      const res = await axiosInstance.get(`/orders/${search}`);
+      const res = await axiosInstance.get(`/order/${search}`);
       return res.data;
     } catch (error) {
       // console.error("Error fetching order detail:", error);
-      throw new Error(error?.message || "Data not found");
+      throw new Error(error?.message || 'Data not found');
     }
   };
 
@@ -57,10 +58,10 @@ export default function ScanProgress() {
     // data,
     error,
     isError,
-    refetch
+    refetch,
   } = useQuery({
     // queryKey: ["detailScanOrders", search], // ketika search berubah, data otomatis di-fetch
-    queryKey: ["detailScanOrders"],
+    queryKey: ['detailScanOrders'],
     queryFn: () => fetchOrderDetail(search),
     retry: false, // jangan auto retry
     enabled: false, // biar gak auto fetch pas awal
@@ -84,15 +85,15 @@ export default function ScanProgress() {
       // setOpenModal(true);
       setOpenLocker(true);
     }
-  }
+  };
 
   const handleClose = () => {
     // setOpenModal(false);
     setOpenLocker(false);
     setTimeout(() => {
-      setSelectedProgress("");
+      setSelectedProgress('');
     }, 500);
-  }
+  };
 
   const handleScanSuccess = (text) => {
     if (text) {
@@ -103,9 +104,9 @@ export default function ScanProgress() {
 
         // Trigger event keydown Enter secara programatik
         setTimeout(() => {
-          const enterEvent = new KeyboardEvent("keydown", {
-            key: "Enter",
-            code: "Enter",
+          const enterEvent = new KeyboardEvent('keydown', {
+            key: 'Enter',
+            code: 'Enter',
             keyCode: 13,
             which: 13,
             bubbles: true,
@@ -131,9 +132,7 @@ export default function ScanProgress() {
       const imageSrc = webcamRef.current.getScreenshot();
       if (imageSrc) {
         try {
-          const result = await codeReaderRef.current.decodeFromImageUrl(
-            imageSrc
-          );
+          const result = await codeReaderRef.current.decodeFromImageUrl(imageSrc);
           if (result) {
             handleScanSuccess(result.getText());
           }
@@ -154,7 +153,7 @@ export default function ScanProgress() {
       try {
         codeReaderRef.current.reset();
       } catch (err) {
-        console.warn("ZXing reset error:", err);
+        console.warn('ZXing reset error:', err);
       }
     }
 
@@ -174,7 +173,7 @@ export default function ScanProgress() {
     };
 
     // Add event listener for browser back action
-    window.addEventListener("popstate", handleBackAction);
+    window.addEventListener('popstate', handleBackAction);
 
     // Manipulasi riwayat secara manual saat membuka kamera
     if (isCameraOpen) {
@@ -183,7 +182,7 @@ export default function ScanProgress() {
 
     // Cleanup when the component unmounts or camera is closed
     return () => {
-      window.removeEventListener("popstate", handleBackAction);
+      window.removeEventListener('popstate', handleBackAction);
       if (isCameraOpen) {
         handleCloseCamera(); // Ensure camera is closed when leaving the modal
       }
@@ -196,7 +195,7 @@ export default function ScanProgress() {
     }
 
     const totalQty = sumBy(detail?.orders, (item) => {
-      const tot = (item?.qty || 0);
+      const tot = item?.qty || 0;
       return tot;
     });
 
@@ -205,7 +204,7 @@ export default function ScanProgress() {
         status: val,
         qty: totalQty,
         // unit
-      }
+      },
     };
 
     setLoading(true);
@@ -213,24 +212,24 @@ export default function ScanProgress() {
     try {
       await axiosInstance.post(`/progress/${detail?._id}`, data);
       await refetch();
-      enqueueSnackbar("Update data success!");
+      enqueueSnackbar('Update data success!');
     } catch (error) {
-      console.error("Submit failed:", error);
-      enqueueSnackbar(error?.message || "Submit failed")
+      console.error('Submit failed:', error);
+      enqueueSnackbar(error?.message || 'Submit failed');
     } finally {
       setLoading(false); // reset loading state
-      setSelectedProgress("");
+      setSelectedProgress('');
     }
   };
 
   return (
     <Page title="Scan Orders">
-      <Container maxWidth={themeStretch ? false : "xl"}>
+      <Container maxWidth={themeStretch ? false : 'xl'}>
         <HeaderBreadcrumbs
           heading="Scan Orders"
           links={[
-            { name: "Dashboard", href: PATH_DASHBOARD.root },
-            { name: "Scan Orders", href: PATH_DASHBOARD.progressScan },
+            { name: 'Dashboard', href: PATH_DASHBOARD.root },
+            { name: 'Scan Orders', href: PATH_DASHBOARD.progressScan },
           ]}
         />
 
@@ -242,7 +241,7 @@ export default function ScanProgress() {
             onFilterName={setSearch}
             filterName={search}
             onEnter={(e) => {
-              if (e.key === "Enter" && search) {
+              if (e.key === 'Enter' && search) {
                 setIsLoading(true);
                 refetch();
               }
@@ -255,14 +254,19 @@ export default function ScanProgress() {
 
           <Stack sx={{ pb: 1 }}>
             {showError && (
-              <Alert severity="error" sx={{ mb: 1 }}>{error.message}</Alert>
+              <Alert severity="error" sx={{ mb: 1 }}>
+                {error.message}
+              </Alert>
             )}
 
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}
-                sx={{
-                  order: { xs: 1, sm: 2 }
-                }}
+            <Grid container spacing={2} sx={{ p: 1.5 }}>
+              <Grid
+                item
+                xs={12}
+                sm={12}
+                // sx={{
+                //   order: { xs: 1, sm: 2 },
+                // }}
               >
                 <Stack spacing={2}>
                   <Stack>
@@ -271,28 +275,156 @@ export default function ScanProgress() {
                       {isLoading ? (
                         <Skeleton variant="text" width="100px" />
                       ) : (
-                        <Label variant="ghost" color="warning" sx={{ textTransform: "capitalize" }}>
-                          {detail?.progressRef?.latestStatus || "-"}
+                        <Label variant="ghost" color="warning" sx={{ textTransform: 'capitalize' }}>
+                          {detail?.progressRef?.latestStatus || '-'}
                         </Label>
                       )}
                     </div>
                   </Stack>
                   <Stack>
-                    <Typography variant="subtitle2">Update Proses</Typography>
+                    <table className="styled-table">
+                      <thead>
+                        <tr>
+                          <th>
+                            <Typography variant="subtitle2">Order ID</Typography>
+                          </th>
+                          <th>
+                            <Typography variant="subtitle2">Customer Name</Typography>
+                          </th>
+                          <th>
+                            <Typography variant="subtitle2">Phone</Typography>
+                          </th>
+                          <th>
+                            <Typography variant="subtitle2">Notes</Typography>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            {isLoading ? (
+                              <Skeleton variant="text" />
+                            ) : (
+                              <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                {detail?.orderId || '-'}
+                              </Typography>
+                            )}
+                          </td>
+                          <td>
+                            {isLoading ? (
+                              <Skeleton variant="text" />
+                            ) : (
+                              <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                {detail?.customer?.name || '-'}
+                              </Typography>
+                            )}
+                          </td>
+                          <td>
+                            {isLoading ? (
+                              <Skeleton variant="text" />
+                            ) : (
+                              <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                {detail?.customer?.phone && !detail?.customer?.phone?.includes('EM')
+                                  ? maskedPhone(user?.role === 'Super Admin', detail?.customer?.phone)
+                                  : '-'}
+                              </Typography>
+                            )}
+                          </td>
+                          <td>
+                            {isLoading ? (
+                              <Skeleton variant="text" />
+                            ) : (
+                              <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                {detail?.notes || '-'}
+                              </Typography>
+                            )}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </Stack>
+                  <Stack>
+                    <table className="styled-table">
+                      <thead>
+                        <tr>
+                          <th>
+                            <Typography variant="subtitle2">Items</Typography>
+                          </th>
+                          <th style={{ textAlign: 'center' }}>
+                            <Typography variant="subtitle2">Qty</Typography>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {!isLoading ? (
+                          detail?.orders?.length > 0 ? (
+                            detail.orders.map((item, i) => (
+                              <tr key={i}>
+                                <td>
+                                  <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                    {item.name}
+                                  </Typography>
+                                  {item.variant.length > 0 &&
+                                    item.variant.map((field, v) => (
+                                      <Typography variant="body2" sx={{ fontStyle: 'italic' }} key={v}>
+                                        <em>{`${field.name} : ${field.option}`}</em>
+                                      </Typography>
+                                    ))}
+                                  {item.isLaundryBag && (
+                                    <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                      Laundry Bag Day
+                                    </Typography>
+                                  )}
+                                  {item.notes && (
+                                    <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                      Notes: {item.notes}
+                                    </Typography>
+                                  )}
+                                </td>
+                                <td style={{ textAlign: 'center' }}>
+                                  <Typography variant="body2">
+                                    {`x ${item.qty}${item?.category?.toLowerCase() === 'kiloan' ? 'kg' : ''}`}
+                                  </Typography>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan={2} style={{ textAlign: 'center' }}>
+                                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                  Data kosong
+                                </Typography>
+                              </td>
+                            </tr>
+                          )
+                        ) : (
+                          <tr>
+                            <td colSpan={2}>
+                              <Skeleton variant="text" />
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </Stack>
+                  <Stack>
+                    <Typography variant="subtitle2" sx={{ mb: 1.5 }}>
+                      Update Proses
+                    </Typography>
                     <Stack flexDirection="row" gap={1.5} flexWrap="wrap">
                       {options.map((opt, n) => (
                         <LoadingButton
                           key={n}
                           variant="outlined"
                           onClick={() => {
-                            if (opt !== "packing / qc") {
+                            if (opt !== 'packing / qc') {
                               handleSubmit(opt);
                             } else {
-                              handleOpen(opt)
+                              handleOpen(opt);
                             }
                           }}
-                          sx={{ textTransform: "capitalize" }}
-                          disabled={!detail?._id || detail?.progressRef?.log?.some(row => row?.status === opt)}
+                          sx={{ textTransform: 'capitalize' }}
+                          disabled={!detail?._id || detail?.progressRef?.log?.some((row) => row?.status === opt)}
                           loading={loading && selectedProgress === opt}
                           type="button"
                         >
@@ -304,43 +436,56 @@ export default function ScanProgress() {
                   <table className="styled-table">
                     <thead>
                       <tr>
-                        <th width={150}><Typography variant="subtitle2" align="center">Date</Typography></th>
-                        <th><Typography variant="subtitle2" align="center">Staff</Typography></th>
-                        <th><Typography variant="subtitle2" align="center">Proses</Typography></th>
+                        <th width={150}>
+                          <Typography variant="subtitle2" align="center">
+                            Date
+                          </Typography>
+                        </th>
+                        <th>
+                          <Typography variant="subtitle2" align="center">
+                            Staff
+                          </Typography>
+                        </th>
+                        <th>
+                          <Typography variant="subtitle2" align="center">
+                            Proses
+                          </Typography>
+                        </th>
                         {/* <th width={100}><Typography variant="subtitle2" align="center">Qty</Typography></th> */}
                       </tr>
                     </thead>
                     <tbody>
                       {!isLoading ? (
                         detail?.progressRef && detail?.progressRef?.log?.length > 0 ? (
-                          detail.progressRef.log.slice().reverse().map((item, i) => (
-                            <tr key={i}>
-                              <td style={{ textAlign: "center" }}>
-                                <Typography variant="body2" sx={{ fontStyle: "italic" }}>
-                                  {item?.date ? formatDate2(item?.date) : "-"}
-                                </Typography>
-                              </td>
-                              <td style={{ textAlign: "center" }}>
-                                <Typography variant="body2">
-                                  {item?.staff?.fullname || "-"}
-                                </Typography>
-                              </td>
-                              <td style={{ textAlign: "center" }}>
-                                <Label variant="ghost" color="warning" sx={{ textTransform: "capitalize" }}>
-                                  {item?.status || "-"}
-                                </Label>
-                              </td>
-                              {/* <td style={{ textAlign: "center" }}>
+                          detail.progressRef.log
+                            .slice()
+                            .reverse()
+                            .map((item, i) => (
+                              <tr key={i}>
+                                <td style={{ textAlign: 'center' }}>
+                                  <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                    {item?.date ? formatDate2(item?.date) : '-'}
+                                  </Typography>
+                                </td>
+                                <td style={{ textAlign: 'center' }}>
+                                  <Typography variant="body2">{item?.staff?.fullname || '-'}</Typography>
+                                </td>
+                                <td style={{ textAlign: 'center' }}>
+                                  <Label variant="ghost" color="warning" sx={{ textTransform: 'capitalize' }}>
+                                    {item?.status || '-'}
+                                  </Label>
+                                </td>
+                                {/* <td style={{ textAlign: "center" }}>
                                 <Typography variant="body2">
                                   {item?.qty ? `${item?.qty} ${item?.unit}` : "-"}
                                 </Typography>
                               </td> */}
-                            </tr>
-                          ))
+                              </tr>
+                            ))
                         ) : (
                           <tr>
-                            <td colSpan={4} style={{ textAlign: "center" }}>
-                              <Typography variant="body2" sx={{ fontStyle: "italic" }}>
+                            <td colSpan={4} style={{ textAlign: 'center' }}>
+                              <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
                                 Data kosong
                               </Typography>
                             </td>
@@ -348,118 +493,9 @@ export default function ScanProgress() {
                         )
                       ) : (
                         <tr>
-                          <td colSpan={4}><Skeleton variant="text" /></td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </Stack>
-              </Grid>
-              <Grid item xs={12} sm={3}
-                sx={{
-                  order: { xs: 2, sm: 1 }
-                }}
-              >
-                <Stack spacing={2}>
-                  <table className="styled-table">
-                    <tbody>
-                      <tr>
-                        <th width={150}><Typography variant="subtitle2">Order ID</Typography></th>
-                        <td>
-                          {isLoading ? (
+                          <td colSpan={4}>
                             <Skeleton variant="text" />
-                          ) : (
-                            <Typography variant="body2" sx={{ fontStyle: "italic" }}>{detail?.orderId || "-"}</Typography>
-                          )}
-                        </td>
-                      </tr>
-                      <tr>
-                        <th><Typography variant="subtitle2">Customer Name</Typography></th>
-                        <td>
-                          {isLoading ? (
-                            <Skeleton variant="text" />
-                          ) : (
-                            <Typography variant="body2" sx={{ fontStyle: "italic" }}>{detail?.customer?.name || "-"}</Typography>
-                          )}
-                        </td>
-                      </tr>
-                      <tr>
-                        <th><Typography variant="subtitle2">Phone</Typography></th>
-                        <td>
-                          {isLoading ? (
-                            <Skeleton variant="text" />
-                          ) : (
-                            <Typography variant="body2" sx={{ fontStyle: "italic" }}>
-                              {detail?.customer?.phone && !detail?.customer?.phone?.includes("EM") ?
-                                maskedPhone(user?.role === "Super Admin", detail?.customer?.phone)
-                                : "-"
-                              }
-                            </Typography>
-                          )}
-                        </td>
-                      </tr>
-                      <tr>
-                        <th><Typography variant="subtitle2">Locker Name</Typography></th>
-                        <td>
-                          {isLoading ? (
-                            <Skeleton variant="text" />
-                          ) : (
-                            <Typography variant="body2" sx={{ fontStyle: "italic" }}>{detail?.lockerName || "-"}</Typography>
-                          )}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                  <table className="styled-table">
-                    <thead>
-                      <tr>
-                        <th><Typography variant="subtitle2">Items</Typography></th>
-                        <th width={100} style={{ textAlign: "center" }}><Typography variant="subtitle2">Qty</Typography></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {!isLoading ? (
-                        detail?.orders?.length > 0 ? (
-                          detail.orders.map((item, i) => (
-                            <tr key={i}>
-                              <td>
-                                <Typography variant="body2" sx={{ fontStyle: "italic" }}>{item.name}</Typography>
-                                {item.variant.length > 0 && item.variant.map((field, v) => (
-                                  <Typography variant="body2" sx={{ fontStyle: "italic" }} key={v}>
-                                    <em>{`${field.name} : ${field.option}`}</em>
-                                  </Typography>
-                                ))}
-                                {item.isLaundryBag && (
-                                  <Typography variant="body2" sx={{ fontStyle: "italic" }}>
-                                    Laundry Bag Day
-                                  </Typography>
-                                )}
-                                {item.notes && (
-                                  <Typography variant="body2" sx={{ fontStyle: "italic" }}>
-                                    Notes: {item.notes}
-                                  </Typography>
-                                )}
-                              </td>
-                              <td style={{ textAlign: "center" }}>
-                                <Typography variant="body2">
-                                  {`x ${item.qty}${item?.category?.toLowerCase() === "kiloan" ? "kg" : ""}`}
-                                </Typography>
-                              </td>
-                            </tr>
-                          ))
-                        ) : (
-                          <tr>
-                            <td colSpan={2} style={{ textAlign: "center" }}>
-                              <Typography variant="body2" sx={{ fontStyle: "italic" }}>
-                                Data kosong
-                              </Typography>
-                            </td>
-                          </tr>
-                        )
-                      ) : (
-                        <tr>
-                          <td colSpan={2}><Skeleton variant="text" /></td>
+                          </td>
                         </tr>
                       )}
                     </tbody>
@@ -490,16 +526,16 @@ export default function ScanProgress() {
       {isCameraOpen && (
         <div
           style={{
-            position: "fixed",
+            position: 'fixed',
             top: 0,
             left: 0,
-            width: "100vw",
-            height: "100vh",
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
             zIndex: 9999,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
           {/* Kamera pakai react-webcam */}
@@ -507,17 +543,17 @@ export default function ScanProgress() {
             ref={webcamRef}
             audio={false}
             screenshotFormat="image/jpeg"
-            videoConstraints={{ facingMode: "environment" }}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            videoConstraints={{ facingMode: 'environment' }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
           <IconButton
             onClick={() => handleCloseCamera()}
             style={{
-              position: "absolute",
+              position: 'absolute',
               top: 20,
               right: 20,
-              color: "white",
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              color: 'white',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
               zIndex: 10000,
             }}
           >
@@ -529,24 +565,24 @@ export default function ScanProgress() {
             alignItems="center"
             gap={4}
             p={1}
-            sx={{ position: "absolute", inset: 0 }}
+            sx={{ position: 'absolute', inset: 0 }}
           >
-            <div style={{ position: "relative", width: "50vw", height: "50vh" }}>
-              {["top left", "top right", "bottom left", "bottom right"].map((pos, i) => {
-                let bgColor = "#FFFFFF transparent transparent #FFFFFF";
-                if (i === 1) bgColor = "#FFFFFF #FFFFFF transparent transparent";
-                if (i === 2) bgColor = "transparent transparent #FFFFFF #FFFFFF";
-                if (i === 3) bgColor = "transparent #FFFFFF #FFFFFF transparent";
+            <div style={{ position: 'relative', width: '50vw', height: '50vh' }}>
+              {['top left', 'top right', 'bottom left', 'bottom right'].map((pos, i) => {
+                let bgColor = '#FFFFFF transparent transparent #FFFFFF';
+                if (i === 1) bgColor = '#FFFFFF #FFFFFF transparent transparent';
+                if (i === 2) bgColor = 'transparent transparent #FFFFFF #FFFFFF';
+                if (i === 3) bgColor = 'transparent #FFFFFF #FFFFFF transparent';
                 return (
                   <div
                     key={i}
                     style={{
-                      position: "absolute",
-                      [pos.split(" ")[0]]: 0,
-                      [pos.split(" ")[1]]: 0,
-                      width: "2rem",
-                      height: "2rem",
-                      border: "4px solid transparent",
+                      position: 'absolute',
+                      [pos.split(' ')[0]]: 0,
+                      [pos.split(' ')[1]]: 0,
+                      width: '2rem',
+                      height: '2rem',
+                      border: '4px solid transparent',
                       borderColor: bgColor,
                     }}
                   />
@@ -556,31 +592,31 @@ export default function ScanProgress() {
               {/* Animasi scan */}
               <div
                 style={{
-                  position: "absolute",
+                  position: 'absolute',
                   top: 0,
                   left: 0,
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  justifyContent: "center",
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  justifyContent: 'center',
                 }}
               >
                 <div
                   style={{
-                    width: "100%",
-                    height: "100%",
-                    background: "rgba(255, 255, 255, 0.1)",
-                    position: "absolute",
+                    width: '100%',
+                    height: '100%',
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    position: 'absolute',
                   }}
                 />
                 <div
                   style={{
-                    width: "100%",
-                    height: "4px",
-                    background: "rgba(255, 255, 255, 0.8)",
-                    position: "absolute",
-                    animation: "scanMove 2s linear infinite",
-                    boxShadow: "0px 0px 10px #FFFFFF",
+                    width: '100%',
+                    height: '4px',
+                    background: 'rgba(255, 255, 255, 0.8)',
+                    position: 'absolute',
+                    animation: 'scanMove 2s linear infinite',
+                    boxShadow: '0px 0px 10px #FFFFFF',
                   }}
                 />
               </div>
