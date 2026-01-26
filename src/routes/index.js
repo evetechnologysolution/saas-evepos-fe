@@ -107,9 +107,9 @@ export default function Router() {
         {
           path: 'scan-progress',
           element: (
-            <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Cashier', 'Staff']}>
-              <ProgressScan />
-            </RoleBasedGuard>
+            // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Cashier', 'Staff']}>
+            <ProgressScan />
+            // </RoleBasedGuard>
           ),
         },
         {

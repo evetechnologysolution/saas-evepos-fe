@@ -70,12 +70,12 @@ export const useNavConfig = () => {
           icon: ICONS.pickup,
           roles: ['Owner', 'Staff', 'Admin'],
         },
-        // {
-        //   title: 'Scan Orders',
-        //   path: PATH_DASHBOARD.progressScan,
-        //   icon: ICONS.scan,
-        //   roles: ['Super Admin', 'Admin', 'Cashier', 'Staff'],
-        // },
+        {
+          title: 'Scan Orders',
+          path: PATH_DASHBOARD.progressScan,
+          icon: ICONS.scan,
+          roles: ['Super Admin', 'Admin', 'Cashier', 'Staff'],
+        },
         // {
         //   title: 'Scan Voucher',
         //   path: PATH_DASHBOARD.voucherScan,

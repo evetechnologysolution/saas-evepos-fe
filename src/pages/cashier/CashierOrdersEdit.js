@@ -1,55 +1,50 @@
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 // @mui
-import { Container } from "@mui/material";
-import axios from "../../utils/axios";
+import { Box, CircularProgress, Container } from '@mui/material';
+import axios from '../../utils/axios';
 // routes
-import { PATH_DASHBOARD } from "../../routes/paths";
+import { PATH_DASHBOARD } from '../../routes/paths';
 // hooks
-import useSettings from "../../hooks/useSettings";
+import useSettings from '../../hooks/useSettings';
 // components
-import Page from "../../components/Page";
-import HeaderBreadcrumbs from "../../components/HeaderBreadcrumbs";
+import Page from '../../components/Page';
+import HeaderBreadcrumbs from '../../components/HeaderBreadcrumbs';
 // sections
-import OrdersForm from "../../sections/@dashboard/cashier/orders/OrdersForm";
+import OrdersForm from '../../sections/@dashboard/cashier/orders/OrdersForm';
+import useOrder from './service/useOrder';
 
 // ----------------------------------------------------------------------
 
 export default function CashierOrdersEdit() {
-    const { themeStretch } = useSettings();
+  const { themeStretch } = useSettings();
+  const { getById } = useOrder();
 
-    const { id = "" } = useParams();
+  const { id = '' } = useParams();
 
-    const [currentData, setCurrentData] = useState({});
+  const { data: currentData, isLoading } = getById(id);
 
-    useEffect(() => {
-        const getData = async () => {
-            try {
-                await axios.get(`/orders/${id}`).then((response) => {
-                    setCurrentData(response.data);
-                });
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        getData();
-    }, [id]);
+  return (
+    <Page title="Orders: Edit">
+      <Container maxWidth={themeStretch ? false : 'xl'}>
+        <HeaderBreadcrumbs
+          heading="Edit Orders"
+          links={[
+            { name: 'Dashboard', href: PATH_DASHBOARD.root },
+            { name: 'Cashier', href: PATH_DASHBOARD.cashier.root },
+            { name: 'Orders', href: PATH_DASHBOARD.cashier.orders },
+            { name: 'Edit' },
+          ]}
+        />
 
-    return (
-        <Page title="Orders: Edit">
-            <Container maxWidth={themeStretch ? false : "xl"}>
-                <HeaderBreadcrumbs
-                    heading="Edit Orders"
-                    links={[
-                        { name: "Dashboard", href: PATH_DASHBOARD.root },
-                        { name: "Cashier", href: PATH_DASHBOARD.cashier.root },
-                        { name: "Orders", href: PATH_DASHBOARD.cashier.orders },
-                        { name: "Edit" },
-                    ]}
-                />
-
-                <OrdersForm currentData={currentData} />
-            </Container>
-        </Page>
-    );
+        {isLoading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <OrdersForm currentData={currentData} />
+        )}
+      </Container>
+    </Page>
+  );
 }
