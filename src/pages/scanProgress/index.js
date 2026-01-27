@@ -530,7 +530,7 @@ export default function ScanProgress() {
                                   </Typography>
                                 </td>
                                 <td style={{ textAlign: 'center' }}>
-                                  <Typography variant="body2">{item?.staff?.fullname || '-'}</Typography>
+                                  <Typography variant="body2">{item?.staffRef?.fullname || '-'}</Typography>
                                 </td>
                                 <td style={{ textAlign: 'center' }}>
                                   <Label variant="ghost" color="warning" sx={{ textTransform: 'capitalize' }}>
