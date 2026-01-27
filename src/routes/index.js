@@ -436,25 +436,25 @@ export default function Router() {
             {
               path: 'promotion',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryPromotion />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                <LibraryPromotion />
+                // </RoleBasedGuard>
               ),
             },
             {
               path: 'promotion/new',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryPromotionCreate />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                <LibraryPromotionCreate />
+                // </RoleBasedGuard>
               ),
             },
             {
               path: 'promotion/:id/edit',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryPromotionEdit />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                <LibraryPromotionEdit />
+                // </RoleBasedGuard>
               ),
             },
             {
