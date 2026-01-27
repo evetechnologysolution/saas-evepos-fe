@@ -1,7 +1,7 @@
-import React, { useEffect, useContext } from 'react';
+import React from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 // @mui
-import { Container } from '@mui/material';
+import { Box, CircularProgress, Container } from '@mui/material';
 // components
 import HeaderBreadcrumbs from '../../../components/HeaderBreadcrumbs';
 import Page from '../../../components/Page';
@@ -12,26 +12,16 @@ import useSettings from '../../../hooks/useSettings';
 // sections
 import PromotionForm from '../../../sections/@dashboard/library/promotion/PromotionForm';
 // context
-import { mainContext } from '../../../contexts/MainContext';
+import usePromotion from './service/usePromotion';
 
 export default function LibraryPromotionEdit() {
-
-  const ctx = useContext(mainContext);
-
   const { themeStretch } = useSettings();
-
   const { pathname } = useLocation();
-
   const isEdit = pathname.includes('edit');
-
   const { id = '' } = useParams();
+  const { getById } = usePromotion();
 
-  useEffect(() => {
-    ctx.getDetailPromo(id);
-  }, [])
-
-
-  const currentData = ctx.detailPromo ? ctx.detailPromo : null;
+  const { data: promoById, isLoading: loadingPromoById } = getById(id);
 
   return (
     <Page title="Promotion: Edit">
@@ -46,7 +36,13 @@ export default function LibraryPromotionEdit() {
           ]}
         />
 
-        <PromotionForm isEdit={isEdit} currentData={currentData} />
+        {loadingPromoById ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <PromotionForm isEdit={isEdit} currentData={promoById} />
+        )}
       </Container>
     </Page>
   );

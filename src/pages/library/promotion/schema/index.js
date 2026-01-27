@@ -28,8 +28,6 @@ const schema = yup.object().shape({
     otherwise: (schema) => schema.default(0),
   }),
 
-  isSpecial: yup.boolean().required(),
-
   validUntil: yup.boolean().required(),
 
   startDate: yup.date().required('Tanggal mulai wajib diisi'),

@@ -69,12 +69,11 @@ export default function PromotionForm({ currentData, isEdit }) {
       amount: currentData?.type === 1 ? currentData?.amount ?? 0 : 0,
       qtyMin: currentData?.type === 3 ? currentData?.qtyMin ?? 0 : 0,
       qtyFree: currentData?.type === 3 ? currentData?.qtyFree ?? 0 : 0,
-      isSpecial: currentData?.isSpecial ?? false,
       validUntil: currentData?.validUntil ?? false,
       startDate: currentData?.startDate ? new Date(currentData.startDate) : new Date(),
       endDate: currentData?.validUntil && currentData?.endDate ? new Date(currentData.endDate) : '',
       selectedDay:
-        currentData?.selectedDay !== undefined && currentData?.selectedDay !== null ? currentData.selectedDay : '',
+        currentData?.selectedDay !== undefined && currentData?.selectedDay !== null ? currentData.selectedDay[0] : '',
       isAvailable: currentData?.isAvailable ?? true,
       image: currentData?.image ?? '',
       products: currentData?.products ?? [],
@@ -105,8 +104,6 @@ export default function PromotionForm({ currentData, isEdit }) {
   const values = watch();
 
   const ctx = useContext(mainContext);
-
-  const [productList, setProductList] = useState(['']);
 
   const handleDrop = useCallback(
     (acceptedFiles) => {
@@ -150,7 +147,6 @@ export default function PromotionForm({ currentData, isEdit }) {
   useEffect(() => {
     if (isEdit && currentData) {
       reset(defaultValues);
-      setProductList(currentData?.products);
     }
     if (!isEdit) {
       reset(defaultValues);
@@ -204,48 +200,46 @@ export default function PromotionForm({ currentData, isEdit }) {
   };
 
   const onSubmit = async (data) => {
-    console.log(data);
-    // try {
-    //   const formData = new FormData();
+    try {
+      const formData = new FormData();
 
-    //   formData.append('name', data.name);
-    //   formData.append('type', Number(data.type));
+      formData.append('name', data.name);
+      formData.append('type', Number(data.type));
 
-    //   formData.append('amount', data.type === 1 ? Number(data.amount) : 0);
+      formData.append('amount', data.type === 1 ? Number(data.amount) : 0);
 
-    //   formData.append('qtyMin', data.type === 3 ? Number(data.qtyMin) : 0);
-    //   formData.append('qtyFree', data.type === 3 ? Number(data.qtyFree) : 0);
+      formData.append('qtyMin', data.type === 3 ? Number(data.qtyMin) : 0);
+      formData.append('qtyFree', data.type === 3 ? Number(data.qtyFree) : 0);
 
-    //   formData.append('startDate', data.startDate);
-    //   formData.append('endDate', data.validUntil ? data.endDate : '');
-    //   formData.append('validUntil', data.validUntil);
-    //   formData.append('isSpecial', data.isSpecial);
-    //   formData.append('selectedDay', data.selectedDay === '' ? '' : Number(data.selectedDay));
+      formData.append('startDate', data.startDate);
+      formData.append('endDate', data.validUntil ? data.endDate : '');
+      formData.append('validUntil', data.validUntil);
+      formData.append('selectedDay', data.selectedDay === '' ? '' : Number(data.selectedDay));
 
-    //   formData.append('products', JSON.stringify(data.products || []));
+      formData.append('products', JSON.stringify(data.products || []));
 
-    //   formData.append('isAvailable', isEdit ? data.isAvailable : true);
+      formData.append('isAvailable', isEdit ? data.isAvailable : true);
 
-    //   if (data.image instanceof File) {
-    //     formData.append('image', data.image);
-    //   }
+      if (data.image instanceof File) {
+        formData.append('image', data.image);
+      }
 
-    //   const mutation = isEdit
-    //     ? update.mutateAsync({
-    //         id: currentData._id,
-    //         payload: formData,
-    //       })
-    //     : create.mutateAsync(formData);
+      const mutation = isEdit
+        ? update.mutateAsync({
+            id: currentData._id,
+            payload: formData,
+          })
+        : create.mutateAsync(formData);
 
-    //   await handleMutationFeedback(mutation, {
-    //     successMsg: isEdit ? 'Promo berhasil diperbarui!' : 'Promo berhasil ditambahkan!',
-    //     errorMsg: 'Gagal menyimpan promo!',
-    //     onSuccess: () => navigate(PATH_DASHBOARD.library.promotion),
-    //     enqueueSnackbar,
-    //   });
-    // } catch (error) {
-    //   console.error(error);
-    // }
+      await handleMutationFeedback(mutation, {
+        successMsg: isEdit ? 'Promotion updated successfully!' : 'Promotion added successfully!',
+        errorMsg: 'Failed to save promotion!',
+        onSuccess: () => navigate(PATH_DASHBOARD.library.promotion),
+        enqueueSnackbar,
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const isMobile = useResponsive('down', 'lg');
@@ -314,6 +308,7 @@ export default function PromotionForm({ currentData, isEdit }) {
                             inputFormat="dd/MM/yyyy"
                             value={field.value || null}
                             disabled={!values.validUntil}
+                            minDate={new Date(values.startDate)}
                             onChange={(newValue) => field.onChange(newValue)}
                             renderInput={(params) => (
                               <TextField
@@ -441,21 +436,6 @@ export default function PromotionForm({ currentData, isEdit }) {
                   <RHFUploadSingleFile name="image" accept="image/*" maxSize={900000} onDrop={handleDrop} />
                 </Box>
               )}
-
-              {isEdit && (
-                <Box sx={{ mt: 4 }}>
-                  <RHFSwitch
-                    name="isAvailable"
-                    labelPlacement="start"
-                    label={
-                      <>
-                        <Typography variant="subtitle2">Available</Typography>
-                      </>
-                    }
-                    sx={{ mx: 0 }}
-                  />
-                </Box>
-              )}
             </Stack>
 
             <Stack spacing={3} mt={2}>
@@ -538,6 +518,21 @@ export default function PromotionForm({ currentData, isEdit }) {
                   <Iconify icon="eva:plus-fill" width={20} height={20} /> Add Product
                 </Button>
               </Stack>
+
+              {isEdit && (
+                <Box sx={{ mt: 4 }}>
+                  <RHFSwitch
+                    name="isAvailable"
+                    labelPlacement="start"
+                    label={
+                      <>
+                        <Typography variant="subtitle2">Promo still available ?</Typography>
+                      </>
+                    }
+                    sx={{ mx: 0 }}
+                  />
+                </Box>
+              )}
 
               <Stack direction="row" justifyContent="flex-end" sx={{ mt: 3 }} gap={1}>
                 <Button variant="outlined" onClick={() => navigate(PATH_DASHBOARD.library.promotion)}>

@@ -76,18 +76,21 @@ BootstrapDialogTitle.propTypes = {
 export default function PromotionTableRow({ row, onEditRow, onDeleteRow }) {
   const theme = useTheme();
 
-  const { date, name, products, type, startDate, endDate, isAvailable, amount } = row;
+  const { createdAt, name, products, type, startDate, endDate, isAvailable, amount, qtyMin, qtyFree } = row;
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handlePromoType = (type, amount) => {
+  const handlePromoType = () => {
     if (type === 1) {
       return `Discount ${amount}%`;
     }
     if (type === 2) {
       return `Package Rp. ${numberWithCommas(amount)}`;
+    }
+    if (type === 3) {
+      return `Bundling ${qtyMin} get ${qtyFree}`;
     }
     return null;
   };
@@ -95,7 +98,7 @@ export default function PromotionTableRow({ row, onEditRow, onDeleteRow }) {
   return (
     <>
       <CustomTableRow hover>
-        <TableCell align="center">{formatDate2(date)}</TableCell>
+        <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
         <TableCell align="left">{name}</TableCell>
 
@@ -116,14 +119,12 @@ export default function PromotionTableRow({ row, onEditRow, onDeleteRow }) {
           )}
         </TableCell>
 
-        <TableCell align="left">{`${handlePromoType(type, amount)}`}</TableCell>
+        <TableCell align="left">{`${handlePromoType()}`}</TableCell>
 
         <TableCell align="center">
-          {endDate ? (
-            `${formatOnlyDate(startDate)} - ${formatOnlyDate(endDate)}`
-          ) : (
-            `${formatOnlyDate(startDate)} - Selamanya`
-          )}
+          {endDate
+            ? `${formatOnlyDate(startDate)} - ${formatOnlyDate(endDate)}`
+            : `${formatOnlyDate(startDate)} - Selamanya`}
         </TableCell>
 
         <TableCell align="center">
@@ -138,14 +139,25 @@ export default function PromotionTableRow({ row, onEditRow, onDeleteRow }) {
 
         <TableCell align="center">
           <Stack direction="row" justifyContent="center" gap={1}>
-            <Button title="Edit" variant="contained" sx={{ p: 0, minWidth: 35, height: 35 }} onClick={() => {
-              onEditRow();
-            }}>
+            <Button
+              title="Edit"
+              variant="contained"
+              sx={{ p: 0, minWidth: 35, height: 35 }}
+              onClick={() => {
+                onEditRow();
+              }}
+            >
               <Iconify icon="eva:edit-outline" sx={{ width: 24, height: 24 }} />
             </Button>
-            <Button title="Delete" variant="contained" color="error" sx={{ p: 0, minWidth: 35, height: 35 }} onClick={() => {
-              onDeleteRow();
-            }}>
+            <Button
+              title="Delete"
+              variant="contained"
+              color="error"
+              sx={{ p: 0, minWidth: 35, height: 35 }}
+              onClick={() => {
+                onDeleteRow();
+              }}
+            >
               <Iconify icon="eva:trash-2-outline" sx={{ width: 24, height: 24 }} />
             </Button>
           </Stack>
@@ -183,7 +195,7 @@ export default function PromotionTableRow({ row, onEditRow, onDeleteRow }) {
                   <tr key={i}>
                     <td style={{ padding: '0.2rem 0' }}>{item.name}</td>
                     <td align="center">x 1</td>
-                    <td align="right">Rp. {numberWithCommas(item.price - (item.price * (amount / 100)))}</td>
+                    <td align="right">Rp. {numberWithCommas(item.price - item.price * (amount / 100))}</td>
                   </tr>
                 ))
               ) : (
