@@ -21,17 +21,17 @@ function Products({ items }) {
 
   return (
     <Grid container spacing={3} sx={{ padding: '1rem' }}>
-      {items.map((item, i) => (
+      {items?.map((item, i) => (
         <Grid item xs={6} sm={3} lg={3} key={i}>
           <ProductCard
             key={i}
             id={item._id}
-            name={item.name}
+            name={item?.name}
             image={showImage(item.image)}
             price={item.price}
             productionPrice={item?.productionPrice || 0}
             discount={item?.discount || {}}
-            category={item.category.name}
+            category={item?.category?.name}
             unit={item?.unit || 'pcs'}
             variant={item?.variant || []}
             notes={item.extraNotes}

@@ -208,7 +208,7 @@ export const useNavConfig = () => {
             { title: 'product', path: PATH_DASHBOARD.library.product },
             { title: 'variant', path: PATH_DASHBOARD.library.variant },
             // { title: 'perfume', path: PATH_DASHBOARD.library.perfume },
-            // { title: 'promotion', path: PATH_DASHBOARD.library.promotion },
+            { title: 'promotion', path: PATH_DASHBOARD.library.promotion },
             // { title: 'special promotion', path: PATH_DASHBOARD.library.specialPromotion },
             // { title: 'voucher', path: PATH_DASHBOARD.library.voucher },
             // { title: 'discount', path: PATH_DASHBOARD.library.discount },
