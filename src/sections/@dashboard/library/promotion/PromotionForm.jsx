@@ -1,8 +1,7 @@
-import React, { useCallback, useMemo, useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router";
-import PropTypes from "prop-types";
-import * as Yup from "yup";
-import { useSnackbar } from "notistack";
+import React, { useCallback, useMemo, useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router';
+import PropTypes from 'prop-types';
+import { useSnackbar } from 'notistack';
 
 // @mui
 import {
@@ -19,16 +18,19 @@ import {
   Checkbox,
   FormGroup,
   FormControlLabel,
-} from "@mui/material";
-import { NumericFormat } from "react-number-format";
-import { LoadingButton } from "@mui/lab";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
+} from '@mui/material';
+import { NumericFormat } from 'react-number-format';
+import { LoadingButton } from '@mui/lab';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 
 // form
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { handleMutationFeedback } from 'src/utils/mutationfeedback';
+import schema from '../../../../pages/library/promotion/schema';
+import usePromotion from '../../../../pages/library/promotion/service/usePromotion';
 
 // components
 import {
@@ -37,17 +39,18 @@ import {
   RHFSelect,
   RHFUploadSingleFile,
   RHFSwitch,
-} from "../../../../components/hook-form";
-import Iconify from "../../../../components/Iconify";
+  RHFDaySelect,
+} from '../../../../components/hook-form';
+import Iconify from '../../../../components/Iconify';
 
 // hook
-import useResponsive from "../../../../hooks/useResponsive";
+import useResponsive from '../../../../hooks/useResponsive';
 
 // routes
-import { PATH_DASHBOARD } from "../../../../routes/paths";
+import { PATH_DASHBOARD } from '../../../../routes/paths';
 
 // context
-import { mainContext } from "../../../../contexts/MainContext";
+import { mainContext } from '../../../../contexts/MainContext';
 
 PromotionForm.propTypes = {
   isEdit: PropTypes.bool,
@@ -56,45 +59,45 @@ PromotionForm.propTypes = {
 
 export default function PromotionForm({ currentData, isEdit }) {
   const navigate = useNavigate();
-
-  const NewDataSchema = Yup.object().shape({
-    id: Yup.string(),
-    name: Yup.string().required("Name is required"),
-    type: Yup.number().moreThan(0, "Type is required"),
-    amount: Yup.number().moreThan(0, "Amount is required"),
-    startDate: Yup.date().required("End Date is required").nullable(),
-    endDate: Yup.date().when("validUntil", {
-      is: true,
-      then: (schema) => schema.required("End Date is required"),
-      otherwise: (schema) => schema.notRequired(),
-    }).nullable(),
-    validUntil: Yup.bool(),
-    products: Yup.array(),
-  });
+  const { create, update } = usePromotion();
 
   const defaultValues = useMemo(
     () => ({
-      id: currentData?._id,
-      name: currentData?.name || "",
-      type: currentData?.type || 1,
-      amount: currentData?.amount || 0,
-      startDate: currentData?.startDate || new Date(),
-      endDate: currentData?.endDate || null,
-      validUntil: currentData?.validUntil || false,
-      isAvailable: currentData?.isAvailable || false,
-      image: currentData?.image || "",
-      products: currentData?.products || [],
+      id: currentData?._id || null,
+      name: currentData?.name ?? '',
+      type: currentData?.type ?? 1,
+      amount: currentData?.type === 1 ? currentData?.amount ?? 0 : 0,
+      qtyMin: currentData?.type === 3 ? currentData?.qtyMin ?? 0 : 0,
+      qtyFree: currentData?.type === 3 ? currentData?.qtyFree ?? 0 : 0,
+      validUntil: currentData?.validUntil ?? false,
+      startDate: currentData?.startDate ? new Date(currentData.startDate) : new Date(),
+      endDate: currentData?.validUntil && currentData?.endDate ? new Date(currentData.endDate) : '',
+      selectedDay:
+        currentData?.selectedDay !== undefined && currentData?.selectedDay !== null ? currentData.selectedDay[0] : '',
+      isAvailable: currentData?.isAvailable ?? true,
+      image: currentData?.image ?? '',
+      products: currentData?.products ?? [],
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentData]
   );
 
   const methods = useForm({
-    resolver: yupResolver(NewDataSchema),
+    resolver: yupResolver(schema),
     defaultValues,
   });
 
-  const { control, reset, watch, getValues, setValue, clearErrors, handleSubmit } = methods;
+  const {
+    control,
+    reset,
+    watch,
+    getValues,
+    setValue,
+    clearErrors,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = methods;
+
+  const { append, replace, remove, fields } = useFieldArray({ control, name: 'products' });
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -102,16 +105,13 @@ export default function PromotionForm({ currentData, isEdit }) {
 
   const ctx = useContext(mainContext);
 
-  const [productList, setProductList] = useState([""]);
-  const [loading, setLoading] = useState(false);
-
   const handleDrop = useCallback(
     (acceptedFiles) => {
       const file = acceptedFiles[0];
 
       if (file) {
         setValue(
-          "image",
+          'image',
           Object.assign(file, {
             preview: URL.createObjectURL(file),
           })
@@ -122,26 +122,31 @@ export default function PromotionForm({ currentData, isEdit }) {
   );
 
   const handleProductAdd = () => {
-    setProductList([...productList, ""]);
+    append('');
   };
 
   const handleOptionRemove = (index) => {
-    const list = [...productList];
-    list.splice(index, 1);
-    setProductList(list);
+    remove(index);
   };
 
   const handleProductsChange = (e, index) => {
     const { value } = e.target;
-    const list = [...productList];
-    list[index] = value;
-    setProductList(list);
+    const updatedProducts = [...fields];
+    updatedProducts[index] = { ...updatedProducts[index], id: updatedProducts[index].id, value };
+    replace(updatedProducts.map((item) => item.value));
+  };
+
+  const handleAllProductsCheckbox = (e) => {
+    if (e.target.checked) {
+      replace(ctx?.product?.map((row) => row?._id) || ['']);
+    } else {
+      replace(['']);
+    }
   };
 
   useEffect(() => {
     if (isEdit && currentData) {
       reset(defaultValues);
-      setProductList(currentData?.products);
     }
     if (!isEdit) {
       reset(defaultValues);
@@ -152,9 +157,10 @@ export default function PromotionForm({ currentData, isEdit }) {
 
   useEffect(() => {
     if (!values.validUntil) {
-      setValue("endDate", null);
-      clearErrors("endDate");
+      setValue('endDate', null);
+      clearErrors('endDate');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [values.validUntil]);
 
   const handleTypeLabel = (type) => {
@@ -164,10 +170,10 @@ export default function PromotionForm({ currentData, isEdit }) {
           name="amount"
           label="Discount"
           autoComplete="off"
-          value={getValues("amount") === 0 ? "" : getValues("amount")}
+          value={getValues('amount') === 0 ? '' : getValues('amount')}
           InputLabelProps={{ shrink: true }}
-          InputProps={{ endAdornment: <InputAdornment position="end">%</InputAdornment>, type: "number" }}
-          onChange={(e) => setValue("amount", Number(e.target.value))}
+          InputProps={{ endAdornment: <InputAdornment position="end">%</InputAdornment>, type: 'number' }}
+          onChange={(e) => setValue('amount', Number(e.target.value))}
         />
       );
     }
@@ -183,48 +189,63 @@ export default function PromotionForm({ currentData, isEdit }) {
           thousandSeparator=","
           allowNegative={false}
           InputProps={{ startAdornment: <InputAdornment position="start">Rp</InputAdornment> }}
-          value={getValues("amount") === 0 ? "" : getValues("amount")}
-          onValueChange={(values) => setValue("amount", Number(values.value))}
+          value={getValues('amount') === 0 ? '' : getValues('amount')}
+          onValueChange={(values) => setValue('amount', Number(values.value))}
         />
       );
     }
+    if (type === 3) return null;
 
     return <RHFTextField name="amount" label="Amount" autoComplete="off" disabled />;
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (data) => {
     try {
-      setLoading(true);
       const formData = new FormData();
-      formData.append("name", values.name);
-      formData.append("type", values.type);
-      formData.append("amount", values.amount);
-      formData.append("startDate", values.startDate || "");
-      formData.append("endDate", values.endDate || "");
-      formData.append("validUntil", values.validUntil);
-      formData.append("image", values.image);
-      formData.append("products", JSON.stringify(productList));
-      formData.append("isAvailable", isEdit ? values.isAvailable : true);
-      if (!isEdit) {
-        await ctx.createPromotion(formData);
-      } else {
-        await ctx.updatePromotion(currentData._id, formData);
+
+      formData.append('name', data.name);
+      formData.append('type', Number(data.type));
+
+      formData.append('amount', data.type === 1 ? Number(data.amount) : 0);
+
+      formData.append('qtyMin', data.type === 3 ? Number(data.qtyMin) : 0);
+      formData.append('qtyFree', data.type === 3 ? Number(data.qtyFree) : 0);
+
+      formData.append('startDate', data.startDate);
+      formData.append('endDate', data.validUntil ? data.endDate : '');
+      formData.append('validUntil', data.validUntil);
+      formData.append('selectedDay', data.selectedDay === '' ? '' : Number(data.selectedDay));
+
+      formData.append('products', JSON.stringify(data.products || []));
+
+      formData.append('isAvailable', isEdit ? data.isAvailable : true);
+
+      if (data.image instanceof File) {
+        formData.append('image', data.image);
       }
-      reset();
-      enqueueSnackbar(!isEdit ? "Create success!" : "Update success!");
-      navigate(PATH_DASHBOARD.library.promotion);
-      setLoading(false);
+
+      const mutation = isEdit
+        ? update.mutateAsync({
+            id: currentData._id,
+            payload: formData,
+          })
+        : create.mutateAsync(formData);
+
+      await handleMutationFeedback(mutation, {
+        successMsg: isEdit ? 'Promotion updated successfully!' : 'Promotion added successfully!',
+        errorMsg: 'Failed to save promotion!',
+        onSuccess: () => navigate(PATH_DASHBOARD.library.promotion),
+        enqueueSnackbar,
+      });
     } catch (error) {
-      setLoading(false);
       console.error(error);
     }
-
   };
 
-  const isMobile = useResponsive("down", "lg");
+  const isMobile = useResponsive('down', 'lg');
 
   return (
-    <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+    <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit, (e) => console.log(e))}>
       <Card sx={{ p: 3 }}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
@@ -286,6 +307,8 @@ export default function PromotionForm({ currentData, isEdit }) {
                             label="End Date"
                             inputFormat="dd/MM/yyyy"
                             value={field.value || null}
+                            disabled={!values.validUntil}
+                            minDate={new Date(values.startDate)}
                             onChange={(newValue) => field.onChange(newValue)}
                             renderInput={(params) => (
                               <TextField
@@ -308,6 +331,9 @@ export default function PromotionForm({ currentData, isEdit }) {
                       )}
                     />
                   </Grid>
+                  <Grid item xs={12} md={6}>
+                    <RHFDaySelect name="selectedDay" />
+                  </Grid>
                 </Grid>
               </Box>
               <Grid container spacing={3} sx={{ mt: 2 }}>
@@ -323,9 +349,9 @@ export default function PromotionForm({ currentData, isEdit }) {
                       sx={{
                         mx: 1,
                         borderRadius: 0.75,
-                        typography: "body2",
-                        fontStyle: "italic",
-                        color: "text.secondary",
+                        typography: 'body2',
+                        fontStyle: 'italic',
+                        color: 'text.secondary',
                       }}
                       disabled
                     >
@@ -339,10 +365,22 @@ export default function PromotionForm({ currentData, isEdit }) {
                         mx: 1,
                         my: 0.5,
                         borderRadius: 0.75,
-                        typography: "body2",
+                        typography: 'body2',
                       }}
                     >
                       Discount
+                    </MenuItem>
+
+                    <MenuItem
+                      value={3}
+                      sx={{
+                        mx: 1,
+                        my: 0.5,
+                        borderRadius: 0.75,
+                        typography: 'body2',
+                      }}
+                    >
+                      Bundle
                     </MenuItem>
 
                     {/* <MenuItem
@@ -359,7 +397,37 @@ export default function PromotionForm({ currentData, isEdit }) {
                   </RHFSelect>
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  {handleTypeLabel(values.type)}
+                  <Stack spacing={3}>
+                    {handleTypeLabel(values.type)}
+                    {values.type === 3 && (
+                      <>
+                        <NumericFormat
+                          customInput={RHFTextField}
+                          name="qtyMin"
+                          label="Qty Min Buy"
+                          autoComplete="off"
+                          decimalScale={2}
+                          decimalSeparator="."
+                          thousandSeparator=","
+                          allowNegative={false}
+                          value={getValues('qtyMin') === 0 ? '' : getValues('qtyMin')}
+                          onValueChange={(values) => setValue('qtyMin', Number(values.value))}
+                        />
+                        <NumericFormat
+                          customInput={RHFTextField}
+                          name="qtyFree"
+                          label="Qty Free"
+                          autoComplete="off"
+                          decimalScale={2}
+                          decimalSeparator="."
+                          thousandSeparator=","
+                          allowNegative={false}
+                          value={getValues('qtyFree') === 0 ? '' : getValues('qtyFree')}
+                          onValueChange={(values) => setValue('qtyFree', Number(values.value))}
+                        />
+                      </>
+                    )}
+                  </Stack>
                 </Grid>
               </Grid>
               {values.type === 2 && (
@@ -368,57 +436,22 @@ export default function PromotionForm({ currentData, isEdit }) {
                   <RHFUploadSingleFile name="image" accept="image/*" maxSize={900000} onDrop={handleDrop} />
                 </Box>
               )}
-
-              {isEdit && (
-                <Box sx={{ mt: 4 }}>
-                  <RHFSwitch
-                    name="isAvailable"
-                    labelPlacement="start"
-                    label={
-                      <>
-                        <Typography variant="subtitle2">Available</Typography>
-                      </>
-                    }
-                    sx={{ mx: 0 }}
-                  />
-                </Box>
-              )}
             </Stack>
-            {/* </Grid>
-          <Grid item xs={12} md={6}> */}
+
             <Stack spacing={3} mt={2}>
               <Stack flexDirection="row" alignItems="center" gap={3}>
-                <Typography variant="subtitle1"> List of Products</Typography>
+                <Typography variant="subtitle1">List of Products</Typography>
                 <FormGroup>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        // checked={checked}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setProductList(ctx?.product?.map(row => row?._id) || [""])
-                          } else {
-                            setProductList([""]);
-                          }
-                        }}
-                      />
-                    }
-                    label="All Products" />
+                  <FormControlLabel control={<Checkbox onChange={handleAllProductsCheckbox} />} label="All Products" />
                 </FormGroup>
               </Stack>
-              {productList?.map((product, index) => (
-                <Stack
-                  key={index}
-                  flexDirection="row"
-                  alignItems="center"
-                  justifyContent="center"
-                  gap={2}
-                >
+
+              {fields.map((field, index) => (
+                <Stack key={field.id} flexDirection="row" alignItems="center" justifyContent="center" gap={2}>
                   <RHFSelect
-                    name={`product${index}`}
+                    name={`products.${index}`}
                     SelectProps={{ native: false }}
                     onChange={(e) => handleProductsChange(e, index)}
-                    value={product}
                     required
                   >
                     <MenuItem
@@ -426,9 +459,9 @@ export default function PromotionForm({ currentData, isEdit }) {
                       sx={{
                         mx: 1,
                         borderRadius: 0.75,
-                        typography: "body2",
-                        fontStyle: "italic",
-                        color: "text.secondary",
+                        typography: 'body2',
+                        fontStyle: 'italic',
+                        color: 'text.secondary',
                       }}
                       disabled
                     >
@@ -443,24 +476,31 @@ export default function PromotionForm({ currentData, isEdit }) {
                           mx: 1,
                           my: 0.5,
                           borderRadius: 0.75,
-                          typography: "body2",
+                          typography: 'body2',
                         }}
                       >
-                        <div style={{ display: "flex", flexDirection: "column" }}>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
                           <Typography variant="body2">{item.name}</Typography>
                         </div>
                       </MenuItem>
                     ))}
                   </RHFSelect>
-                  {productList?.length !== 1 && (
+
+                  {fields.length !== 1 && (
                     <Stack alignItems="flex-end">
                       <Button
                         color="error"
                         variant="contained"
                         sx={{
-                          boxShadow: "0", p: 0, minWidth: 30, height: 30, mb: 0.5, bgcolor: "#FFC2B4", color: "red",
-                          "&:hover": {
-                            bgcolor: "#FFC2B4"
+                          boxShadow: '0',
+                          p: 0,
+                          minWidth: 30,
+                          height: 30,
+                          mb: 0.5,
+                          bgcolor: '#FFC2B4',
+                          color: 'red',
+                          '&:hover': {
+                            bgcolor: '#FFC2B4',
                           },
                         }}
                         size="large"
@@ -479,16 +519,33 @@ export default function PromotionForm({ currentData, isEdit }) {
                 </Button>
               </Stack>
 
+              {isEdit && (
+                <Box sx={{ mt: 4 }}>
+                  <RHFSwitch
+                    name="isAvailable"
+                    labelPlacement="start"
+                    label={
+                      <>
+                        <Typography variant="subtitle2">Promo still available ?</Typography>
+                      </>
+                    }
+                    sx={{ mx: 0 }}
+                  />
+                </Box>
+              )}
+
               <Stack direction="row" justifyContent="flex-end" sx={{ mt: 3 }} gap={1}>
-                <Button variant="outlined" onClick={() => navigate(PATH_DASHBOARD.library.promotion)}>Cancel</Button>
-                <LoadingButton type="submit" variant="contained" loading={loading} disabled={productList?.length > 0 ? Boolean(false) : Boolean(true)}>
-                  {!isEdit ? "New Promotion" : "Save Changes"}
+                <Button variant="outlined" onClick={() => navigate(PATH_DASHBOARD.library.promotion)}>
+                  Cancel
+                </Button>
+                <LoadingButton type="submit" variant="contained" loading={isSubmitting} disabled={fields.length === 0}>
+                  {!isEdit ? 'New Promotion' : 'Save Changes'}
                 </LoadingButton>
               </Stack>
             </Stack>
           </Grid>
         </Grid>
       </Card>
-    </FormProvider >
+    </FormProvider>
   );
 }

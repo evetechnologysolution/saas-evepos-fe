@@ -5,7 +5,11 @@ import { useSnackbar } from 'notistack';
 // @mui
 import { styled, useTheme } from '@mui/material/styles';
 import { Box, Stack, Drawer, List } from '@mui/material';
-import { ListItemStyle as ListItem, ListItemTextStyle, ListItemIconStyle } from '../../../components/nav-section/vertical/style';
+import {
+  ListItemStyle as ListItem,
+  ListItemTextStyle,
+  ListItemIconStyle,
+} from '../../../components/nav-section/vertical/style';
 // hooks
 import useAuth from '../../../hooks/useAuth';
 import useResponsive from '../../../hooks/useResponsive';
@@ -98,8 +102,8 @@ export default function NavbarVertical({ isOpenSidebar, onCloseSidebar }) {
           ...(isCollapse && { alignItems: 'center' }),
         }}
       >
-        <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Logo disabledLink sx={{ marginBottom: 3 }} />
+        <Stack direction="row" alignItems="center" justifyContent="center">
+          <Logo disabledLink />
 
           {isDesktop && !isCollapse && (
             <CollapseButton onToggleCollapse={onToggleCollapse} collapseClick={collapseClick} />
@@ -113,15 +117,12 @@ export default function NavbarVertical({ isOpenSidebar, onCloseSidebar }) {
 
       <List disablePadding sx={{ px: 2 }}>
         <ListItem sx={{ color: 'red' }} onClick={() => setOpenConfirm(true)}>
-          <ListItemIconStyle><Iconify icon="material-symbols:logout-rounded" width={24} height={24} /></ListItemIconStyle>
-          <ListItemTextStyle
-            disableTypography
-            primary="logout"
-            isCollapse={isCollapse}
-          />
+          <ListItemIconStyle>
+            <Iconify icon="material-symbols:logout-rounded" width={24} height={24} />
+          </ListItemIconStyle>
+          <ListItemTextStyle disableTypography primary="logout" isCollapse={isCollapse} />
         </ListItem>
       </List>
-
 
       <Box sx={{ flexGrow: 1 }} />
 
@@ -181,8 +182,8 @@ export default function NavbarVertical({ isOpenSidebar, onCloseSidebar }) {
         open={openConfirm}
         onClick={handleLogout}
         onClose={() => setOpenConfirm(false)}
-        title='Confirm Logout'
-        text='Are you sure want to logout?'
+        title="Confirm Logout"
+        text="Are you sure want to logout?"
       />
     </>
   );

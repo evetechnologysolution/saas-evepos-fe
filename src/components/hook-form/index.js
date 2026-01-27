@@ -9,3 +9,4 @@ export { default as RHFEditor } from './RHFEditor';
 export { default as RHFTextField } from './RHFTextField';
 export { default as RHFRadioGroup } from './RHFRadioGroup';
 export { default as RHFSelectMultiple } from './RHFSelectMultiple';
+export { default as RHFDaySelect } from './RHFDaySelect';

@@ -34,7 +34,7 @@ function Products({ items }) {
             category={item?.category?.name}
             unit={item?.unit || 'pcs'}
             variant={item?.variant || []}
-            notes={item.extraNotes}
+            notes={item?.extraNotes}
             amountKg={item?.amountKg || 0}
             isLaundryBag={item.isLaundryBag}
             isAvailable={item.isAvailable}

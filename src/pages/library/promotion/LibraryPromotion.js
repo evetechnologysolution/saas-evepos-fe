@@ -123,7 +123,7 @@ export default function PromotionList() {
 
     remove.mutate(selectedId, {
       onSuccess: () => {
-        enqueueSnackbar('Product deleted!', { variant: 'success' });
+        enqueueSnackbar('Promotion deleted!', { variant: 'success' });
         setOpen(false);
       },
       onError: (err) => {
