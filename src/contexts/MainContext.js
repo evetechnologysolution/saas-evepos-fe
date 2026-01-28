@@ -89,8 +89,8 @@ const MainContextProvider = ({ children }) => {
   const { data: product = [] } = useQuery(
     ['allProduct'],
     async () => {
-      const res = await axios.get('/product');
-      return res.data?.docs;
+      const res = await axios.get('/product/all');
+      return res.data;
     },
     {
       refetchOnWindowFocus: false, // Prevents refetch on window focus

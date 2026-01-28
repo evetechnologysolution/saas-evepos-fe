@@ -124,10 +124,6 @@ export default function CashierPos() {
   const [anchorSplit, setAnchorSplit] = useState(null);
   const splitOpen = Boolean(anchorSplit);
 
-  const handleOpenSplit = (e) => {
-    setAnchorSplit(e.currentTarget);
-  };
-
   const handleCloseSplit = () => {
     setAnchorSplit(null);
   };
