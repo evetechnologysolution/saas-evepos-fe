@@ -14,7 +14,6 @@ import {
   CircularProgress,
   Stack,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import { LoadingButton } from '@mui/lab';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -37,7 +36,7 @@ export default function Dashboard() {
 
   const [filterRevenue, setFilterRevenue] = useState(null);
   const [typeOfTime, setTypeOfTime] = useState(0);
-  const [filterLabel, setFilterLabel] = useState('This Month');
+  const [filterLabel, setFilterLabel] = useState('thisMonth');
   const [loadingRev, setLoadingRev] = useState(false);
   const [startRev, setStartRev] = useState(null);
   const [endRev, setEndRev] = useState(null);
@@ -45,29 +44,11 @@ export default function Dashboard() {
   const [expenseDate, setExpenseDate] = useState({});
 
   const [paymentMethod, setPaymentMethod] = useState(null);
-  const [popular, setPopular] = useState([]);
 
   const [showFilterDate, setShowFilterDate] = useState(false);
   const [period, setPeriod] = useState('');
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-
-  // Query untuk popular berdasarkan tanggal
-  const { data: popularByDate } = useQuery(
-    ['popularByDate', startDate, endDate],
-    async () => {
-      if (startDate && endDate) {
-        const { data } = await axios.get(`/report/popular/date?start=${startDate}&end=${endDate}`);
-        return data[0] || {};
-      }
-      return null;
-    },
-    { enabled: !!startDate && !!endDate }
-  );
-
-  useEffect(() => {
-    if (popularByDate) setPopular(popularByDate);
-  }, [popularByDate]);
 
   // Fetch data menggunakan useQuery
   const fetchData = async (endpoint, isArray = false) => {
@@ -83,10 +64,10 @@ export default function Dashboard() {
     staleTime: 0, // Data selalu dianggap usang, sehingga akan selalu di-fetch ulang
   };
 
-  const { data: today } = useQuery('revenueToday', () => fetchData('/report/revenue/today'), queryOptions);
-  const { data: thisWeek } = useQuery('revenueThisWeek', () => fetchData('/report/revenue/this-week'), queryOptions);
-  const { data: thisMonth } = useQuery('revenueThisMonth', () => fetchData('/report/revenue/this-month'), queryOptions);
-  const { data: thisYear } = useQuery('revenueThisYear', () => fetchData('/report/revenue/this-year'), queryOptions);
+  const { data: today } = useQuery('revenueToday', () => fetchData('/revenue/today'), queryOptions);
+  const { data: thisWeek } = useQuery('revenueThisWeek', () => fetchData('/revenue/this-week'), queryOptions);
+  const { data: thisMonth } = useQuery('revenueThisMonth', () => fetchData('/revenue/this-month'), queryOptions);
+  const { data: thisYear } = useQuery('revenueThisYear', () => fetchData('/revenue/this-year'), queryOptions);
   const { data: expenseToday } = useQuery(
     'expenseToday',
     () => fetchData('/expense/total?filter=today', true),
@@ -109,63 +90,42 @@ export default function Dashboard() {
   );
   const { data: salesThisWeek, isLoading: loadingChart } = useQuery(
     'salesThisWeek',
-    () => fetchData('/report/sales/this-week', true),
+    () => fetchData('/sales/this-week', true),
     queryOptions
   );
-  const { data: salesThisMonth } = useQuery(
-    'salesThisMonth',
-    () => fetchData('/report/sales/this-month', true),
-    queryOptions
-  );
-  const { data: salesMonthly } = useQuery('salesMonthly', () => fetchData('/report/sales/monthly', true), queryOptions);
+  const { data: salesThisMonth } = useQuery('salesThisMonth', () => fetchData('/sales/this-month', true), queryOptions);
+  const { data: salesMonthly } = useQuery('salesMonthly', () => fetchData('/sales/monthly', true), queryOptions);
   const { data: paymentRevenueToday } = useQuery(
     'paymentRevenueToday',
-    () => fetchData('/report/revenue-overview/today'),
+    () => fetchData('/revenue-overview/today'),
     queryOptions
   );
   const { data: paymentRevenueThisWeek } = useQuery(
     'paymentRevenueThisWeek',
-    () => fetchData('/report/revenue-overview/this-week'),
+    () => fetchData('/revenue-overview/this-week'),
     queryOptions
   );
   const { data: paymentRevenueThisMonth, isLoading: loadingPayment } = useQuery(
     'paymentRevenueThisMonth',
-    () => fetchData('/report/revenue-overview/this-month'),
+    () => fetchData('/revenue-overview/this-month'),
     queryOptions
   );
   const { data: paymentRevenueThisYear } = useQuery(
     'paymentRevenueThisYear',
-    () => fetchData('/report/revenue-overview/this-year'),
+    () => fetchData('/revenue-overview/this-year'),
     queryOptions
   );
-  const { data: popularToday } = useQuery('popularToday', () => fetchData('/report/popular/today'), queryOptions);
-  const { data: popularThisWeek } = useQuery(
-    'popularThisWeek',
-    () => fetchData('/report/popular/this-week'),
-    queryOptions
-  );
-  const { data: popularThisMonth, isLoading: loadingPopular } = useQuery(
-    'popularThisMonth',
-    () => fetchData('/report/popular/this-month'),
-    queryOptions
-  );
-  const { data: popularThisYear } = useQuery(
-    'popularThisYear',
-    () => fetchData('/report/popular/this-year'),
-    queryOptions
-  );
+  const { data: popularProduct, isLoading: loadingPopularProduct } = useQuery({
+    queryKey: ['popular', filterLabel, startDate, endDate],
+    queryFn: () =>
+      axios.get(`/popular?filter=${filterLabel}&start=${startDate}&end=${endDate}`).then((res) => res.data),
+    ...queryOptions,
+  });
 
   useEffect(() => {
     setShowFilterDate(filterLabel === 'By Date');
 
     if (filterLabel !== 'By Date') {
-      const mapping = {
-        Today: popularToday,
-        'This Week': popularThisWeek,
-        'This Month': popularThisMonth,
-        'This Year': popularThisYear,
-      };
-
       const mappingPayment = {
         Today: paymentRevenueToday,
         'This Week': paymentRevenueThisWeek,
@@ -173,11 +133,10 @@ export default function Dashboard() {
         'This Year': paymentRevenueThisYear,
       };
 
-      setPopular(mapping[filterLabel]);
       setPaymentMethod(mappingPayment[filterLabel]);
       handleReset();
     }
-  }, [filterLabel, popularThisMonth, paymentRevenueThisMonth]);
+  }, [filterLabel, paymentRevenueThisMonth]);
 
   useEffect(() => {
     if (typeOfTime === 0) {
@@ -213,7 +172,7 @@ export default function Dashboard() {
 
     try {
       const [revResponse, expenseResponse] = await Promise.all([
-        axios.get(`/report/revenue/date?start=${startRev}&end=${endRev}`),
+        axios.get(`/revenue/date?start=${startRev}&end=${endRev}`),
         axios.get(`/expense/total?start=${startRev}&end=${endRev}`),
       ]);
       setRevDate(revResponse.data[0]);
@@ -232,16 +191,16 @@ export default function Dashboard() {
 
     try {
       const [popularResponse, revenueResponse] = await Promise.all([
-        axios.get(`/report/popular/date?start=${startDate}&end=${endDate}`),
-        axios.get(`/report/revenue-overview/date?start=${startDate}&end=${endDate}`),
+        axios.get(`/popular/date?start=${startDate}&end=${endDate}`),
+        axios.get(`/revenue-overview/date?start=${startDate}&end=${endDate}`),
       ]);
 
       setPeriod(`(${moment(startDate).format('DD MMM YYYY')} - ${moment(endDate).format('DD MMM YYYY')})`);
-      setPopular(popularResponse.data[0]);
+      // setPopular(popularResponse.data[0]);
       setPaymentMethod(revenueResponse.data[0]);
     } catch (error) {
       console.error('Error fetching reports:', error);
-      setPopular([]);
+      // setPopular([]);
       setPaymentMethod([]);
     }
   };
@@ -432,10 +391,10 @@ export default function Dashboard() {
                 mt: 2,
               }}
             >
-              <MenuItem value="Today">Today</MenuItem>
-              <MenuItem value="This Week">This Week</MenuItem>
-              <MenuItem value="This Month">This Month</MenuItem>
-              <MenuItem value="This Year">This Year</MenuItem>
+              <MenuItem value="today">Today</MenuItem>
+              <MenuItem value="thisWeek">This Week</MenuItem>
+              <MenuItem value="thisMonth">This Month</MenuItem>
+              <MenuItem value="thisYear">This Year</MenuItem>
               <MenuItem value="By Date">By Date</MenuItem>
             </Select>
           </Grid>
@@ -564,7 +523,7 @@ export default function Dashboard() {
           </Grid>
 
           <Grid item xs={12} md={6} lg={6}>
-            {loadingPopular ? (
+            {loadingPopularProduct ? (
               <Stack height={364} justifyContent="center" alignItems="center">
                 <CircularProgress />
               </Stack>
@@ -574,34 +533,34 @@ export default function Dashboard() {
                 subheader={`${filterLabel} ${period}`}
                 data={[
                   {
-                    label: popular?.detail?.[0]?.product || '',
-                    total: popular?.detail?.[0]?.sales || 0,
-                    percent: ((popular?.detail?.[0]?.sales || 0) / (popular?.totalSales || 0)) * 100 || 0,
+                    label: popularProduct?.detail?.[0]?.product || '',
+                    total: popularProduct?.detail?.[0]?.sales || 0,
+                    percent: ((popularProduct?.detail?.[0]?.sales || 0) / (popularProduct?.totalSales || 0)) * 100 || 0,
                   },
                   {
-                    label: popular?.detail?.[1]?.product || '',
-                    total: popular?.detail?.[1]?.sales || 0,
-                    percent: ((popular?.detail?.[1]?.sales || 0) / (popular?.totalSales || 0)) * 100 || 0,
+                    label: popularProduct?.detail?.[1]?.product || '',
+                    total: popularProduct?.detail?.[1]?.sales || 0,
+                    percent: ((popularProduct?.detail?.[1]?.sales || 0) / (popularProduct?.totalSales || 0)) * 100 || 0,
                   },
                   {
-                    label: popular?.detail?.[2]?.product || '',
-                    total: popular?.detail?.[2]?.sales || 0,
-                    percent: ((popular?.detail?.[2]?.sales || 0) / (popular?.totalSales || 0)) * 100 || 0,
+                    label: popularProduct?.detail?.[2]?.product || '',
+                    total: popularProduct?.detail?.[2]?.sales || 0,
+                    percent: ((popularProduct?.detail?.[2]?.sales || 0) / (popularProduct?.totalSales || 0)) * 100 || 0,
                   },
                   {
-                    label: popular?.detail?.[3]?.product || '',
-                    total: popular?.detail?.[3]?.sales || 0,
-                    percent: ((popular?.detail?.[3]?.sales || 0) / (popular?.totalSales || 0)) * 100 || 0,
+                    label: popularProduct?.detail?.[3]?.product || '',
+                    total: popularProduct?.detail?.[3]?.sales || 0,
+                    percent: ((popularProduct?.detail?.[3]?.sales || 0) / (popularProduct?.totalSales || 0)) * 100 || 0,
                   },
                   {
-                    label: popular?.detail?.[4]?.product || '',
-                    total: popular?.detail?.[4]?.sales || 0,
-                    percent: ((popular?.detail?.[4]?.sales || 0) / (popular?.totalSales || 0)) * 100 || 0,
+                    label: popularProduct?.detail?.[4]?.product || '',
+                    total: popularProduct?.detail?.[4]?.sales || 0,
+                    percent: ((popularProduct?.detail?.[4]?.sales || 0) / (popularProduct?.totalSales || 0)) * 100 || 0,
                   },
                   {
-                    label: popular?.detail?.[5]?.product || '',
-                    total: popular?.detail?.[5]?.sales || 0,
-                    percent: ((popular?.detail?.[5]?.sales || 0) / (popular?.totalSales || 0)) * 100 || 0,
+                    label: popularProduct?.detail?.[5]?.product || '',
+                    total: popularProduct?.detail?.[5]?.sales || 0,
+                    percent: ((popularProduct?.detail?.[5]?.sales || 0) / (popularProduct?.totalSales || 0)) * 100 || 0,
                   },
                   // {
                   //   label: popular?.detail?.[6]?.product || "",
