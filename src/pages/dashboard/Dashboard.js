@@ -95,48 +95,18 @@ export default function Dashboard() {
   );
   const { data: salesThisMonth } = useQuery('salesThisMonth', () => fetchData('/sales/this-month', true), queryOptions);
   const { data: salesMonthly } = useQuery('salesMonthly', () => fetchData('/sales/monthly', true), queryOptions);
-  const { data: paymentRevenueToday } = useQuery(
-    'paymentRevenueToday',
-    () => fetchData('/revenue-overview/today'),
-    queryOptions
-  );
-  const { data: paymentRevenueThisWeek } = useQuery(
-    'paymentRevenueThisWeek',
-    () => fetchData('/revenue-overview/this-week'),
-    queryOptions
-  );
-  const { data: paymentRevenueThisMonth, isLoading: loadingPayment } = useQuery(
-    'paymentRevenueThisMonth',
-    () => fetchData('/revenue-overview/this-month'),
-    queryOptions
-  );
-  const { data: paymentRevenueThisYear } = useQuery(
-    'paymentRevenueThisYear',
-    () => fetchData('/revenue-overview/this-year'),
-    queryOptions
-  );
   const { data: popularProduct, isLoading: loadingPopularProduct } = useQuery({
     queryKey: ['popular', filterLabel, startDate, endDate],
     queryFn: () =>
       axios.get(`/popular?filter=${filterLabel}&start=${startDate}&end=${endDate}`).then((res) => res.data),
     ...queryOptions,
   });
-
-  useEffect(() => {
-    setShowFilterDate(filterLabel === 'By Date');
-
-    if (filterLabel !== 'By Date') {
-      const mappingPayment = {
-        Today: paymentRevenueToday,
-        'This Week': paymentRevenueThisWeek,
-        'This Month': paymentRevenueThisMonth,
-        'This Year': paymentRevenueThisYear,
-      };
-
-      setPaymentMethod(mappingPayment[filterLabel]);
-      handleReset();
-    }
-  }, [filterLabel, paymentRevenueThisMonth]);
+  const { data: mostPaymentUsed, isLoading: loadingMostPaymentUsed } = useQuery({
+    queryKey: ['paymentmethod', filterLabel, startDate, endDate],
+    queryFn: () =>
+      axios.get(`/payment-revenue?filter=${filterLabel}&start=${startDate}&end=${endDate}`).then((res) => res.data[0]),
+    ...queryOptions,
+  });
 
   useEffect(() => {
     if (typeOfTime === 0) {
@@ -186,29 +156,18 @@ export default function Dashboard() {
     }
   };
 
-  const handleSearch = async () => {
-    if (!startDate || !endDate) return;
-
-    try {
-      const [popularResponse, revenueResponse] = await Promise.all([
-        axios.get(`/popular/date?start=${startDate}&end=${endDate}`),
-        axios.get(`/revenue-overview/date?start=${startDate}&end=${endDate}`),
-      ]);
-
-      setPeriod(`(${moment(startDate).format('DD MMM YYYY')} - ${moment(endDate).format('DD MMM YYYY')})`);
-      // setPopular(popularResponse.data[0]);
-      setPaymentMethod(revenueResponse.data[0]);
-    } catch (error) {
-      console.error('Error fetching reports:', error);
-      // setPopular([]);
-      setPaymentMethod([]);
-    }
-  };
-
   const handleReset = () => {
     setPeriod('');
     setStartDate(null);
     setEndDate(null);
+  };
+
+  const label = {
+    thisMonth: 'This Month',
+    thisWeek: 'This Week',
+    today: 'Today',
+    thisYear: 'This Year',
+    date: 'Date',
   };
 
   return (
@@ -385,7 +344,17 @@ export default function Dashboard() {
           <Grid item xs={12} textAlign="right">
             <Select
               value={filterLabel}
-              onChange={(e) => setFilterLabel(e.target.value)}
+              onChange={(e) => {
+                if (e.target.value === 'date') {
+                  setFilterLabel(e.target.value);
+                  setShowFilterDate(true);
+                } else {
+                  setShowFilterDate(false);
+                  setStartDate(null);
+                  setEndDate(null);
+                  setFilterLabel(e.target.value);
+                }
+              }}
               sx={{
                 height: '40px',
                 mt: 2,
@@ -395,7 +364,7 @@ export default function Dashboard() {
               <MenuItem value="thisWeek">This Week</MenuItem>
               <MenuItem value="thisMonth">This Month</MenuItem>
               <MenuItem value="thisYear">This Year</MenuItem>
-              <MenuItem value="By Date">By Date</MenuItem>
+              <MenuItem value="date">By Date</MenuItem>
             </Select>
           </Grid>
 
@@ -454,10 +423,7 @@ export default function Dashboard() {
                   </LocalizationProvider>
                 </Grid>
 
-                <Grid item xs={3} sm="auto">
-                  {/* <Button variant="contained" color="warning" sx={{ color: "white", mr: 1 }} title="Reset" onClick={() => handleReset()}>
-                    <Iconify icon={"mdi:reload"} sx={{ width: 25, height: 25 }} />
-                  </Button> */}
+                {/* <Grid item xs={3} sm="auto">
                   <Button
                     variant="contained"
                     title="Search"
@@ -466,55 +432,55 @@ export default function Dashboard() {
                   >
                     <Iconify icon={'eva:search-fill'} sx={{ width: 25, height: 25 }} />
                   </Button>
-                </Grid>
+                </Grid> */}
               </Grid>
             </Grid>
           )}
 
           <Grid item xs={12} md={6} lg={6}>
-            {loadingPayment ? (
+            {loadingMostPaymentUsed ? (
               <Stack height={364} justifyContent="center" alignItems="center">
                 <CircularProgress />
               </Stack>
             ) : (
               <BestSeller
                 title="Payment Method"
-                subheader={`${filterLabel} ${period}`}
+                subheader={`${label[filterLabel]} ${period}`}
                 data={[
                   {
-                    label: paymentMethod?.label?.[1] || '',
-                    total: paymentMethod?.value?.[1] || 0,
-                    percent: ((paymentMethod?.value?.[1] || 0) / (paymentMethod?.totalRevenue || 1)) * 100 || 0,
+                    label: mostPaymentUsed?.label?.[1] || '',
+                    total: mostPaymentUsed?.value?.[1] || 0,
+                    percent: ((mostPaymentUsed?.value?.[1] || 0) / (mostPaymentUsed?.totalRevenue || 1)) * 100 || 0,
                     type: 'currency',
                   },
                   {
-                    label: paymentMethod?.label?.[5] || '',
-                    total: paymentMethod?.value?.[5] || 0,
-                    percent: ((paymentMethod?.value?.[5] || 0) / (paymentMethod?.totalRevenue || 1)) * 100 || 0,
+                    label: mostPaymentUsed?.label?.[5] || '',
+                    total: mostPaymentUsed?.value?.[5] || 0,
+                    percent: ((mostPaymentUsed?.value?.[5] || 0) / (mostPaymentUsed?.totalRevenue || 1)) * 100 || 0,
                     type: 'currency',
                   },
                   {
-                    label: paymentMethod?.label?.[3] || '',
-                    total: paymentMethod?.value?.[3] || 0,
-                    percent: ((paymentMethod?.value?.[3] || 0) / (paymentMethod?.totalRevenue || 1)) * 100 || 0,
+                    label: mostPaymentUsed?.label?.[3] || '',
+                    total: mostPaymentUsed?.value?.[3] || 0,
+                    percent: ((mostPaymentUsed?.value?.[3] || 0) / (mostPaymentUsed?.totalRevenue || 1)) * 100 || 0,
                     type: 'currency',
                   },
                   {
-                    label: paymentMethod?.label?.[0] || '',
-                    total: paymentMethod?.value?.[0] || 0,
-                    percent: ((paymentMethod?.value?.[0] || 0) / (paymentMethod?.totalRevenue || 1)) * 100 || 0,
+                    label: mostPaymentUsed?.label?.[0] || '',
+                    total: mostPaymentUsed?.value?.[0] || 0,
+                    percent: ((mostPaymentUsed?.value?.[0] || 0) / (mostPaymentUsed?.totalRevenue || 1)) * 100 || 0,
                     type: 'currency',
                   },
                   {
-                    label: paymentMethod?.label?.[2] || '',
-                    total: paymentMethod?.value?.[2] || 0,
-                    percent: ((paymentMethod?.value?.[2] || 0) / (paymentMethod?.totalRevenue || 1)) * 100 || 0,
+                    label: mostPaymentUsed?.label?.[2] || '',
+                    total: mostPaymentUsed?.value?.[2] || 0,
+                    percent: ((mostPaymentUsed?.value?.[2] || 0) / (mostPaymentUsed?.totalRevenue || 1)) * 100 || 0,
                     type: 'currency',
                   },
                   {
-                    label: paymentMethod?.label?.[4] || '',
-                    total: paymentMethod?.value?.[4] || 0,
-                    percent: ((paymentMethod?.value?.[4] || 0) / (paymentMethod?.totalRevenue || 1)) * 100 || 0,
+                    label: mostPaymentUsed?.label?.[4] || '',
+                    total: mostPaymentUsed?.value?.[4] || 0,
+                    percent: ((mostPaymentUsed?.value?.[4] || 0) / (mostPaymentUsed?.totalRevenue || 1)) * 100 || 0,
                     type: 'currency',
                   },
                 ]}
@@ -530,7 +496,7 @@ export default function Dashboard() {
             ) : (
               <BestSeller
                 title="Popular Product"
-                subheader={`${filterLabel} ${period}`}
+                subheader={`${label[filterLabel]} ${period}`}
                 data={[
                   {
                     label: popularProduct?.detail?.[0]?.product || '',
