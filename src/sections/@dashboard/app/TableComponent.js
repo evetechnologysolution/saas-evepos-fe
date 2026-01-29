@@ -1,6 +1,6 @@
-import React, { useState, useRef } from "react";
-import { useQuery } from "react-query";
-import { CSVLink } from "react-csv";
+import React, { useState, useRef } from 'react';
+import { useQuery } from 'react-query';
+import { CSVLink } from 'react-csv';
 // @mui
 import {
   styled,
@@ -16,51 +16,61 @@ import {
   TextField,
   InputAdornment,
   Grid,
-} from "@mui/material";
-import { LoadingButton } from "@mui/lab";
+} from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 // hooks
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 // utils
-import axios from "../../../utils/axios";
-import { fCurrency } from "../../../utils/formatNumber";
-import { formatQDate, formatDate, formatDate2, formatOnlyDate } from "../../../utils/getData";
+import axios from '../../../utils/axios';
+import { fCurrency } from '../../../utils/formatNumber';
+import { formatQDate, formatDate, formatDate2, formatOnlyDate } from '../../../utils/getData';
 // components
-import Iconify from "../../../components/Iconify";
-import Scrollbar from "../../../components/Scrollbar";
-import HeaderBreadcrumbs from "../../../components/HeaderBreadcrumbs";
-import Label from "../../../components/Label";
-import { TableHeadCustom, TableLoading, TableNoData } from "../../../components/table";
+import Iconify from '../../../components/Iconify';
+import Scrollbar from '../../../components/Scrollbar';
+import HeaderBreadcrumbs from '../../../components/HeaderBreadcrumbs';
+import Label from '../../../components/Label';
+import { TableHeadCustom, TableLoading, TableNoData } from '../../../components/table';
 
 // ----------------------------------------------------------------------
 
 const CustomTableRow = styled(TableRow)(() => ({
-  "&.MuiTableRow-hover:hover": {
+  '&.MuiTableRow-hover:hover': {
     // boxShadow: "inset 8px 0 0 #fff, inset -8px 0 0 #fff",
-    borderRadius: "8px",
+    borderRadius: '8px',
   },
 }));
 
 const TABLE_HEAD = [
-  { id: "no", label: "No", align: "left" },
+  { id: 'no', label: 'No', align: 'left' },
   // { id: "date", label: "Order Date", align: "left" },
-  { id: "paymentDate", label: "Payment Date", align: "left" },
-  { id: "orderId", label: "Order ID", align: "left" },
-  { id: "", label: "Customer", align: "left" },
-  { id: "orders", label: "Orders", align: "left" },
-  { id: "deliveryPrice", label: "Delivery Fee", align: "left" },
-  { id: "total", label: "Total", align: "left" },
-  { id: "payment", label: "Payment", align: "left" },
+  { id: 'paymentDate', label: 'Payment Date', align: 'left' },
+  { id: 'orderId', label: 'Order ID', align: 'left' },
+  { id: '', label: 'Customer', align: 'left' },
+  { id: 'orders', label: 'Orders', align: 'left' },
+  { id: 'deliveryPrice', label: 'Delivery Fee', align: 'left' },
+  { id: 'total', label: 'Total', align: 'left' },
+  { id: 'payment', label: 'Payment', align: 'left' },
 ];
 
 export default function TableComponent() {
-
   const [countData, setCountData] = useState(0);
   const [pagingCounter, setPagingCounter] = useState(0);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
 
-  const headers = ["Payment Date", "Order ID", "Order Type", "Item", "Price", "Qty", "Discount", "Delivery Fee", "Total", "Payment"];
+  const headers = [
+    'Payment Date',
+    'Order ID',
+    'Order Type',
+    'Item',
+    'Price',
+    'Qty',
+    'Discount',
+    'Delivery Fee',
+    'Total',
+    'Payment',
+  ];
   const exportCsv = useRef(null);
   const [exportData, setExportData] = useState([]);
   const [loadingExport, setLoadingExport] = useState(false);
@@ -70,38 +80,38 @@ export default function TableComponent() {
   const [controller, setController] = useState({
     page: 0,
     rowsPerPage: 10,
-    search: "",
-    start: "",
-    end: ""
+    search: '',
+    start: '',
+    end: '',
   });
 
   const getData = async ({ queryKey }) => {
     const [, params] = queryKey; // Extract query params
     const queryString = new URLSearchParams(params).toString(); // Build query string
     try {
-      const res = await axios.get(`/orders/paid?${queryString}`);
+      const res = await axios.get(`/order/paid?${queryString}`);
       setCountData(res?.data?.totalDocs || 0);
       setPagingCounter(res?.data?.pagingCounter || 0);
       return res.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw new Error(error.response?.data?.message || "Failed to fetch orders");
+      console.error('Error fetching data:', error);
+      throw new Error(error.response?.data?.message || 'Failed to fetch orders');
     }
   };
 
   const { isLoading, data: tableData } = useQuery(
     [
-      "listPaidOrders",
+      'listPaidOrders',
       {
         page: controller.page + 1,
         perPage: controller.rowsPerPage,
-        search: controller.search || "",
+        search: controller.search || '',
         // start: controller.start || "",
         // end: controller.end || "",
-        paidStart: controller.start || "",
-        paidEnd: controller.end || "",
-        sortBy: "paymentDate",
-        sortType: "desc"
+        paidStart: controller.start || '',
+        paidEnd: controller.end || '',
+        sortBy: 'paymentDate',
+        sortType: 'desc',
       },
     ],
     getData
@@ -110,7 +120,7 @@ export default function TableComponent() {
   const handlePageChange = (event, newPage) => {
     setController({
       ...controller,
-      page: newPage
+      page: newPage,
     });
   };
 
@@ -118,7 +128,7 @@ export default function TableComponent() {
     setController({
       ...controller,
       rowsPerPage: parseInt(event.target.value, 10),
-      page: 0
+      page: 0,
     });
   };
 
@@ -126,42 +136,42 @@ export default function TableComponent() {
     let params = {
       page: 0,
       rowsPerPage: controller.rowsPerPage,
-    }
+    };
 
     if (search) {
       params = {
         ...params,
-        search
-      }
+        search,
+      };
     }
 
     if (startDate && endDate) {
       params = {
         ...params,
         start: formatQDate(startDate),
-        end: formatQDate(endDate)
-      }
+        end: formatQDate(endDate),
+      };
     }
 
     setController(params);
   };
 
   const handleOnKeyPress = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleSearch();
     }
   };
 
   const handleReset = () => {
-    setSearch("");
+    setSearch('');
     setStartDate(null);
     setEndDate(null);
     setController({
       page: 0,
       rowsPerPage: controller.rowsPerPage,
-      search: "",
-      start: "",
-      end: "",
+      search: '',
+      start: '',
+      end: '',
     });
   };
 
@@ -170,23 +180,23 @@ export default function TableComponent() {
   };
 
   const showOrderType = (orderType) => {
-    if (orderType?.toLowerCase() === "onsite") {
-      return "Onsite";
+    if (orderType?.toLowerCase() === 'onsite') {
+      return 'Onsite';
     }
-    return "Delivery";
-  }
+    return 'Delivery';
+  };
 
   const handleExport = async () => {
     setLoadingExport(true);
 
     handleSearch();
 
-    let url = `/orders/export`;
+    let url = `/order/export`;
     if (search) {
       url = `${url}?search=${search}`;
     }
     if (startDate && endDate) {
-      const sign = search ? "&" : "?";
+      const sign = search ? '&' : '?';
       // url = `${url + sign}start=${startDate}&end=${endDate}`;
       url = `${url + sign}paidStart=${startDate}&paidEnd=${endDate}&sortBy=paymentDate&sortType=desc`;
     }
@@ -196,13 +206,13 @@ export default function TableComponent() {
       response.data.forEach((data) => {
         let payment;
         if (!data.refundType) {
-          if (data.payment === "Card") {
+          if (data.payment === 'Card') {
             payment = `${data.payment} | ${data.cardBankName} a/n ${data.cardAccountName} ${data.cardNumber}`;
           } else {
             payment = data.payment;
           }
         } else {
-          payment = "Refund";
+          payment = 'Refund';
         }
         result.push([
           // formatOnlyDate(data.date),
@@ -215,7 +225,7 @@ export default function TableComponent() {
           data.discountPrice ? data.discountPrice : 0,
           data.deliveryPrice ? data.deliveryPrice : 0,
           data.billedAmount,
-          payment
+          payment,
         ]);
 
         if (data.orders.length > 1) {
@@ -223,19 +233,19 @@ export default function TableComponent() {
             if (i > 0) {
               result.push([
                 // "",
-                "",
-                "",
-                "",
+                '',
+                '',
+                '',
                 row.name,
                 row.price,
                 row.qty,
-                "",
-                "",
-                "",
-                ""
+                '',
+                '',
+                '',
+                '',
               ]);
             }
-          })
+          });
         }
       });
     });
@@ -246,7 +256,7 @@ export default function TableComponent() {
       if (result.length > 0) {
         exportCsv.current.link.click();
       } else {
-        alert("Export failed because data is empty!");
+        alert('Export failed because data is empty!');
       }
       setLoadingExport(false);
     }, 1000);
@@ -256,10 +266,7 @@ export default function TableComponent() {
     <Card>
       <Box sx={{ px: 2 }}>
         <Box sx={{ px: 1, py: 2 }}>
-          <HeaderBreadcrumbs
-            heading="Sales Report"
-            links={[]}
-          />
+          <HeaderBreadcrumbs heading="Sales Report" links={[]} />
           <Grid container spacing={2} alignItems="center" justifyContent="flex-end">
             <Grid item xs={12} sm={6} md="auto">
               <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -323,7 +330,7 @@ export default function TableComponent() {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Iconify icon={"eva:search-fill"} sx={{ color: "text.disabled", width: 20, height: 20 }} />
+                      <Iconify icon={'eva:search-fill'} sx={{ color: 'text.disabled', width: 20, height: 20 }} />
                     </InputAdornment>
                   ),
                 }}
@@ -331,13 +338,19 @@ export default function TableComponent() {
             </Grid>
 
             <Grid item xs="auto">
-              <Button variant="contained" color="warning" sx={{ color: "white" }} title="Reset" onClick={() => handleReset()}>
+              <Button
+                variant="contained"
+                color="warning"
+                sx={{ color: 'white' }}
+                title="Reset"
+                onClick={() => handleReset()}
+              >
                 {/* Reset */}
-                <Iconify icon={"mdi:reload"} sx={{ width: 25, height: 25 }} />
+                <Iconify icon={'mdi:reload'} sx={{ width: 25, height: 25 }} />
               </Button>
               <Button variant="contained" title="Search" sx={{ ml: 1 }} onClick={() => handleClickSearch()}>
                 {/* Search */}
-                <Iconify icon={"eva:search-fill"} sx={{ width: 25, height: 25 }} />
+                <Iconify icon={'eva:search-fill'} sx={{ width: 25, height: 25 }} />
               </Button>
               <CSVLink
                 filename={`Export-Orders-${formatDate(new Date())}`}
@@ -346,20 +359,24 @@ export default function TableComponent() {
                 headers={headers}
                 ref={exportCsv}
               />
-              <LoadingButton variant="contained" color="info" title="Export" sx={{ ml: 1 }} loading={loadingExport} onClick={() => handleExport()}>
+              <LoadingButton
+                variant="contained"
+                color="info"
+                title="Export"
+                sx={{ ml: 1 }}
+                loading={loadingExport}
+                onClick={() => handleExport()}
+              >
                 {/* Export */}
-                <Iconify icon={"material-symbols:download-rounded"} sx={{ width: 25, height: 25 }} />
+                <Iconify icon={'material-symbols:download-rounded'} sx={{ width: 25, height: 25 }} />
               </LoadingButton>
             </Grid>
           </Grid>
         </Box>
         <Scrollbar>
-          <TableContainer sx={{ minWidth: 800, position: "relative" }}>
+          <TableContainer sx={{ minWidth: 800, position: 'relative' }}>
             <Table size="small">
-              <TableHeadCustom
-                headLabel={TABLE_HEAD}
-                rowCount={countData}
-              />
+              <TableHeadCustom headLabel={TABLE_HEAD} rowCount={countData} />
 
               <TableBody>
                 {!isLoading ? (
@@ -368,46 +385,44 @@ export default function TableComponent() {
                       <CustomTableRow hover key={index}>
                         <TableCell>{pagingCounter + index}</TableCell>
                         {/* <TableCell>{formatDate2(row.date)}</TableCell> */}
-                        <TableCell>{row.paymentDate ? formatDate2(row.paymentDate) : "-"}</TableCell>
+                        <TableCell>{row.paymentDate ? formatDate2(row.paymentDate) : '-'}</TableCell>
                         <TableCell>
-                          <Label
-                            variant="ghost"
-                            color={showOrderType(row.orderType) === "Onsite" ? "default" : "info"}
-                          >
+                          <Label variant="ghost" color={showOrderType(row.orderType) === 'Onsite' ? 'default' : 'info'}>
                             {showOrderType(row.orderType)}
                           </Label>
                           <p>{row.orderId ? row.orderId : row._id}</p>
                         </TableCell>
                         <TableCell align="left">
-                          <p>{row.customer?.name || "-"}</p>
+                          <p>{row.customer?.name || '-'}</p>
                           <p>
-                            {row.customer?.phone && !row.customer?.phone?.includes("EM")
-                              ? row.customer?.phone
-                              : "-"}
+                            {row.customer?.phone && !row.customer?.phone?.includes('EM') ? row.customer?.phone : '-'}
                           </p>
                         </TableCell>
                         <TableCell>
                           {row.orders.map((item, i) => (
-                            <p key={i} style={{ marginBottom: "5px" }}>
-                              {`x ${item.qty}${item.category?.toLowerCase() === "kiloan" ? "kg" : ""} ${item.name}`}
-                              {item.variant.length > 0 && item.variant.map((item, v) => (
-                                <span key={v}>
-                                  <br />
-                                  <em>{`${item.name} : ${item.option} ${item.qty > 1 ? `(x${item.qty})` : ""}`}</em>
-                                </span>
-                              ))}
+                            <p key={i} style={{ marginBottom: '5px' }}>
+                              {`x ${item.qty}${item.category?.toLowerCase() === 'kiloan' ? 'kg' : ''} ${item.name}`}
+                              {item.variant.length > 0 &&
+                                item.variant.map((item, v) => (
+                                  <span key={v}>
+                                    <br />
+                                    <em>{`${item.name} : ${item.option} ${item.qty > 1 ? `(x${item.qty})` : ''}`}</em>
+                                  </span>
+                                ))}
                             </p>
                           ))}
                         </TableCell>
-                        <TableCell>{row.deliveryPrice ? fCurrency(row.deliveryPrice) : "-"}</TableCell>
-                        <TableCell sx={{ color: row.refundType ? "red" : "#212B36" }}>{fCurrency(row.billedAmount)}</TableCell>
-                        <TableCell sx={{ color: row.refundType ? "red" : "#212B36" }}>
-                          {row.refundType && "Refund"}
+                        <TableCell>{row.deliveryPrice ? fCurrency(row.deliveryPrice) : '-'}</TableCell>
+                        <TableCell sx={{ color: row.refundType ? 'red' : '#212B36' }}>
+                          {fCurrency(row.billedAmount)}
+                        </TableCell>
+                        <TableCell sx={{ color: row.refundType ? 'red' : '#212B36' }}>
+                          {row.refundType && 'Refund'}
                           {!row.refundType && (
                             <div>
                               {row.payment}
-                              {row.payment === "Card" && (
-                                <div style={{ fontSize: "13px" }}>
+                              {row.payment === 'Card' && (
+                                <div style={{ fontSize: '13px' }}>
                                   {row.cardBankName}
                                   <br />
                                   {row.cardAccountName}
@@ -431,11 +446,11 @@ export default function TableComponent() {
           </TableContainer>
         </Scrollbar>
 
-        <Box sx={{ position: "relative" }}>
+        <Box sx={{ position: 'relative' }}>
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={countData}
+            count={tableData?.totalPages}
             rowsPerPage={controller.rowsPerPage}
             page={controller.page}
             onPageChange={handlePageChange}
@@ -443,6 +458,6 @@ export default function TableComponent() {
           />
         </Box>
       </Box>
-    </Card >
+    </Card>
   );
 }
