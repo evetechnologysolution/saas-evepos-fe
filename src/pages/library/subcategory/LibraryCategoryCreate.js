@@ -66,7 +66,7 @@ export default function LibraryCategoryCreate() {
     <Page title="Category: New">
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <HeaderBreadcrumbs
-          heading="New Category"
+          heading="New Sub Category"
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
             { name: 'Library', href: PATH_DASHBOARD.library.root },

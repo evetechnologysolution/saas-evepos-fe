@@ -126,7 +126,7 @@ const MainContextProvider = ({ children }) => {
     ['allVariant'],
     async () => {
       const res = await axios.get('/variant');
-      return sortByName(res.data);
+      return sortByName(res.data?.docs);
     },
     {
       refetchOnWindowFocus: false,

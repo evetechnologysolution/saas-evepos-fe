@@ -17,28 +17,25 @@ import HeaderBreadcrumbs from '../../../components/HeaderBreadcrumbs';
 import CategoryForm from './form/CategoryForm';
 import schema from './schema';
 import useCategory from './service/useCategory';
-
 // ----------------------------------------------------------------------
-
 export default function LibraryCategoryCreate() {
   const { themeStretch } = useSettings();
   const { update, getById, list } = useCategory();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const { id } = useParams();
-
-  const { data: tableData, isSuccess } = list({
+  const { data: tableData, isLoading: loadingData } = list({
     page: 1,
     perPage: 50,
   });
-
   const { data: categoryById, isSuccess: isSuccessById, isLoading: loadingCategoryById } = getById(id);
-
   const methods = useForm({
     resolver: yupResolver(schema),
-    defaultValues: schema.getDefault(),
+    defaultValues: {
+      ...schema.getDefault(),
+      selectedList: [],
+    },
   });
-
   const {
     handleSubmit,
     setValue,
@@ -46,26 +43,26 @@ export default function LibraryCategoryCreate() {
     watch,
     reset,
   } = methods;
-
   const liveFormState = watch();
 
   useEffect(() => {
-    if (isSuccessById) {
-      reset(categoryById);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessById]);
+    if (!isSuccessById || !tableData?.docs) return;
 
-  useEffect(() => {
-    if (isSuccess) {
-      const ids = tableData.docs?.map((item) => item.listNumber) ?? [];
-      setValue('selectedList', ids);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess]);
+    const ids = tableData.docs.map((item) => item.listNumber);
+
+    reset({
+      ...categoryById,
+      selectedList: ids,
+    });
+  }, [isSuccessById, categoryById, tableData?.docs, reset]);
 
   const onSubmit = async (data) => {
-    await handleMutationFeedback(update.mutateAsync({ id, payload: data }), {
+    const sanitizedData = {
+      ...data,
+      selectedList: data.selectedList || [],
+    };
+
+    await handleMutationFeedback(update.mutateAsync({ id, payload: sanitizedData }), {
       successMsg: 'Kategori berhasil disimpan!',
       errorMsg: 'Gagal menyimpan kategori!',
       onSuccess: () => navigate('/dashboard/library/category'),
@@ -74,7 +71,7 @@ export default function LibraryCategoryCreate() {
   };
 
   return (
-    <Page title="Category: New">
+    <Page title="Category: Edit">
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <HeaderBreadcrumbs
           heading="Edit Category"
@@ -85,8 +82,7 @@ export default function LibraryCategoryCreate() {
             { name: 'New' },
           ]}
         />
-
-        {loadingCategoryById ? (
+        {loadingCategoryById || loadingData ? (
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <CircularProgress />
           </Box>
