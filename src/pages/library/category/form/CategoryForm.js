@@ -3,7 +3,7 @@
 import PropTypes from 'prop-types';
 // @mui
 import { LoadingButton } from '@mui/lab';
-import { Card, Grid, Stack, Button, Typography } from '@mui/material';
+import { Card, Grid, Stack, Button, Typography, Box, CircularProgress } from '@mui/material';
 // routes
 import { useNavigate } from 'react-router';
 import { FormProvider, RHFTextField } from '../../../../components/hook-form';
@@ -34,21 +34,27 @@ export default function CategoryForm({ methods, onSubmit, type, isSubmitting, se
                 <div>
                   <Typography sx={{ mb: 1, ml: 2 }}>List Number</Typography>
                   <Stack display="grid" gap={1} gridTemplateColumns="repeat(auto-fit, 80px)">
-                    {Array.from({ length: 30 }).map((_, n) => (
-                      <Button
-                        key={n}
-                        variant={formState?.listNumber === n + 1 ? 'contained' : 'outlined'}
-                        sx={{ height: 50 }}
-                        onClick={() => setValue('listNumber', n + 1)}
-                        disabled={
-                          formState?.selectedList?.some((item) => item === n + 1) && formState?.listNumber !== n + 1
-                            ? Boolean(true)
-                            : Boolean(false)
-                        }
-                      >
-                        {n + 1}
-                      </Button>
-                    ))}
+                    {formState?.selectedList?.length === 0 ? (
+                      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <CircularProgress />
+                      </Box>
+                    ) : (
+                      Array.from({ length: 30 }).map((_, n) => (
+                        <Button
+                          key={n}
+                          variant={formState?.listNumber === n + 1 ? 'contained' : 'outlined'}
+                          sx={{ height: 50 }}
+                          onClick={() => setValue('listNumber', n + 1)}
+                          disabled={
+                            formState?.selectedList?.some((item) => item === n + 1) && formState?.listNumber !== n + 1
+                              ? Boolean(true)
+                              : Boolean(false)
+                          }
+                        >
+                          {n + 1}
+                        </Button>
+                      ))
+                    )}
                   </Stack>
                 </div>
               </Stack>

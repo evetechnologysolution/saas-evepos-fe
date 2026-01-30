@@ -146,7 +146,7 @@ export default function LibraryCategory() {
                 component={RouterLink}
                 to={PATH_DASHBOARD.library.subcategoryCreate}
               >
-                New Category
+                New Sub Category
               </Button>
             </Stack>
 

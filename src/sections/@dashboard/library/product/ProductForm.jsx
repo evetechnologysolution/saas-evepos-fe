@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-boolean-value */
 /* eslint-disable react/prop-types */
 import PropTypes from 'prop-types';
 import { useState, useEffect, useContext, useCallback, useMemo } from 'react';
@@ -208,7 +209,7 @@ export default function ProductForm({ isEdit, currentData }) {
       formData.append('listNumber', Number(data.listNumber));
 
       // variant => stringify, karena form-data tidak bisa array object langsung
-      formData.append('variantString', JSON.stringify(data.variant || []));
+      formData.append('variantString', JSON.stringify(variantList || []));
 
       // image (string URL / File / null)
       if (data.image instanceof File) {
@@ -424,122 +425,125 @@ export default function ProductForm({ isEdit, currentData }) {
               </div>
 
               <Typography variant="subtitle1">List of Variant</Typography>
-              {variantList?.map((variant, index) => (
-                <Stack key={index} flexDirection="row" alignItems="center" justifyContent="center" gap={2}>
-                  <RHFSelect
-                    name={`variant${index}`}
-                    SelectProps={{ native: false }}
-                    onChange={(e) => handleVariantChange(e, index)}
-                    value={variant?.variantRef || ''}
-                    required
-                  >
-                    <MenuItem
-                      value=""
-                      sx={{
-                        mx: 1,
-                        borderRadius: 0.75,
-                        typography: 'body2',
-                        fontStyle: 'italic',
-                        color: 'text.secondary',
-                      }}
-                      disabled
+              {ctx.variant?.length === 0 && <CircularProgress />}
+              {ctx.variant?.length > 0 &&
+                variantList?.map((variant, index) => (
+                  <Stack key={index} flexDirection="row" alignItems="center" justifyContent="center" gap={2}>
+                    <RHFSelect
+                      name={`variant${index}`}
+                      SelectProps={{ native: false }}
+                      onChange={(e) => handleVariantChange(e, index)}
+                      value={variant?.variantRef || ''}
+                      required
                     >
-                      Select One
-                    </MenuItem>
-                    <Divider />
-                    {ctx.variant.map((item, n) => (
                       <MenuItem
-                        key={n}
-                        value={item._id}
+                        value=""
                         sx={{
                           mx: 1,
-                          my: 0.5,
                           borderRadius: 0.75,
                           typography: 'body2',
+                          fontStyle: 'italic',
+                          color: 'text.secondary',
                         }}
+                        disabled
                       >
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <Typography variant="body2">{item.name}</Typography>
-                          <Typography variant="body2" color="primary">
-                            {item.options.map((field, i) => (
-                              <span key={i}>
-                                {field.name}
-                                {item.options.length > 1 && i !== item.options.length - 1 && ', '}
-                              </span>
-                            ))}
-                          </Typography>
-                        </div>
+                        Select One
                       </MenuItem>
-                    ))}
-                  </RHFSelect>
-                  <FormControlLabel
-                    name={`isRequired[${index}]`}
-                    labelPlacement="start"
-                    sx={{ mx: 0, width: 0.5, justifyContent: 'space-between' }}
-                    control={
-                      <CustomSwitch
-                        checked={Boolean(variant.isMandatory)}
-                        onChange={(e) => handleVariantMandatory(e.target.checked, index)}
-                      />
-                    }
-                    label={
-                      <>
-                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                          Mandatory
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                          Enable for mandatory
-                        </Typography>
-                      </>
-                    }
-                  />
-                  <FormControlLabel
-                    name={`isMultiple[${index}]`}
-                    labelPlacement="start"
-                    sx={{ mx: 0, width: 0.5, justifyContent: 'space-between' }}
-                    control={
-                      <CustomSwitch
-                        checked={Boolean(variant.isMultiple)}
-                        onChange={(e) => handleVariantMultiple(e.target.checked, index)}
-                      />
-                    }
-                    label={
-                      <>
-                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                          Multiple Select
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                          Enable for multiple
-                        </Typography>
-                      </>
-                    }
-                  />
-                  <Stack alignItems="flex-end">
-                    <Button
-                      color="error"
-                      variant="contained"
-                      sx={{
-                        boxShadow: '0',
-                        p: 0,
-                        minWidth: 30,
-                        height: 30,
-                        mb: 0.5,
-                        bgcolor: '#FFC2B4',
-                        color: 'red',
-                        '&:hover': {
+                      <Divider />
+                      {ctx.variant.map((item, n) => (
+                        <MenuItem
+                          key={n}
+                          value={item._id}
+                          sx={{
+                            mx: 1,
+                            my: 0.5,
+                            borderRadius: 0.75,
+                            typography: 'body2',
+                          }}
+                          disabled={variantList.some((v) => v.variantRef === item._id)}
+                        >
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <Typography variant="body2">{item.name}</Typography>
+                            <Typography variant="body2" color="primary">
+                              {item.options.map((field, i) => (
+                                <span key={i}>
+                                  {field.name}
+                                  {item.options.length > 1 && i !== item.options.length - 1 && ', '}
+                                </span>
+                              ))}
+                            </Typography>
+                          </div>
+                        </MenuItem>
+                      ))}
+                    </RHFSelect>
+                    <FormControlLabel
+                      name={`isRequired[${index}]`}
+                      labelPlacement="start"
+                      sx={{ mx: 0, width: 0.5, justifyContent: 'space-between' }}
+                      control={
+                        <CustomSwitch
+                          checked={Boolean(variant.isMandatory)}
+                          onChange={(e) => handleVariantMandatory(e.target.checked, index)}
+                        />
+                      }
+                      label={
+                        <>
+                          <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                            Mandatory
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            Enable for mandatory
+                          </Typography>
+                        </>
+                      }
+                    />
+                    <FormControlLabel
+                      name={`isMultiple[${index}]`}
+                      labelPlacement="start"
+                      sx={{ mx: 0, width: 0.5, justifyContent: 'space-between' }}
+                      control={
+                        <CustomSwitch
+                          checked={Boolean(variant.isMultiple)}
+                          onChange={(e) => handleVariantMultiple(e.target.checked, index)}
+                        />
+                      }
+                      label={
+                        <>
+                          <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                            Multiple Select
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            Enable for multiple
+                          </Typography>
+                        </>
+                      }
+                    />
+                    <Stack alignItems="flex-end">
+                      <Button
+                        color="error"
+                        variant="contained"
+                        sx={{
+                          boxShadow: '0',
+                          p: 0,
+                          minWidth: 30,
+                          height: 30,
+                          mb: 0.5,
                           bgcolor: '#FFC2B4',
-                        },
-                      }}
-                      size="large"
-                      onClick={() => handleOptionRemove(index)}
-                    >
-                      <Iconify icon="eva:trash-2-outline" width={20} height={20} />
-                    </Button>
+                          color: 'red',
+                          '&:hover': {
+                            bgcolor: '#FFC2B4',
+                          },
+                        }}
+                        size="large"
+                        onClick={() => handleOptionRemove(index)}
+                      >
+                        <Iconify icon="eva:trash-2-outline" width={20} height={20} />
+                      </Button>
+                    </Stack>
                   </Stack>
-                </Stack>
-              ))}
+                ))}
               <Stack alignItems="flex-end">
-                <Button variant="text" onClick={handleVariantAdd}>
+                <Button variant="text" onClick={handleVariantAdd} disabled={ctx.variant?.length === 0}>
                   <Iconify icon="eva:plus-fill" width={20} height={20} /> Add Variant
                 </Button>
               </Stack>

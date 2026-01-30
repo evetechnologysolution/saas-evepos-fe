@@ -50,19 +50,15 @@ export default function LibraryCategoryCreate() {
   const liveFormState = watch();
 
   useEffect(() => {
-    if (isSuccessById) {
-      reset(categoryById);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessById]);
+    if (!isSuccessById || !tableData?.docs) return;
 
-  useEffect(() => {
-    if (isSuccess) {
-      const ids = tableData.docs?.map((item) => item.listNumber) ?? [];
-      setValue('selectedList', ids);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess]);
+    const ids = tableData.docs.map((item) => item.listNumber);
+
+    reset({
+      ...categoryById,
+      selectedList: ids,
+    });
+  }, [isSuccessById, categoryById, tableData?.docs, reset]);
 
   const onSubmit = async (data) => {
     await handleMutationFeedback(update.mutateAsync({ id, payload: data }), {
@@ -74,10 +70,10 @@ export default function LibraryCategoryCreate() {
   };
 
   return (
-    <Page title="Category: New">
+    <Page title="Sub Category: Edit">
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <HeaderBreadcrumbs
-          heading="Edit Category"
+          heading="Edit Sub Category"
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
             { name: 'Library', href: PATH_DASHBOARD.library.root },

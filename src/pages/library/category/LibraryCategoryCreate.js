@@ -1,5 +1,5 @@
 // @mui
-import { Container } from '@mui/material';
+import { Box, CircularProgress, Container } from '@mui/material';
 // routes
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -26,7 +26,11 @@ export default function LibraryCategoryCreate() {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
-  const { data: tableData, isSuccess } = list({
+  const {
+    data: tableData,
+    isSuccess,
+    loadingData,
+  } = list({
     page: 1,
     perPage: 50,
   });
@@ -46,12 +50,12 @@ export default function LibraryCategoryCreate() {
   const liveFormState = watch();
 
   useEffect(() => {
-    if (isSuccess) {
-      const ids = tableData.docs?.map((item) => item.listNumber) ?? [];
-      setValue('selectedList', ids);
-    }
+    if (!tableData?.docs) return;
+
+    const ids = tableData.docs.map((item) => item.listNumber);
+    setValue('selectedList', ids);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess]);
+  }, [tableData]);
 
   const onSubmit = async (data) => {
     await handleMutationFeedback(create.mutateAsync(data), {
@@ -75,14 +79,20 @@ export default function LibraryCategoryCreate() {
           ]}
         />
 
-        <CategoryForm
-          type="create"
-          methods={methods}
-          isSubmitting={isSubmitting}
-          onSubmit={handleSubmit(onSubmit, (e) => console.log(e))}
-          setValue={setValue}
-          formState={liveFormState}
-        />
+        {loadingData ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <CategoryForm
+            type="create"
+            methods={methods}
+            isSubmitting={isSubmitting}
+            onSubmit={handleSubmit(onSubmit, (e) => console.log(e))}
+            setValue={setValue}
+            formState={liveFormState}
+          />
+        )}
       </Container>
     </Page>
   );
