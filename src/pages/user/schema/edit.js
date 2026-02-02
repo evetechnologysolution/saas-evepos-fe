@@ -16,7 +16,7 @@ const userSchemaEdit = Yup.object({
     .nullable()
     .optional()
     .min(6, 'Password minimal 6 karakter'),
-  role: Yup.string().required('Role wajib diisi').oneOf(['Admin', 'Staff', 'Kasir'], 'Role tidak valid'),
+  role: Yup.string().required('Role wajib diisi').oneOf(['Admin', 'Staff', 'Cashier'], 'Role tidak valid'),
 });
 
 export default userSchemaEdit;

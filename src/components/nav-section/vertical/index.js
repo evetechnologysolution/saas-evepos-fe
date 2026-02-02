@@ -37,8 +37,7 @@ export default function NavSectionVertical({ navConfig, isCollapse = false, ...o
     <Box {...other}>
       {navConfig.map((group) => (
         <List key={group.subheader} disablePadding sx={{ px: 2 }}>
-          {//   filter((data) => data.roles !== 'undefined' && data.roles.includes(currentRole)).
-          group.items.length > 0 && (
+          {group.items.filter((data) => data.roles !== 'undefined' && data.roles.includes(currentRole)).length > 0 && (
             <ListSubheaderStyle
               sx={{
                 ...(isCollapse && {
@@ -52,7 +51,7 @@ export default function NavSectionVertical({ navConfig, isCollapse = false, ...o
 
           {/* {group.items.map(list => ( */}
           {group.items
-            // .filter((data) => data.roles !== 'undefined' && data.roles.includes(currentRole))
+            .filter((data) => data.roles !== 'undefined' && data.roles.includes(currentRole))
             .map((list) => (
               <NavListRoot key={list.title + list.path} list={list} isCollapse={isCollapse} />
             ))}

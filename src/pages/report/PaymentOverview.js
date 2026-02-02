@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 // @mui
 import {
   Button,
@@ -8,120 +8,128 @@ import {
   TextField,
   Stack,
   Typography,
-  InputAdornment
-} from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
-import moment from "moment";
+  InputAdornment,
+  CircularProgress,
+} from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+import moment from 'moment';
+import { useQuery } from 'react-query';
 // utils
-import axios from "../../utils/axios";
-import { numberWithCommas } from "../../utils/getData";
+import axios from '../../utils/axios';
+import { numberWithCommas } from '../../utils/getData';
 // hooks
-import useSettings from "../../hooks/useSettings";
+import useSettings from '../../hooks/useSettings';
 // components
-import Page from "../../components/Page";
-import Iconify from "../../components/Iconify";
+import Page from '../../components/Page';
+import Iconify from '../../components/Iconify';
 // sections
-import {
-  WidgetSummary,
-  RevenueOverview,
-} from "../../sections/@dashboard/app";
+import { WidgetSummary, RevenueOverview } from '../../sections/@dashboard/app';
 
 // ----------------------------------------------------------------------
+
+const queryOptions = {
+  cacheTime: 0,
+  staleTime: 0,
+};
 
 export default function PaymentOverview() {
   const theme = useTheme();
   const { themeStretch } = useSettings();
 
-  const [filterLabel, setFilterLabel] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState(null);
-  const [paymentToday, setPaymentToday] = useState(null);
-  const [paymentThisWeek, setPaymentThisWeek] = useState(null);
-  const [paymentThisMonth, setPaymentThisMonth] = useState(null);
-  const [paymentThisYear, setPaymentThisYear] = useState(null);
-
+  const [filterLabel, setFilterLabel] = useState('today');
   const [showFilterDate, setShowFilterDate] = useState(false);
-  const [period, setPeriod] = useState("");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+
   const options = [
-    "Today", "This Week", "This Month", "This Year",
-    // "By Date"
+    { label: 'Today', value: 'today' },
+    { label: 'This Week', value: 'thisWeek' },
+    { label: 'This Month', value: 'thisMonth' },
+    { label: 'This Year', value: 'thisYear' },
+    // { label: "By Date", value: "date" },
   ];
 
-  useEffect(() => {
-    if (filterLabel === "Today") {
-      setPaymentMethod(paymentToday);
-      setShowFilterDate(false);
-      handleReset();
-    } else if (filterLabel === "This Week") {
-      setPaymentMethod(paymentThisWeek);
-      setShowFilterDate(false);
-      handleReset();
-    } else if (filterLabel === "This Month") {
-      setPaymentMethod(paymentThisMonth);
-      setShowFilterDate(false);
-      handleReset();
-    } else if (filterLabel === "This Year") {
-      setPaymentMethod(paymentThisYear);
-      setShowFilterDate(false);
-      handleReset();
-    } else if (filterLabel === "By Date") {
-      setShowFilterDate(true);
-    }
-  }, [filterLabel]);
+  // Format date untuk API
+  const formatDateForAPI = (date) => {
+    return date ? moment(date).format('YYYY-MM-DD') : null;
+  };
 
-  const handleSearch = async () => {
-    try {
-      if (startDate && endDate) {
-        const revenueResponse = await axios.get(`/report/revenue-overview/date?start=${startDate}&end=${endDate}`);
+  // Fetch revenue data menggunakan React Query
+  const { data: revenueData, isLoading } = useQuery({
+    queryKey:
+      filterLabel === 'date'
+        ? ['revenueOverview', filterLabel, formatDateForAPI(startDate), formatDateForAPI(endDate)]
+        : ['revenueOverview', filterLabel],
+    queryFn: () => {
+      let url = `/payment-revenue?filter=${filterLabel}`;
 
-        setPeriod(`(${moment(startDate).format("DD MMMM YYYY")} - ${moment(endDate).format("DD MMMM YYYY")})`);
-        setPaymentMethod(revenueResponse.data[0]);
+      // Only add start and end params for date filter
+      if (filterLabel === 'date' && startDate && endDate) {
+        url += `&start=${formatDateForAPI(startDate)}&end=${formatDateForAPI(endDate)}`;
       }
-    } catch (error) {
-      console.log(error);
-      setPaymentMethod([]);
+
+      return axios.get(url).then((res) => res.data);
+    },
+    ...queryOptions,
+    enabled: filterLabel !== 'date' || (startDate !== null && endDate !== null),
+  });
+
+  // Handle array or object response
+  const paymentMethod = revenueData ? (Array.isArray(revenueData) ? revenueData[0] : revenueData) : null;
+
+  // Get period text
+  const getPeriodText = () => {
+    if (filterLabel === 'date' && paymentMethod?.period) {
+      return `(${moment(paymentMethod.period.start).format('DD MMMM YYYY')} - ${moment(paymentMethod.period.end).format(
+        'DD MMMM YYYY'
+      )})`;
+    }
+    if (filterLabel === 'date' && startDate && endDate) {
+      return `(${moment(startDate).format('DD MMMM YYYY')} - ${moment(endDate).format('DD MMMM YYYY')})`;
+    }
+    return '';
+  };
+
+  // Get filter label text
+  const getFilterLabelText = () => {
+    const option = options.find((opt) => opt.value === filterLabel);
+    return option ? option.label : '';
+  };
+
+  // Handle filter change
+  const handleFilterChange = (value) => {
+    setFilterLabel(value);
+
+    if (value === 'date') {
+      setShowFilterDate(true);
+    } else {
+      setShowFilterDate(false);
+      setStartDate(null);
+      setEndDate(null);
     }
   };
 
-  const handleReset = () => {
-    setPeriod("");
-    setStartDate(null);
-    setEndDate(null);
+  // Safe value getter with fallback
+  const getValue = (index) => {
+    return paymentMethod?.value?.[index] || 0;
   };
 
-  const fetchDataReport = async () => {
-    try {
-      const [
-        paymentToday,
-        paymentWeek,
-        paymentMonth,
-        paymentYear,
-      ] = await Promise.all([
-        axios.get("/report/revenue-overview/today"),
-        axios.get("/report/revenue-overview/this-week"),
-        axios.get("/report/revenue-overview/this-month"),
-        axios.get("/report/revenue-overview/this-year"),
-      ]);
-      setPaymentToday(paymentToday.data[0]);
-      setPaymentThisWeek(paymentWeek.data[0]);
-      setPaymentThisMonth(paymentMonth.data[0]);
-      setPaymentThisYear(paymentYear.data[0]);
-    } catch (error) {
-      console.error(error);
-    }
+  const getLabel = (index, fallback) => {
+    return paymentMethod?.label?.[index] || fallback;
   };
 
-  useEffect(() => {
-    fetchDataReport();
-  }, []);
+  // Calculate total
+  const getTotal = () => {
+    if (!paymentMethod?.value) return 0;
+    return paymentMethod.value.reduce((sum, val) => sum + (val || 0), 0);
+  };
 
   return (
     <Page title="Dashboard">
-      <Container maxWidth={themeStretch ? false : "xl"}>
+      <Container maxWidth={themeStretch ? false : 'xl'}>
         <Typography variant="h6" mx={1}>
           Payment Overview
         </Typography>
@@ -140,13 +148,13 @@ export default function PaymentOverview() {
               key={i}
               sx={{
                 boxShadow: 0,
-                color: filterLabel === item ? theme.palette.primary.main : theme.palette.grey[400],
-                bgcolor: filterLabel === item ? theme.palette.primary.lighter : "",
+                color: filterLabel === item.value ? theme.palette.primary.main : theme.palette.grey[400],
+                bgcolor: filterLabel === item.value ? theme.palette.primary.lighter : '',
               }}
               size="large"
-              onClick={() => setFilterLabel(item)}
+              onClick={() => handleFilterChange(item.value)}
             >
-              {item}
+              {item.label}
             </Button>
           ))}
         </Stack>
@@ -161,14 +169,13 @@ export default function PaymentOverview() {
                       label="Start Date"
                       inputFormat="dd/MM/yyyy"
                       value={startDate}
-                      onChange={(newValue) => {
-                        setStartDate(newValue);
-                      }}
+                      onChange={(newValue) => setStartDate(newValue)}
                       renderInput={(params) => (
                         <TextField
                           {...params}
                           fullWidth
                           InputProps={{
+                            ...params.InputProps,
                             endAdornment: (
                               <InputAdornment position="end">
                                 <img src="/assets/calender-icon.svg" alt="icon" />
@@ -187,14 +194,14 @@ export default function PaymentOverview() {
                       label="End Date"
                       inputFormat="dd/MM/yyyy"
                       value={endDate}
-                      onChange={(newValue) => {
-                        setEndDate(newValue);
-                      }}
+                      minDate={startDate}
+                      onChange={(newValue) => setEndDate(newValue)}
                       renderInput={(params) => (
                         <TextField
                           {...params}
                           fullWidth
                           InputProps={{
+                            ...params.InputProps,
                             endAdornment: (
                               <InputAdornment position="end">
                                 <img src="/assets/calender-icon.svg" alt="icon" />
@@ -208,136 +215,142 @@ export default function PaymentOverview() {
                 </Grid>
 
                 <Grid item xs={3} sm="auto">
-                  {/* <Button variant="contained" color="warning" sx={{ color: "white", mr: 1 }} title="Reset" onClick={() => handleReset()}>
-                    <Iconify icon={"mdi:reload"} sx={{ width: 25, height: 25 }} />
-                  </Button> */}
                   <Button
                     variant="contained"
                     title="Search"
-                    disabled={startDate && endDate ? Boolean(false) : Boolean(true)}
-                    onClick={() => handleSearch()}
+                    disabled={!startDate || !endDate}
+                    onClick={() => setFilterLabel('date')}
                   >
-                    <Iconify icon={"eva:search-fill"} sx={{ width: 25, height: 25 }} />
+                    <Iconify icon={'eva:search-fill'} sx={{ width: 25, height: 25 }} />
                   </Button>
                 </Grid>
               </Grid>
             </Grid>
           )}
 
-          <Grid item xs={12} md={6} lg={6}>
-            <Card>
-              <RevenueOverview
-                sx={{
-                  padding: "0.5vw",
-                }}
-                title="Payment Method Overview"
-                subheader={`${filterLabel} ${period}`}
-                chartData={[
-                  {
-                    label: paymentMethod?.label?.[1] || "Cash",
-                    value: paymentMethod?.value?.[1] || 0
-                  },
-                  {
-                    label: paymentMethod?.label?.[5] || "QRIS",
-                    value: paymentMethod?.value?.[5] || 0
-                  },
-                  {
-                    label: paymentMethod?.label?.[3] || "Bank Transfer",
-                    value: paymentMethod?.value?.[3] || 0
-                  },
-                  {
-                    label: paymentMethod?.label?.[0] || "Card",
-                    value: paymentMethod?.value?.[0] || 0
-                  },
-                  {
-                    label: paymentMethod?.label?.[2] || "E-Wallet",
-                    value: paymentMethod?.value?.[2] || 0
-                  },
-                  {
-                    label: paymentMethod?.label?.[4] || "Online Payment",
-                    value: paymentMethod?.value?.[4] || 0
-                  },
-                ]}
-                chartColors={[
-                  theme.palette.primary.main,
-                  theme.palette.primary.light,
-                  theme.palette.primary.dark,
-                ]}
-                chartType="donut"
-              />
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <WidgetSummary
-                  title={paymentMethod?.label?.[1] || "Cash"}
-                  total={paymentMethod?.value?.[1] || 0}
-                  type="currency"
-                  color="warning"
-                  icon={"heroicons-solid:currency-dollar"}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <WidgetSummary
-                  title={paymentMethod?.label?.[5] || "QRIS"}
-                  total={paymentMethod?.value?.[5] || 0}
-                  type="currency"
-                  icon={"heroicons-solid:currency-dollar"}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <WidgetSummary
-                  title={paymentMethod?.label?.[3] || "Bank Transfer"}
-                  total={paymentMethod?.value?.[3] || 0}
-                  type="currency"
-                  color="success"
-                  icon={"heroicons-solid:currency-dollar"}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <WidgetSummary
-                  title={paymentMethod?.label?.[0] || "Card"}
-                  total={paymentMethod?.value?.[0] || 0}
-                  type="currency"
-                  color="success"
-                  icon={"heroicons-solid:currency-dollar"}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <WidgetSummary
-                  title={paymentMethod?.label?.[2] || "E-Wallet"}
-                  total={paymentMethod?.value?.[2] || 0}
-                  type="currency"
-                  color="success"
-                  icon={"heroicons-solid:currency-dollar"}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <WidgetSummary
-                  title={paymentMethod?.label?.[4] || "Online Payment"}
-                  total={paymentMethod?.value?.[4] || 0}
-                  type="currency"
-                  color="success"
-                  icon={"heroicons-solid:currency-dollar"}
-                />
-              </Grid>
+          {isLoading ? (
+            <Grid item xs={12} display="flex" justifyContent="center" alignItems="center">
+              <CircularProgress />
             </Grid>
-          </Grid>
+          ) : (
+            <>
+              <Grid item xs={12} md={6} lg={6}>
+                <Card>
+                  <RevenueOverview
+                    sx={{
+                      padding: '0.5vw',
+                    }}
+                    title="Payment Method Overview"
+                    subheader={`${getFilterLabelText()} ${getPeriodText()}`}
+                    chartData={[
+                      {
+                        label: getLabel(1, 'Cash'),
+                        value: getValue(1),
+                      },
+                      {
+                        label: getLabel(5, 'QRIS'),
+                        value: getValue(5),
+                      },
+                      {
+                        label: getLabel(3, 'Bank Transfer'),
+                        value: getValue(3),
+                      },
+                      {
+                        label: getLabel(0, 'Card'),
+                        value: getValue(0),
+                      },
+                      {
+                        label: getLabel(2, 'E-Wallet'),
+                        value: getValue(2),
+                      },
+                      {
+                        label: getLabel(4, 'Online Payment'),
+                        value: getValue(4),
+                      },
+                    ]}
+                    chartColors={[theme.palette.primary.main, theme.palette.primary.light, theme.palette.primary.dark]}
+                    chartType="donut"
+                  />
+                </Card>
+              </Grid>
 
-          <Grid item xs={12}>
-            <Stack flexDirection="row" justifyContent="space-between" bgcolor={theme.palette.primary.lighter} borderRadius={1} p={2} gap={3}>
-              <Typography variant="h6" color="#637381">Total</Typography>
-              <Typography variant="h6" color="#637381">
-                Rp. {numberWithCommas(
-                  paymentMethod?.value?.[0] + paymentMethod?.value?.[1] + paymentMethod?.value?.[2] +
-                  paymentMethod?.value?.[3] + paymentMethod?.value?.[4] || 0
-                )}
-              </Typography>
-            </Stack>
-          </Grid>
+              <Grid item xs={12} md={6}>
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <WidgetSummary
+                      title={getLabel(1, 'Cash')}
+                      total={getValue(1)}
+                      type="currency"
+                      color="warning"
+                      icon={'heroicons-solid:currency-dollar'}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <WidgetSummary
+                      title={getLabel(5, 'QRIS')}
+                      total={getValue(5)}
+                      type="currency"
+                      icon={'heroicons-solid:currency-dollar'}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <WidgetSummary
+                      title={getLabel(3, 'Bank Transfer')}
+                      total={getValue(3)}
+                      type="currency"
+                      color="success"
+                      icon={'heroicons-solid:currency-dollar'}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <WidgetSummary
+                      title={getLabel(0, 'Card')}
+                      total={getValue(0)}
+                      type="currency"
+                      color="success"
+                      icon={'heroicons-solid:currency-dollar'}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <WidgetSummary
+                      title={getLabel(2, 'E-Wallet')}
+                      total={getValue(2)}
+                      type="currency"
+                      color="success"
+                      icon={'heroicons-solid:currency-dollar'}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <WidgetSummary
+                      title={getLabel(4, 'Online Payment')}
+                      total={getValue(4)}
+                      type="currency"
+                      color="success"
+                      icon={'heroicons-solid:currency-dollar'}
+                    />
+                  </Grid>
+                </Grid>
+              </Grid>
 
+              <Grid item xs={12}>
+                <Stack
+                  flexDirection="row"
+                  justifyContent="space-between"
+                  bgcolor={theme.palette.primary.lighter}
+                  borderRadius={1}
+                  p={2}
+                  gap={3}
+                >
+                  <Typography variant="h6" color="#637381">
+                    Total
+                  </Typography>
+                  <Typography variant="h6" color="#637381">
+                    Rp. {numberWithCommas(getTotal())}
+                  </Typography>
+                </Stack>
+              </Grid>
+            </>
+          )}
         </Grid>
       </Container>
     </Page>

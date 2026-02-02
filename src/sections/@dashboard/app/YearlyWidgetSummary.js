@@ -1,7 +1,7 @@
 // @mui
 import PropTypes from 'prop-types';
 import { alpha, styled } from '@mui/material/styles';
-import { Card, Typography } from '@mui/material';
+import { Card, CircularProgress, Typography } from '@mui/material';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
 // utils
@@ -33,9 +33,21 @@ YearlyWidgetSummary.propTypes = {
   sales: PropTypes.number,
   type: PropTypes.string,
   sx: PropTypes.object,
+  isLoading: PropTypes.bool,
 };
 
-export default function YearlyWidgetSummary({ title, subtitle, total, sales, type, icon, color = 'primary', sx, ...other }) {
+export default function YearlyWidgetSummary({
+  title,
+  subtitle,
+  total,
+  sales,
+  type,
+  icon,
+  color = 'primary',
+  sx,
+  isLoading,
+  ...other
+}) {
   const isDesktop = useResponsive('up', 'lg');
 
   return (
@@ -63,23 +75,21 @@ export default function YearlyWidgetSummary({ title, subtitle, total, sales, typ
         <Iconify icon={icon} width={24} height={24} />
       </IconWrapperStyle>
 
-      {sales >= 0 && (
-        <Typography variant="subtitle2">
-          {fShortenNumber(sales)} Sales
+      {sales >= 0 && <Typography variant="subtitle2">{fShortenNumber(sales)} Sales</Typography>}
+
+      {isLoading ? (
+        <CircularProgress />
+      ) : (
+        <Typography variant={isDesktop ? 'h4' : 'h5'}>
+          {type === 'currency' ? fCurrency(total) : fShortenNumber(total)}
         </Typography>
       )}
-
-      <Typography variant={isDesktop ? 'h4' : 'h5'}>
-        {type === 'currency' ? fCurrency(total) : fShortenNumber(total)}
-      </Typography>
 
       <Typography variant="subtitle2" sx={{ fontSize: '1.063rem' }} noWrap>
         {title}
       </Typography>
 
-      <Typography variant="body2">
-        {subtitle}
-      </Typography>
+      <Typography variant="body2">{subtitle}</Typography>
     </Card>
   );
 }

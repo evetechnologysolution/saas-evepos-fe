@@ -1,9 +1,6 @@
-import { useContext } from 'react';
-// routes
 import { PATH_DASHBOARD } from '../../../routes/paths';
 // components
 import SvgIconStyle from '../../../components/SvgIconStyle';
-import { mainContext } from '../../../contexts/MainContext';
 
 // ----------------------------------------------------------------------
 
@@ -32,7 +29,6 @@ const ICONS = {
 };
 
 export const useNavConfig = () => {
-  const ctx = useContext(mainContext);
   return [
     // GENERAL
     // ----------------------------------------------------------------------
@@ -43,19 +39,19 @@ export const useNavConfig = () => {
           title: 'Dashboard',
           path: PATH_DASHBOARD.app,
           icon: ICONS.dashboard,
-          roles: [''],
+          roles: ['owner', 'admin'],
         },
         {
           title: 'POS',
           path: PATH_DASHBOARD.cashier.pos,
           icon: ICONS.pos,
-          roles: ['Admin', 'Owner'],
+          roles: ['owner', 'admin', 'cashier', 'staff'],
         },
         {
           title: 'Orders',
           path: PATH_DASHBOARD.cashier.orders,
           icon: ICONS.order,
-          roles: ['Owner', 'Staff', 'Admin'],
+          roles: ['owner', 'admin', 'cashier', 'staff'],
         },
         // {
         //   title: 'Delivery',
@@ -68,13 +64,13 @@ export const useNavConfig = () => {
           title: 'PickUp',
           path: PATH_DASHBOARD.pickup.root,
           icon: ICONS.pickup,
-          roles: ['Owner', 'Staff', 'Admin'],
+          roles: ['owner', 'admin', 'cashier', 'staff'],
         },
         {
           title: 'Scan Orders',
           path: PATH_DASHBOARD.progressScan,
           icon: ICONS.scan,
-          roles: ['Super Admin', 'Admin', 'Cashier', 'Staff'],
+          roles: ['owner', 'admin', 'cashier', 'staff'],
         },
         // {
         //   title: 'Scan Voucher',
@@ -179,28 +175,28 @@ export const useNavConfig = () => {
         //   ],
         // },
         // // REPORT
-        // {
-        //   title: 'report',
-        //   path: PATH_DASHBOARD.report.root,
-        //   icon: ICONS.report,
-        //   roles: ['Super Admin', 'Admin'],
-        //   children: [
-        //     { title: 'member point', path: PATH_DASHBOARD.report.memberPoint },
-        //     // { title: "neraca", path: PATH_DASHBOARD.report.neraca },
-        //     { title: 'profit loss', path: PATH_DASHBOARD.report.profitLoss },
-        //     { title: 'cash flow', path: PATH_DASHBOARD.report.cashFlow },
-        //     { title: 'sales report', path: PATH_DASHBOARD.report.sales },
-        //     { title: 'popular product', path: PATH_DASHBOARD.report.popular },
-        //     { title: 'payment overview', path: PATH_DASHBOARD.report.paymentOverview },
-        //     { title: 'staff performance', path: PATH_DASHBOARD.report.performance },
-        //   ],
-        // },
+        {
+          title: 'report',
+          path: PATH_DASHBOARD.report.root,
+          icon: ICONS.report,
+          roles: ['owner', 'admin'],
+          children: [
+            // { title: 'member point', path: PATH_DASHBOARD.report.memberPoint },
+            // { title: "neraca", path: PATH_DASHBOARD.report.neraca },
+            // { title: 'profit loss', path: PATH_DASHBOARD.report.profitLoss },
+            // { title: 'cash flow', path: PATH_DASHBOARD.report.cashFlow },
+            { title: 'sales report', path: PATH_DASHBOARD.report.sales },
+            { title: 'popular product', path: PATH_DASHBOARD.report.popular },
+            { title: 'payment overview', path: PATH_DASHBOARD.report.paymentOverview },
+            // { title: 'staff performance', path: PATH_DASHBOARD.report.performance },
+          ],
+        },
         // LIBRARY
         {
           title: 'library',
           path: PATH_DASHBOARD.library.root,
           icon: ICONS.library,
-          roles: ['Super Admin', 'Admin'],
+          roles: ['owner', 'admin'],
           children: [
             // { title: 'banner', path: PATH_DASHBOARD.library.banner },
             { title: 'category', path: PATH_DASHBOARD.library.category },
@@ -231,7 +227,7 @@ export const useNavConfig = () => {
           title: 'user',
           path: '/dashboard/user',
           icon: ICONS.user,
-          roles: ['Super Admin', 'Admin'],
+          roles: ['owner', 'admin'],
         },
       ],
     },
