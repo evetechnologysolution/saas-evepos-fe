@@ -179,22 +179,22 @@ export const useNavConfig = () => {
         //   ],
         // },
         // // REPORT
-        // {
-        //   title: 'report',
-        //   path: PATH_DASHBOARD.report.root,
-        //   icon: ICONS.report,
-        //   roles: ['Super Admin', 'Admin'],
-        //   children: [
-        //     { title: 'member point', path: PATH_DASHBOARD.report.memberPoint },
-        //     // { title: "neraca", path: PATH_DASHBOARD.report.neraca },
-        //     { title: 'profit loss', path: PATH_DASHBOARD.report.profitLoss },
-        //     { title: 'cash flow', path: PATH_DASHBOARD.report.cashFlow },
-        //     { title: 'sales report', path: PATH_DASHBOARD.report.sales },
-        //     { title: 'popular product', path: PATH_DASHBOARD.report.popular },
-        //     { title: 'payment overview', path: PATH_DASHBOARD.report.paymentOverview },
-        //     { title: 'staff performance', path: PATH_DASHBOARD.report.performance },
-        //   ],
-        // },
+        {
+          title: 'report',
+          path: PATH_DASHBOARD.report.root,
+          icon: ICONS.report,
+          roles: ['Super Admin', 'Admin'],
+          children: [
+            // { title: 'member point', path: PATH_DASHBOARD.report.memberPoint },
+            // { title: "neraca", path: PATH_DASHBOARD.report.neraca },
+            // { title: 'profit loss', path: PATH_DASHBOARD.report.profitLoss },
+            // { title: 'cash flow', path: PATH_DASHBOARD.report.cashFlow },
+            { title: 'sales report', path: PATH_DASHBOARD.report.sales },
+            { title: 'popular product', path: PATH_DASHBOARD.report.popular },
+            { title: 'payment overview', path: PATH_DASHBOARD.report.paymentOverview },
+            // { title: 'staff performance', path: PATH_DASHBOARD.report.performance },
+          ],
+        },
         // LIBRARY
         {
           title: 'library',

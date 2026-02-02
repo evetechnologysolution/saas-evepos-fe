@@ -1,139 +1,201 @@
-import PropTypes from "prop-types";
-import merge from "lodash/merge";
-import { useEffect, useState } from "react";
-import ReactApexChart from "react-apexcharts";
-import moment from "moment";
+import PropTypes from 'prop-types';
+import merge from 'lodash/merge';
+import { useEffect, useState } from 'react';
+import ReactApexChart from 'react-apexcharts';
+import moment from 'moment';
 // @mui
-import { Card, CardHeader, Box, Select, MenuItem, Grid, Button, TextField, InputAdornment } from "@mui/material";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
-import axios from "../../../utils/axios";
+import {
+  Card,
+  CardHeader,
+  Box,
+  Select,
+  MenuItem,
+  Grid,
+  Button,
+  TextField,
+  InputAdornment,
+  CircularProgress,
+} from '@mui/material';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+import { useQuery } from 'react-query';
+import axios from '../../../utils/axios';
 // components
-import { BaseOptionChart } from "../../../components/chart";
-import Iconify from "../../../components/Iconify";
+import { BaseOptionChart } from '../../../components/chart';
 
 // ----------------------------------------------------------------------
 
 SalesOverview.propTypes = {
   title: PropTypes.string,
-  chartData: PropTypes.array.isRequired,
 };
 
-export default function SalesOverview({ title, chartData, ...other }) {
-  // const [seriesData, setSeriesData] = useState(chartData[0]?.filter);
-  // const [label, setLabel] = useState(chartData[0]?.label);
-  const [seriesData, setSeriesData] = useState("This Week");
-  const [label, setLabel] = useState(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]);
-  const [subheader, setSubheader] = useState(null);
+const queryOptions = {
+  cacheTime: 0,
+  staleTime: 0,
+};
 
-  const [showFilterDate, setShowFilterDate] = useState(false);
+export default function SalesOverview({ title, ...other }) {
+  const [filterLabel, setFilterLabel] = useState('today');
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [showFilterDate, setShowFilterDate] = useState(false);
+  const [subheader, setSubheader] = useState('');
 
-  function getFirstDateInWeek(d) {
-    d = new Date(d);
-    const day = d.getDay();
-    // const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
-    const diff = d.getDate() - day;
-    return new Date(d.setDate(diff));
-  }
+  // Helper functions
+  const getFirstDateInWeek = (d) => {
+    const date = new Date(d);
+    const day = date.getDay();
+    const diff = date.getDate() - day;
+    return new Date(date.setDate(diff));
+  };
 
-  function getLastDateInWeek(d) {
-    d = new Date(d);
-    const day = d.getDay();
-    // const first = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
-    const first = d.getDate() - day;
+  const getLastDateInWeek = (d) => {
+    const date = new Date(d);
+    const day = date.getDay();
+    const first = date.getDate() - day;
     const last = first + 6;
-    return new Date(d.setDate(last));
-  }
+    return new Date(date.setDate(last));
+  };
 
-  function getFirstDateInMonth(year, month) {
+  const getFirstDateInMonth = (year, month) => {
     return new Date(year, month, 1);
-  }
+  };
 
-  function getLastDateInMonth(year, month) {
+  const getLastDateInMonth = (year, month) => {
     return new Date(year, month + 1, 0);
-  }
-
-  // get the first date of the current month
-  const date = new Date();
-  const firstDay = getFirstDateInMonth(date.getFullYear(), date.getMonth());
-  const lastDay = getLastDateInMonth(date.getFullYear(), date.getMonth());
-
-  const handleChangeSeriesData = (event) => {
-    setSeriesData(event.target.value);
-
-    // if (event.target.value === "Daily") {
-    //   setLabel(chartData[0]?.label);
-    //   setSubheader(`${moment(new Date()).format("DD MMMM YYYY")}`);
-    // }
-    if (event.target.value === "Date") {
-      setLabel(chartData[3]?.label);
-      if (startDate && endDate) {
-        setSubheader(`${moment(startDate).format("DD MMMM YYYY")} - ${moment(endDate).format("DD MMMM YYYY")}`);
-      }
-      setShowFilterDate(true);
-    } else if (event.target.value === "This Week") {
-      setLabel(chartData[0]?.label);
-      setSubheader(
-        `${moment(getFirstDateInWeek(new Date())).format("DD MMMM YYYY")} - ${moment(
-          getLastDateInWeek(new Date())
-        ).format("DD MMMM YYYY")}`
-      );
-      setShowFilterDate(false);
-    } else if (event.target.value === "This Month") {
-      setLabel(chartData[1]?.label);
-      setSubheader(`${moment(firstDay).format("DD MMMM YYYY")} - ${moment(lastDay).format("DD MMMM YYYY")}`);
-      setShowFilterDate(false);
-    } else {
-      setLabel(chartData[2]?.label);
-      setSubheader(`January - December (${new Date().getFullYear()})`);
-      setShowFilterDate(false);
-    }
   };
 
-  const handleSearch = async () => {
-    try {
-      if (startDate && endDate) {
-        const sales = await axios.get(`/report/sales/date?start=${startDate}&end=${endDate}`);
-
-        chartData[3] = sales.data[0];
-        setSubheader(`${moment(startDate).format("DD MMMM YYYY")} - ${moment(endDate).format("DD MMMM YYYY")}`);
-        setLabel(sales.data[0].label);
-      }
-    } catch (error) {
-      console.log(error);
-      setLabel([]);
-    }
+  // Format date untuk API
+  const formatDateForAPI = (date) => {
+    return date ? moment(date).format('YYYY-MM-DD') : null;
   };
 
+  const { data: salesReport, isLoading: loadingSalesReport } = useQuery({
+    queryKey:
+      filterLabel === 'date'
+        ? ['salesReport', filterLabel, formatDateForAPI(startDate), formatDateForAPI(endDate)]
+        : ['salesReport', filterLabel],
+    queryFn: () => {
+      let url = `/sales-overview?filter=${filterLabel}`;
+
+      // Only add start and end params for date filter
+      if (filterLabel === 'date' && startDate && endDate) {
+        url += `&start=${formatDateForAPI(startDate)}&end=${formatDateForAPI(endDate)}`;
+      }
+
+      return axios.get(url).then((res) => res.data);
+    },
+    ...queryOptions,
+    enabled: filterLabel !== 'date' || (startDate !== null && endDate !== null),
+  });
+
+  // Update subheader based on filter
   useEffect(() => {
-    setSubheader(
-      `${moment(getFirstDateInWeek(new Date())).format("DD MMMM YYYY")} - ${moment(
-        getLastDateInWeek(new Date())
-      ).format("DD MMMM YYYY")}`
-    );
-  }, []);
+    const today = new Date();
 
-  const handleTypeOption = (filter) => {
-    if (filter === "This Week") {
-      return "This Week";
+    // Handle if response is array
+    const data = Array.isArray(salesReport) ? salesReport[0] : salesReport;
+
+    // If we have salesReport with period, use that for date filter
+    if (filterLabel === 'date' && data?.period) {
+      setSubheader(
+        `${moment(data.period.start).format('DD MMMM YYYY')} - ${moment(data.period.end).format('DD MMMM YYYY')}`
+      );
+      return;
     }
-    if (filter === "This Month") {
-      return "This Month";
+
+    switch (filterLabel) {
+      case 'today': {
+        setSubheader(moment(today).format('DD MMMM YYYY'));
+        break;
+      }
+      case 'thisWeek': {
+        const firstDay = getFirstDateInWeek(today);
+        const lastDay = getLastDateInWeek(today);
+        setSubheader(`${moment(firstDay).format('DD MMMM YYYY')} - ${moment(lastDay).format('DD MMMM YYYY')}`);
+        break;
+      }
+      case 'thisMonth': {
+        const firstDay = getFirstDateInMonth(today.getFullYear(), today.getMonth());
+        const lastDay = getLastDateInMonth(today.getFullYear(), today.getMonth());
+        setSubheader(`${moment(firstDay).format('DD MMMM YYYY')} - ${moment(lastDay).format('DD MMMM YYYY')}`);
+        break;
+      }
+      case 'monthly': {
+        setSubheader(`January - December ${today.getFullYear()}`);
+        break;
+      }
+      case 'date': {
+        if (startDate && endDate) {
+          setSubheader(`${moment(startDate).format('DD MMMM YYYY')} - ${moment(endDate).format('DD MMMM YYYY')}`);
+        } else {
+          setSubheader('Please select date range');
+        }
+        break;
+      }
+      default:
+        setSubheader('');
     }
-    if (filter === "Monthly") {
-      return "This Year";
+  }, [filterLabel, startDate, endDate, salesReport]);
+
+  // Handle filter change
+  const handleFilterChange = (e) => {
+    const { value } = e.target;
+    setFilterLabel(value);
+
+    if (value === 'date') {
+      setShowFilterDate(true);
+    } else {
+      setShowFilterDate(false);
+      setStartDate(null);
+      setEndDate(null);
     }
-    if (filter === "Date") {
-      return "By Date";
-    }
+  };
+
+  // Get labels based on sales data
+  const getChartLabels = () => {
+    if (!salesReport) return [];
+    // Handle if response is array
+    const data = Array.isArray(salesReport) ? salesReport[0] : salesReport;
+    return data?.label || [];
+  };
+
+  // Get series data
+  const getChartSeries = () => {
+    if (!salesReport) return [];
+    // Handle if response is array
+    const data = Array.isArray(salesReport) ? salesReport[0] : salesReport;
+    return data?.sales || [];
   };
 
   const chartOptions = merge(BaseOptionChart(), {
     xaxis: {
-      categories: label,
+      categories: getChartLabels(),
+      labels: {
+        show: true,
+        rotate: -45,
+        rotateAlways: false,
+        hideOverlappingLabels: true,
+        trim: false,
+      },
+    },
+    yaxis: {
+      min: 0,
+      max: undefined,
+      tickAmount: 5,
+      forceNiceScale: false,
+      labels: {
+        show: true,
+        formatter(val) {
+          return Math.floor(val);
+        },
+      },
+    },
+    chart: {
+      toolbar: {
+        show: true,
+      },
     },
   });
 
@@ -144,41 +206,40 @@ export default function SalesOverview({ title, chartData, ...other }) {
         subheader={subheader}
         action={
           <Select
-            value={seriesData}
-            onChange={(e) => handleChangeSeriesData(e)}
+            value={filterLabel}
+            onChange={handleFilterChange}
             sx={{
-              height: "40px",
+              height: '40px',
             }}
           >
-            {chartData?.map((option, index) => (
-              <MenuItem value={option.filter} key={index}>
-                {handleTypeOption(option.filter)}
-              </MenuItem>
-            ))}
+            <MenuItem value="today">Today</MenuItem>
+            <MenuItem value="thisWeek">This Week</MenuItem>
+            <MenuItem value="thisMonth">This Month</MenuItem>
+            <MenuItem value="monthly">This Year</MenuItem>
+            <MenuItem value="date">By Date</MenuItem>
           </Select>
         }
       />
 
       {showFilterDate && (
-        <Grid item xs={12} mt={1}>
-          <Grid container spacing={2} alignItems="center" justifyContent="flex-end">
-            <Grid item xs={12} sm="auto">
+        <Box sx={{ mt: 2, px: 3 }}>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} sm={2}>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <MobileDatePicker
                   label="Start Date"
                   inputFormat="dd/MM/yyyy"
                   value={startDate}
-                  onChange={(newValue) => {
-                    setStartDate(newValue);
-                  }}
+                  onChange={(newValue) => setStartDate(newValue)}
                   renderInput={(params) => (
                     <TextField
                       {...params}
                       fullWidth
                       InputProps={{
+                        ...params.InputProps,
                         endAdornment: (
                           <InputAdornment position="end">
-                            <img src="/assets/calender-icon.svg" alt="icon" />
+                            <img src="/assets/calender-icon.svg" alt="calendar" />
                           </InputAdornment>
                         ),
                       }}
@@ -188,23 +249,23 @@ export default function SalesOverview({ title, chartData, ...other }) {
               </LocalizationProvider>
             </Grid>
 
-            <Grid item xs={9} sm="auto">
+            <Grid item xs={12} sm={2}>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <MobileDatePicker
                   label="End Date"
                   inputFormat="dd/MM/yyyy"
                   value={endDate}
-                  onChange={(newValue) => {
-                    setEndDate(newValue);
-                  }}
+                  onChange={(newValue) => setEndDate(newValue)}
+                  minDate={startDate}
                   renderInput={(params) => (
                     <TextField
                       {...params}
                       fullWidth
                       InputProps={{
+                        ...params.InputProps,
                         endAdornment: (
                           <InputAdornment position="end">
-                            <img src="/assets/calender-icon.svg" alt="icon" />
+                            <img src="/assets/calender-icon.svg" alt="calendar" />
                           </InputAdornment>
                         ),
                       }}
@@ -213,31 +274,24 @@ export default function SalesOverview({ title, chartData, ...other }) {
                 />
               </LocalizationProvider>
             </Grid>
-
-            <Grid item xs={3} sm="auto">
-              {/* <Button variant="contained" color="warning" sx={{ color: "white", mr: 1 }} title="Reset" onClick={() => handleReset()}>
-                    <Iconify icon={"mdi:reload"} sx={{ width: 25, height: 25 }} />
-                  </Button> */}
-              <Button
-                variant="contained"
-                title="Search"
-                disabled={startDate && endDate ? Boolean(false) : Boolean(true)}
-                onClick={() => handleSearch()}
-              >
-                <Iconify icon={"eva:search-fill"} sx={{ width: 25, height: 25 }} />
-              </Button>
-            </Grid>
           </Grid>
-        </Grid>
+        </Box>
       )}
 
-      {chartData?.map((item, i) => (
-        <Box key={i} sx={{ mt: 3, mx: 3 }} dir="ltr">
-          {item.filter === seriesData && (
-            <ReactApexChart type="line" series={item.sales} options={chartOptions} height={364} />
-          )}
-        </Box>
-      ))}
+      <Box sx={{ mt: 3, mx: 3 }} dir="ltr">
+        {loadingSalesReport ? (
+          <Box sx={{ height: 364, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <ReactApexChart
+            type="line"
+            series={getChartSeries().length > 0 ? getChartSeries() : [{ name: 'No Data', data: [] }]}
+            options={chartOptions}
+            height={364}
+          />
+        )}
+      </Box>
     </Card>
   );
 }

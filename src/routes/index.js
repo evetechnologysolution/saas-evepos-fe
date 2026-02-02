@@ -641,25 +641,25 @@ export default function Router() {
             {
               path: 'sales',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <Sales />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                <Sales />
+                // </RoleBasedGuard>
               ),
             },
             {
               path: 'popular-product',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <PopularProduct />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                <PopularProduct />
+                // </RoleBasedGuard>
               ),
             },
             {
               path: 'payment-overview',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <PaymentOverview />
-                </RoleBasedGuard>
+                // <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                <PaymentOverview />
+                // </RoleBasedGuard>
               ),
             },
             {

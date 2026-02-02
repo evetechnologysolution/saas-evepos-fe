@@ -1,29 +1,21 @@
-import React, { useState } from "react";
-import { useQuery } from "react-query";
+import React, { useState } from 'react';
+import { useQuery } from 'react-query';
 // @mui
-import {
-  Button,
-  Container,
-  Grid,
-  Stack,
-  Typography,
-  TextField,
-  InputAdornment,
-} from "@mui/material";
-import { LoadingButton } from "@mui/lab";
-import { useTheme } from "@mui/material/styles";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
-import moment from "moment";
-import axios from "../../utils/axios";
+import { Button, Container, Grid, Stack, Typography, TextField, InputAdornment, CircularProgress } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { useTheme } from '@mui/material/styles';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+import moment from 'moment';
+import axios from '../../utils/axios';
 // hooks
-import useSettings from "../../hooks/useSettings";
+import useSettings from '../../hooks/useSettings';
 // components
-import Page from "../../components/Page";
-import Iconify from "../../components/Iconify";
+import Page from '../../components/Page';
+import Iconify from '../../components/Iconify';
 // sections
-import { BestSeller } from "../../sections/@dashboard/app";
+import { BestSeller } from '../../sections/@dashboard/app';
 
 // ----------------------------------------------------------------------
 
@@ -31,82 +23,126 @@ export default function PopularProduct() {
   const theme = useTheme();
   const { themeStretch } = useSettings();
 
-  const [filterLabel, setFilterLabel] = useState("This Month");
+  const [filterLabel, setFilterLabel] = useState('This Year');
 
   const [showFilterDate, setShowFilterDate] = useState(false);
-  const [period, setPeriod] = useState("");
+  const [period, setPeriod] = useState('');
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+
   const options = [
-    { label: "Today", value: "today" },
-    { label: "This Week", value: "this-week" },
-    { label: "This Month", value: "this-month" },
-    { label: "This Year", value: "this-year" },
-    // { label: "By Date", value: "by-date" },
+    { label: 'Today', value: 'today' },
+    { label: 'This Week', value: 'thisWeek' },
+    { label: 'This Month', value: 'thisMonth' },
+    { label: 'This Year', value: 'thisYear' },
+    { label: 'By Date', value: 'by-date' },
   ];
-  const defaultPeriod = "this-month";
+
+  const defaultFilter = 'thisYear';
   const [controller, setController] = useState({
-    periodBy: defaultPeriod,
-    start: "",
-    end: ""
+    filter: defaultFilter,
+    start: '',
+    end: '',
+    limit: 10,
   });
 
   const getData = async ({ queryKey }) => {
-    const [, params] = queryKey; // Extract query params
-    const queryString = new URLSearchParams(params).toString(); // Build query string
+    const [, params] = queryKey;
+    const queryString = new URLSearchParams(params).toString();
     try {
-      const res = await axios.get(`/report/v2/popular?${queryString}`);
+      const res = await axios.get(`/popular/category?${queryString}`);
       return res.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw new Error(error.response?.data?.message || "Failed to fetch orders");
+      console.error('Error fetching data:', error);
+      throw new Error(error.response?.data?.message || 'Failed to fetch popular products');
     }
   };
 
   const { isLoading, data } = useQuery(
     [
-      "listPopular",
+      'listPopularCategory',
       {
-        periodBy: controller.periodBy,
+        filter: controller.filter,
         start: controller.start,
         end: controller.end,
+        limit: controller.limit,
       },
     ],
     getData
   );
 
   const handleReset = () => {
-    setPeriod("");
+    setPeriod('');
     setStartDate(null);
     setEndDate(null);
+    setFilterLabel('This Year');
     setController({
-      periodBy: defaultPeriod,
-      start: "",
-      end: ""
+      filter: defaultFilter,
+      start: '',
+      end: '',
+      limit: 10,
     });
+    setShowFilterDate(false);
   };
 
   const handleFilter = (val) => {
     setFilterLabel(val?.label);
-    if (val?.value !== "by-date") {
-      setController({ ...controller, periodBy: val?.value });
+    if (val?.value !== 'by-date') {
+      setController({
+        ...controller,
+        filter: val?.value,
+        start: '',
+        end: '',
+      });
       setShowFilterDate(false);
-      setPeriod("");
+      setPeriod('');
     } else {
       setShowFilterDate(true);
     }
-  }
+  };
 
   const handleSearch = async () => {
-    setController({ ...controller, periodBy: "", start: startDate, end: endDate });
-    setPeriod(`(${moment(startDate).format("DD MMMM YYYY")} - ${moment(endDate).format("DD MMMM YYYY")})`);
+    const formattedStart = moment(startDate).format('YYYY-MM-DD');
+    const formattedEnd = moment(endDate).format('YYYY-MM-DD');
+
+    setController({
+      ...controller,
+      filter: '',
+      start: formattedStart,
+      end: formattedEnd,
+    });
+    setPeriod(`(${moment(startDate).format('DD MMMM YYYY')} - ${moment(endDate).format('DD MMMM YYYY')})`);
+  };
+
+  // Helper function to get category data
+  const getCategoryData = (categoryName) => {
+    const category = data?.categories?.find((cat) => cat.category.toLowerCase() === categoryName.toLowerCase());
+    return category || { detail: [], totalSales: 0 };
+  };
+
+  // Helper function to format product data for BestSeller component
+  const formatProductData = (categoryName) => {
+    const categoryData = getCategoryData(categoryName);
+    const products = [];
+
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < 10; i++) {
+      const detail = categoryData.detail?.[i];
+      products.push({
+        label: detail?.product || '',
+        total: detail?.sales || 0,
+        percent: categoryData.totalSales > 0 ? ((detail?.sales || 0) / categoryData.totalSales) * 100 : 0,
+      });
+    }
+
+    return products;
   };
 
   return (
     <Page title="Popular Product">
-      <Container maxWidth={themeStretch ? false : "xl"}>
+      <Container maxWidth={themeStretch ? false : 'xl'}>
         <Typography variant="h6" mx={1}>
-          Popular Product
+          Popular Product by Category
         </Typography>
 
         <Stack
@@ -124,7 +160,7 @@ export default function PopularProduct() {
               sx={{
                 boxShadow: 0,
                 color: filterLabel === item?.label ? theme.palette.primary.main : theme.palette.grey[400],
-                bgcolor: filterLabel === item?.label ? theme.palette.primary.lighter : "",
+                bgcolor: filterLabel === item?.label ? theme.palette.primary.lighter : '',
               }}
               size="large"
               onClick={() => handleFilter(item)}
@@ -191,8 +227,14 @@ export default function PopularProduct() {
                 </Grid>
 
                 <Grid item xs={3} sm="auto">
-                  <Button variant="contained" color="warning" sx={{ color: "white", mr: 1 }} title="Reset" onClick={() => handleReset()}>
-                    <Iconify icon={"mdi:reload"} sx={{ width: 25, height: 25 }} />
+                  <Button
+                    variant="contained"
+                    color="warning"
+                    sx={{ color: 'white', mr: 1 }}
+                    title="Reset"
+                    onClick={() => handleReset()}
+                  >
+                    <Iconify icon={'mdi:reload'} sx={{ width: 25, height: 25 }} />
                   </Button>
                   <LoadingButton
                     variant="contained"
@@ -201,159 +243,41 @@ export default function PopularProduct() {
                     loading={isLoading}
                     onClick={() => handleSearch()}
                   >
-                    <Iconify icon={"eva:search-fill"} sx={{ width: 25, height: 25 }} />
+                    <Iconify icon={'eva:search-fill'} sx={{ width: 25, height: 25 }} />
                   </LoadingButton>
                 </Grid>
               </Grid>
             </Grid>
           )}
 
-          <Grid item xs={12} md={6} lg={6}>
-            <BestSeller
-              sx={{
-                padding: "1vw",
-                boxShadow: "0 5px 20px 0 rgb(145 158 171 / 40%), 0 12px 40px -4px rgb(145 158 171 / 12%)"
-              }}
-              title="Top 10 Produk Satuan"
-              subheader={`${filterLabel} ${period}`}
-              data={[
-                {
-                  label: data?.[0]?.satuan?.detail?.[0]?.product || "",
-                  total: data?.[0]?.satuan?.detail?.[0]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.satuan?.detail?.[0]?.sales || 0) / (data?.[0]?.satuan?.totalSales || 0)) * 100 || 0,
-                },
-                {
-                  label: data?.[0]?.satuan?.detail?.[1]?.product || "",
-                  total: data?.[0]?.satuan?.detail?.[1]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.satuan?.detail?.[1]?.sales || 0) / (data?.[0]?.satuan?.totalSales || 0)) * 100 || 0,
-                },
-                {
-                  label: data?.[0]?.satuan?.detail?.[2]?.product || "",
-                  total: data?.[0]?.satuan?.detail?.[2]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.satuan?.detail?.[2]?.sales || 0) / (data?.[0]?.satuan?.totalSales || 0)) * 100 || 0,
-                },
-                {
-                  label: data?.[0]?.satuan?.detail?.[3]?.product || "",
-                  total: data?.[0]?.satuan?.detail?.[3]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.satuan?.detail?.[3]?.sales || 0) / (data?.[0]?.satuan?.totalSales || 0)) * 100 || 0,
-                },
-                {
-                  label: data?.[0]?.satuan?.detail?.[4]?.product || "",
-                  total: data?.[0]?.satuan?.detail?.[4]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.satuan?.detail?.[4]?.sales || 0) / (data?.[0]?.satuan?.totalSales || 0)) * 100 || 0,
-                },
-                {
-                  label: data?.[0]?.satuan?.detail?.[5]?.product || "",
-                  total: data?.[0]?.satuan?.detail?.[5]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.satuan?.detail?.[5]?.sales || 0) / (data?.[0]?.satuan?.totalSales || 0)) * 100 || 0,
-                },
-                {
-                  label: data?.[0]?.satuan?.detail?.[6]?.product || "",
-                  total: data?.[0]?.satuan?.detail?.[6]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.satuan?.detail?.[6]?.sales || 0) / (data?.[0]?.satuan?.totalSales || 0)) * 100 || 0,
-                },
-                {
-                  label: data?.[0]?.satuan?.detail?.[7]?.product || "",
-                  total: data?.[0]?.satuan?.detail?.[7]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.satuan?.detail?.[7]?.sales || 0) / (data?.[0]?.satuan?.totalSales || 0)) * 100 || 0,
-                },
-                {
-                  label: data?.[0]?.satuan?.detail?.[8]?.product || "",
-                  total: data?.[0]?.satuan?.detail?.[8]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.satuan?.detail?.[8]?.sales || 0) / (data?.[0]?.satuan?.totalSales || 0)) * 100 || 0,
-                },
-                {
-                  label: data?.[0]?.satuan?.detail?.[9]?.product || "",
-                  total: data?.[0]?.satuan?.detail?.[9]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.satuan?.detail?.[9]?.sales || 0) / (data?.[0]?.satuan?.totalSales || 0)) * 100 || 0,
-                },
-              ]}
-            />
-          </Grid>
+          {/* Render BestSeller components for each category */}
+          {data?.categories?.map((category, index) => (
+            <Grid item xs={12} md={6} lg={6} key={index}>
+              <BestSeller
+                sx={{
+                  padding: '1vw',
+                  boxShadow: '0 5px 20px 0 rgb(145 158 171 / 40%), 0 12px 40px -4px rgb(145 158 171 / 12%)',
+                }}
+                title={`Top 10 ${category.category.charAt(0).toUpperCase() + category.category.slice(1)}`}
+                subheader={`${data?.filter || filterLabel} ${period}`}
+                data={formatProductData(category.category)}
+              />
+            </Grid>
+          ))}
 
-          <Grid item xs={12} md={6} lg={6}>
-            <BestSeller
-              sx={{
-                padding: "1vw",
-                boxShadow: "0 5px 20px 0 rgb(145 158 171 / 40%), 0 12px 40px -4px rgb(145 158 171 / 12%)"
-              }}
-              title="Top 10 Produk Kiloan"
-              subheader={`${filterLabel} ${period}`}
-              data={[
-                {
-                  label: data?.[0]?.kiloan?.detail?.[0]?.product || "",
-                  total: data?.[0]?.kiloan?.detail?.[0]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.kiloan?.detail?.[0]?.sales || 0) / (data?.[0]?.kiloan?.totalSales || 0)) * 100 || 0,
-                },
-                {
-                  label: data?.[0]?.kiloan?.detail?.[1]?.product || "",
-                  total: data?.[0]?.kiloan?.detail?.[1]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.kiloan?.detail?.[1]?.sales || 0) / (data?.[0]?.kiloan?.totalSales || 0)) * 100 || 0,
-                },
-                {
-                  label: data?.[0]?.kiloan?.detail?.[2]?.product || "",
-                  total: data?.[0]?.kiloan?.detail?.[2]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.kiloan?.detail?.[2]?.sales || 0) / (data?.[0]?.kiloan?.totalSales || 0)) * 100 || 0,
-                },
-                {
-                  label: data?.[0]?.kiloan?.detail?.[3]?.product || "",
-                  total: data?.[0]?.kiloan?.detail?.[3]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.kiloan?.detail?.[3]?.sales || 0) / (data?.[0]?.kiloan?.totalSales || 0)) * 100 || 0,
-                },
-                {
-                  label: data?.[0]?.kiloan?.detail?.[4]?.product || "",
-                  total: data?.[0]?.kiloan?.detail?.[4]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.kiloan?.detail?.[4]?.sales || 0) / (data?.[0]?.kiloan?.totalSales || 0)) * 100 || 0,
-                },
-                {
-                  label: data?.[0]?.kiloan?.detail?.[5]?.product || "",
-                  total: data?.[0]?.kiloan?.detail?.[5]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.kiloan?.detail?.[5]?.sales || 0) / (data?.[0]?.kiloan?.totalSales || 0)) * 100 || 0,
-                },
-                {
-                  label: data?.[0]?.kiloan?.detail?.[6]?.product || "",
-                  total: data?.[0]?.kiloan?.detail?.[6]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.kiloan?.detail?.[6]?.sales || 0) / (data?.[0]?.kiloan?.totalSales || 0)) * 100 || 0,
-                },
-                {
-                  label: data?.[0]?.kiloan?.detail?.[7]?.product || "",
-                  total: data?.[0]?.kiloan?.detail?.[7]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.kiloan?.detail?.[7]?.sales || 0) / (data?.[0]?.kiloan?.totalSales || 0)) * 100 || 0,
-                },
-                {
-                  label: data?.[0]?.kiloan?.detail?.[8]?.product || "",
-                  total: data?.[0]?.kiloan?.detail?.[8]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.kiloan?.detail?.[8]?.sales || 0) / (data?.[0]?.kiloan?.totalSales || 0)) * 100 || 0,
-                },
-                {
-                  label: data?.[0]?.kiloan?.detail?.[9]?.product || "",
-                  total: data?.[0]?.kiloan?.detail?.[9]?.sales || 0,
-                  percent:
-                    ((data?.[0]?.kiloan?.detail?.[9]?.sales || 0) / (data?.[0]?.kiloan?.totalSales || 0)) * 100 || 0,
-                },
-              ]}
-            />
-          </Grid>
-
+          {isLoading && (
+            <Grid item xs={12} display="flex" justifyContent="center" alignItems="center">
+              <CircularProgress />
+            </Grid>
+          )}
+          {/* Show message if no data */}
+          {!isLoading && (!data?.categories || data?.categories?.length === 0) && (
+            <Grid item xs={12}>
+              <Typography variant="body1" textAlign="center" color="text.secondary">
+                No data available for the selected period
+              </Typography>
+            </Grid>
+          )}
         </Grid>
       </Container>
     </Page>
