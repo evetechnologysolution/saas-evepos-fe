@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
-import { Box } from '@mui/material';
+import { Alert, Box, Typography } from '@mui/material';
 // hooks
+import useAuth from 'src/hooks/useAuth';
+import { formatDate } from 'src/utils/getData';
 import useSettings from '../../hooks/useSettings';
 import useResponsive from '../../hooks/useResponsive';
 import useCollapseDrawer from '../../hooks/useCollapseDrawer';
@@ -43,8 +45,8 @@ const MainStyle = styled('main', {
 
 export default function DashboardLayout() {
   const { collapseClick, isCollapse } = useCollapseDrawer();
-
   const { themeLayout } = useSettings();
+  const { user } = useAuth();
 
   const isDesktop = useResponsive('up', 'lg');
 
@@ -56,13 +58,11 @@ export default function DashboardLayout() {
     return (
       <>
         <DashboardHeader onOpenSidebar={() => setOpen(true)} verticalLayout={verticalLayout} />
-
         {isDesktop ? (
           <NavbarHorizontal />
         ) : (
           <NavbarVertical isOpenSidebar={open} onCloseSidebar={() => setOpen(false)} />
         )}
-
         <Box
           component="main"
           sx={{
@@ -95,6 +95,38 @@ export default function DashboardLayout() {
       <NavbarVertical isOpenSidebar={open} onCloseSidebar={() => setOpen(false)} />
 
       <MainStyle collapseClick={collapseClick}>
+        {(() => {
+          const endDate = new Date(user?.tenantRef?.subsRef?.endDate);
+          const today = new Date();
+          const diffInDays = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+
+          if (diffInDays < 0) {
+            return (
+              <Box mb={3}>
+                <Box display="flex" justifyContent="center" alignItems="center">
+                  <Alert severity="error" variant="outlined">
+                    Paket kamu telah berakhir pada {formatDate(endDate)}. Segera perpanjang.
+                  </Alert>
+                </Box>
+              </Box>
+            );
+          }
+
+          if (diffInDays <= 7) {
+            return (
+              <Box mb={3}>
+                <Box display="flex" justifyContent="center" alignItems="center">
+                  <Alert severity="warning" variant="outlined">
+                    Paket akan berakhir dalam {diffInDays} hari.
+                  </Alert>
+                </Box>
+              </Box>
+            );
+          }
+
+          return null;
+        })()}
+
         <Outlet />
       </MainStyle>
     </Box>
