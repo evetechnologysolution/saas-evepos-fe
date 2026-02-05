@@ -4,6 +4,7 @@ import { Navigate, useRoutes, useLocation } from 'react-router-dom';
 import GuestGuard from '../guards/GuestGuard';
 import AuthGuard from '../guards/AuthGuard';
 import RoleBasedGuard from '../guards/RoleBasedGuard';
+import SubscriptionGuard from '../guards/SubscriptionGuard';
 // layouts
 import DashboardLayout from '../layouts/dashboard';
 import LogoOnlyLayout from '../layouts/LogoOnlyLayout';
@@ -95,477 +96,747 @@ export default function Router() {
         </AuthGuard>
       ),
       children: [
-        { element: <Navigate to="/dashboard/app" replace />, index: true },
         {
-          path: 'app',
-          element: (
-            <RoleBasedGuard hasContent roles={['owner', 'admin']}>
-              <Dashboard />
-            </RoleBasedGuard>
-          ),
-        },
-        {
-          path: 'scan-progress',
-          element: (
-            <RoleBasedGuard hasContent roles={['owner', 'staff', 'cashier', 'admin']}>
-              <ProgressScan />
-            </RoleBasedGuard>
-          ),
-        },
-        {
-          path: 'scan-voucher',
-          element: (
-            <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Cashier', 'Admin Bazaar', 'Staff Bazaar']}>
-              <VoucherScan />
-            </RoleBasedGuard>
-          ),
-        },
-        {
-          path: 'cashier',
+          element: <SubscriptionGuard />,
           children: [
-            { element: <Navigate to="/dashboard/cashier/pos" replace />, index: true },
+            { element: <Navigate to="/dashboard/app" replace />, index: true },
             {
-              path: 'pos',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'cashier', 'admin']}>
-                  <CashierPos />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'orders',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'cashier', 'admin']}>
-                  <CashierOrders />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'orders/:id/edit',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'cashier', 'admin']}>
-                  <CashierOrdersEdit />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'delivery',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                  <CashierDelivery />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'delivery/:id/edit',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                  <CashierDeliveryEdit />
-                </RoleBasedGuard>
-              ),
-            },
-          ],
-        },
-        {
-          path: 'pickup',
-          element: (
-            <RoleBasedGuard hasContent roles={['owner', 'staff', 'cashier', 'admin']}>
-              <PickupOrders />
-            </RoleBasedGuard>
-          ),
-        },
-        {
-          path: 'chat',
-          children: [
-            { element: <ChatPage />, index: true },
-            { path: 'new', element: <ChatPage /> },
-            { path: ':id', element: <ChatPage /> },
-          ],
-        },
-        {
-          path: 'customer',
-          children: [
-            {
-              path: '',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                  <CustomerList />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'new',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                  <CustomerCreate />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: ':id/edit',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                  <CustomerEdit />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: ':id/view',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                  <CustomerView />
-                </RoleBasedGuard>
-              ),
-            },
-          ],
-        },
-        {
-          path: 'member',
-          children: [
-            { element: <Navigate to="/dashboard/member/list" replace />, index: true },
-            {
-              path: 'list',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                  <MemberList />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'member-card',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                  <MemberCard />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'log-voucher',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                  <MemberLogVoucher />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'new',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                  <MemberCreate />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: ':id/edit',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                  <MemberEdit />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: ':id/view',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                  <MemberView />
-                </RoleBasedGuard>
-              ),
-            },
-          ],
-        },
-        {
-          path: 'postcard',
-          element: (
-            <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-              <MemberPostcard />
-            </RoleBasedGuard>
-          ),
-        },
-        {
-          path: 'track-history',
-          element: (
-            <RoleBasedGuard hasContent roles={['Super Admin']}>
-              <History />
-            </RoleBasedGuard>
-          ),
-        },
-        {
-          path: 'track-order',
-          element: (
-            <RoleBasedGuard hasContent roles={['Super Admin']}>
-              <HistoryOrder />
-            </RoleBasedGuard>
-          ),
-        },
-        {
-          path: 'print-count',
-          element: (
-            <RoleBasedGuard hasContent roles={['Super Admin']}>
-              <PrintCount />
-            </RoleBasedGuard>
-          ),
-        },
-        {
-          path: 'expense',
-          element: (
-            <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Cashier']}>
-              <ExpenseData />
-            </RoleBasedGuard>
-          ),
-        },
-        {
-          path: 'library',
-          children: [
-            { element: <Navigate to="/dashboard/library/product" replace />, index: true },
-            {
-              path: 'product',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
-                  <LibraryProduct />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'product/new',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
-                  <LibraryProductCreate />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'product/:id/edit',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
-                  <LibraryProductEdit />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'category',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
-                  <LibraryCategory />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'category/new',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
-                  <LibraryCategoryCreate />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'category/:id/edit',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
-                  <LibraryCategoryEdit />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'subcategory',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
-                  <LibrarySubCategory />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'subcategory/new',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
-                  <LibrarySubCategoryCreate />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'subcategory/:id/edit',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
-                  <LibrarySubCategoryEdit />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'variant',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
-                  <LibraryVariant />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'variant/new',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
-                  <LibraryVariantCreate />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'variant/:id/edit',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
-                  <LibraryVariantEdit />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'perfume',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryPerfume />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'banner',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryBanner />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'banner/new',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryBannerCreate />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'banner/:id/edit',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryBannerEdit />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'promotion',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
-                  <LibraryPromotion />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'promotion/new',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
-                  <LibraryPromotionCreate />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'promotion/:id/edit',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
-                  <LibraryPromotionEdit />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'special-promotion',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibrarySpecialPromotion />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'special-promotion/new',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibrarySpecialPromotionCreate />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'special-promotion/:id/edit',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibrarySpecialPromotionEdit />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'voucher',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryVoucher />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'voucher/new',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryVoucherCreate />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'voucher/:id/edit',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <LibraryVoucherEdit />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'discount',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
-                  <LibraryDiscount />
-                </RoleBasedGuard>
-              ),
-            },
-          ],
-        },
-        {
-          path: 'user',
-          children: [
-            {
-              path: '',
+              path: 'app',
               element: (
                 <RoleBasedGuard hasContent roles={['owner', 'admin']}>
-                  <UserList />
+                  <Dashboard />
                 </RoleBasedGuard>
               ),
             },
             {
-              path: 'new',
+              path: 'scan-progress',
               element: (
-                <RoleBasedGuard hasContent roles={['owner', 'admin']}>
-                  <UserCreate />
+                <RoleBasedGuard hasContent roles={['owner', 'staff', 'cashier', 'admin']}>
+                  <ProgressScan />
                 </RoleBasedGuard>
               ),
             },
             {
-              path: ':id/edit',
+              path: 'scan-voucher',
               element: (
-                <RoleBasedGuard hasContent roles={['owner', 'admin']}>
-                  <UserEdit />
+                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Cashier', 'Admin Bazaar', 'Staff Bazaar']}>
+                  <VoucherScan />
                 </RoleBasedGuard>
               ),
             },
-          ],
-        },
-        {
-          path: 'list/gallery',
-          children: [
             {
-              path: '',
+              path: 'cashier',
+              children: [
+                { element: <Navigate to="/dashboard/cashier/pos" replace />, index: true },
+                {
+                  path: 'pos',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'cashier', 'admin']}>
+                      <CashierPos />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'orders',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'cashier', 'admin']}>
+                      <CashierOrders />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'orders/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'cashier', 'admin']}>
+                      <CashierOrdersEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'delivery',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                      <CashierDelivery />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'delivery/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                      <CashierDeliveryEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'pickup',
+              element: (
+                <RoleBasedGuard hasContent roles={['owner', 'staff', 'cashier', 'admin']}>
+                  <PickupOrders />
+                </RoleBasedGuard>
+              ),
+            },
+            {
+              path: 'chat',
+              children: [
+                { element: <ChatPage />, index: true },
+                { path: 'new', element: <ChatPage /> },
+                { path: ':id', element: <ChatPage /> },
+              ],
+            },
+            {
+              path: 'customer',
+              children: [
+                {
+                  path: '',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                      <CustomerList />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                      <CustomerCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: ':id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                      <CustomerEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: ':id/view',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                      <CustomerView />
+                    </RoleBasedGuard>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'member',
+              children: [
+                { element: <Navigate to="/dashboard/member/list" replace />, index: true },
+                {
+                  path: 'list',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                      <MemberList />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'member-card',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                      <MemberCard />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'log-voucher',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                      <MemberLogVoucher />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                      <MemberCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: ':id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                      <MemberEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: ':id/view',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                      <MemberView />
+                    </RoleBasedGuard>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'postcard',
+              element: (
+                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                  <MemberPostcard />
+                </RoleBasedGuard>
+              ),
+            },
+            {
+              path: 'track-history',
               element: (
                 <RoleBasedGuard hasContent roles={['Super Admin']}>
-                  <Subscription />
+                  <History />
                 </RoleBasedGuard>
               ),
+            },
+            {
+              path: 'track-order',
+              element: (
+                <RoleBasedGuard hasContent roles={['Super Admin']}>
+                  <HistoryOrder />
+                </RoleBasedGuard>
+              ),
+            },
+            {
+              path: 'print-count',
+              element: (
+                <RoleBasedGuard hasContent roles={['Super Admin']}>
+                  <PrintCount />
+                </RoleBasedGuard>
+              ),
+            },
+            {
+              path: 'expense',
+              element: (
+                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Cashier']}>
+                  <ExpenseData />
+                </RoleBasedGuard>
+              ),
+            },
+            {
+              path: 'library',
+              children: [
+                { element: <Navigate to="/dashboard/library/product" replace />, index: true },
+                {
+                  path: 'product',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <LibraryProduct />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'product/new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <LibraryProductCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'product/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <LibraryProductEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'category',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <LibraryCategory />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'category/new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <LibraryCategoryCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'category/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <LibraryCategoryEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'subcategory',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <LibrarySubCategory />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'subcategory/new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <LibrarySubCategoryCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'subcategory/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <LibrarySubCategoryEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'variant',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <LibraryVariant />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'variant/new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <LibraryVariantCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'variant/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <LibraryVariantEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'perfume',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                      <LibraryPerfume />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'banner',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                      <LibraryBanner />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'banner/new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                      <LibraryBannerCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'banner/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                      <LibraryBannerEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'promotion',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <LibraryPromotion />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'promotion/new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <LibraryPromotionCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'promotion/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <LibraryPromotionEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'special-promotion',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                      <LibrarySpecialPromotion />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'special-promotion/new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                      <LibrarySpecialPromotionCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'special-promotion/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                      <LibrarySpecialPromotionEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'voucher',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                      <LibraryVoucher />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'voucher/new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                      <LibraryVoucherCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'voucher/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                      <LibraryVoucherEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'discount',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
+                      <LibraryDiscount />
+                    </RoleBasedGuard>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'user',
+              children: [
+                {
+                  path: '',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'admin']}>
+                      <UserList />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'admin']}>
+                      <UserCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: ':id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'admin']}>
+                      <UserEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'list/gallery',
+              children: [
+                {
+                  path: '',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin']}>
+                      <Subscription />
+                    </RoleBasedGuard>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'profile',
+              element: (
+                <RoleBasedGuard>
+                  <UserProfile />
+                </RoleBasedGuard>
+              ),
+            },
+            {
+              path: 'account',
+              element: (
+                <RoleBasedGuard>
+                  <UserAccount />
+                </RoleBasedGuard>
+              ),
+            },
+            {
+              path: 'cash-cashier',
+              element: (
+                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                  <CashCashier />
+                </RoleBasedGuard>
+              ),
+            },
+            {
+              path: 'report',
+              children: [
+                { element: <Navigate to="/dashboard/report/profit-loss" replace />, index: true },
+                {
+                  path: 'member-point',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff']}>
+                      <MemberPointList />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'member-point/:id/view',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                      <MemberPointView />
+                    </RoleBasedGuard>
+                  ),
+                },
+                // {
+                //   path: "neraca",
+                //   element: (
+                //     <RoleBasedGuard hasContent roles={["Super Admin", "Admin"]}>
+                //       <Neraca />
+                //     </RoleBasedGuard>
+                //   ),
+                // },
+                {
+                  path: 'profit-loss',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                      <ProfitLoss />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'cash-flow',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                      <CashFlow />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'sales',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <Sales />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'popular-product',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <PopularProduct />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'payment-overview',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <PaymentOverview />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'staff-performance',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                      <StaffPerformance />
+                    </RoleBasedGuard>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'settings',
+              children: [
+                { element: <Navigate to="/dashboard/settings/general-setting" replace />, index: true },
+                {
+                  path: 'general-setting',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                      <Settings />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'tax',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                      <Tax />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'receipt-setting',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                      <ReceiptSetting />
+                    </RoleBasedGuard>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'content',
+              children: [
+                { element: <Navigate to="/dashboard/content/blog" replace />, index: true },
+                {
+                  path: 'blog',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
+                      <ListBlog />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'blog/new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
+                      <BlogCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'blog/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
+                      <BlogEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'gallery',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
+                      <ListGallery />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'gallery/new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
+                      <GalleryCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'gallery/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
+                      <GalleryEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'category',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
+                      <BlogCategory />
+                    </RoleBasedGuard>
+                  ),
+                },
+              ],
+            },
+            // bazaar
+            {
+              path: 'bazaar',
+              children: [
+                { element: <Navigate to="/dashboard/bazaar/stand" replace />, index: true },
+                {
+                  path: 'stand',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
+                      <BazaarStand />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'stand/new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
+                      <BazaarStandCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'stand/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
+                      <BazaarStandEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'master-voucher',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
+                      <BazaarVoucher />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'master-voucher/new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
+                      <BazaarVoucherCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'master-voucher/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
+                      <BazaarVoucherEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'log',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
+                      <BazaarLog />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'voucher-log',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
+                      <BazaarLogVoucher />
+                    </RoleBasedGuard>
+                  ),
+                },
+              ],
             },
           ],
         },
@@ -575,273 +846,8 @@ export default function Router() {
             {
               path: '',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin']}>
+                <RoleBasedGuard hasContent roles={['owner', 'admin']}>
                   <Subscription />
-                </RoleBasedGuard>
-              ),
-            },
-          ],
-        },
-        {
-          path: 'profile',
-          element: (
-            <RoleBasedGuard>
-              <UserProfile />
-            </RoleBasedGuard>
-          ),
-        },
-        {
-          path: 'account',
-          element: (
-            <RoleBasedGuard>
-              <UserAccount />
-            </RoleBasedGuard>
-          ),
-        },
-        {
-          path: 'cash-cashier',
-          element: (
-            <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-              <CashCashier />
-            </RoleBasedGuard>
-          ),
-        },
-        {
-          path: 'report',
-          children: [
-            { element: <Navigate to="/dashboard/report/profit-loss" replace />, index: true },
-            {
-              path: 'member-point',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff']}>
-                  <MemberPointList />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'member-point/:id/view',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <MemberPointView />
-                </RoleBasedGuard>
-              ),
-            },
-            // {
-            //   path: "neraca",
-            //   element: (
-            //     <RoleBasedGuard hasContent roles={["Super Admin", "Admin"]}>
-            //       <Neraca />
-            //     </RoleBasedGuard>
-            //   ),
-            // },
-            {
-              path: 'profit-loss',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <ProfitLoss />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'cash-flow',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <CashFlow />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'sales',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
-                  <Sales />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'popular-product',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
-                  <PopularProduct />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'payment-overview',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
-                  <PaymentOverview />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'staff-performance',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <StaffPerformance />
-                </RoleBasedGuard>
-              ),
-            },
-          ],
-        },
-        {
-          path: 'settings',
-          children: [
-            { element: <Navigate to="/dashboard/settings/general-setting" replace />, index: true },
-            {
-              path: 'general-setting',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <Settings />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'tax',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <Tax />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'receipt-setting',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                  <ReceiptSetting />
-                </RoleBasedGuard>
-              ),
-            },
-          ],
-        },
-        {
-          path: 'content',
-          children: [
-            { element: <Navigate to="/dashboard/content/blog" replace />, index: true },
-            {
-              path: 'blog',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
-                  <ListBlog />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'blog/new',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
-                  <BlogCreate />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'blog/:id/edit',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
-                  <BlogEdit />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'gallery',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
-                  <ListGallery />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'gallery/new',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
-                  <GalleryCreate />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'gallery/:id/edit',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
-                  <GalleryEdit />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'category',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
-                  <BlogCategory />
-                </RoleBasedGuard>
-              ),
-            },
-          ],
-        },
-        // bazaar
-        {
-          path: 'bazaar',
-          children: [
-            { element: <Navigate to="/dashboard/bazaar/stand" replace />, index: true },
-            {
-              path: 'stand',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
-                  <BazaarStand />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'stand/new',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
-                  <BazaarStandCreate />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'stand/:id/edit',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
-                  <BazaarStandEdit />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'master-voucher',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
-                  <BazaarVoucher />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'master-voucher/new',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
-                  <BazaarVoucherCreate />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'master-voucher/:id/edit',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
-                  <BazaarVoucherEdit />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'log',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
-                  <BazaarLog />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'voucher-log',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
-                  <BazaarLogVoucher />
                 </RoleBasedGuard>
               ),
             },

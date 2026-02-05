@@ -102,12 +102,12 @@ export default function DashboardLayout() {
 
           if (diffInDays < 0) {
             return (
-              <Box mb={3}>
-                <Box display="flex" justifyContent="center" alignItems="center">
-                  <Alert severity="error" variant="outlined">
-                    Paket kamu telah berakhir pada {formatDate(endDate)}. Segera perpanjang.
-                  </Alert>
-                </Box>
+              <Box mb={3} px={5}>
+                {/* <Box display="flex" justifyContent="center" alignItems="center"> */}
+                <Alert severity="error" variant="outlined">
+                  Paket kamu telah berakhir pada {formatDate(endDate)}. Segera perpanjang.
+                </Alert>
+                {/* </Box> */}
               </Box>
             );
           }
