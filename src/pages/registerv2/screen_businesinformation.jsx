@@ -16,8 +16,6 @@ import { useNavigate } from 'react-router';
 import useSettings from '../../hooks/useSettings';
 // components
 import Page from '../../components/Page';
-import Logo from '../../components/LogoForLogin';
-import LoginPicture from '../../components/LoginPicture';
 import schema from './schema/businesinformation';
 import { business_sector, business_year_operation, provinces, cities } from './mock';
 // sections
@@ -107,13 +105,13 @@ export default function RegisterEmailConfirm() {
               <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)} fullwidth={true}>
                 <Grid container spacing={3} sx={{ marginBottom: '1.5em' }}>
                   <Grid item xs={12} sm={6}>
-                    <RHFTextField name="fullName" label="Nama pemilik usaha" placeholder="nama" />
+                    <RHFTextField name="ownerName" label="Nama pemilik usaha" placeholder="nama" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <RHFTextField name="businessName" label="Nama usaha" placeholder="nama usaha" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <RHFSelect name="businessSector" label="Bidang usaha" SelectProps={{ native: false }}>
+                    <RHFSelect name="businessType" label="Bidang usaha" SelectProps={{ native: false }}>
                       {business_sector.map((result, index) => (
                         <MenuItem value={result.value} key={index}>
                           {result.name}
@@ -122,7 +120,7 @@ export default function RegisterEmailConfirm() {
                     </RHFSelect>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <RHFSelect name="yearsInOperation" label="Lama beroperasi" SelectProps={{ native: false }}>
+                    <RHFSelect name="operatingSince" label="Lama beroperasi" SelectProps={{ native: false }}>
                       {business_year_operation.map((result, index) => (
                         <MenuItem value={result.value} key={index}>
                           {result.name}
