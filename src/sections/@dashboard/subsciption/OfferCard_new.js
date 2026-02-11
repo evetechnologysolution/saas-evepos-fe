@@ -20,7 +20,7 @@ export default function OfferCard({ data, isMonthly, isPopular = false }) {
 
   const formatLabel = (key) => key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
-  const moduleCount = Object.values(data.modules || {}).filter(Boolean).length;
+  const moduleCount = Object.values(data.modules || {}).filter((a) => !!a.enabled).length;
 
   const monthlyCost = data.price?.monthly || 0;
   const yearlyCost = data.price?.yearly || 0;
@@ -137,8 +137,8 @@ export default function OfferCard({ data, isMonthly, isPopular = false }) {
 
         <Stack spacing={1.5} mb={3}>
           {Object.entries(data.modules || {})
-            .filter(([_, value]) => value === true)
-            .map(([key], i) => (
+            .filter(([_, value]) => value?.enabled)
+            .map(([key, value]) => (
               <Stack key={key} direction="row" alignItems="center" spacing={1.5}>
                 <Box
                   sx={{
@@ -154,8 +154,14 @@ export default function OfferCard({ data, isMonthly, isPopular = false }) {
                 >
                   <Iconify icon="eva:checkmark-fill" sx={{ color: 'primary.main', width: 14, height: 14 }} />
                 </Box>
+
                 <Typography variant="body2" color="text.primary">
                   {formatLabel(key)}
+                  {value.qty > 0 && (
+                    <Typography component="span" variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>
+                      ({value.qty} Data)
+                    </Typography>
+                  )}
                 </Typography>
               </Stack>
             ))}
