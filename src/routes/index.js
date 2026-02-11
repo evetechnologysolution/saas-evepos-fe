@@ -465,7 +465,7 @@ export default function Router() {
                 {
                   path: '',
                   element: (
-                    <RoleBasedGuard hasContent roles={['owner', 'admin']}>
+                    <RoleBasedGuard hasContent roles={['owner']}>
                       <UserList />
                     </RoleBasedGuard>
                   ),
@@ -473,7 +473,7 @@ export default function Router() {
                 {
                   path: 'new',
                   element: (
-                    <RoleBasedGuard hasContent roles={['owner', 'admin']}>
+                    <RoleBasedGuard hasContent roles={['owner']}>
                       <UserCreate />
                     </RoleBasedGuard>
                   ),
@@ -481,7 +481,7 @@ export default function Router() {
                 {
                   path: ':id/edit',
                   element: (
-                    <RoleBasedGuard hasContent roles={['owner', 'admin']}>
+                    <RoleBasedGuard hasContent roles={['owner']}>
                       <UserEdit />
                     </RoleBasedGuard>
                   ),
