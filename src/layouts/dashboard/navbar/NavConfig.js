@@ -225,7 +225,7 @@ export const useNavConfig = () => {
         // PROFILE
         {
           title: 'profile',
-          path: PATH_DASHBOARD.profile.account,
+          path: PATH_DASHBOARD.profile.root,
           icon: ICONS.user,
           roles: ['owner', 'admin'],
           children: [
