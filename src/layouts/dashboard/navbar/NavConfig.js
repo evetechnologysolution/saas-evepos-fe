@@ -230,8 +230,8 @@ export const useNavConfig = () => {
           roles: ['owner', 'admin'],
           children: [
             { title: 'account information', path: PATH_DASHBOARD.profile.account },
-            { title: 'business information', path: PATH_DASHBOARD.profile.business },
-            { title: 'bank information', path: PATH_DASHBOARD.profile.bank },
+            { title: 'business information', path: PATH_DASHBOARD.profile.business, roles: ['owner'] },
+            { title: 'bank information', path: PATH_DASHBOARD.profile.bank, roles: ['owner'] },
           ],
         },
         // USER
