@@ -129,6 +129,12 @@ export const PATH_DASHBOARD = {
     tax: path(ROOTS_DASHBOARD, '/settings/tax'),
     receiptSetting: path(ROOTS_DASHBOARD, '/settings/receipt-setting'),
   },
+  profile: {
+    root: path(ROOTS_DASHBOARD, '/profile'),
+    account: path(ROOTS_DASHBOARD, '/profile/account'),
+    business: path(ROOTS_DASHBOARD, '/profile/business'),
+    bank: path(ROOTS_DASHBOARD, '/profile/bank'),
+  },
   user: {
     root: path(ROOTS_DASHBOARD, '/user'),
     create: path(ROOTS_DASHBOARD, '/user/new'),

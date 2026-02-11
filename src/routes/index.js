@@ -236,14 +236,6 @@ export default function Router() {
                   ),
                 },
                 {
-                  path: 'member-card',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                      <MemberCard />
-                    </RoleBasedGuard>
-                  ),
-                },
-                {
                   path: 'log-voucher',
                   element: (
                     <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
@@ -276,38 +268,6 @@ export default function Router() {
                   ),
                 },
               ],
-            },
-            {
-              path: 'postcard',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
-                  <MemberPostcard />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'track-history',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin']}>
-                  <History />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'track-order',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin']}>
-                  <HistoryOrder />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'print-count',
-              element: (
-                <RoleBasedGuard hasContent roles={['Super Admin']}>
-                  <PrintCount />
-                </RoleBasedGuard>
-              ),
             },
             {
               path: 'expense',
@@ -418,38 +378,6 @@ export default function Router() {
                   ),
                 },
                 {
-                  path: 'perfume',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                      <LibraryPerfume />
-                    </RoleBasedGuard>
-                  ),
-                },
-                {
-                  path: 'banner',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                      <LibraryBanner />
-                    </RoleBasedGuard>
-                  ),
-                },
-                {
-                  path: 'banner/new',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                      <LibraryBannerCreate />
-                    </RoleBasedGuard>
-                  ),
-                },
-                {
-                  path: 'banner/:id/edit',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
-                      <LibraryBannerEdit />
-                    </RoleBasedGuard>
-                  ),
-                },
-                {
                   path: 'promotion',
                   element: (
                     <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
@@ -555,6 +483,35 @@ export default function Router() {
                   element: (
                     <RoleBasedGuard hasContent roles={['owner', 'admin']}>
                       <UserEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'profile',
+              children: [
+                {
+                  path: 'account',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'admin']}>
+                      <ProfileAccount />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'business',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner']}>
+                      <ProfileBusiness />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'bank',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner']}>
+                      <UserList />
                     </RoleBasedGuard>
                   ),
                 },
@@ -972,6 +929,10 @@ const UserCreate = Loadable(lazy(() => import('../pages/user/UserCreate')));
 const UserEdit = Loadable(lazy(() => import('../pages/user/UserEdit')));
 const UserAccount = Loadable(lazy(() => import('../pages/UserAccount')));
 const UserProfile = Loadable(lazy(() => import('../pages/UserProfile')));
+
+// User Profile
+const ProfileAccount = Loadable(lazy(() => import('../pages/user-profile/account/ProfileAccount')));
+const ProfileBusiness = Loadable(lazy(() => import('../pages/user-profile/business/ProfileBusiness')));
 
 // SUBSCRIPTION
 const Subscription = Loadable(lazy(() => import('../pages/subscription/Subscription')));

@@ -222,6 +222,18 @@ export const useNavConfig = () => {
         //     { title: 'receipt setting', path: PATH_DASHBOARD.settings.receiptSetting },
         //   ],
         // },
+        // PROFILE
+        {
+          title: 'profile',
+          path: PATH_DASHBOARD.profile.root,
+          icon: ICONS.user,
+          roles: ['owner', 'admin'],
+          children: [
+            { title: 'account information', path: PATH_DASHBOARD.profile.account },
+            { title: 'business information', path: PATH_DASHBOARD.profile.business },
+            { title: 'bank information', path: PATH_DASHBOARD.profile.bank },
+          ],
+        },
         // USER
         {
           title: 'user',
