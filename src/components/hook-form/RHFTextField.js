@@ -2,16 +2,21 @@ import PropTypes from 'prop-types';
 // form
 import { useFormContext, Controller } from 'react-hook-form';
 // @mui
-import { TextField } from '@mui/material';
+import { TextField, Skeleton } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
 RHFTextField.propTypes = {
   name: PropTypes.string,
+  loading: PropTypes.bool,
 };
 
-export default function RHFTextField({ name, ...other }) {
+export default function RHFTextField({ name, loading = false, ...other }) {
   const { control } = useFormContext();
+
+  if (loading) {
+    return <Skeleton variant="rectangular" height={56} sx={{ borderRadius: 1 }} />;
+  }
 
   return (
     <Controller
