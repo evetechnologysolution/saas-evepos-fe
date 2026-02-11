@@ -26,6 +26,27 @@ const dataSchema = Yup.object({
     .max(15, 'Maksimal 15 digit')
     .default(''),
   email: Yup.string().email('Format email tidak valid').nullable().optional().default(''),
+  ktp: Yup.object({
+    number: Yup.string()
+      .transform((val) => (val === '' ? null : val))
+      .nullable()
+      .optional()
+      .matches(/^\d+$/, 'Hanya boleh angka')
+      .length(16, 'Harus 16 digit'),
+  }).default({
+    number: '',
+  }),
+  npwp: Yup.object({
+    number: Yup.string()
+      .transform((val) => (val === '' ? null : val))
+      .nullable()
+      .optional()
+      .matches(/^\d+$/, 'Hanya boleh angka')
+      .min(15, 'Min. 15 digit')
+      .max(16, 'Max. 16 digit'),
+  }).default({
+    number: '',
+  }),
   oldPassword: Yup.string()
     .transform((val) => (val === '' ? null : val))
     .nullable()

@@ -76,7 +76,7 @@ export default function AccountProfile() {
   const onSubmit = async () => {
     const formData = new FormData();
 
-    const excludedFields = ['oldPassword', 'newPassword', 'confirmPassword'];
+    const excludedFields = ['ktp', 'npwp', 'oldPassword', 'newPassword', 'confirmPassword'];
 
     // ambil key yang valid dari schema
     const schemaKeys = Object.keys(schema.getDefault());
@@ -85,9 +85,6 @@ export default function AccountProfile() {
       const value = values[key];
       // skip field yang tidak boleh dikirim
       if (excludedFields.includes(key)) return;
-
-      // skip kosong
-      if (value === null || value === undefined || value === '') return;
 
       // khusus file
       if (key === 'image') {
@@ -99,6 +96,13 @@ export default function AccountProfile() {
 
       formData.append(key, value);
     });
+
+    if (values.ktp?.number) {
+      formData.append('ktp[number]', values.ktp.number);
+    }
+    if (values.npwp?.number) {
+      formData.append('npwp[number]', values.npwp.number);
+    }
 
     if (values.newPassword) {
       formData.append('oldPassword', values.oldPassword);
@@ -119,9 +123,6 @@ export default function AccountProfile() {
       <FormProvider key={1} methods={methods} onSubmit={handleSubmit(onSubmit)}>
         <Card sx={{ p: 3 }}>
           <Grid container spacing={3}>
-            {/* <Grid item xs={12}>
-              <Divider />
-            </Grid> */}
             <Grid item xs={12} md={4}>
               <Typography variant="h6">Informasi Profil</Typography>
             </Grid>
@@ -135,14 +136,43 @@ export default function AccountProfile() {
                 }}
               >
                 <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
-                  <RHFTextField name="username" label="Username" />
-                  <RHFTextField name="fullname" label="Full Name" />
-                  <RHFTextField name="email" type="email" label="Email" />
+                  <RHFTextField name="username" label="Username" loading={isLoading} />
+                  <RHFTextField name="fullname" label="Full Name" loading={isLoading} />
+                  <RHFTextField name="email" type="email" label="Email" loading={isLoading} />
                 </Box>
                 <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
-                  <RHFTextField name="phone" label="Phone 1" />
-                  <RHFTextField name="phone2" label="Phone 2" />
-                  <RHFTextField name="phone3" label="Phone 3" />
+                  <RHFTextField name="phone" label="Phone 1" loading={isLoading} />
+                  <RHFTextField name="phone2" label="Phone 2" loading={isLoading} />
+                  <RHFTextField name="phone3" label="Phone 3" loading={isLoading} />
+                </Box>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Divider />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Typography variant="h6">Informasi Data Diri</Typography>
+            </Grid>
+            <Grid item xs={12} md={8}>
+              <Box
+                sx={{
+                  display: 'grid',
+                  rowGap: 3,
+                  columnGap: 2,
+                  gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
+                }}
+              >
+                <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
+                  <RHFTextField
+                    name="ktp.number"
+                    label="No. KTP"
+                    disabled={user?.role !== 'owner'}
+                    loading={isLoading}
+                  />
+                </Box>
+                <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
+                  <RHFTextField name="npwp.number" label="NPWP" disabled={user?.role !== 'owner'} loading={isLoading} />
                 </Box>
               </Box>
             </Grid>
@@ -163,9 +193,12 @@ export default function AccountProfile() {
                 }}
               >
                 <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
-                  <RHFTextField name="address" label="Alamat" multiline rows={4.48} />
-                  <RHFSelect name="province" label="Provinsi" SelectProps={{ native: false }}>
-                    <MenuItem value="">Pilih Provinsi</MenuItem>
+                  <RHFTextField name="address" label="Alamat" multiline rows={4.48} loading={isLoading} />
+                  <RHFSelect name="province" label="Provinsi" SelectProps={{ native: false }} loading={isLoading}>
+                    <MenuItem value="" disabled>
+                      Pilih Provinsi
+                    </MenuItem>
+                    <Divider />
                     {provinces.map((result, index) => (
                       <MenuItem value={result?.value?.toUpperCase()} key={index}>
                         {result?.name?.toUpperCase()}
@@ -179,16 +212,20 @@ export default function AccountProfile() {
                     label="Kota/Kabupaten"
                     SelectProps={{ native: false }}
                     disabled={!selectedProvince}
+                    loading={isLoading}
                   >
-                    <MenuItem value="">Pilih Kota</MenuItem>
+                    <MenuItem value="" disabled>
+                      Pilih Kota
+                    </MenuItem>
+                    <Divider />
                     {availableCities.map((result, index) => (
                       <MenuItem value={result?.value?.toUpperCase()} key={index}>
                         {result?.name?.toUpperCase()}
                       </MenuItem>
                     ))}
                   </RHFSelect>
-                  <RHFTextField name="district" label="Kecamatan" />
-                  <RHFTextField name="zipCode" label="Kode Pos" />
+                  <RHFTextField name="district" label="Kecamatan" loading={isLoading} />
+                  <RHFTextField name="zipCode" label="Kode Pos" loading={isLoading} />
                 </Box>
               </Box>
             </Grid>
@@ -209,7 +246,7 @@ export default function AccountProfile() {
                 }}
               >
                 <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
-                  <RHFTextField name="role" label="Hak Akses" disabled />
+                  <RHFTextField name="role" label="Hak Akses" disabled loading={isLoading} />
                   <RHFTextField
                     name="oldPassword"
                     type={showPassword ? 'text' : 'password'}
@@ -223,6 +260,7 @@ export default function AccountProfile() {
                         </InputAdornment>
                       ),
                     }}
+                    loading={isLoading}
                   />
                 </Box>
                 <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
@@ -240,12 +278,14 @@ export default function AccountProfile() {
                       ),
                     }}
                     disabled={!values.oldPassword}
+                    loading={isLoading}
                   />
                   <RHFTextField
                     name="confirmPassword"
                     label="Konfirmasi Kata Sandi Baru"
                     type={showPasswordNew ? 'text' : 'password'}
                     disabled={!values.oldPassword}
+                    loading={isLoading}
                   />
                 </Box>
               </Box>

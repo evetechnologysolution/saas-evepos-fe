@@ -9,11 +9,7 @@ const dataSchema = Yup.object({
     .nullable()
     .optional()
     .default(''),
-  legalStatus: Yup.string()
-    .transform((val) => (val === '' ? null : val))
-    .nullable()
-    .optional()
-    .default(''),
+  legalStatus: Yup.string().required('Bentuk Usaha wajib diisi').default(''),
   operatingSince: Yup.string()
     .transform((val) => (val === '' ? null : val))
     .nullable()
@@ -85,6 +81,14 @@ const dataSchema = Yup.object({
     .min(4, 'Minimal 4 digit')
     .max(5, 'Maksimal 5 digit')
     .default(''),
+  socialMedia: Yup.array()
+    .of(
+      Yup.object({
+        platform: Yup.string().required('Platform wajib diisi').default(''),
+        account: Yup.string().required('Akun wajib diisi').default(''),
+      })
+    )
+    .default([]),
 });
 
 export default dataSchema;
