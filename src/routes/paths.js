@@ -134,6 +134,8 @@ export const PATH_DASHBOARD = {
     account: path(ROOTS_DASHBOARD, '/profile/account'),
     business: path(ROOTS_DASHBOARD, '/profile/business'),
     bank: path(ROOTS_DASHBOARD, '/profile/bank'),
+    bankCreate: path(ROOTS_DASHBOARD, '/profile/bank/new'),
+    bankEdit: (id) => path(ROOTS_DASHBOARD, `/profile/bank/${id}/edit`),
   },
   user: {
     root: path(ROOTS_DASHBOARD, '/user'),
