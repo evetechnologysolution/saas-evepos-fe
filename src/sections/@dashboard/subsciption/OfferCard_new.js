@@ -26,6 +26,23 @@ export default function OfferCard({ data, isMonthly, isPopular = false }) {
   const yearlyCost = data.price?.yearly || 0;
   const savings = isMonthly ? 0 : monthlyCost * 12 - yearlyCost;
 
+  const getLabel = (value) => {
+    switch (value) {
+      case 'Dashboard':
+        return 'Dashboard — Revenue, Donation, Sales card';
+      case 'DashboardB':
+        return 'Dashboard — Daily Sales';
+      case 'DashboardC':
+        return 'Dashboard — Payment Method';
+      case 'DashboardD':
+        return 'Dashboard — Popular Product';
+      case 'DashboardE':
+        return 'Dashboard — Sales Report';
+      default:
+        return value;
+    }
+  };
+
   return (
     <Card
       sx={{
@@ -156,7 +173,7 @@ export default function OfferCard({ data, isMonthly, isPopular = false }) {
                 </Box>
 
                 <Typography variant="body2" color="text.primary">
-                  {formatLabel(key)}
+                  {getLabel(formatLabel(key))}
                   {value.qty > 0 && (
                     <Typography component="span" variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>
                       ({value.qty} Data)
