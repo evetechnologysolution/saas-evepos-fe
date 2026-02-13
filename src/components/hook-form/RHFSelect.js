@@ -16,7 +16,7 @@ export default function RHFSelect({ name, loading = false, children, ...other })
   const { control } = useFormContext();
 
   if (loading) {
-    return <Skeleton variant="rectangular" height={56} sx={{ borderRadius: 1 }} />;
+    return <Skeleton variant="rectangular" sx={{ borderRadius: 1, width: '100%', minHeight: '56px', height: '100%' }} />;
   }
 
   return (

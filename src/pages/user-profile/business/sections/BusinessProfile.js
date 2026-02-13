@@ -265,16 +265,22 @@ export default function AccountProfile() {
               <Typography variant="h6">Informasi Sosial Media</Typography>
             </Grid>
             <Grid item xs={12} md={8}>
-              <Stack spacing={2}>
+              <Stack gap={2}>
                 {socialFields.map((item, index) => (
                   <Box
                     key={item.id}
+                    // sx={{
+                    //   display: 'grid',
+                    //   columnGap: 2,
+                    //   rowGap: 2,
+                    //   gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr auto' },
+                    //   alignItems: 'center',
+                    // }}
                     sx={{
                       display: 'grid',
+                      rowGap: 3,
                       columnGap: 2,
-                      rowGap: 2,
-                      gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr auto' },
-                      alignItems: 'center',
+                      gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
                     }}
                   >
                     <RHFSelect
@@ -293,11 +299,15 @@ export default function AccountProfile() {
                       ))}
                     </RHFSelect>
 
-                    <RHFTextField name={`socialMedia.${index}.account`} label="Url / Username" />
+                    <Stack flexDirection="row" gap={1} alignItems="center">
+                      <RHFTextField name={`socialMedia.${index}.account`} label="Url / Username" />
 
-                    <IconButton color="error" onClick={() => removeSocial(index)}>
-                      <Iconify icon="eva:trash-2-outline" sx={{ width: 24, height: 24 }} />
-                    </IconButton>
+                      <Box>
+                        <IconButton color="error" onClick={() => removeSocial(index)}>
+                          <Iconify icon="eva:trash-2-outline" sx={{ width: 24, height: 24 }} />
+                        </IconButton>
+                      </Box>
+                    </Stack>
                   </Box>
                 ))}
 
@@ -310,7 +320,7 @@ export default function AccountProfile() {
                         account: '',
                       })
                     }
-                    disabled={values?.socialMedia?.length === 4}
+                    disabled={isLoading || values?.socialMedia?.length === 4}
                   >
                     + Tambah Sosial Media
                   </Button>
@@ -320,7 +330,7 @@ export default function AccountProfile() {
 
             <Grid item xs={12}>
               <Stack spacing={3} alignItems="flex-end" sx={{ mt: 3 }}>
-                <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+                <LoadingButton type="submit" variant="contained" loading={isSubmitting} disabled={isLoading}>
                   Save Changes
                 </LoadingButton>
               </Stack>

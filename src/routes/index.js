@@ -511,7 +511,23 @@ export default function Router() {
                   path: 'bank',
                   element: (
                     <RoleBasedGuard hasContent roles={['owner']}>
-                      <UserList />
+                      <ProfileBankList />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'bank/new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner']}>
+                      <ProfileBankCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'bank/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner']}>
+                      <ProfileBankEdit />
                     </RoleBasedGuard>
                   ),
                 },
@@ -933,6 +949,9 @@ const UserProfile = Loadable(lazy(() => import('../pages/UserProfile')));
 // User Profile
 const ProfileAccount = Loadable(lazy(() => import('../pages/user-profile/account/ProfileAccount')));
 const ProfileBusiness = Loadable(lazy(() => import('../pages/user-profile/business/ProfileBusiness')));
+const ProfileBankList = Loadable(lazy(() => import('../pages/user-profile/bank/BankList')));
+const ProfileBankCreate = Loadable(lazy(() => import('../pages/user-profile/bank/BankCreate')));
+const ProfileBankEdit = Loadable(lazy(() => import('../pages/user-profile/bank/BankEdit')));
 
 // SUBSCRIPTION
 const Subscription = Loadable(lazy(() => import('../pages/subscription/Subscription')));
