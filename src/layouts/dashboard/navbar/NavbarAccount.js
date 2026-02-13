@@ -23,15 +23,16 @@ const RootStyle = styled('div')(({ theme }) => ({
 }));
 
 const SubscriptionChip = styled(Chip)(({ theme, subscriptiontype }) => ({
-  height: 20,
-  fontSize: '0.75rem',
+  height: 18,
+  fontSize: '0.65rem',
   fontWeight: 600,
   backgroundColor:
-    subscriptiontype === 'pro'
-      ? theme.palette.primary.main
+    subscriptiontype === 'expired'
+      ? theme.palette.error.main
       : subscriptiontype === 'trial'
       ? theme.palette.warning.main
-      : theme.palette.grey[400],
+      : theme.palette.primary.main,
+  // : theme.palette.grey[400],
   color: theme.palette.common.white,
   textTransform: 'uppercase',
 }));
@@ -67,46 +68,50 @@ export default function NavbarAccount({ isCollapse }) {
           }),
         }}
       >
-        <Avatar src={defaultAvatar} alt={user?.fullname} />
-        <Box
-          sx={{
-            ml: 2,
-            transition: (theme) =>
-              theme.transitions.create('width', {
-                duration: theme.transitions.duration.shorter,
-              }),
-            ...(isCollapse && {
-              ml: 0,
-              width: 0,
-            }),
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-            <Typography variant="subtitle2" noWrap fontWeight="bold">
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+            <Typography variant="subtitle2" fontWeight="bold" noWrap sx={{ maxWidth: 130 }}>
               {user?.fullname}
             </Typography>
             <SubscriptionChip label={subscriptionType} size="small" subscriptiontype={subscriptionType} />
           </Box>
 
-          <Typography variant="caption" noWrap sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
-            {user?.tenantRef?.businessName} • {user?.role}
-          </Typography>
-
-          {/* Subscription info - hanya tampil jika ada subscription expiry */}
-          {daysRemaining !== null && (
-            <Typography
-              variant="caption"
-              noWrap
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Avatar src={defaultAvatar} alt={user?.fullname} />
+            <Box
               sx={{
-                color: daysRemaining <= 7 ? 'error.main' : 'text.secondary',
-                display: 'block',
-                mt: 0.25,
-                fontWeight: daysRemaining <= 7 ? 600 : 400,
+                ml: 2,
+                transition: (theme) =>
+                  theme.transitions.create('width', {
+                    duration: theme.transitions.duration.shorter,
+                  }),
+                ...(isCollapse && {
+                  ml: 0,
+                  width: 0,
+                }),
               }}
             >
-              {daysRemaining > 0 ? `${daysRemaining} hari tersisa` : 'Subscription berakhir'}
-            </Typography>
-          )}
+              <Typography variant="caption" noWrap sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
+                {user?.tenantRef?.businessName} • {user?.role}
+              </Typography>
+
+              {/* Subscription info - hanya tampil jika ada subscription expiry */}
+              {daysRemaining !== null && (
+                <Typography
+                  variant="caption"
+                  noWrap
+                  sx={{
+                    color: daysRemaining <= 7 ? 'error.main' : 'text.secondary',
+                    display: 'block',
+                    mt: 0.25,
+                    fontWeight: daysRemaining <= 7 ? 600 : 400,
+                  }}
+                >
+                  {daysRemaining > 0 ? `${daysRemaining} hari tersisa` : 'Subscription berakhir'}
+                </Typography>
+              )}
+            </Box>
+          </Box>
         </Box>
       </RootStyle>
     </Link>

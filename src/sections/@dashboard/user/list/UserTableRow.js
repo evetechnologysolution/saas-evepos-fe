@@ -75,19 +75,19 @@ export default function UserTableRow({ row, onEditRow, onDeleteRow }) {
           >
             <Iconify icon="eva:edit-outline" sx={{ width: 24, height: 24 }} />
           </Button>
-          {/* {user.role === 'Super Admin' && user._id !== _id && role !== 'Super Admin' && ( */}
-          <Button
-            title="Delete"
-            variant="contained"
-            color="error"
-            sx={{ p: 0, minWidth: 35, height: 35 }}
-            onClick={() => {
-              onDeleteRow();
-            }}
-          >
-            <Iconify icon="eva:trash-2-outline" sx={{ width: 24, height: 24 }} />
-          </Button>
-          {/* )} */}
+          {user.role === 'owner' && user._id !== _id && role !== 'owner' && (
+            <Button
+              title="Delete"
+              variant="contained"
+              color="error"
+              sx={{ p: 0, minWidth: 35, height: 35 }}
+              onClick={() => {
+                onDeleteRow();
+              }}
+            >
+              <Iconify icon="eva:trash-2-outline" sx={{ width: 24, height: 24 }} />
+            </Button>
+          )}
         </Stack>
       </TableCell>
     </CustomTableRow>

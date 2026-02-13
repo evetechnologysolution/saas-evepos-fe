@@ -239,7 +239,7 @@ export const useNavConfig = () => {
           title: 'user',
           path: '/dashboard/user',
           icon: ICONS.user,
-          roles: ['owner', 'admin'],
+          roles: ['owner'],
         },
       ],
     },

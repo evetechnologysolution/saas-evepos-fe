@@ -12,10 +12,9 @@ const userSchemaEdit = Yup.object({
     .max(15, 'Maksimal 15 digit'),
   email: Yup.string().email('Format email tidak valid').nullable().optional(),
   password: Yup.string()
-    .transform((val) => (val === '' ? null : val))
-    .nullable()
-    .optional()
-    .min(6, 'Password minimal 6 karakter'),
+    .transform((val) => (val === '' ? undefined : val))
+    .min(6, 'Password minimal 6 karakter')
+    .optional(),
   role: Yup.string().required('Role wajib diisi').oneOf(['Admin', 'Staff', 'Cashier'], 'Role tidak valid'),
 });
 
