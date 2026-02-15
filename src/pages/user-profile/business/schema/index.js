@@ -15,6 +15,7 @@ const dataSchema = Yup.object({
     .nullable()
     .optional()
     .default(''),
+  image: Yup.string().default(''),
   description: Yup.string()
     .transform((val) => (val === '' ? null : val))
     .nullable()

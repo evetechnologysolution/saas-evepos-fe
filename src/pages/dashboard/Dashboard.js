@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 // @mui
 import {
@@ -280,7 +280,7 @@ export default function Dashboard() {
             <YearlyWidgetSummary
               title="Sales"
               subtitle={getTopCurrentFilterLabel()}
-              total={dashboardRevenue?.totalSales}
+              total={dashboardRevenue?.totalSales || 0}
               type="currency"
               color="info"
               icon={'heroicons-solid:currency-dollar'}

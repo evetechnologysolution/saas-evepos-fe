@@ -1,5 +1,5 @@
 /* eslint-disable import/no-unresolved */
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQueryClient } from 'react-query';
 import { useSnackbar } from 'notistack';
 // form
@@ -14,7 +14,7 @@ import Iconify from '../../../../components/Iconify';
 // hooks
 import useAuth from '../../../../hooks/useAuth';
 // components
-import { FormProvider, RHFTextField, RHFSelect } from '../../../../components/hook-form';
+import { FormProvider, RHFTextField, RHFSelect, RHFUploadSingleFile } from '../../../../components/hook-form';
 // schema
 import schema from '../schema';
 // service
@@ -36,6 +36,11 @@ export default function AccountProfile() {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordNew, setShowPasswordNew] = useState(false);
 
+  const maxSize = {
+    label: '900KB',
+    value: 900000,
+  };
+
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: schema.getDefault(),
@@ -52,7 +57,13 @@ export default function AccountProfile() {
   useEffect(() => {
     if (!isSuccess) return;
 
-    reset(dataUser);
+    const objData = {
+      ...dataUser,
+      imageKtp: dataUser?.ktp?.image,
+      imageNpwp: dataUser?.npwp?.image,
+    };
+
+    reset(objData);
   }, [isSuccess, dataUser, reset]);
 
   const values = watch();
@@ -63,6 +74,38 @@ export default function AccountProfile() {
       setValue('confirmPassword', '');
     }
   }, [values.oldPassword]);
+
+  const handleDropKtp = useCallback(
+    (acceptedFiles) => {
+      const file = acceptedFiles[0];
+
+      if (file) {
+        setValue(
+          'imageKtp',
+          Object.assign(file, {
+            preview: URL.createObjectURL(file),
+          })
+        );
+      }
+    },
+    [setValue]
+  );
+
+  const handleDropNpwp = useCallback(
+    (acceptedFiles) => {
+      const file = acceptedFiles[0];
+
+      if (file) {
+        setValue(
+          'imageNpwp',
+          Object.assign(file, {
+            preview: URL.createObjectURL(file),
+          })
+        );
+      }
+    },
+    [setValue]
+  );
 
   const selectedProvince = values?.province;
   // const selectedCity = values?.city;
@@ -87,7 +130,7 @@ export default function AccountProfile() {
       if (excludedFields.includes(key)) return;
 
       // khusus file
-      if (key === 'image') {
+      if (key === 'imageKtp' || key === 'imageNpwp') {
         if (value instanceof File) {
           formData.append(key, value);
         }
@@ -130,21 +173,20 @@ export default function AccountProfile() {
               <Box
                 sx={{
                   display: 'grid',
-                  rowGap: 3,
-                  columnGap: 2,
-                  gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
+                  gap: 3,
+                  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
                 }}
               >
-                <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
+                <Stack spacing={3}>
                   <RHFTextField name="username" label="Username" loading={isLoading} />
                   <RHFTextField name="fullname" label="Full Name" loading={isLoading} />
                   <RHFTextField name="email" type="email" label="Email" loading={isLoading} />
-                </Box>
-                <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
+                </Stack>
+                <Stack spacing={3}>
                   <RHFTextField name="phone" label="Phone 1" loading={isLoading} />
                   <RHFTextField name="phone2" label="Phone 2" loading={isLoading} />
                   <RHFTextField name="phone3" label="Phone 3" loading={isLoading} />
-                </Box>
+                </Stack>
               </Box>
             </Grid>
 
@@ -158,22 +200,41 @@ export default function AccountProfile() {
               <Box
                 sx={{
                   display: 'grid',
-                  rowGap: 3,
-                  columnGap: 2,
-                  gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
+                  gap: 3,
+                  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
                 }}
               >
-                <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
+                <Stack spacing={3}>
                   <RHFTextField
                     name="ktp.number"
                     label="No. KTP"
                     disabled={user?.role !== 'owner'}
                     loading={isLoading}
                   />
-                </Box>
-                <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
+                  <Stack flexDirection="column" gap={1}>
+                    <Typography>{`Upload KTP (max size: ${maxSize.label})`}</Typography>
+                    <RHFUploadSingleFile
+                      name="imageKtp"
+                      accept="image/*"
+                      maxSize={maxSize.value}
+                      onDrop={handleDropKtp}
+                      loading={isLoading}
+                    />
+                  </Stack>
+                </Stack>
+                <Stack spacing={3}>
                   <RHFTextField name="npwp.number" label="NPWP" disabled={user?.role !== 'owner'} loading={isLoading} />
-                </Box>
+                  <Stack flexDirection="column" gap={1}>
+                    <Typography>{`Upload NPWP (max size: ${maxSize.label})`}</Typography>
+                    <RHFUploadSingleFile
+                      name="imageNpwp"
+                      accept="image/*"
+                      maxSize={maxSize.value}
+                      onDrop={handleDropNpwp}
+                      loading={isLoading}
+                    />
+                  </Stack>
+                </Stack>
               </Box>
             </Grid>
 
@@ -187,12 +248,11 @@ export default function AccountProfile() {
               <Box
                 sx={{
                   display: 'grid',
-                  rowGap: 3,
-                  columnGap: 2,
-                  gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
+                  gap: 3,
+                  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
                 }}
               >
-                <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
+                <Stack spacing={3}>
                   <RHFTextField name="address" label="Alamat" multiline rows={4.48} loading={isLoading} />
                   <RHFSelect name="province" label="Provinsi" SelectProps={{ native: false }} loading={isLoading}>
                     <MenuItem value="" disabled>
@@ -205,8 +265,8 @@ export default function AccountProfile() {
                       </MenuItem>
                     ))}
                   </RHFSelect>
-                </Box>
-                <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
+                </Stack>
+                <Stack spacing={3}>
                   <RHFSelect
                     name="city"
                     label="Kota/Kabupaten"
@@ -226,7 +286,7 @@ export default function AccountProfile() {
                   </RHFSelect>
                   <RHFTextField name="district" label="Kecamatan" loading={isLoading} />
                   <RHFTextField name="zipCode" label="Kode Pos" loading={isLoading} />
-                </Box>
+                </Stack>
               </Box>
             </Grid>
 
@@ -240,12 +300,11 @@ export default function AccountProfile() {
               <Box
                 sx={{
                   display: 'grid',
-                  rowGap: 3,
-                  columnGap: 2,
-                  gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
+                  gap: 3,
+                  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
                 }}
               >
-                <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
+                <Stack spacing={3}>
                   <RHFTextField name="role" label="Hak Akses" disabled loading={isLoading} />
                   <RHFTextField
                     name="oldPassword"
@@ -262,8 +321,8 @@ export default function AccountProfile() {
                     }}
                     loading={isLoading}
                   />
-                </Box>
-                <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
+                </Stack>
+                <Stack spacing={3}>
                   <RHFTextField
                     name="newPassword"
                     type={showPasswordNew ? 'text' : 'password'}
@@ -287,13 +346,13 @@ export default function AccountProfile() {
                     disabled={!values.oldPassword}
                     loading={isLoading}
                   />
-                </Box>
+                </Stack>
               </Box>
             </Grid>
 
             <Grid item xs={12}>
               <Stack spacing={3} alignItems="flex-end" sx={{ mt: 3 }}>
-                <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+                <LoadingButton type="submit" variant="contained" loading={isSubmitting} disabled={isLoading}>
                   Save Changes
                 </LoadingButton>
               </Stack>
