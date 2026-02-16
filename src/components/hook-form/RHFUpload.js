@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 // form
 import { useFormContext, Controller } from 'react-hook-form';
 // @mui
-import { FormHelperText } from '@mui/material';
+import { FormHelperText, Skeleton } from '@mui/material';
 // type
 import { UploadAvatar, UploadMultiFile, UploadSingleFile } from '../upload';
 
@@ -10,10 +10,15 @@ import { UploadAvatar, UploadMultiFile, UploadSingleFile } from '../upload';
 
 RHFUploadAvatar.propTypes = {
   name: PropTypes.string,
+  loading: PropTypes.bool,
 };
 
-export function RHFUploadAvatar({ name, ...other }) {
+export function RHFUploadAvatar({ name, loading = false, ...other }) {
   const { control } = useFormContext();
+
+  if (loading) {
+    return <Skeleton variant="rectangular" sx={{ borderRadius: 1, minHeight: '56px', height: '100%' }} />;
+  }
 
   return (
     <Controller
@@ -41,10 +46,15 @@ export function RHFUploadAvatar({ name, ...other }) {
 
 RHFUploadSingleFile.propTypes = {
   name: PropTypes.string,
+  loading: PropTypes.bool,
 };
 
-export function RHFUploadSingleFile({ name, ...other }) {
+export function RHFUploadSingleFile({ name, loading = false, ...other }) {
   const { control } = useFormContext();
+
+  if (loading) {
+    return <Skeleton variant="rectangular" sx={{ borderRadius: 1, minHeight: '56px', height: '100%' }} />;
+  }
 
   return (
     <Controller
@@ -77,10 +87,15 @@ export function RHFUploadSingleFile({ name, ...other }) {
 
 RHFUploadMultiFile.propTypes = {
   name: PropTypes.string,
+  loading: PropTypes.bool,
 };
 
-export function RHFUploadMultiFile({ name, ...other }) {
+export function RHFUploadMultiFile({ name, loading = false, ...other }) {
   const { control } = useFormContext();
+
+  if (loading) {
+    return <Skeleton variant="rectangular" sx={{ borderRadius: 1, minHeight: '56px', height: '100%' }} />;
+  }
 
   return (
     <Controller

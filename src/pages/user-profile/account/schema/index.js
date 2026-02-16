@@ -36,6 +36,7 @@ const dataSchema = Yup.object({
   }).default({
     number: '',
   }),
+  imageKtp: Yup.string().default(''),
   npwp: Yup.object({
     number: Yup.string()
       .transform((val) => (val === '' ? null : val))
@@ -47,6 +48,7 @@ const dataSchema = Yup.object({
   }).default({
     number: '',
   }),
+  imageNpwp: Yup.string().default(''),
   oldPassword: Yup.string()
     .transform((val) => (val === '' ? null : val))
     .nullable()

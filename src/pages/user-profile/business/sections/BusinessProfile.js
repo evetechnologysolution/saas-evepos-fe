@@ -1,5 +1,5 @@
 /* eslint-disable import/no-unresolved */
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 import { useQueryClient } from 'react-query';
 import { useSnackbar } from 'notistack';
 // form
@@ -12,7 +12,13 @@ import { handleMutationFeedback } from 'src/utils/mutationfeedback';
 // hooks
 import useAuth from '../../../../hooks/useAuth';
 // components
-import { FormProvider, RHFTextField, RHFSelect } from '../../../../components/hook-form';
+import {
+  FormProvider,
+  RHFTextField,
+  RHFSelect,
+  // RHFUploadSingleFile,
+  RHFUploadAvatar,
+} from '../../../../components/hook-form';
 import Iconify from '../../../../components/Iconify';
 // schema
 import schema from '../schema';
@@ -34,6 +40,10 @@ export default function AccountProfile() {
 
   const { getById, update } = useService();
   const { data: dataTenant, isSuccess, isLoading } = getById(user?.tenantRef?._id);
+  const maxSize = {
+    label: '900KB',
+    value: 900000,
+  };
 
   const methods = useForm({
     resolver: yupResolver(schema),
@@ -43,6 +53,7 @@ export default function AccountProfile() {
   const {
     control,
     watch,
+    setValue,
     handleSubmit,
     formState: { isSubmitting },
     reset,
@@ -73,6 +84,22 @@ export default function AccountProfile() {
     if (!selectedProvince) return [];
     return cities[selectedProvince?.toLocaleLowerCase()] || [];
   }, [selectedProvince]);
+
+  const handleDrop = useCallback(
+    (acceptedFiles) => {
+      const file = acceptedFiles[0];
+
+      if (file) {
+        setValue(
+          'image',
+          Object.assign(file, {
+            preview: URL.createObjectURL(file),
+          })
+        );
+      }
+    },
+    [setValue]
+  );
 
   const onSubmit = async () => {
     const formData = new FormData();
@@ -128,21 +155,20 @@ export default function AccountProfile() {
               <Box
                 sx={{
                   display: 'grid',
-                  rowGap: 3,
-                  columnGap: 2,
-                  gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
+                  gap: 3,
+                  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
                 }}
               >
-                <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
+                <Stack spacing={3}>
                   <RHFTextField name="ownerName" label="Nama Pemilik" disabled loading={isLoading} />
                   <RHFTextField name="businessName" label="Nama Bisnis" loading={isLoading} />
                   <RHFTextField name="email" type="email" label="Email" loading={isLoading} />
-                </Box>
-                <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
+                </Stack>
+                <Stack spacing={3}>
                   <RHFTextField name="phone" label="Phone 1" loading={isLoading} />
                   <RHFTextField name="phone2" label="Phone 2" loading={isLoading} />
                   <RHFTextField name="phone3" label="Phone 3" loading={isLoading} />
-                </Box>
+                </Stack>
               </Box>
             </Grid>
 
@@ -156,12 +182,11 @@ export default function AccountProfile() {
               <Box
                 sx={{
                   display: 'grid',
-                  rowGap: 3,
-                  columnGap: 2,
-                  gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
+                  gap: 3,
+                  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
                 }}
               >
-                <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
+                <Stack spacing={3}>
                   <RHFTextField name="address" label="Alamat" multiline rows={4.48} loading={isLoading} />
                   <RHFSelect name="province" label="Provinsi" SelectProps={{ native: false }} loading={isLoading}>
                     <MenuItem value="" disabled>
@@ -174,8 +199,8 @@ export default function AccountProfile() {
                       </MenuItem>
                     ))}
                   </RHFSelect>
-                </Box>
-                <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
+                </Stack>
+                <Stack spacing={3}>
                   <RHFSelect
                     name="city"
                     label="Kota/Kabupaten"
@@ -195,7 +220,7 @@ export default function AccountProfile() {
                   </RHFSelect>
                   <RHFTextField name="district" label="Kecamatan" loading={isLoading} />
                   <RHFTextField name="zipCode" label="Kode Pos" loading={isLoading} />
-                </Box>
+                </Stack>
               </Box>
             </Grid>
 
@@ -209,15 +234,40 @@ export default function AccountProfile() {
               <Box
                 sx={{
                   display: 'grid',
-                  rowGap: 3,
-                  columnGap: 2,
-                  gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
+                  gap: 3,
+                  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
                 }}
               >
-                <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
-                  <RHFTextField name="description" label="Deskripsi Bisnis" multiline rows={4.48} loading={isLoading} />
-                </Box>
-                <Box sx={{ display: 'grid', rowGap: 3, columnGap: 2 }}>
+                <Stack spacing={3}>
+                  <Stack flexDirection="column" gap={1}>
+                    <Typography>{`Upload Logo (max size: ${maxSize.label})`}</Typography>
+                    {/* <RHFUploadSingleFile name="image" accept="image/*" maxSize={maxSize.value} onDrop={handleDrop} loading={isLoading} /> */}
+                    <RHFUploadAvatar
+                      name="image"
+                      accept="image/*"
+                      maxSize={maxSize?.value}
+                      onDrop={handleDrop}
+                      loading={isLoading}
+                      helperText={
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            mt: 2,
+                            mx: 'auto',
+                            display: 'block',
+                            textAlign: 'center',
+                            color: 'text.secondary',
+                          }}
+                        >
+                          Allowed *.jpeg, *.jpg, *.png
+                          <br /> max size of {maxSize?.label}
+                        </Typography>
+                      }
+                    />
+                  </Stack>
+                </Stack>
+                <Stack spacing={3}>
+                  <RHFTextField name="description" label="Deskripsi Bisnis" multiline rows={5} loading={isLoading} />
                   <Stack flexDirection={{ xs: 'column', md: 'row' }} gap={3}>
                     <RHFSelect
                       name="businessType"
@@ -254,7 +304,7 @@ export default function AccountProfile() {
                     </RHFSelect>
                   </Stack>
                   <RHFTextField name="website" label="Website" loading={isLoading} />
-                </Box>
+                </Stack>
               </Box>
             </Grid>
 
@@ -269,18 +319,10 @@ export default function AccountProfile() {
                 {socialFields.map((item, index) => (
                   <Box
                     key={item.id}
-                    // sx={{
-                    //   display: 'grid',
-                    //   columnGap: 2,
-                    //   rowGap: 2,
-                    //   gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr auto' },
-                    //   alignItems: 'center',
-                    // }}
                     sx={{
                       display: 'grid',
-                      rowGap: 3,
-                      columnGap: 2,
-                      gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
+                      gap: 3,
+                      gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
                     }}
                   >
                     <RHFSelect
