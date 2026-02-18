@@ -1,15 +1,15 @@
-import React, { useState, useContext, useRef, useEffect } from "react";
-import PropTypes from "prop-types";
-import Marquee from "react-fast-marquee";
+import React, { useState, useContext, useRef, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import Marquee from 'react-fast-marquee';
 // @mui
-import { Box, Card, Tooltip, Typography } from "@mui/material";
+import { Box, Card, Tooltip, Typography } from '@mui/material';
 // context
-import { cashierContext } from "../../../contexts/CashierContext";
+import { cashierContext } from '../../../contexts/CashierContext';
 // components
-import Label from "../../../components/Label";
+import Label from '../../../components/Label';
 // import Image from "../../../components/Image";
-import ProductDialog from "./ProductDialog";
-import "./ProductCard.scss";
+import ProductDialog from './ProductDialog';
+import './ProductCard.scss';
 
 // ----------------------------------------------------------------------
 
@@ -29,7 +29,21 @@ ProductCard.propTypes = {
   isAvailable: PropTypes.bool,
 };
 
-export default function ProductCard({ id, name, image, price, productionPrice, variant, discount, category, unit, notes, amountKg, isLaundryBag, isAvailable }) {
+export default function ProductCard({
+  id,
+  name,
+  image,
+  price,
+  productionPrice,
+  variant,
+  discount,
+  category,
+  unit,
+  notes,
+  amountKg,
+  isLaundryBag,
+  isAvailable,
+}) {
   const ctx = useContext(cashierContext);
 
   const wrapperRef = useRef(null);
@@ -47,8 +61,8 @@ export default function ProductCard({ id, name, image, price, productionPrice, v
     checkOverflow();
 
     // Tambahkan event listener untuk mengatasi perubahan ukuran layar
-    window.addEventListener("resize", checkOverflow);
-    return () => window.removeEventListener("resize", checkOverflow);
+    window.addEventListener('resize', checkOverflow);
+    return () => window.removeEventListener('resize', checkOverflow);
   }, [id]);
 
   const [isHovering, setIsHovering] = useState(false);
@@ -76,10 +90,7 @@ export default function ProductCard({ id, name, image, price, productionPrice, v
 
   const handleClick = () => {
     if (isAvailable) {
-      if (
-        (variant.length === 0 && !notes) ||
-        (variant.length === 0 && !notes)
-      ) {
+      if ((variant.length === 0 && !notes) || (variant.length === 0 && !notes)) {
         let promoType = 0;
         let promoQtyMin = 0;
         let promoAmount = 0;
@@ -118,7 +129,7 @@ export default function ProductCard({ id, name, image, price, productionPrice, v
               promotionQtyMin: promoQtyMin,
               discountAmount: promoAmount,
               isDailyPromotion: discount.isDailyPromotion,
-              isLaundryBag
+              isLaundryBag,
             },
           ]);
         } else {
@@ -126,18 +137,18 @@ export default function ProductCard({ id, name, image, price, productionPrice, v
             currentBill.map((item) =>
               item.id === id
                 ? {
-                  ...item,
-                  qty: item.qty + 1,
-                  promotionType: promoType,
-                  promotionQtyMin: promoQtyMin,
-                  discountAmount: promoAmount,
-                }
+                    ...item,
+                    qty: item.qty + 1,
+                    promotionType: promoType,
+                    promotionQtyMin: promoQtyMin,
+                    discountAmount: promoAmount,
+                  }
                 : item
             )
           );
         }
 
-        if (ctx.currentOrderID !== "") {
+        if (ctx.currentOrderID !== '') {
           if (findQtyUpdatedBill() === 0) {
             ctx.setUpdatedBill((arr) => [
               ...arr,
@@ -151,7 +162,7 @@ export default function ProductCard({ id, name, image, price, productionPrice, v
                 unit,
                 promotionType: promoType,
                 discountAmount: promoAmount,
-                isLaundryBag
+                isLaundryBag,
               },
             ]);
           } else {
@@ -159,9 +170,9 @@ export default function ProductCard({ id, name, image, price, productionPrice, v
               currentBill.map((item) =>
                 item.id === id
                   ? {
-                    ...item,
-                    qty: item.qty + 1,
-                  }
+                      ...item,
+                      qty: item.qty + 1,
+                    }
                   : item
               )
             );
@@ -173,7 +184,9 @@ export default function ProductCard({ id, name, image, price, productionPrice, v
     }
   };
 
-  const Ribbon = ({ color = "error", text }) => {
+  const isSelected = findQty() > 0;
+
+  const Ribbon = ({ color = 'error', text }) => {
     return (
       <Label
         variant="filled"
@@ -182,18 +195,18 @@ export default function ProductCard({ id, name, image, price, productionPrice, v
           top: 15,
           right: 0,
           zIndex: 9,
-          borderRadius: "20px 0px 0px 20px",
+          borderRadius: '20px 0px 0px 20px',
           height: 30,
           padding: 2,
-          position: "absolute",
-          textTransform: "uppercase",
+          position: 'absolute',
+          textTransform: 'uppercase',
           fontWeight: 400,
-          opacity: "1",
+          opacity: '1',
         }}
       >
         {text}
       </Label>
-    )
+    );
   };
 
   Ribbon.propTypes = {
@@ -208,30 +221,23 @@ export default function ProductCard({ id, name, image, price, productionPrice, v
         onMouseLeave={handleMouseLeave}
         onClick={() => handleClick()}
         sx={{
-          textAlign: "center",
-          cursor: "pointer",
-          boxShadow: isHovering ? "rgba(0, 0, 0, 0.24) 0px 3px 8px;" : "rgba(0, 0, 0, 0.16) 0px 1px 4px",
+          textAlign: 'center',
+          cursor: 'pointer',
+          boxShadow: isHovering ? 'rgba(0, 0, 0, 0.24) 0px 3px 8px' : 'rgba(0, 0, 0, 0.16) 0px 1px 4px',
+          outline: isSelected ? '2px solid' : 'none',
+          outlineColor: isSelected ? 'primary.main' : 'transparent',
+          position: 'relative',
         }}
       >
-        <Box sx={{ position: "relative" }}>
+        <Box sx={{ position: 'relative' }}>
           {!isAvailable ? (
-            <Ribbon
-              text="out of stock"
-            />
+            <Ribbon text="out of stock" />
           ) : (
             discount.isAvailable && (
               <>
-                {discount.amount > 0 && (
-                  <Ribbon
-                    color="error"
-                    text={`Disc ${discount.amount}%`}
-                  />
-                )}
+                {discount.amount > 0 && <Ribbon color="error" text={`Disc ${discount.amount}%`} />}
                 {discount.qtyMin > 0 && (
-                  <Ribbon
-                    color="warning"
-                    text={`Order ${discount.qtyMin}, Free ${discount.qtyFree}`}
-                  />
+                  <Ribbon color="warning" text={`Order ${discount.qtyMin}, Free ${discount.qtyFree}`} />
                 )}
               </>
             )
@@ -242,10 +248,10 @@ export default function ProductCard({ id, name, image, price, productionPrice, v
             sx={{
               width: 1,
               lineHeight: 0,
-              display: "block",
-              overflow: "hidden",
-              position: "relative",
-              pt: "calc(100% / 4 * 3)",
+              display: 'block',
+              overflow: 'hidden',
+              position: 'relative',
+              pt: 'calc(100% / 4 * 3)',
             }}
           >
             <Box
@@ -256,11 +262,15 @@ export default function ProductCard({ id, name, image, price, productionPrice, v
                 right: 0,
                 bottom: 0,
                 lineHeight: 0,
-                position: "absolute",
-                backgroundSize: "cover !important",
+                position: 'absolute',
+                backgroundSize: 'cover !important',
               }}
             >
-              <img src={image} alt={image} style={{ opacity: isAvailable ? "1" : "0.5", width: "100%", height: "100%", objectFit: "cover" }} />
+              <img
+                src={image}
+                alt={image}
+                style={{ opacity: isAvailable ? '1' : '0.5', width: '100%', height: '100%', objectFit: 'cover' }}
+              />
             </Box>
           </Box>
         </Box>
@@ -269,7 +279,7 @@ export default function ProductCard({ id, name, image, price, productionPrice, v
           ref={contentRef}
           variant="subtitle2"
           noWrap
-          sx={{ my: 1, px: 2, visibility: "hidden", position: "absolute", }}
+          sx={{ my: 1, px: 2, visibility: 'hidden', position: 'absolute' }}
         >
           {name}
         </Typography>
@@ -279,21 +289,40 @@ export default function ProductCard({ id, name, image, price, productionPrice, v
             ref={wrapperRef}
             variant="subtitle2"
             noWrap
-            sx={{ my: 1, px: 2, textDecoration: isAvailable ? "none" : "line-through" }}
+            sx={{ my: 1, px: 2, textDecoration: isAvailable ? 'none' : 'line-through' }}
           >
             {isOverflow ? (
               <Marquee>
-                <span style={{ marginRight: 10 }}>
-                  {name}
-                </span>
+                <span style={{ marginRight: 10 }}>{name}</span>
               </Marquee>
             ) : (
-              <span>
-                {name}
-              </span>
+              <span>{name}</span>
             )}
           </Typography>
         </Tooltip>
+
+        {isSelected && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 8,
+              left: 8,
+              zIndex: 10,
+              bgcolor: 'primary.main',
+              color: 'white',
+              borderRadius: '50%',
+              width: 24,
+              height: 24,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 12,
+              fontWeight: 700,
+            }}
+          >
+            {findQty()}
+          </Box>
+        )}
       </Card>
 
       <ProductDialog
