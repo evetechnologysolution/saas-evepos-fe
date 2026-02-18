@@ -59,6 +59,8 @@ export const mainContext = createContext({
   setGeneralPerfume: () => {},
   getGeneralPerfume: () => {},
   saveGeneralPerfume: () => {},
+  selectedSubs: {},
+  setSelectedSubs: () => {},
 });
 
 const MainContextProvider = ({ children }) => {
@@ -72,6 +74,8 @@ const MainContextProvider = ({ children }) => {
 
   const [generalSettings, setGeneralSettings] = useState({});
   const [generalPerfume, setGeneralPerfume] = useState({});
+
+  const [selectedSubs, setSelectedSubs] = useState({});
 
   // Fetch notification
   // const { data: allNotif } = useQuery(
@@ -541,6 +545,8 @@ const MainContextProvider = ({ children }) => {
         setGeneralPerfume,
         getGeneralPerfume,
         saveGeneralPerfume,
+        selectedSubs,
+        setSelectedSubs,
       }}
     >
       {children}

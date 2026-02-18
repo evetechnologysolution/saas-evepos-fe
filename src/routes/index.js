@@ -673,8 +673,16 @@ export default function Router() {
             {
               path: '',
               element: (
-                <RoleBasedGuard hasContent roles={['owner', 'admin']}>
+                <RoleBasedGuard hasContent roles={['owner']}>
                   <Subscription />
+                </RoleBasedGuard>
+              ),
+            },
+            {
+              path: 'checkout',
+              element: (
+                <RoleBasedGuard hasContent roles={['owner']}>
+                  <Checkout />
                 </RoleBasedGuard>
               ),
             },
@@ -773,6 +781,7 @@ const ProfileBankEdit = Loadable(lazy(() => import('../pages/user-profile/bank/B
 
 // SUBSCRIPTION
 const Subscription = Loadable(lazy(() => import('../pages/subscription/Subscription')));
+const Checkout = Loadable(lazy(() => import('../pages/subscription/Checkout')));
 
 // CASH
 const CashCashier = Loadable(lazy(() => import('../pages/cash-cashier/CashCashier')));
