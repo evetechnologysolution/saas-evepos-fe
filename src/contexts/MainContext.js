@@ -86,7 +86,7 @@ const MainContextProvider = ({ children }) => {
   // );
 
   // Fetch product data
-  const { data: product = [] } = useQuery(
+  const { data: product = [], isLoading: loadingProduct } = useQuery(
     ['allProduct'],
     async () => {
       const res = await axios.get('/product/all');
@@ -495,6 +495,7 @@ const MainContextProvider = ({ children }) => {
         setSocket,
         allNotif,
         product,
+        loadingProduct,
         createProduct,
         updateProduct,
         deleteProduct,
