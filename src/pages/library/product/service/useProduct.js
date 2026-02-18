@@ -25,6 +25,7 @@ export default function useProduct() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries('allProduct');
     },
   });
 

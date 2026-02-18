@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 // @mui
 import {
   Alert,
@@ -14,31 +14,31 @@ import {
   TablePagination,
   TextField,
   InputAdornment,
-} from "@mui/material";
-import { LoadingButton } from "@mui/lab";
+} from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
-import Scrollbar from "../../../../components/Scrollbar";
-import Label from "../../../../components/Label";
-import Iconify from "../../../../components/Iconify";
-import { TableHeadCustom, TableNoData } from "../../../../components/table";
+import Scrollbar from '../../../../components/Scrollbar';
+import Label from '../../../../components/Label';
+import Iconify from '../../../../components/Iconify';
+import { TableHeadCustom, TableNoData } from '../../../../components/table';
 // sections
-import HistoryOrderTableRow from "./HistoryOrderTableRow";
+import HistoryOrderTableRow from './HistoryOrderTableRow';
 // utils
-import axios from "../../../../utils/axios";
-import { numberWithCommas } from "../../../../utils/getData";
+import axios from '../../../../utils/axios';
+import { numberWithCommas } from '../../../../utils/getData';
 
 // ----------------------------------------------------------------------
 
 const ORDER_THEAD = [
-  { id: "date", label: "Order Date", align: "center" },
-  { id: "paymentDate", label: "Payment Date", align: "center" },
-  { id: "orderId", label: "Order ID", align: "left" },
-  { id: "customer", label: "Customer", align: "left" },
-  { id: "firstOrder", label: "Customer Status", align: "center" },
-  { id: "status", label: "Status", align: "center" },
-  { id: "billedAmount", label: "Total", align: "center" },
+  { id: 'date', label: 'Order Date', align: 'center' },
+  { id: 'paymentDate', label: 'Payment Date', align: 'center' },
+  { id: 'orderId', label: 'Order ID', align: 'left' },
+  { id: 'customer', label: 'Customer', align: 'left' },
+  { id: 'firstOrder', label: 'Customer Status', align: 'center' },
+  { id: 'status', label: 'Status', align: 'center' },
+  { id: 'billedAmount', label: 'Total', align: 'center' },
 ];
 
 // ----------------------------------------------------------------------
@@ -54,7 +54,7 @@ export default function HistoryForm() {
 
   const [controllerOrder, setControllerOrder] = useState({
     page: 0,
-    rowsPerPage: 25
+    rowsPerPage: 25,
   });
 
   const isNotFoundOrder = !orderData.length;
@@ -62,7 +62,7 @@ export default function HistoryForm() {
   const handlePageChangeOrder = (event, newPage) => {
     setControllerOrder({
       ...controllerOrder,
-      page: newPage
+      page: newPage,
     });
   };
 
@@ -70,7 +70,7 @@ export default function HistoryForm() {
     setControllerOrder({
       ...controllerOrder,
       rowsPerPage: parseInt(event.target.value, 10),
-      page: 0
+      page: 0,
     });
   };
 
@@ -82,7 +82,7 @@ export default function HistoryForm() {
     setEndDate(null);
 
     handlePageChangeOrder(e, 0);
-  }
+  };
 
   const handleSearch = async () => {
     if (!startDate || !endDate) {
@@ -94,8 +94,8 @@ export default function HistoryForm() {
 
       // Melakukan permintaan API paralel
       const [res1, res2] = await Promise.all([
-        axios.get("/orders/track-count", { params: { start: startDate, end: endDate } }),
-        axios.get("/orders/track", { params: { start: startDate, end: endDate, perPage: 25 } }),
+        axios.get('/order/track-count', { params: { start: startDate, end: endDate } }),
+        axios.get('/order/track', { params: { start: startDate, end: endDate, perPage: 25 } }),
       ]);
 
       // Validasi hasil respons
@@ -109,9 +109,8 @@ export default function HistoryForm() {
       setOrderData(res2.data.docs);
       setCountOrder(res2.data.totalDocs);
       setIsEmpty(false);
-
     } catch (error) {
-      if (error.message === "Data not found") {
+      if (error.message === 'Data not found') {
         setIsEmpty(true);
         resetData();
       }
@@ -124,17 +123,19 @@ export default function HistoryForm() {
   useEffect(() => {
     const getData = async () => {
       try {
-        await axios.get("/orders/track", {
-          params: {
-            start: startDate,
-            end: endDate,
-            page: controllerOrder.page + 1,
-            perPage: controllerOrder.rowsPerPage
-          }
-        }).then((response) => {
-          setOrderData(response.data.docs);
-          setCountOrder(response.data.totalDocs);
-        });
+        await axios
+          .get('/order/track', {
+            params: {
+              start: startDate,
+              end: endDate,
+              page: controllerOrder.page + 1,
+              perPage: controllerOrder.rowsPerPage,
+            },
+          })
+          .then((response) => {
+            setOrderData(response.data.docs);
+            setCountOrder(response.data.totalDocs);
+          });
       } catch (error) {
         console.log(error);
       }
@@ -200,19 +201,14 @@ export default function HistoryForm() {
             </LocalizationProvider>
           </div>
           <Stack direction="row" alignItems="center" gap={1}>
-            <LoadingButton
-              title="Search"
-              variant="contained"
-              loading={loading}
-              onClick={() => handleSearch()}
-            >
+            <LoadingButton title="Search" variant="contained" loading={loading} onClick={() => handleSearch()}>
               <Iconify icon="eva:search-fill" sx={{ width: 25, height: 25 }} />
             </LoadingButton>
             <Button
               title="Reset"
               variant="contained"
               color="warning"
-              sx={{ color: "white" }}
+              sx={{ color: 'white' }}
               onClick={() => {
                 setIsEmpty(false);
                 resetData();
@@ -232,14 +228,12 @@ export default function HistoryForm() {
           <Stack>
             <Typography variant="subtitle2">Total</Typography>
             <div>
-              <Label
-                variant="ghost"
-                color="primary"
-                sx={{ minWidth: 60 }}
-              >
+              <Label variant="ghost" color="primary" sx={{ minWidth: 60 }}>
                 <Stack flexDirection="row" justifyContent="space-between" width="100%">
-                  <Iconify icon="solar:user-id-bold" sx={{ width: 20, height: 20 }} />{" "}
-                  <Typography variant="subtitle2" sx={{ fontStyle: "italic" }}>{numberWithCommas(data?.new + data?.old || 0)}</Typography>
+                  <Iconify icon="solar:user-id-bold" sx={{ width: 20, height: 20 }} />{' '}
+                  <Typography variant="subtitle2" sx={{ fontStyle: 'italic' }}>
+                    {numberWithCommas(data?.new + data?.old || 0)}
+                  </Typography>
                 </Stack>
               </Label>
             </div>
@@ -247,15 +241,15 @@ export default function HistoryForm() {
           <Stack>
             <Typography variant="subtitle2">Baru</Typography>
             <div>
-              <Label
-                variant="ghost"
-                color="success"
-                sx={{ minWidth: 150 }}
-              >
+              <Label variant="ghost" color="success" sx={{ minWidth: 150 }}>
                 <Stack flexDirection="row" justifyContent="space-between" width="100%">
-                  <Iconify icon="solar:user-id-bold" sx={{ width: 20, height: 20 }} />{" "}
-                  <Typography variant="subtitle2" sx={{ fontStyle: "italic" }}>{numberWithCommas(data?.new || 0)}</Typography>
-                  <Typography variant="subtitle2" sx={{ fontStyle: "italic" }}>{`(${((data?.new / (data?.new + data?.old)) * 100 || 0).toFixed(2)}%)`}</Typography>
+                  <Iconify icon="solar:user-id-bold" sx={{ width: 20, height: 20 }} />{' '}
+                  <Typography variant="subtitle2" sx={{ fontStyle: 'italic' }}>
+                    {numberWithCommas(data?.new || 0)}
+                  </Typography>
+                  <Typography variant="subtitle2" sx={{ fontStyle: 'italic' }}>{`(${(
+                    (data?.new / (data?.new + data?.old)) * 100 || 0
+                  ).toFixed(2)}%)`}</Typography>
                 </Stack>
               </Label>
             </div>
@@ -263,15 +257,15 @@ export default function HistoryForm() {
           <Stack>
             <Typography variant="subtitle2">Lama</Typography>
             <div>
-              <Label
-                variant="ghost"
-                color="warning"
-                sx={{ minWidth: 150 }}
-              >
+              <Label variant="ghost" color="warning" sx={{ minWidth: 150 }}>
                 <Stack flexDirection="row" justifyContent="space-between" width="100%">
-                  <Iconify icon="solar:user-id-bold" sx={{ width: 20, height: 20 }} />{" "}
-                  <Typography variant="subtitle2" sx={{ fontStyle: "italic" }}>{numberWithCommas(data?.old || 0)}</Typography>
-                  <Typography variant="subtitle2" sx={{ fontStyle: "italic" }}>{`(${((data?.old / (data?.new + data?.old)) * 100 || 0).toFixed(2)}%)`}</Typography>
+                  <Iconify icon="solar:user-id-bold" sx={{ width: 20, height: 20 }} />{' '}
+                  <Typography variant="subtitle2" sx={{ fontStyle: 'italic' }}>
+                    {numberWithCommas(data?.old || 0)}
+                  </Typography>
+                  <Typography variant="subtitle2" sx={{ fontStyle: 'italic' }}>{`(${(
+                    (data?.old / (data?.new + data?.old)) * 100 || 0
+                  ).toFixed(2)}%)`}</Typography>
                 </Stack>
               </Label>
             </div>
@@ -281,22 +275,18 @@ export default function HistoryForm() {
         {/* order history */}
         <div>
           <Divider sx={{ my: 3 }} />
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>Order History</Typography>
+          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+            Order History
+          </Typography>
           <Box>
             <Scrollbar>
-              <TableContainer sx={{ minWidth: 980, position: "relative" }}>
+              <TableContainer sx={{ minWidth: 980, position: 'relative' }}>
                 <Table size="small">
-                  <TableHeadCustom
-                    headLabel={ORDER_THEAD}
-                    rowCount={orderData.length}
-                  />
+                  <TableHeadCustom headLabel={ORDER_THEAD} rowCount={orderData.length} />
 
                   <TableBody>
                     {orderData.map((row) => (
-                      <HistoryOrderTableRow
-                        key={row._id}
-                        row={row}
-                      />
+                      <HistoryOrderTableRow key={row._id} row={row} />
                     ))}
 
                     <TableNoData isNotFound={isNotFoundOrder} />
@@ -305,7 +295,7 @@ export default function HistoryForm() {
               </TableContainer>
             </Scrollbar>
 
-            <Box sx={{ position: "relative" }}>
+            <Box sx={{ position: 'relative' }}>
               <TablePagination
                 rowsPerPageOptions={[25, 50, 100]}
                 component="div"
@@ -318,8 +308,7 @@ export default function HistoryForm() {
             </Box>
           </Box>
         </div>
-
-      </Card >
+      </Card>
     </>
   );
 }

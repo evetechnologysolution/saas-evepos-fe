@@ -34,7 +34,7 @@ export default function CategoryForm({ methods, onSubmit, type, isSubmitting, se
                 <div>
                   <Typography sx={{ mb: 1, ml: 2 }}>List Number</Typography>
                   <Stack display="grid" gap={1} gridTemplateColumns="repeat(auto-fit, 80px)">
-                    {formState?.selectedList?.length === 0 ? (
+                    {formState?.selectedList?.length === 0 && type !== 'create' ? (
                       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                         <CircularProgress />
                       </Box>
