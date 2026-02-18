@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 // @mui
-import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, IconButton, Stack, Typography } from '@mui/material';
 // horizontal scroll
 import { ScrollMenu } from 'react-horizontal-scrolling-menu';
 import 'react-horizontal-scrolling-menu/dist/styles.css';
@@ -114,13 +114,16 @@ export default function CashierPosProduct() {
       </Box>
       <Scrollbar>
         <Box sx={{ height: '71vh', position: 'relative' }}>
-          {/* <Products category={selectedCategory} items={currProduct} /> */}
-          {currProduct?.length > 0 ? (
+          {ctm.loadingProduct ? (
+            <Box display="flex" justifyContent="center" py={6}>
+              <CircularProgress />
+            </Box>
+          ) : currProduct?.length > 0 ? (
             <Products items={currProduct} />
           ) : (
             <Box py={12}>
               <Typography textAlign="center">
-                Kamu belum memiliki produk. Mohon refresh jika anda sudah punya produk.
+                Kamu belum memiliki produk. Mohon refresh jika Anda sudah punya produk.
               </Typography>
             </Box>
           )}
