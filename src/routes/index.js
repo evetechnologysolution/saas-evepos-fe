@@ -119,7 +119,7 @@ export default function Router() {
             {
               path: 'scan-voucher',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Cashier', 'Admin Bazaar', 'Staff Bazaar']}>
+                <RoleBasedGuard hasContent roles={['super admin', 'admin', 'Cashier', 'Admin Bazaar', 'Staff Bazaar']}>
                   <VoucherScan />
                 </RoleBasedGuard>
               ),
@@ -155,7 +155,7 @@ export default function Router() {
                 {
                   path: 'delivery',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'Cashier']}>
                       <CashierDelivery />
                     </RoleBasedGuard>
                   ),
@@ -163,7 +163,7 @@ export default function Router() {
                 {
                   path: 'delivery/:id/edit',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'Cashier']}>
                       <CashierDeliveryEdit />
                     </RoleBasedGuard>
                   ),
@@ -192,7 +192,7 @@ export default function Router() {
                 {
                   path: '',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'Cashier']}>
                       <CustomerList />
                     </RoleBasedGuard>
                   ),
@@ -200,7 +200,7 @@ export default function Router() {
                 {
                   path: 'new',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'Cashier']}>
                       <CustomerCreate />
                     </RoleBasedGuard>
                   ),
@@ -208,7 +208,7 @@ export default function Router() {
                 {
                   path: ':id/edit',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'Cashier']}>
                       <CustomerEdit />
                     </RoleBasedGuard>
                   ),
@@ -216,7 +216,7 @@ export default function Router() {
                 {
                   path: ':id/view',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'Cashier']}>
                       <CustomerView />
                     </RoleBasedGuard>
                   ),
@@ -230,7 +230,7 @@ export default function Router() {
                 {
                   path: 'list',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'Cashier']}>
                       <MemberList />
                     </RoleBasedGuard>
                   ),
@@ -238,7 +238,7 @@ export default function Router() {
                 {
                   path: 'log-voucher',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'Cashier']}>
                       <MemberLogVoucher />
                     </RoleBasedGuard>
                   ),
@@ -246,7 +246,7 @@ export default function Router() {
                 {
                   path: 'new',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'Cashier']}>
                       <MemberCreate />
                     </RoleBasedGuard>
                   ),
@@ -254,7 +254,7 @@ export default function Router() {
                 {
                   path: ':id/edit',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'Cashier']}>
                       <MemberEdit />
                     </RoleBasedGuard>
                   ),
@@ -262,7 +262,7 @@ export default function Router() {
                 {
                   path: ':id/view',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'Cashier']}>
                       <MemberView />
                     </RoleBasedGuard>
                   ),
@@ -272,7 +272,7 @@ export default function Router() {
             {
               path: 'expense',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Cashier']}>
+                <RoleBasedGuard hasContent roles={['super admin', 'admin', 'Cashier']}>
                   <ExpenseData />
                 </RoleBasedGuard>
               ),
@@ -404,7 +404,7 @@ export default function Router() {
                 {
                   path: 'special-promotion',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'admin']}>
                       <LibrarySpecialPromotion />
                     </RoleBasedGuard>
                   ),
@@ -412,7 +412,7 @@ export default function Router() {
                 {
                   path: 'special-promotion/new',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'admin']}>
                       <LibrarySpecialPromotionCreate />
                     </RoleBasedGuard>
                   ),
@@ -420,7 +420,7 @@ export default function Router() {
                 {
                   path: 'special-promotion/:id/edit',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'admin']}>
                       <LibrarySpecialPromotionEdit />
                     </RoleBasedGuard>
                   ),
@@ -428,7 +428,7 @@ export default function Router() {
                 {
                   path: 'voucher',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'admin']}>
                       <LibraryVoucher />
                     </RoleBasedGuard>
                   ),
@@ -436,7 +436,7 @@ export default function Router() {
                 {
                   path: 'voucher/new',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'admin']}>
                       <LibraryVoucherCreate />
                     </RoleBasedGuard>
                   ),
@@ -444,7 +444,7 @@ export default function Router() {
                 {
                   path: 'voucher/:id/edit',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'admin']}>
                       <LibraryVoucherEdit />
                     </RoleBasedGuard>
                   ),
@@ -452,7 +452,7 @@ export default function Router() {
                 {
                   path: 'discount',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'admin', 'Admin Bazaar', 'Staff Bazaar']}>
                       <LibraryDiscount />
                     </RoleBasedGuard>
                   ),
@@ -534,19 +534,6 @@ export default function Router() {
               ],
             },
             {
-              path: 'list/gallery',
-              children: [
-                {
-                  path: '',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin']}>
-                      <Subscription />
-                    </RoleBasedGuard>
-                  ),
-                },
-              ],
-            },
-            {
               path: 'profile',
               element: (
                 <RoleBasedGuard>
@@ -565,7 +552,7 @@ export default function Router() {
             {
               path: 'cash-cashier',
               element: (
-                <RoleBasedGuard hasContent roles={['Super Admin', 'Cashier']}>
+                <RoleBasedGuard hasContent roles={['super admin', 'Cashier']}>
                   <CashCashier />
                 </RoleBasedGuard>
               ),
@@ -585,7 +572,7 @@ export default function Router() {
                 {
                   path: 'member-point/:id/view',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'admin']}>
                       <MemberPointView />
                     </RoleBasedGuard>
                   ),
@@ -593,7 +580,7 @@ export default function Router() {
                 // {
                 //   path: "neraca",
                 //   element: (
-                //     <RoleBasedGuard hasContent roles={["Super Admin", "Admin"]}>
+                //     <RoleBasedGuard hasContent roles={["super admin", "admin"]}>
                 //       <Neraca />
                 //     </RoleBasedGuard>
                 //   ),
@@ -601,7 +588,7 @@ export default function Router() {
                 {
                   path: 'profit-loss',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'admin']}>
                       <ProfitLoss />
                     </RoleBasedGuard>
                   ),
@@ -609,7 +596,7 @@ export default function Router() {
                 {
                   path: 'cash-flow',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'admin']}>
                       <CashFlow />
                     </RoleBasedGuard>
                   ),
@@ -641,7 +628,7 @@ export default function Router() {
                 {
                   path: 'staff-performance',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'admin']}>
                       <StaffPerformance />
                     </RoleBasedGuard>
                   ),
@@ -655,7 +642,7 @@ export default function Router() {
                 {
                   path: 'general-setting',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'admin']}>
                       <Settings />
                     </RoleBasedGuard>
                   ),
@@ -663,7 +650,7 @@ export default function Router() {
                 {
                   path: 'tax',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'admin']}>
                       <Tax />
                     </RoleBasedGuard>
                   ),
@@ -671,141 +658,8 @@ export default function Router() {
                 {
                   path: 'receipt-setting',
                   element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin']}>
+                    <RoleBasedGuard hasContent roles={['super admin', 'admin']}>
                       <ReceiptSetting />
-                    </RoleBasedGuard>
-                  ),
-                },
-              ],
-            },
-            {
-              path: 'content',
-              children: [
-                { element: <Navigate to="/dashboard/content/blog" replace />, index: true },
-                {
-                  path: 'blog',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
-                      <ListBlog />
-                    </RoleBasedGuard>
-                  ),
-                },
-                {
-                  path: 'blog/new',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
-                      <BlogCreate />
-                    </RoleBasedGuard>
-                  ),
-                },
-                {
-                  path: 'blog/:id/edit',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
-                      <BlogEdit />
-                    </RoleBasedGuard>
-                  ),
-                },
-                {
-                  path: 'gallery',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
-                      <ListGallery />
-                    </RoleBasedGuard>
-                  ),
-                },
-                {
-                  path: 'gallery/new',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
-                      <GalleryCreate />
-                    </RoleBasedGuard>
-                  ),
-                },
-                {
-                  path: 'gallery/:id/edit',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
-                      <GalleryEdit />
-                    </RoleBasedGuard>
-                  ),
-                },
-                {
-                  path: 'category',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Content Writer']}>
-                      <BlogCategory />
-                    </RoleBasedGuard>
-                  ),
-                },
-              ],
-            },
-            // bazaar
-            {
-              path: 'bazaar',
-              children: [
-                { element: <Navigate to="/dashboard/bazaar/stand" replace />, index: true },
-                {
-                  path: 'stand',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
-                      <BazaarStand />
-                    </RoleBasedGuard>
-                  ),
-                },
-                {
-                  path: 'stand/new',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
-                      <BazaarStandCreate />
-                    </RoleBasedGuard>
-                  ),
-                },
-                {
-                  path: 'stand/:id/edit',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
-                      <BazaarStandEdit />
-                    </RoleBasedGuard>
-                  ),
-                },
-                {
-                  path: 'master-voucher',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
-                      <BazaarVoucher />
-                    </RoleBasedGuard>
-                  ),
-                },
-                {
-                  path: 'master-voucher/new',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
-                      <BazaarVoucherCreate />
-                    </RoleBasedGuard>
-                  ),
-                },
-                {
-                  path: 'master-voucher/:id/edit',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
-                      <BazaarVoucherEdit />
-                    </RoleBasedGuard>
-                  ),
-                },
-                {
-                  path: 'log',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
-                      <BazaarLog />
-                    </RoleBasedGuard>
-                  ),
-                },
-                {
-                  path: 'voucher-log',
-                  element: (
-                    <RoleBasedGuard hasContent roles={['Super Admin', 'Admin', 'Admin Bazaar', 'Staff Bazaar']}>
-                      <BazaarLogVoucher />
                     </RoleBasedGuard>
                   ),
                 },
@@ -839,27 +693,6 @@ export default function Router() {
     { path: '*', element: <Navigate to="/404" replace /> },
   ]);
 }
-
-// Bazaar
-const BazaarStand = Loadable(lazy(() => import('../pages/bazaar/stand/BazaarStand')));
-const BazaarStandCreate = Loadable(lazy(() => import('../pages/bazaar/stand/BazaarStandCreate')));
-const BazaarStandEdit = Loadable(lazy(() => import('../pages/bazaar/stand/BazaarStandEdit')));
-const BazaarVoucher = Loadable(lazy(() => import('../pages/bazaar/voucher/BazaarVoucher')));
-const BazaarVoucherCreate = Loadable(lazy(() => import('../pages/bazaar/voucher/BazaarVoucherCreate')));
-const BazaarVoucherEdit = Loadable(lazy(() => import('../pages/bazaar/voucher/BazaarVoucherEdit')));
-const BazaarLog = Loadable(lazy(() => import('../pages/bazaar/log/BazaarLog')));
-const BazaarLogVoucher = Loadable(lazy(() => import('../pages/bazaar/log-voucher/BazaarLogVoucher')));
-
-// Gallery
-const GalleryCreate = Loadable(lazy(() => import('../pages/gallery/Gallery')));
-const ListGallery = Loadable(lazy(() => import('../pages/gallery/TableGallery')));
-const GalleryEdit = Loadable(lazy(() => import('../pages/gallery/GalleryEdit')));
-
-// Blog
-const ListBlog = Loadable(lazy(() => import('../pages/blog/TableBlog')));
-const BlogCreate = Loadable(lazy(() => import('../pages/blog/Blog')));
-const BlogEdit = Loadable(lazy(() => import('../pages/blog/BlogEdit')));
-const BlogCategory = Loadable(lazy(() => import('../pages/category/TableCategory')));
 
 // Login
 const Login = Loadable(lazy(() => import('../pages/auth/Login')));
@@ -895,17 +728,6 @@ const MemberCreate = Loadable(lazy(() => import('../pages/member/list/MemberCrea
 const MemberEdit = Loadable(lazy(() => import('../pages/member/list/MemberEdit')));
 const MemberView = Loadable(lazy(() => import('../pages/member/list/MemberView')));
 const MemberLogVoucher = Loadable(lazy(() => import('../pages/member/log-voucher/MemberLogVoucher')));
-const MemberPostcard = Loadable(lazy(() => import('../pages/member/postcard/MemberPostcard')));
-const MemberCard = Loadable(lazy(() => import('../pages/memberCard/memberCard')));
-
-// Track History
-const History = Loadable(lazy(() => import('../pages/history/HistoryView')));
-
-// Track History Order
-const HistoryOrder = Loadable(lazy(() => import('../pages/history/HistoryOrderView')));
-
-// Print Count
-const PrintCount = Loadable(lazy(() => import('../pages/print-count/PrintCount')));
 
 // Library
 const LibraryProduct = Loadable(lazy(() => import('../pages/library/product/LibraryProduct')));
@@ -920,10 +742,6 @@ const LibrarySubCategoryEdit = Loadable(lazy(() => import('../pages/library/subc
 const LibraryVariant = Loadable(lazy(() => import('../pages/library/variant/LibraryVariant')));
 const LibraryVariantCreate = Loadable(lazy(() => import('../pages/library/variant/LibraryVariantCreate')));
 const LibraryVariantEdit = Loadable(lazy(() => import('../pages/library/variant/LibraryVariantEdit')));
-const LibraryPerfume = Loadable(lazy(() => import('../pages/library/perfume/PerfumeForm')));
-const LibraryBanner = Loadable(lazy(() => import('../pages/library/banner/LibraryBanner')));
-const LibraryBannerCreate = Loadable(lazy(() => import('../pages/library/banner/LibraryBannerCreate')));
-const LibraryBannerEdit = Loadable(lazy(() => import('../pages/library/banner/LibraryBannerEdit')));
 const LibraryPromotion = Loadable(lazy(() => import('../pages/library/promotion/LibraryPromotion')));
 const LibraryPromotionCreate = Loadable(lazy(() => import('../pages/library/promotion/LibraryPromotionCreate')));
 const LibraryPromotionEdit = Loadable(lazy(() => import('../pages/library/promotion/LibraryPromotionEdit')));
