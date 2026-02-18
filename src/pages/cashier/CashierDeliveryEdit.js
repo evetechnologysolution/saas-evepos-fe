@@ -16,40 +16,40 @@ import OrdersForm from '../../sections/@dashboard/cashier/delivery/OrdersForm';
 // ----------------------------------------------------------------------
 
 export default function CashierDeliveryEdit() {
-    const { themeStretch } = useSettings();
+  const { themeStretch } = useSettings();
 
-    const { id = '' } = useParams();
+  const { id = '' } = useParams();
 
-    const [currentData, setCurrentData] = useState({});
+  const [currentData, setCurrentData] = useState({});
 
-    useEffect(() => {
-        const getData = async () => {
-            try {
-                await axios.get(`/orders/${id}`).then((response) => {
-                    setCurrentData(response.data);
-                });
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        getData();
-    }, [id]);
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        await axios.get(`/order/${id}`).then((response) => {
+          setCurrentData(response.data);
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getData();
+  }, [id]);
 
-    return (
-        <Page title="Delivery: Edit">
-            <Container maxWidth={themeStretch ? false : 'xl'}>
-                <HeaderBreadcrumbs
-                    heading='Edit Delivery'
-                    links={[
-                        { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                        { name: 'Cashier', href: PATH_DASHBOARD.cashier.root },
-                        { name: 'Delivery', href: PATH_DASHBOARD.cashier.delivery },
-                        { name: 'Edit' },
-                    ]}
-                />
+  return (
+    <Page title="Delivery: Edit">
+      <Container maxWidth={themeStretch ? false : 'xl'}>
+        <HeaderBreadcrumbs
+          heading="Edit Delivery"
+          links={[
+            { name: 'Dashboard', href: PATH_DASHBOARD.root },
+            { name: 'Cashier', href: PATH_DASHBOARD.cashier.root },
+            { name: 'Delivery', href: PATH_DASHBOARD.cashier.delivery },
+            { name: 'Edit' },
+          ]}
+        />
 
-                <OrdersForm currentData={currentData} />
-            </Container>
-        </Page>
-    );
+        <OrdersForm currentData={currentData} />
+      </Container>
+    </Page>
+  );
 }

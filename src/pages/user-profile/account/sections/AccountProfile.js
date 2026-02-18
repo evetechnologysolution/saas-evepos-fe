@@ -6,10 +6,22 @@ import { useSnackbar } from 'notistack';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
-import { Box, Grid, Card, Stack, Typography, InputAdornment, IconButton, Divider, MenuItem } from '@mui/material';
+import {
+  Box,
+  Grid,
+  Card,
+  Stack,
+  Typography,
+  InputAdornment,
+  IconButton,
+  Divider,
+  MenuItem,
+  Alert,
+} from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { handleMutationFeedback } from 'src/utils/mutationfeedback';
 // components
+import { formatDate } from 'src/utils/getData';
 import Iconify from '../../../../components/Iconify';
 // hooks
 import useAuth from '../../../../hooks/useAuth';
@@ -29,6 +41,8 @@ export default function AccountProfile() {
   const { enqueueSnackbar } = useSnackbar();
 
   const { user } = useAuth();
+
+  const subscriptionExpiry = user?.tenantRef?.subsRef?.endDate;
 
   const { getById, update } = useService();
   const { data: dataUser, isSuccess, isLoading } = getById(user?._id);
@@ -163,6 +177,9 @@ export default function AccountProfile() {
 
   return (
     <Box>
+      <Alert sx={{ mb: 3 }} severity="warning">
+        Paket kamu akan berakhir pada {formatDate(subscriptionExpiry)}
+      </Alert>
       <FormProvider key={1} methods={methods} onSubmit={handleSubmit(onSubmit)}>
         <Card sx={{ p: 3 }}>
           <Grid container spacing={3}>

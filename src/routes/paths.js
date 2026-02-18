@@ -29,7 +29,7 @@ export const PATH_DASHBOARD = {
     root: path(ROOTS_DASHBOARD, '/cashier'),
     pos: path(ROOTS_DASHBOARD, '/cashier/pos'),
     orders: path(ROOTS_DASHBOARD, '/cashier/orders'),
-    ordersEdit: (id) => path(ROOTS_DASHBOARD, `/cashier/orders/${id}/edit`),
+    ordersEdit: (id) => path(ROOTS_DASHBOARD, `/cashier/order/${id}/edit`),
     delivery: path(ROOTS_DASHBOARD, '/cashier/delivery'),
     deliveryEdit: (id) => path(ROOTS_DASHBOARD, `/cashier/delivery/${id}/edit`),
   },

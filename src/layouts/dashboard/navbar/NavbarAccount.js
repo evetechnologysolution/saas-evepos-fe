@@ -91,7 +91,7 @@ export default function NavbarAccount({ isCollapse }) {
                 }),
               }}
             >
-              <Typography variant="caption" noWrap sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
                 {user?.tenantRef?.businessName} • {user?.role}
               </Typography>
 
