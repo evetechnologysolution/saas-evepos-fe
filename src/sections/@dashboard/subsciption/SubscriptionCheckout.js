@@ -1,5 +1,6 @@
-import React, { useState, useContext, useMemo, useEffect } from 'react';
+import React, { useContext, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 // @mui
 import { Button, Box, Card, Divider, Grid, Typography, Stack, Select, MenuItem } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
@@ -8,18 +9,25 @@ import Iconify from '../../../components/Iconify';
 // utils
 import { fCurrency } from '../../../utils/formatNumber';
 import { formatDate } from '../../../utils/getData';
+import { handleMutationFeedback } from '../../../utils/mutationfeedback';
 // context
 import { mainContext } from '../../../contexts/MainContext';
+// hooks
+import useAuth from '../../../hooks/useAuth';
+import useService from './service/useService';
 
 // ----------------------------------------------------------------------
 
 const shadow = '0 5px 20px 0 rgb(145 158 171 / 40%), 0 12px 40px -4px rgb(145 158 171 / 12%)';
 
 export default function SubscriptionCheckout() {
+  const { user } = useAuth();
+  const { create } = useService();
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   const ctx = useContext(mainContext);
 
-  const adminPrice = 10000;
+  const adminFee = 10000;
   const price = ctx.selectedSubs?.price ?? 0;
   const qty = ctx.selectedSubs?.qty ?? 1;
   const discount = ctx.selectedSubs?.discount ?? 0;
@@ -43,11 +51,11 @@ export default function SubscriptionCheckout() {
   }, [subPrice, discount]);
 
   const tax = useMemo(() => {
-    return (subPrice - discountAmount + adminPrice) * 0.11;
+    return (subPrice - discountAmount + adminFee) * 0.11;
   }, [subPrice, discountAmount]);
 
-  const total = useMemo(() => {
-    return subPrice - discountAmount + adminPrice + tax;
+  const billedAmount = useMemo(() => {
+    return subPrice - discountAmount + adminFee + tax;
   }, [subPrice, discountAmount, tax]);
 
   useEffect(() => {
@@ -64,11 +72,11 @@ export default function SubscriptionCheckout() {
     });
   }, [ctx.selectedSubs?.subsType]);
 
-  // useEffect(() => {
-  //   if (!ctx.selectedSubs?._id) {
-  //     navigate('/dashboard/subscription');
-  //   }
-  // }, [ctx.selectedSubs?._id]);
+  useEffect(() => {
+    if (!ctx.selectedSubs?._id) {
+      navigate('/dashboard/subscription');
+    }
+  }, [ctx.selectedSubs?._id]);
 
   const handleMinus = () => {
     ctx.setSelectedSubs((prev) => {
@@ -83,6 +91,48 @@ export default function SubscriptionCheckout() {
     ctx.setSelectedSubs((prev) => {
       if (!prev) return prev;
       return { ...prev, qty: (prev.qty ?? 1) + 1 };
+    });
+  };
+
+  const handleCheckout = async () => {
+    if (!user?.tenantRef?._id) return;
+
+    const { origin, _id, name, ...other } = ctx.selectedSubs;
+
+    const payload = {
+      ...other,
+      tenantRef: user?.tenantRef?._id,
+      subsRef: user?.tenantRef?.subsRef?._id,
+      serviceRef: _id,
+      serviceName: name,
+      startDate: today,
+      endDate: expired,
+      discount,
+      adminFee,
+      tax,
+      billedAmount,
+      customer: {
+        name: user?.tenantRef?.ownerName,
+        email: user?.tenantRef?.email || user?.email || '',
+        phone: user?.tenantRef?.phone || user?.phone || '',
+      },
+      baseUrl: window.location.origin,
+    };
+
+    const mutation = create.mutateAsync(payload);
+
+    await handleMutationFeedback(mutation, {
+      successMsg: 'Data berhasil dibuat!',
+      errorMsg: 'Gagal menyimpan data!',
+      onSuccess: (res) => {
+        // navigate(`/dashboard/invoice/${res?._id}/detail`);
+        navigate('/dashboard/subscription');
+        // Jika ada invoiceUrl, buka di tab baru
+        if (res?.invoiceUrl) {
+          window.open(res.invoiceUrl, '_blank', 'noopener,noreferrer');
+        }
+      },
+      enqueueSnackbar,
     });
   };
 
@@ -185,7 +235,7 @@ export default function SubscriptionCheckout() {
               </Stack>
               <Stack flexDirection="row" justifyContent="space-between" gap={1}>
                 <Typography variant="body2">Biaya Admin</Typography>
-                <Typography variant="subtitle2">{fCurrency(adminPrice)}</Typography>
+                <Typography variant="subtitle2">{fCurrency(adminFee)}</Typography>
               </Stack>
               <Stack flexDirection="row" justifyContent="space-between" gap={1}>
                 <Typography variant="body2">PPN 11%</Typography>
@@ -196,10 +246,12 @@ export default function SubscriptionCheckout() {
                   Total
                 </Typography>
                 <Typography variant="subtitle1" color="primary">
-                  {fCurrency(total)}
+                  {fCurrency(billedAmount)}
                 </Typography>
               </Stack>
-              <LoadingButton variant="contained">CHECKOUT</LoadingButton>
+              <LoadingButton variant="contained" onClick={() => handleCheckout()} loading={create.isLoading}>
+                CHECKOUT
+              </LoadingButton>
             </Stack>
           </Card>
         </Grid>

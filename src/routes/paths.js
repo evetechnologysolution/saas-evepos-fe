@@ -150,6 +150,11 @@ export const PATH_DASHBOARD = {
     root: path(ROOTS_DASHBOARD, '/subscription'),
     checkout: path(ROOTS_DASHBOARD, '/subscription/checkout'),
   },
+  payment: {
+    root: path(ROOTS_DASHBOARD, '/payment'),
+    success: (id) => path(ROOTS_DASHBOARD, `/payment/success/${id}`),
+    failed: (id) => path(ROOTS_DASHBOARD, `/payment/failed/${id}`),
+  },
   bazaar: {
     root: path(ROOTS_DASHBOARD, '/bazaar'),
     stand: path(ROOTS_DASHBOARD, '/bazaar/stand'),

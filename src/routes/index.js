@@ -688,6 +688,27 @@ export default function Router() {
             },
           ],
         },
+        {
+          path: 'payment',
+          children: [
+            {
+              path: 'success/:id',
+              element: (
+                <RoleBasedGuard hasContent roles={['owner']}>
+                  <PaymentSuccess />
+                </RoleBasedGuard>
+              ),
+            },
+            {
+              path: 'failed/:id',
+              element: (
+                <RoleBasedGuard hasContent roles={['owner']}>
+                  <PaymentFailed />
+                </RoleBasedGuard>
+              ),
+            },
+          ],
+        },
       ],
     },
     {
@@ -782,6 +803,8 @@ const ProfileBankEdit = Loadable(lazy(() => import('../pages/user-profile/bank/B
 // SUBSCRIPTION
 const Subscription = Loadable(lazy(() => import('../pages/subscription/Subscription')));
 const Checkout = Loadable(lazy(() => import('../pages/subscription/Checkout')));
+const PaymentSuccess = Loadable(lazy(() => import('../pages/subscription/Success')));
+const PaymentFailed = Loadable(lazy(() => import('../pages/subscription/Failed')));
 
 // CASH
 const CashCashier = Loadable(lazy(() => import('../pages/cash-cashier/CashCashier')));
