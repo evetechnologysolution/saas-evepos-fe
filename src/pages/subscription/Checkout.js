@@ -25,7 +25,7 @@ export default function Checkout() {
               name: 'Subscription',
               href: PATH_DASHBOARD.subscription.root,
             },
-            { name: 'checkout' },
+            { name: 'Checkout' },
           ]}
         />
 
