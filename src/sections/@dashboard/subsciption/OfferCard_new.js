@@ -1,4 +1,6 @@
 /* eslint-disable no-unused-vars */
+import { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 // @mui
 import { Box, Button, Card, Stack, Typography, Divider, Chip } from '@mui/material';
@@ -6,8 +8,10 @@ import { useTheme, alpha } from '@mui/material/styles';
 // utils
 import { fCurrency } from '../../../utils/formatNumber';
 // components
-import Label from '../../../components/Label';
+// import Label from '../../../components/Label';
 import Iconify from '../../../components/Iconify';
+// context
+import { mainContext } from '../../../contexts/MainContext';
 // ----------------------------------------------------------------------
 OfferCard.propTypes = {
   data: PropTypes.object,
@@ -17,6 +21,8 @@ OfferCard.propTypes = {
 
 export default function OfferCard({ data, isMonthly, isPopular = false }) {
   const theme = useTheme();
+  const ctx = useContext(mainContext);
+  const navigate = useNavigate();
 
   const formatLabel = (key) => key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
@@ -41,6 +47,23 @@ export default function OfferCard({ data, isMonthly, isPopular = false }) {
       default:
         return value;
     }
+  };
+
+  const handleSelected = (val) => {
+    const selected = {
+      _id: val?._id,
+      name: val?.name,
+      price: isMonthly ? monthlyCost : yearlyCost,
+      qty: 1,
+      subsType: isMonthly ? 'monthly' : 'yearly',
+      origin: {
+        price: val?.price,
+        discount: val?.discount,
+      },
+    };
+    // console.log(selected);
+    ctx.setSelectedSubs(selected);
+    navigate('/dashboard/subscription/checkout');
   };
 
   return (
@@ -218,6 +241,7 @@ export default function OfferCard({ data, isMonthly, isPopular = false }) {
               background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
             }),
           }}
+          onClick={() => handleSelected(data)}
         >
           {data.isActive ? 'Get Started' : 'Not Available'}
         </Button>
