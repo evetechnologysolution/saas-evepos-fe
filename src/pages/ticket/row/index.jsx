@@ -22,7 +22,7 @@ const CustomTableRow = styled(TableRow)(() => ({
 }));
 
 export default function UserTableRow({ row, onEditRow, onDeleteRow }) {
-  const { createdAt, title, status } = row;
+  const { createdAt, ticketId, title, status } = row;
 
   const STATUS_CONFIG = {
     open: { label: 'Open', color: 'success' },
@@ -38,6 +38,7 @@ export default function UserTableRow({ row, onEditRow, onDeleteRow }) {
   return (
     <CustomTableRow hover>
       <TableCell align="center">{formatDate2(createdAt)}</TableCell>
+      <TableCell align="left">{ticketId}</TableCell>
       <TableCell align="left">{title}</TableCell>
       <TableCell align="left">{getBadge(status)}</TableCell>
 

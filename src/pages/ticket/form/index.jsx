@@ -143,7 +143,7 @@ export default function TicketNewEditForm({ isEdit, currentData }) {
                     TICKET ID
                   </Typography>
                   <Typography variant="body2" fontWeight={600}>
-                    {currentData?._id}
+                    {currentData?.ticketId}
                   </Typography>
                 </Box>
               )}

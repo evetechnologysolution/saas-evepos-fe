@@ -37,6 +37,7 @@ import useTicket from './service/useTicket';
 
 const TABLE_HEAD = [
   { id: 'date', label: 'Date', align: 'center' },
+  { id: 'ticketId', label: 'Ticket ID', align: 'left' },
   { id: 'fullname', label: 'Title', align: 'left' },
   { id: 'username', label: 'Status', align: 'left' },
   { id: '', label: 'Action', align: 'center' },
@@ -66,6 +67,7 @@ export default function UserList() {
     page: controller.page + 1,
     perPage: controller.rowsPerPage,
     search: controller.search,
+    all: 0,
   });
 
   const handlePageChange = (event, newPage) => {
