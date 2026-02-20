@@ -148,6 +148,12 @@ export const PATH_DASHBOARD = {
   permissionDenied: path(ROOTS_DASHBOARD, '/permission-denied'),
   subscription: {
     root: path(ROOTS_DASHBOARD, '/subscription'),
+    checkout: path(ROOTS_DASHBOARD, '/subscription/checkout'),
+  },
+  payment: {
+    root: path(ROOTS_DASHBOARD, '/payment'),
+    success: (id) => path(ROOTS_DASHBOARD, `/payment/success/${id}`),
+    failed: (id) => path(ROOTS_DASHBOARD, `/payment/failed/${id}`),
   },
   bazaar: {
     root: path(ROOTS_DASHBOARD, '/bazaar'),
