@@ -22,7 +22,7 @@ const CustomTableRow = styled(TableRow)(() => ({
 }));
 
 export default function UserTableRow({ row, onEditRow, onDeleteRow }) {
-  const { createdAt, ticketId, title, status } = row;
+  const { createdAt, ticketId, title, status, module } = row;
 
   const STATUS_CONFIG = {
     open: { label: 'Open', color: 'success' },
@@ -39,6 +39,7 @@ export default function UserTableRow({ row, onEditRow, onDeleteRow }) {
     <CustomTableRow hover>
       <TableCell align="center">{formatDate2(createdAt)}</TableCell>
       <TableCell align="left">{ticketId}</TableCell>
+      <TableCell align="left">{module}</TableCell>
       <TableCell align="left">{title}</TableCell>
       <TableCell align="left">{getBadge(status)}</TableCell>
 
@@ -53,6 +54,17 @@ export default function UserTableRow({ row, onEditRow, onDeleteRow }) {
             }}
           >
             <Iconify icon="eva:edit-outline" sx={{ width: 24, height: 24 }} />
+          </Button>
+          <Button
+            title="Delete"
+            variant="contained"
+            color="error"
+            sx={{ p: 0, minWidth: 35, height: 35 }}
+            onClick={() => {
+              onDeleteRow();
+            }}
+          >
+            <Iconify icon="eva:trash-2-outline" sx={{ width: 24, height: 24 }} />
           </Button>
         </Stack>
       </TableCell>

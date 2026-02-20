@@ -7,12 +7,12 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { LoadingButton } from '@mui/lab';
-import { Card, Grid, Stack, Button, Box, Typography, alpha, useTheme } from '@mui/material';
+import { Card, Grid, Stack, Button, Box, Typography, alpha, useTheme, MenuItem } from '@mui/material';
 // routes
 import Iconify from 'src/components/Iconify';
 import { handleMutationFeedback } from 'src/utils/mutationfeedback';
 // components
-import { FormProvider, RHFTextField } from '../../../components/hook-form';
+import { FormProvider, RHFTextField, RHFSelect } from '../../../components/hook-form';
 // utils
 // schema & service
 import { ticketSchema } from '../schema';
@@ -33,6 +33,19 @@ const STATUS_OPTIONS = [
 
 const SUPPORTED_FORMATS_LABEL = 'JPG, JPEG, PNG, WEBP, PDF';
 const MAX_FILE_SIZE_LABEL = '5MB';
+
+const MODULE_LIST = [
+  'Dashboard',
+  'POS',
+  'Orders',
+  'Pickup',
+  'Scan Orders',
+  'Subscription',
+  'Report',
+  'Library',
+  'Profile',
+  'User',
+];
 
 export default function TicketNewEditForm({ isEdit, currentData }) {
   const navigate = useNavigate();
@@ -55,6 +68,7 @@ export default function TicketNewEditForm({ isEdit, currentData }) {
             status: currentData.status,
             reply: currentData.reply ?? '',
             attachment: null,
+            module: currentData?.module,
           }
         : {}),
     },
@@ -76,6 +90,7 @@ export default function TicketNewEditForm({ isEdit, currentData }) {
     formData.append('title', data.title);
     formData.append('body', data.body);
     formData.append('status', data.status);
+    formData.append('module', data.module);
     if (data.reply) {
       formData.append('reply', data.reply);
     }
@@ -175,6 +190,14 @@ export default function TicketNewEditForm({ isEdit, currentData }) {
                   </Typography>
                 </Box>
               </Box>
+
+              <RHFSelect name="module" label="Module" SelectProps={{ native: false }}>
+                {MODULE_LIST.map((value) => (
+                  <MenuItem key={value} value={value}>
+                    {value}
+                  </MenuItem>
+                ))}
+              </RHFSelect>
 
               {/* Reply / Admin Feedback */}
               {isEdit && (
@@ -372,6 +395,7 @@ export default function TicketNewEditForm({ isEdit, currentData }) {
                 <Box
                   sx={{
                     mt: 1,
+                    ml: 1,
                     px: 2,
                     py: 1,
                     borderRadius: 1.5,

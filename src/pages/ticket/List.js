@@ -38,6 +38,7 @@ import useTicket from './service/useTicket';
 const TABLE_HEAD = [
   { id: 'date', label: 'Date', align: 'center' },
   { id: 'ticketId', label: 'Ticket ID', align: 'left' },
+  { id: 'module', label: 'Module', align: 'left' },
   { id: 'fullname', label: 'Title', align: 'left' },
   { id: 'username', label: 'Status', align: 'left' },
   { id: '', label: 'Action', align: 'center' },
@@ -99,7 +100,7 @@ export default function UserList() {
 
     remove.mutate(selectedId, {
       onSuccess: () => {
-        enqueueSnackbar('User deleted!', { variant: 'success' });
+        enqueueSnackbar('Ticket deleted!', { variant: 'success' });
         setOpen(false);
       },
       onError: (err) => {

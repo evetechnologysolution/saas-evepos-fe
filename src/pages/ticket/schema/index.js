@@ -6,6 +6,7 @@ const SUPPORTED_FORMATS = ['image/jpg', 'image/jpeg', 'image/png', 'image/webp',
 export const ticketSchema = Yup.object().shape({
   title: Yup.string().required('Title wajib diisi').max(200, 'Title maksimal 200 karakter'),
   body: Yup.string().required('Deskripsi wajib diisi').max(2000, 'Deskripsi terlalu panjang'),
+  module: Yup.string().required(),
   status: Yup.string().default('open'),
   attachment: Yup.mixed()
     .nullable()
