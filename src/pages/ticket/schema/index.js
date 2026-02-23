@@ -8,6 +8,11 @@ export const ticketSchema = Yup.object().shape({
   body: Yup.string().required('Deskripsi wajib diisi').max(2000, 'Deskripsi terlalu panjang'),
   module: Yup.string().required(),
   status: Yup.string().default('open'),
+  message: Yup.object({
+    text: Yup.string().max(2000, 'Pesan terlalu panjang'),
+    isAdmin: Yup.boolean().default(false),
+    isTenant: Yup.boolean().default(true),
+  }),
   attachment: Yup.mixed()
     .nullable()
     .test('fileSize', 'Ukuran file maksimal 5MB', (value) => {
