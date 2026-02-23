@@ -32,6 +32,7 @@ import ConfirmDelete from '../../components/ConfirmDelete';
 import TableRow from './row';
 // context
 import useTicket from './service/useTicket';
+import TicketToolbar from './toolbar/ticket';
 
 // ----------------------------------------------------------------------
 
@@ -55,6 +56,22 @@ export default function UserList() {
 
   const [selectedId, setSelectedId] = useState('');
   const [open, setOpen] = useState(false);
+
+  const [search, setSearch] = useState('');
+
+  const handleSearch = (value) => {
+    setSearch(value);
+  };
+
+  const handleOnKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      setController({
+        page: 0,
+        rowsPerPage: controller.rowsPerPage,
+        search: search !== '' ? search : '',
+      });
+    }
+  };
 
   const [controller, setController] = useState({
     page: 0,
@@ -127,14 +144,7 @@ export default function UserList() {
               mb={2}
             >
               <div style={{ minWidth: '40%' }}>
-                {/* <UserTableToolbar
-                  filterName={search}
-                  onFilterName={handleSearch}
-                  filterRole={filterRole}
-                  onFilterRole={handleFilterRole}
-                  optionsRole={ROLE_OPTIONS}
-                  onEnter={handleOnKeyPress}
-                /> */}
+                <TicketToolbar filterName={search} onFilterName={handleSearch} onEnter={handleOnKeyPress} />
               </div>
               <Button
                 variant="contained"

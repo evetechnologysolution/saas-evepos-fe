@@ -1,10 +1,11 @@
 import PropTypes from 'prop-types';
 // @mui
-import { styled, Stack, Button, TableRow, TableCell, Chip } from '@mui/material';
+import { styled, Stack, Button, TableRow, TableCell, Chip, Link } from '@mui/material';
 // components
 // assets
 import Iconify from 'src/components/Iconify';
 import { formatDate2 } from 'src/utils/getData';
+import { useNavigate } from 'react-router';
 
 // ----------------------------------------------------------------------
 
@@ -22,7 +23,8 @@ const CustomTableRow = styled(TableRow)(() => ({
 }));
 
 export default function UserTableRow({ row, onEditRow, onDeleteRow }) {
-  const { createdAt, ticketId, title, status, module } = row;
+  const { createdAt, ticketId, title, status, module, _id } = row;
+  const navigate = useNavigate();
 
   const STATUS_CONFIG = {
     open: { label: 'Open', color: 'success' },
@@ -38,7 +40,16 @@ export default function UserTableRow({ row, onEditRow, onDeleteRow }) {
   return (
     <CustomTableRow hover>
       <TableCell align="center">{formatDate2(createdAt)}</TableCell>
-      <TableCell align="left">{ticketId}</TableCell>
+      <TableCell align="left">
+        <Link
+          component="button"
+          variant="subtitle2"
+          underline="hover"
+          onClick={() => navigate(`/dashboard/ticket/${_id}/detail`)}
+        >
+          {ticketId}
+        </Link>
+      </TableCell>
       <TableCell align="left">{module}</TableCell>
       <TableCell align="left">{title}</TableCell>
       <TableCell align="left">{getBadge(status)}</TableCell>

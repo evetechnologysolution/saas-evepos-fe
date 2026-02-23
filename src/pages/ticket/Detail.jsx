@@ -25,10 +25,10 @@ export default function UserCreate() {
   const { data: userById, isLoading: loadingUserById } = getById(id);
 
   return (
-    <Page title="Ticket: Edit">
+    <Page title="Ticket: Detail">
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <HeaderBreadcrumbs
-          heading="Edit Ticket"
+          heading="Detail Ticket"
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
             { name: 'User', href: PATH_DASHBOARD.user.root },
@@ -41,7 +41,7 @@ export default function UserCreate() {
             <CircularProgress />
           </Box>
         ) : (
-          <Form isEdit={isEdit} currentData={userById} />
+          <Form isEdit={isEdit} type="view" currentData={userById} />
         )}
       </Container>
     </Page>

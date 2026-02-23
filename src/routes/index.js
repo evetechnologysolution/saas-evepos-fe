@@ -515,6 +515,14 @@ export default function Router() {
                     </RoleBasedGuard>
                   ),
                 },
+                {
+                  path: ':id/detail',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner']}>
+                      <TicketDetail />
+                    </RoleBasedGuard>
+                  ),
+                },
               ],
             },
             {
@@ -826,6 +834,7 @@ const UserProfile = Loadable(lazy(() => import('../pages/UserProfile')));
 const TicketList = Loadable(lazy(() => import('../pages/ticket/List')));
 const TicketCreate = Loadable(lazy(() => import('../pages/ticket/Create')));
 const TicketEdit = Loadable(lazy(() => import('../pages/ticket/Edit')));
+const TicketDetail = Loadable(lazy(() => import('../pages/ticket/Detail')));
 
 // User Profile
 const ProfileAccount = Loadable(lazy(() => import('../pages/user-profile/account/ProfileAccount')));
