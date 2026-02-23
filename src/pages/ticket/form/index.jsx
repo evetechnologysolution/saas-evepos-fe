@@ -103,10 +103,12 @@ export default function TicketNewEditForm({ isEdit, currentData, type = '' }) {
       ? update.mutateAsync({ id: currentData._id, payload: formData })
       : create.mutateAsync(formData);
 
+    const navigateTo = isEdit ? navigate(`/dashboard/ticket/${currentData._id}/edit`) : navigate('/dashboard/ticket');
+
     await handleMutationFeedback(mutation, {
       successMsg: isEdit ? 'Tiket berhasil diperbarui!' : 'Tiket berhasil dibuat!',
       errorMsg: 'Gagal menyimpan tiket!',
-      onSuccess: () => navigate('/dashboard/ticket'),
+      onSuccess: () => navigateTo,
       enqueueSnackbar,
     });
   };
