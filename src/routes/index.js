@@ -489,6 +489,35 @@ export default function Router() {
               ],
             },
             {
+              path: 'ticket',
+              children: [
+                {
+                  path: '',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff']}>
+                      <TicketList />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner']}>
+                      <TicketCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: ':id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner']}>
+                      <TicketEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+              ],
+            },
+            {
               path: 'profile',
               children: [
                 {
@@ -792,6 +821,11 @@ const UserCreate = Loadable(lazy(() => import('../pages/user/UserCreate')));
 const UserEdit = Loadable(lazy(() => import('../pages/user/UserEdit')));
 const UserAccount = Loadable(lazy(() => import('../pages/UserAccount')));
 const UserProfile = Loadable(lazy(() => import('../pages/UserProfile')));
+
+// Ticket
+const TicketList = Loadable(lazy(() => import('../pages/ticket/List')));
+const TicketCreate = Loadable(lazy(() => import('../pages/ticket/Create')));
+const TicketEdit = Loadable(lazy(() => import('../pages/ticket/Edit')));
 
 // User Profile
 const ProfileAccount = Loadable(lazy(() => import('../pages/user-profile/account/ProfileAccount')));

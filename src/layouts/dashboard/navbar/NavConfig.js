@@ -247,6 +247,12 @@ export const useNavConfig = () => {
           icon: ICONS.user,
           roles: ['owner'],
         },
+        {
+          title: 'ticket',
+          path: '/dashboard/ticket',
+          icon: ICONS.report,
+          roles: ['owner', 'staff'],
+        },
       ],
     },
   ];
