@@ -281,9 +281,9 @@ export default function Dashboard() {
               title="Sales"
               subtitle={getTopCurrentFilterLabel()}
               total={dashboardRevenue?.totalSales || 0}
-              type="currency"
+              type="other"
               color="info"
-              icon={'heroicons-solid:currency-dollar'}
+              icon={'heroicons-solid:trending-up'}
               isLoading={loadingDashboardRevenue}
             />
           </Grid>
