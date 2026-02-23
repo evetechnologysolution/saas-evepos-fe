@@ -1,13 +1,14 @@
+/* eslint-disable react/prop-types */
 import PropTypes from 'prop-types';
 import { useState, useRef } from 'react';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
 // form
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { LoadingButton } from '@mui/lab';
-import { Card, Grid, Stack, Button, Box, Typography, alpha, useTheme, MenuItem } from '@mui/material';
+import { Card, Grid, Stack, Button, Box, Typography, alpha, useTheme, MenuItem, Chip } from '@mui/material';
 // routes
 import Iconify from 'src/components/Iconify';
 import { handleMutationFeedback } from 'src/utils/mutationfeedback';
@@ -27,7 +28,7 @@ TicketNewEditForm.propTypes = {
 
 const STATUS_OPTIONS = [
   { value: 'open', label: 'Open', color: '#22c55e' },
-  { value: 'in_progress', label: 'In Progress', color: '#f59e0b' },
+  { value: 'progress', label: 'In Progress', color: '#f59e0b' },
   { value: 'closed', label: 'Closed', color: '#ef4444' },
 ];
 
@@ -47,7 +48,7 @@ const MODULE_LIST = [
   'User',
 ];
 
-export default function TicketNewEditForm({ isEdit, currentData }) {
+export default function TicketNewEditForm({ isEdit, currentData, type = '' }) {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { create, update } = useTicket();
@@ -61,7 +62,7 @@ export default function TicketNewEditForm({ isEdit, currentData }) {
     resolver: yupResolver(ticketSchema),
     defaultValues: {
       ...ticketSchema.getDefault(),
-      ...(isEdit && currentData
+      ...((isEdit || type === 'view') && currentData
         ? {
             title: currentData.title,
             body: currentData.body,
@@ -76,14 +77,14 @@ export default function TicketNewEditForm({ isEdit, currentData }) {
 
   const {
     handleSubmit,
-
+    control,
     setValue,
     watch,
     formState: { isSubmitting, errors },
   } = methods;
 
   const watchedBody = watch('body', '');
-  const watchedStatus = watch('status', 'open');
+  const watchedStatus = watch('status');
 
   const onSubmit = async (data) => {
     const formData = new FormData();
@@ -137,6 +138,7 @@ export default function TicketNewEditForm({ isEdit, currentData }) {
     : null;
 
   const activeStatus = STATUS_OPTIONS.find((s) => s.value === watchedStatus);
+  const editAndView = isEdit || type === 'view';
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
@@ -144,7 +146,7 @@ export default function TicketNewEditForm({ isEdit, currentData }) {
         <Grid item xs={12} md={8}>
           <Card sx={{ p: 3 }}>
             <Stack spacing={3}>
-              {isEdit && (
+              {editAndView && (
                 <Box
                   sx={{
                     px: 2,
@@ -171,6 +173,7 @@ export default function TicketNewEditForm({ isEdit, currentData }) {
                 autoComplete="off"
                 inputProps={{ maxLength: 200 }}
                 helperText="Maksimal 200 karakter"
+                disabled={type === 'view'}
               />
 
               {/* Body */}
@@ -183,6 +186,7 @@ export default function TicketNewEditForm({ isEdit, currentData }) {
                   minRows={5}
                   maxRows={12}
                   inputProps={{ maxLength: 2000 }}
+                  disabled={type === 'view'}
                 />
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 0.5 }}>
                   <Typography variant="caption" color={watchedBody.length > 1800 ? 'warning.main' : 'text.disabled'}>
@@ -191,59 +195,13 @@ export default function TicketNewEditForm({ isEdit, currentData }) {
                 </Box>
               </Box>
 
-              <RHFSelect name="module" label="Module" SelectProps={{ native: false }}>
+              <RHFSelect name="module" label="Module" SelectProps={{ native: false }} disabled={type === 'view'}>
                 {MODULE_LIST.map((value) => (
                   <MenuItem key={value} value={value}>
                     {value}
                   </MenuItem>
                 ))}
               </RHFSelect>
-
-              {/* Reply / Admin Feedback */}
-              {isEdit && (
-                <Box
-                  sx={{
-                    borderRadius: 2,
-                    border: `1px solid ${alpha(theme.palette.warning.main, 0.3)}`,
-                    bgcolor: alpha(theme.palette.warning.main, 0.04),
-                    overflow: 'hidden',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      px: 2,
-                      py: 1.25,
-                      bgcolor: alpha(theme.palette.warning.main, 0.1),
-                      borderBottom: `1px solid ${alpha(theme.palette.warning.main, 0.2)}`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                    }}
-                  >
-                    <Iconify icon="eva:message-circle-outline" sx={{ width: 18, height: 18, color: 'warning.dark' }} />
-                    <Typography variant="subtitle2" color="warning.dark">
-                      Balasan / Feedback Admin
-                    </Typography>
-                  </Box>
-                  <Box sx={{ p: 2 }}>
-                    <RHFTextField
-                      name="reply"
-                      label="Respon dari time evepos"
-                      placeholder="Masukkan feedback atau balasan untuk tiket ini..."
-                      multiline
-                      minRows={3}
-                      maxRows={8}
-                      inputProps={{ maxLength: 2000 }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          bgcolor: 'background.paper',
-                        },
-                      }}
-                      disabled
-                    />
-                  </Box>
-                </Box>
-              )}
 
               {/* Attachment */}
               <Box>
@@ -343,9 +301,17 @@ export default function TicketNewEditForm({ isEdit, currentData }) {
                         </Typography>
                       )}
                     </Box>
-                    <Button size="small" color="error" variant="soft" onClick={handleRemoveFile} sx={{ flexShrink: 0 }}>
-                      <Iconify icon="eva:trash-2-outline" />
-                    </Button>
+                    {type !== 'view' && (
+                      <Button
+                        size="small"
+                        color="error"
+                        variant="soft"
+                        onClick={handleRemoveFile}
+                        sx={{ flexShrink: 0 }}
+                      >
+                        <Iconify icon="eva:trash-2-outline" />
+                      </Button>
+                    )}
                   </Box>
                 )}
 
@@ -369,16 +335,20 @@ export default function TicketNewEditForm({ isEdit, currentData }) {
             {/* Actions */}
             <Stack direction="row" justifyContent="flex-end" sx={{ mt: 3 }} gap={1}>
               <Button variant="outlined" color="inherit" onClick={() => navigate('/dashboard/ticket')}>
-                Batal
+                Kembali
               </Button>
-              <LoadingButton
-                type="submit"
-                variant="contained"
-                loading={isSubmitting}
-                startIcon={!isSubmitting && <Iconify icon={isEdit ? 'eva:save-outline' : 'eva:plus-circle-outline'} />}
-              >
-                {isEdit ? 'Simpan Perubahan' : 'Buat Tiket'}
-              </LoadingButton>
+              {!editAndView ? (
+                <LoadingButton
+                  type="submit"
+                  variant="contained"
+                  loading={isSubmitting}
+                  startIcon={
+                    !isSubmitting && <Iconify icon={isEdit ? 'eva:save-outline' : 'eva:plus-circle-outline'} />
+                  }
+                >
+                  {isEdit ? 'Simpan Perubahan' : 'Buat Tiket'}
+                </LoadingButton>
+              ) : null}
             </Stack>
           </Card>
         </Grid>
@@ -387,7 +357,7 @@ export default function TicketNewEditForm({ isEdit, currentData }) {
         <Grid item xs={12} md={4}>
           <Stack spacing={2}>
             {/* Status badge */}
-            {isEdit && activeStatus && (
+            {editAndView && activeStatus && (
               <Card sx={{ p: 2.5 }}>
                 <Typography variant="overline" color="text.secondary">
                   Status Saat Ini
