@@ -194,7 +194,7 @@ export const useNavConfig = () => {
             { title: 'sales report', path: PATH_DASHBOARD.report.sales },
             { title: 'popular product', path: PATH_DASHBOARD.report.popular },
             { title: 'payment overview', path: PATH_DASHBOARD.report.paymentOverview },
-            // { title: 'staff performance', path: PATH_DASHBOARD.report.performance },
+            { title: 'staff performance', path: PATH_DASHBOARD.report.performance },
           ],
         },
         // LIBRARY
