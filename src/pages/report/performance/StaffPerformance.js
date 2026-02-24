@@ -14,6 +14,7 @@ import {
   InputAdornment,
   MenuItem,
   Box,
+  CircularProgress,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -84,7 +85,7 @@ export default function StaffPerformance() {
     const [, params] = queryKey; // Extract query params
     const queryString = new URLSearchParams(params).toString(); // Build query string
     try {
-      const res = await axios.get(`/users?${queryString}`);
+      const res = await axios.get(`/user?${queryString}`);
       return res.data;
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -98,7 +99,7 @@ export default function StaffPerformance() {
         page: ctrStaff.page,
         perPage: ctrStaff.perPage,
         search: ctrStaff.search,
-        role: 'Content Writer:ne',
+        // role: 'Content Writer:ne',
       },
     ],
     getStaff
@@ -143,27 +144,31 @@ export default function StaffPerformance() {
           </Typography>
 
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mb={1}>
-            <TextField
-              name="staff"
-              label="Staff"
-              placeholder="Staff"
-              select
-              sx={{ minWidth: 200 }}
-              value={controller?.staff || 'all'}
-              onChange={(e) => {
-                setController({
-                  ...controller,
-                  staff: e.target.value,
-                });
-              }}
-            >
-              <MenuItem value="all">All</MenuItem>
-              {staffData?.docs?.map((item, i) => (
-                <MenuItem key={i} value={item?._id}>
-                  {item?.fullname}
-                </MenuItem>
-              ))}
-            </TextField>
+            {loadingStaff ? (
+              <CircularProgress />
+            ) : (
+              <TextField
+                name="staff"
+                label="Staff"
+                placeholder="Staff"
+                select
+                sx={{ minWidth: 200 }}
+                value={controller?.staff || 'all'}
+                onChange={(e) => {
+                  setController({
+                    ...controller,
+                    staff: e.target.value,
+                  });
+                }}
+              >
+                <MenuItem value="all">All</MenuItem>
+                {staffData?.docs?.map((item, i) => (
+                  <MenuItem key={i} value={item?._id}>
+                    {item?.fullname}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
             <TextField
               label="Period"
               name="period"
