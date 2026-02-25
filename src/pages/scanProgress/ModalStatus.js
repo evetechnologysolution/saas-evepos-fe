@@ -80,7 +80,7 @@ export default function ModalAddStatus({ open, onClose, isEdit, currentData }) {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
+    <Dialog open={open} onClose={() => {}} fullWidth maxWidth="xs">
       <DialogTitle sx={{ pr: 5 }}>
         {isEdit ? 'Edit Status' : 'Add Status'}
         <IconButton onClick={handleClose} sx={{ position: 'absolute', right: 8, top: 8 }}>
