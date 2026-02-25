@@ -395,16 +395,17 @@ export default function ScanProgress() {
                           {!isEdit &&
                             listStatus?.map((opt, n) => {
                               const statusKey = opt.name?.toLowerCase();
+                              const progressDetail = detail?.progressDetail || [];
 
                               const isDisabled =
                                 !detail?._id ||
-                                !detail?.progressDetail?.some((row) => {
-                                  const totalProgress = row?.progressByStatus?.[statusKey] || 0;
-                                  const orderedQty = row?.orderedQty || 0;
+                                (progressDetail.length > 0 &&
+                                  progressDetail.every((row) => {
+                                    const totalProgress = row?.progressByStatus?.[statusKey] || 0;
+                                    const orderedQty = row?.orderedQty || 0;
 
-                                  // masih bisa diproses jika progress < orderedQty
-                                  return totalProgress < orderedQty;
-                                });
+                                    return totalProgress >= orderedQty;
+                                  }));
 
                               return (
                                 <LoadingButton

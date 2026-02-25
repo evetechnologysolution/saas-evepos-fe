@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useState, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { paramCase } from 'change-case';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from 'react-query';
 import { useSnackbar } from 'notistack';
