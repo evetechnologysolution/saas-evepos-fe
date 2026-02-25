@@ -2,8 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { BrowserMultiFormatReader } from '@zxing/library';
 import Webcam from 'react-webcam';
-import { sumBy } from 'lodash';
-import { useSnackbar } from 'notistack';
 import {
   Alert,
   Container,
@@ -30,27 +28,17 @@ import { formatDate2 } from 'src/utils/getData';
 import { maskedPhone } from 'src/utils/masked';
 import Iconify from 'src/components/Iconify';
 import { Add, EditNote, ModeEdit } from '@mui/icons-material';
-import ModalProgress from './ModalProgress';
-import ModalLocker from './ModalLocker';
-import './scanProgress.scss';
-import ModalAddStatus from './ModalStatus';
 import useStatus from './service/useStatus';
-import ModalNotes from './ModalNotes';
+import ModalProgress from './ModalProgressV2';
+import ModalAddStatus from './ModalStatus';
+import './scanProgress.scss';
 
 export default function ScanProgress() {
-  const options = ['order', 'in progress', 'completed'];
-  // const options = [
-  //   "jemput (pick-up)", "kasir (order)", "cuci (wash)", "kering (dry)", "setrika (iron)", "packing / qc", "antar (delivery)"
-  // ];
   const { user } = useAuth();
   const { themeStretch } = useSettings();
-  const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [detail, setDetail] = useState(null);
-  const [selectedProgress, setSelectedProgress] = useState('');
-  const [openLocker, setOpenLocker] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [isCameraOpen, setIsCameraOpen] = useState(false); // State untuk menampilkan kamera
   const [intervalId, setIntervalId] = useState(null);
@@ -62,7 +50,6 @@ export default function ScanProgress() {
 
   const { data: listStatus, isLoading: loadingStatus } = list();
   const [isEdit, setIsEdit] = useState(false);
-  const [submitProgress, setSubmitProgress] = useState(false);
   const [currentDataEdit, setCurrentDataEdit] = useState(null);
   const [currentDataProgress, setCurrentDataProgress] = useState(null);
 
@@ -83,7 +70,7 @@ export default function ScanProgress() {
     error,
     isError,
     refetch,
-    isLoading: loadingScanOrders,
+    // isLoading: loadingScanOrders,
   } = useQuery({
     // queryKey: ["detailScanOrders", search], // ketika search berubah, data otomatis di-fetch
     queryKey: ['detailScanOrders'],
@@ -103,22 +90,6 @@ export default function ScanProgress() {
   });
 
   const showError = isError && !isLoading;
-
-  const handleOpen = (val) => {
-    if (detail) {
-      setSelectedProgress(val);
-      // setOpenModal(true);
-      setOpenLocker(true);
-    }
-  };
-
-  const handleClose = () => {
-    // setOpenModal(false);
-    setOpenLocker(false);
-    setTimeout(() => {
-      setSelectedProgress('');
-    }, 500);
-  };
 
   const handleScanSuccess = (text) => {
     if (text) {
@@ -215,39 +186,14 @@ export default function ScanProgress() {
   }, [isCameraOpen]);
 
   const handleSubmit = async (val) => {
-    if (!val || loading) {
+    if (!val) {
       return;
     }
 
-    const totalQty = sumBy(detail?.orders, (item) => {
-      const tot = item?.qty || 0;
-      return tot;
-    });
-
-    const data = {
-      log: {
-        status: val,
-        qty: totalQty,
-        // unit
-      },
-    };
-
-    setSubmitProgress(true);
-    setCurrentDataProgress(data);
-
-    // setLoading(true);
-    // setSelectedProgress(val);
-    // try {
-    //   await axiosInstance.post(`/progress/${detail?._id}`, data);
-    //   await refetch();
-    //   enqueueSnackbar('Update data success!');
-    // } catch (error) {
-    //   console.error('Submit failed:', error);
-    //   enqueueSnackbar(error?.message || 'Submit failed');
-    // } finally {
-    //   setLoading(false); // reset loading state
-    //   setSelectedProgress('');
-    // }
+    setCurrentDataProgress(val);
+    setTimeout(() => {
+      setOpenModal(true);
+    }, 500);
   };
 
   return (
@@ -447,24 +393,32 @@ export default function ScanProgress() {
                       <Stack flexDirection="row" gap={1.5} flexWrap="wrap" justifyContent="space-between">
                         <Stack flexDirection="row" gap={1.5}>
                           {!isEdit &&
-                            listStatus?.map((opt, n) => (
-                              <LoadingButton
-                                key={n}
-                                variant="outlined"
-                                onClick={() => {
-                                  handleSubmit(opt.name);
-                                }}
-                                sx={{ textTransform: 'capitalize' }}
-                                disabled={
-                                  !detail?._id ||
-                                  detail?.progressRef?.log?.some((row) => row?.status === opt.name?.toLowerCase())
-                                }
-                                loading={loading && selectedProgress === opt}
-                                type="button"
-                              >
-                                {opt.name}
-                              </LoadingButton>
-                            ))}
+                            listStatus?.map((opt, n) => {
+                              const statusKey = opt.name?.toLowerCase();
+
+                              const isDisabled =
+                                !detail?._id ||
+                                !detail?.progressDetail?.some((row) => {
+                                  const totalProgress = row?.progressByStatus?.[statusKey] || 0;
+                                  const orderedQty = row?.orderedQty || 0;
+
+                                  // masih bisa diproses jika progress < orderedQty
+                                  return totalProgress < orderedQty;
+                                });
+
+                              return (
+                                <LoadingButton
+                                  key={n}
+                                  variant="outlined"
+                                  onClick={() => handleSubmit(opt.name)}
+                                  sx={{ textTransform: 'capitalize' }}
+                                  disabled={isDisabled}
+                                  type="button"
+                                >
+                                  {opt.name}
+                                </LoadingButton>
+                              );
+                            })}
                           {isEdit &&
                             listStatus?.map((opt, n) => (
                               <LoadingButton
@@ -475,7 +429,6 @@ export default function ScanProgress() {
                                   setOpenCreateStatus(true);
                                 }}
                                 sx={{ textTransform: 'capitalize' }}
-                                loading={loading && selectedProgress === opt}
                                 type="button"
                               >
                                 <span>{opt.name}</span> <ModeEdit sx={{ ml: 1.5 }} />
@@ -505,6 +458,16 @@ export default function ScanProgress() {
                         </th>
                         <th>
                           <Typography variant="subtitle2" align="center">
+                            Item
+                          </Typography>
+                        </th>
+                        <th>
+                          <Typography variant="subtitle2" align="center">
+                            Qty
+                          </Typography>
+                        </th>
+                        <th>
+                          <Typography variant="subtitle2" align="center">
                             Staff
                           </Typography>
                         </th>
@@ -517,7 +480,7 @@ export default function ScanProgress() {
                       </tr>
                     </thead>
                     <tbody>
-                      {!loadingScanOrders ? (
+                      {!isLoading ? (
                         detail?.progressRef && detail?.progressRef?.log?.length > 0 ? (
                           detail.progressRef.log
                             .slice()
@@ -530,6 +493,14 @@ export default function ScanProgress() {
                                   </Typography>
                                 </td>
                                 <td style={{ textAlign: 'center' }}>
+                                  <Typography variant="body2">{item?.name || '-'}</Typography>
+                                </td>
+                                <td style={{ textAlign: 'center' }}>
+                                  <Typography variant="body2">
+                                    {item?.qty ? `${item?.qty} ${item?.unit}` : '-'}
+                                  </Typography>
+                                </td>
+                                <td style={{ textAlign: 'center' }}>
                                   <Typography variant="body2">{item?.staffRef?.fullname || '-'}</Typography>
                                 </td>
                                 <td style={{ textAlign: 'center' }}>
@@ -537,16 +508,11 @@ export default function ScanProgress() {
                                     {item?.status || '-'}
                                   </Label>
                                 </td>
-                                {/* <td style={{ textAlign: "center" }}>
-                                <Typography variant="body2">
-                                  {item?.qty ? `${item?.qty} ${item?.unit}` : "-"}
-                                </Typography>
-                              </td> */}
                               </tr>
                             ))
                         ) : (
                           <tr>
-                            <td colSpan={4} style={{ textAlign: 'center' }}>
+                            <td colSpan={5} style={{ textAlign: 'center' }}>
                               <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
                                 Data kosong
                               </Typography>
@@ -555,7 +521,7 @@ export default function ScanProgress() {
                         )
                       ) : (
                         <tr>
-                          <td colSpan={4}>
+                          <td colSpan={5}>
                             <Skeleton variant="text" />
                           </td>
                         </tr>
@@ -569,20 +535,12 @@ export default function ScanProgress() {
         </Card>
       </Container>
 
-      <ModalLocker
-        open={openLocker}
-        onClose={handleClose}
-        progress={selectedProgress}
-        detail={detail}
-        refetchData={refetch}
-      />
-
       <ModalProgress
         open={openModal}
-        onClose={handleClose}
-        progress={selectedProgress}
+        onClose={() => setOpenModal(false)}
+        currProgress={currentDataProgress}
         detail={detail}
-        refetchData={refetch}
+        refetch={refetch}
       />
 
       <ModalAddStatus
@@ -590,14 +548,6 @@ export default function ScanProgress() {
         onClose={() => setOpenCreateStatus(false)}
         isEdit={isEdit}
         currentData={currentDataEdit}
-      />
-
-      <ModalNotes
-        open={submitProgress}
-        onClose={() => setSubmitProgress(false)}
-        payload={currentDataProgress}
-        id={detail?._id}
-        refetch={refetch}
       />
 
       {isCameraOpen && (

@@ -4,7 +4,7 @@ import { Stack, InputAdornment, TextField } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import Iconify from "src/components/Iconify";
 
-const ScanVoucherTableToolbar = forwardRef(({ handleOpenCamera, filterName, onFilterName, onEnter, loading }, ref) => {
+const ScanProgressToolbar = forwardRef(({ handleOpenCamera, filterName, onFilterName, onEnter, loading }, ref) => {
   return (
     <Stack spacing={2} direction={{ xs: "row", sm: "row" }} sx={{ py: 2.5, px: 1 }} alignItems="center">
       <TextField
@@ -41,7 +41,7 @@ const ScanVoucherTableToolbar = forwardRef(({ handleOpenCamera, filterName, onFi
   );
 });
 
-ScanVoucherTableToolbar.propTypes = {
+ScanProgressToolbar.propTypes = {
   handleOpenCamera: PropTypes.func,
   filterName: PropTypes.string,
   onFilterName: PropTypes.func,
@@ -49,4 +49,4 @@ ScanVoucherTableToolbar.propTypes = {
   loading: PropTypes.bool,
 };
 
-export default ScanVoucherTableToolbar;
+export default ScanProgressToolbar;
