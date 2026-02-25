@@ -344,7 +344,7 @@ export default function StaffPerformance() {
           </Grid>
         </Box>
 
-        {/* <ListActivity /> */}
+        <ListActivity />
       </Container>
     </Page>
   );
