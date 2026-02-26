@@ -246,29 +246,33 @@ export default function StaffPerformance() {
 
           <Grid container spacing={4}>
             <Grid item xs={12} md={5} lg={6}>
-              <BestActivity
-                // sx={{
-                //   padding: "1vw",
-                //   boxShadow: "0 5px 20px 0 rgb(145 158 171 / 40%), 0 12px 40px -4px rgb(145 158 171 / 12%)"
-                // }}
-                title="Activity"
-                // subheader={`${options[controller?.periodBy]}`}
-                subheader={options.find((opt) => opt.value === controller?.periodBy)?.label || ''}
-                data={(summaryData?.detail?.length > 0 ? summaryData?.detail : initialData)?.map((item) => {
-                  const totalKg = summaryData?.totalKg || 0;
-                  const totalPcs = summaryData?.totalPcs || 0;
-                  const qtyKg = item?.qtyKg || 0;
-                  const qtyPcs = item?.qtyPcs || 0;
-                  return {
-                    label: item?.status,
-                    // qtyOrder: item?.qty || 0,
-                    qtyKg,
-                    qtyPcs,
-                    total: qtyKg + qtyPcs,
-                    percent: ((qtyKg + qtyPcs) / (totalKg + totalPcs || 1)) * 100 || 0,
-                  };
-                })}
-              />
+              {loadingSummary ? (
+                <CircularProgress />
+              ) : (
+                <BestActivity
+                  // sx={{
+                  //   padding: "1vw",
+                  //   boxShadow: "0 5px 20px 0 rgb(145 158 171 / 40%), 0 12px 40px -4px rgb(145 158 171 / 12%)"
+                  // }}
+                  title="Activity"
+                  // subheader={`${options[controller?.periodBy]}`}
+                  subheader={options.find((opt) => opt.value === controller?.periodBy)?.label || ''}
+                  data={(summaryData?.detail?.length > 0 ? summaryData?.detail : initialData)?.map((item) => {
+                    const totalKg = summaryData?.totalKg || 0;
+                    const totalPcs = summaryData?.totalPcs || 0;
+                    const qtyKg = item?.qtyKg || 0;
+                    const qtyPcs = item?.qtyPcs || 0;
+                    return {
+                      label: item?.status,
+                      // qtyOrder: item?.qty || 0,
+                      qtyKg,
+                      qtyPcs,
+                      total: qtyKg + qtyPcs,
+                      percent: ((qtyKg + qtyPcs) / (totalKg + totalPcs || 1)) * 100 || 0,
+                    };
+                  })}
+                />
+              )}
             </Grid>
             <Grid item xs={12} md={7} lg={6}>
               <Card sx={{ minHeight: 300, height: '100%' }}>
@@ -322,7 +326,7 @@ export default function StaffPerformance() {
                           return (
                             <Grid item xs={12} md={6} lg={6} key={i}>
                               <WidgetPerformance
-                                title={item?.staff?.fullname || '-'}
+                                title={item?.staffRef?.fullname || '-'}
                                 subtitle={item?.status}
                                 // qtyOrder={item?.qty || 0}
                                 qtyKg={qtyKg}
