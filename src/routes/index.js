@@ -665,7 +665,7 @@ export default function Router() {
                 {
                   path: 'staff-performance',
                   element: (
-                    <RoleBasedGuard hasContent roles={['super admin', 'admin']}>
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
                       <StaffPerformance />
                     </RoleBasedGuard>
                   ),
