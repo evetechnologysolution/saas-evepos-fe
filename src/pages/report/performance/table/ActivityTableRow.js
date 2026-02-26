@@ -29,7 +29,10 @@ const CustomTableRow = styled(TableRow)(() => ({
 
 export default function ActivityTableRow({ row }) {
   const {
-    createdAt,
+    date,
+    name,
+    unit,
+    qty,
     orderRef: { orderId },
     log,
   } = row;
@@ -38,9 +41,9 @@ export default function ActivityTableRow({ row }) {
   const navigate = useNavigate();
   return (
     <CustomTableRow hover>
-      <TableCell align="center">{formatDate2(createdAt)}</TableCell>
+      <TableCell align="center">{formatDate2(date)}</TableCell>
 
-      {/* <TableCell>{row?.staff?.fullname || '-'}</TableCell> */}
+      <TableCell>{row?.staffRef?.fullname || '-'}</TableCell>
 
       <TableCell align="left">
         {user?.role === 'Super Admin' ? (
@@ -50,71 +53,53 @@ export default function ActivityTableRow({ row }) {
             underline="hover"
             onClick={() => navigate(PATH_DASHBOARD.cashier.ordersEdit(paramCase(row?.order?._id)))}
           >
-            {orderId || '-'}
+            {`${orderId}` || '-'}
           </Link>
         ) : (
-          orderId || '-'
+          `${orderId}` || '-'
         )}
       </TableCell>
 
+      <TableCell align="left">{name}</TableCell>
+
       <TableCell align="center">
-        <List dense>
-          {log
-            ?.filter((val) => val.unit.toLowerCase() === 'kg')
-            ?.map((result, index) => (
-              <ListItem key={index}>
-                <ListItemText
-                  primary={`${result.name} - ${result.qty} ${result.unit}`}
-                  secondary={`by ${result.staffRef.fullname}`}
-                />
-              </ListItem>
-            ))}
-        </List>
+        {unit.toLowerCase() === 'kg' ? (
+          <List dense>
+            <ListItem>
+              <ListItemText primary={`${name} - ${qty} ${unit}`} secondary={`by ${row.staffRef.fullname}`} />
+            </ListItem>
+          </List>
+        ) : null}
       </TableCell>
 
       <TableCell align="center">
-        <List dense>
-          {log
-            ?.filter((val) => val.unit.toLowerCase() === 'pcs')
-            ?.map((result, index) => (
-              <ListItem key={index}>
-                <ListItemText
-                  primary={`${result.name} - ${result.qty} ${result.unit}`}
-                  secondary={`by ${result.staffRef.fullname}`}
-                />
-              </ListItem>
-            ))}
-        </List>
+        {unit.toLowerCase() === 'pcs' ? (
+          <List dense>
+            <ListItem>
+              <ListItemText primary={`${name} - ${qty} ${unit}`} secondary={`by ${row.staffRef.fullname}`} />
+            </ListItem>
+          </List>
+        ) : null}
       </TableCell>
 
       <TableCell align="center">
-        <List dense>
-          {log
-            ?.filter((val) => val.unit.toLowerCase() === 'm2')
-            ?.map((result, index) => (
-              <ListItem key={index}>
-                <ListItemText
-                  primary={`${result.name} - ${result.qty} ${result.unit}`}
-                  secondary={`by ${result.staffRef.fullname}`}
-                />
-              </ListItem>
-            ))}
-        </List>
+        {unit.toLowerCase() === 'm2' ? (
+          <List dense>
+            <ListItem>
+              <ListItemText primary={`${name} - ${qty} ${unit}`} secondary={`by ${row.staffRef.fullname}`} />
+            </ListItem>
+          </List>
+        ) : null}
       </TableCell>
 
       <TableCell align="center">
-        <List dense>
-          {log
-            ?.filter((val) => val.unit.toLowerCase() === 'cup')
-            ?.map((result, index) => (
-              <ListItem key={index}>
-                <ListItemText
-                  primary={`${result.name} - ${result.qty} ${result.unit}`}
-                  secondary={`by ${result.staffRef.fullname}`}
-                />
-              </ListItem>
-            ))}
-        </List>
+        {unit.toLowerCase() === 'cup' ? (
+          <List dense>
+            <ListItem>
+              <ListItemText primary={`${name} - ${qty} ${unit}`} secondary={`by ${row.staffRef.fullname}`} />
+            </ListItem>
+          </List>
+        ) : null}
       </TableCell>
 
       {/* <TableCell align="center" sx={{ textTransform: 'capitalize' }}>

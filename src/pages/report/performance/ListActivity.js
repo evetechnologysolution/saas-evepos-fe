@@ -32,8 +32,9 @@ import { ActivityTableToolbar, ActivityTableRow } from './table';
 
 const TABLE_HEAD = [
   { id: 'date', label: 'Date', align: 'center' },
-  //   { id: 'staff', label: 'Staff', align: 'left' },
+  { id: 'staff', label: 'Staff', align: 'left' },
   { id: 'order', label: 'Order ID', align: 'left' },
+  { id: 'service', label: 'Service', align: 'left' },
   { id: 'qty', label: 'Qty (Kg)', align: 'center' },
   { id: 'qty', label: 'Qty (Pcs)', align: 'center' },
   { id: 'qty', label: 'Qty (M2)', align: 'center' },
@@ -60,7 +61,7 @@ export default function ListActivity() {
     const [, params] = queryKey; // Extract query params
     const queryString = new URLSearchParams(params).toString(); // Build query string
     try {
-      const res = await axios.get(`/progress?${queryString}`);
+      const res = await axios.get(`/progress/log?${queryString}`);
       setCountData(res?.data?.totalDocs || 0);
       return res.data;
     } catch (error) {
@@ -118,6 +119,8 @@ export default function ListActivity() {
       });
     }
   };
+
+  console.log(tableData?.docs);
 
   return (
     <>
