@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useState, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { paramCase } from 'change-case';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from 'react-query';
 import { useSnackbar } from 'notistack';
@@ -370,7 +369,8 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                 component="button"
                 variant="subtitle2"
                 underline="hover"
-                onClick={() => navigate(PATH_DASHBOARD.cashier.ordersEdit(paramCase(_id)))}
+                // onClick={() => navigate(PATH_DASHBOARD.cashier.ordersEdit(paramCase(_id)))}
+                onClick={() => navigate(`/dashboard/cashier/orders/${_id}/edit`)}
               >
                 {!orderId ? _id : orderId}
               </Link>
