@@ -140,12 +140,12 @@ export const useNavConfig = () => {
         //   icon: ICONS.cashier,
         //   roles: ['super admin', 'cashier'],
         // },
-        // {
-        //   title: 'Expense Data',
-        //   path: PATH_DASHBOARD.expense.root,
-        //   icon: ICONS.expense,
-        //   roles: ['super admin', 'admin', 'cashier'],
-        // },
+        {
+          title: 'Expense Data',
+          path: PATH_DASHBOARD.expense.root,
+          icon: ICONS.expense,
+          roles: ['owner', 'admin'],
+        },
       ],
     },
 
