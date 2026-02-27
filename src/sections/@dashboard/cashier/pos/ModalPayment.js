@@ -636,6 +636,7 @@ export default function ModalPayment(props) {
     if (ctx.customerName) {
       objData.customer = {
         ...(ctx.customerData || {}),
+        memberId: undefined, // reset karena dicek lagi di BE
         name: ctx.customerName,
         phone: ctx.customerPhone,
         notes: ctx.customerNotes,

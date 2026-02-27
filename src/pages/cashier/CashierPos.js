@@ -241,6 +241,7 @@ export default function CashierPos() {
           objData = Object.assign(objData, {
             customer: {
               ...(ctx.customerData || {}), // Pastikan customerData bukan undefined/null
+              memberId: undefined, // reset karena dicek lagi di BE
               name: ctx.customerName,
               phone: ctx.customerPhone,
               notes: ctx.customerNotes,
@@ -282,6 +283,7 @@ export default function CashierPos() {
           objData = Object.assign(objData, {
             customer: {
               ...(ctx.customerData || {}), // Pastikan customerData bukan undefined/null
+              memberId: undefined, // reset karena dicek lagi di BE
               name: ctx.customerName,
               phone: ctx.customerPhone,
               notes: ctx.customerNotes,
