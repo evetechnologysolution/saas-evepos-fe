@@ -199,10 +199,10 @@ export default function ModalScanCustomer(props) {
         const res = await axios.get(`/member/track?search=${memberId}`);
         if (res?.data) {
           setNotFound(false);
-          setNotVerified(!res?.data?.isVerified);
-          setName(res?.data?.isVerified ? res?.data?.name : '');
-          setPhone(res?.data?.isVerified ? res?.data?.phone : '');
-          setPoint(res?.data?.isVerified ? res?.data?.point : 0);
+          // setNotVerified(!res?.data?.isVerified);
+          setName(res?.data?.name);
+          setPhone(res?.data?.phone);
+          setPoint(res?.data?.point);
         }
       } catch (error) {
         console.error('Error fetching members:', error);
@@ -325,11 +325,7 @@ export default function ModalScanCustomer(props) {
             </LoadingButton>
           </Stack>
           {notFound && <Alert severity="warning">Data member tidak ditemukan</Alert>}
-          {notVerified && (
-            <Alert severity="error">
-              Belum terdaftar sebagai member, silakan register di <b>evewash.com</b>.
-            </Alert>
-          )}
+          {notVerified && <Alert severity="error">Belum terdaftar sebagai member.</Alert>}
           <Stack flexDirection="row" alignItems="center" gap={2}>
             <TextField
               name="customerName"
