@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 // @mui
 import { Container } from '@mui/material';
+import { useQuery } from 'react-query';
 import axios from '../../../utils/axios';
 // routes
 import { PATH_DASHBOARD } from '../../../routes/paths';
@@ -15,44 +16,42 @@ import MemberForm from '../../../sections/@dashboard/member/MemberForm';
 
 // ----------------------------------------------------------------------
 
+const fetchMember = async (id) => {
+  const { data } = await axios.get(`/member/${id}`);
+  return data;
+};
+
 export default function MemberEdit() {
-    const { themeStretch } = useSettings();
+  const { themeStretch } = useSettings();
+  const { pathname } = useLocation();
+  const { id = '' } = useParams();
 
-    const { pathname } = useLocation();
+  const isEdit = pathname.includes('edit');
 
-    const isEdit = pathname.includes('edit');
+  const {
+    data: currentData,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ['member', id],
+    queryFn: () => fetchMember(id),
+    enabled: !!id,
+  });
 
-    const { id = '' } = useParams();
+  return (
+    <Page title="Member: Edit">
+      <Container maxWidth={themeStretch ? false : 'xl'}>
+        <HeaderBreadcrumbs
+          heading="Edit Member"
+          links={[
+            { name: 'Dashboard', href: PATH_DASHBOARD.root },
+            { name: 'Member', href: PATH_DASHBOARD.member.list },
+            { name: 'Edit' },
+          ]}
+        />
 
-    const [currentData, setCurrentData] = useState({});
-
-    useEffect(() => {
-        const getData = async () => {
-            try {
-                await axios.get(`/members/${id}`).then((response) => {
-                    setCurrentData(response.data);
-                });
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        getData();
-    }, [id]);
-
-    return (
-        <Page title="Member: Edit">
-            <Container maxWidth={themeStretch ? false : 'xl'}>
-                <HeaderBreadcrumbs
-                    heading='Edit Member'
-                    links={[
-                        { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                        { name: 'Member', href: PATH_DASHBOARD.member.list },
-                        { name: 'Edit' },
-                    ]}
-                />
-
-                <MemberForm isEdit={isEdit} currentData={currentData} />
-            </Container>
-        </Page>
-    );
+        <MemberForm isEdit={isEdit} currentData={currentData} isLoading={isLoading} isError={isError} />
+      </Container>
+    </Page>
+  );
 }
