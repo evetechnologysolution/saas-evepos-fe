@@ -272,7 +272,7 @@ export default function Router() {
             {
               path: 'expense',
               element: (
-                <RoleBasedGuard hasContent roles={['super admin', 'admin', 'Cashier']}>
+                <RoleBasedGuard hasContent roles={['owner', 'admin']}>
                   <ExpenseData />
                 </RoleBasedGuard>
               ),
