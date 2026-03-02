@@ -51,7 +51,7 @@ import {
   combinedDateTime,
   formatDate2,
 } from '../../../../utils/getData';
-import { generateRandomId } from '../../../../utils/generateRandom';
+import { generateRandomOrderId } from '../../../../utils/generateRandom';
 import PaymentType from './PaymentType';
 import PaymentItem from './PaymentItem';
 import PrintReceipt from './PrintReceipt';
@@ -585,7 +585,7 @@ export default function ModalPayment(props) {
 
     const isUpdate = ctx.currentOrderID !== '';
     const orderUid = isUpdate ? ctx.currentOrderID : uuid();
-    const orderId = isUpdate ? ctx.displayOrderID : generateRandomId(6);
+    const orderId = isUpdate ? ctx.displayOrderID : generateRandomOrderId();
 
     if (type === 'save') {
       setCurrUid(orderUid);
