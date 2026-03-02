@@ -134,6 +134,7 @@ export default function OrdersTableRow({ row, local, closeLocal, onDeleteRow }) 
     cardAccountName,
     cardNumber,
     isScan,
+    progressRef,
   } = row;
 
   let statusColor;
@@ -258,6 +259,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
     ctx.setCurrentOrderID(_id);
     ctx.setDisplayOrderID(orderId);
     ctx.setBill(orders);
+    ctx.setProgress(progressRef?.log?.length > 0 ? progressRef?.log : []);
     ctx.setOrderDate(createdAt || date);
     if (customer.name) {
       ctx.setCustomerData(customer);

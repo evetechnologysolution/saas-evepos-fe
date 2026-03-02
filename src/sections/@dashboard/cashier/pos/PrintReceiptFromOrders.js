@@ -291,10 +291,47 @@ const PrintReceiptFromOrders = React.forwardRef(({ data }, ref) => {
       <p style={{ fontSize: '8px', fontStyle: 'italic' }}>
         Bawa nota saat pengambilan laundry. Tanpa nota, wajib menyertakan nama lengkap & nomor HP.
       </p>
-      <Divider />
-      <Divider />
-      <br />
-      <br />
+
+      {data?.progressRef?.log?.length > 0 ? (
+        <>
+          <Divider />
+          <p style={{ fontSize: '8px' }}>Proses Pengerjaan</p>
+          <Divider />
+          <table style={{ width: '100%', fontSize: '6px' }}>
+            <tbody>
+              {data?.progressRef?.log?.map((row, i) => {
+                return (
+                  <tr key={i}>
+                    <td style={{ textAlign: 'left', verticalAlign: 'top' }}>-</td>
+                    <td style={{ textAlign: 'left', verticalAlign: 'top' }}>
+                      <div style={{ paddingBottom: '5px' }}>
+                        <p style={{ textTransform: 'capitalize' }}>{row?.status}</p>
+                        <p>{formatDate2(row?.date)}</p>
+                        <p>
+                          by : <span style={{ textTransform: 'capitalize' }}>{row?.staffRef?.fullname}</span>
+                        </p>
+                      </div>
+                    </td>
+                    <td style={{ textAlign: 'right', verticalAlign: 'top' }}>
+                      <p>{row?.name}</p>
+                      <p>
+                        {row?.qty} {row?.unit}
+                      </p>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </>
+      ) : (
+        <>
+          <Divider />
+          <Divider />
+          <br />
+          <br />
+        </>
+      )}
     </div>
   );
 });
