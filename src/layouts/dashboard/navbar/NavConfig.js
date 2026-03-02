@@ -110,17 +110,17 @@ export const useNavConfig = () => {
         //   // roles: ["super admin", "Cashier"],
         //   roles: ['Forbidden'],
         // },
-        // {
-        //   title: 'Member',
-        //   path: PATH_DASHBOARD.member.root,
-        //   icon: ICONS.member,
-        //   roles: ['super admin', 'cashier'],
-        //   children: [
-        //     { title: 'list member', path: PATH_DASHBOARD.member.list },
-        //     // { title: 'member card', path: PATH_DASHBOARD.member.memberCard },
-        //     { title: 'log voucher', path: PATH_DASHBOARD.member.logVoucher },
-        //   ],
-        // },
+        {
+          title: 'Member',
+          path: PATH_DASHBOARD.member.root,
+          icon: ICONS.member,
+          roles: ['owner', 'admin', 'cashier', 'staff'],
+          children: [
+            { title: 'list member', path: PATH_DASHBOARD.member.list },
+            // { title: 'member card', path: PATH_DASHBOARD.member.memberCard },
+            // { title: 'log voucher', path: PATH_DASHBOARD.member.logVoucher },
+          ],
+        },
         // {
         //   title: 'Postcard',
         //   path: PATH_DASHBOARD.postCard.root,

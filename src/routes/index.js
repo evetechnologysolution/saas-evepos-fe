@@ -230,7 +230,7 @@ export default function Router() {
                 {
                   path: 'list',
                   element: (
-                    <RoleBasedGuard hasContent roles={['super admin', 'Cashier']}>
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'cashier', 'admin']}>
                       <MemberList />
                     </RoleBasedGuard>
                   ),
@@ -246,7 +246,7 @@ export default function Router() {
                 {
                   path: 'new',
                   element: (
-                    <RoleBasedGuard hasContent roles={['super admin', 'Cashier']}>
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'cashier', 'admin']}>
                       <MemberCreate />
                     </RoleBasedGuard>
                   ),
@@ -254,7 +254,7 @@ export default function Router() {
                 {
                   path: ':id/edit',
                   element: (
-                    <RoleBasedGuard hasContent roles={['super admin', 'Cashier']}>
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'cashier', 'admin']}>
                       <MemberEdit />
                     </RoleBasedGuard>
                   ),
@@ -262,7 +262,7 @@ export default function Router() {
                 {
                   path: ':id/view',
                   element: (
-                    <RoleBasedGuard hasContent roles={['super admin', 'Cashier']}>
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'cashier', 'admin']}>
                       <MemberView />
                     </RoleBasedGuard>
                   ),
