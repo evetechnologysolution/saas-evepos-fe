@@ -28,13 +28,13 @@ const CustomTableRow = styled(TableRow)(() => ({
 export default function MemberTableRow({ row, onDetailRow, onEditRow, onDeleteRow }) {
   const { user } = useAuth();
 
-  const { date, memberId, name, phone, email, addresses, point } = row;
+  const { date, createdAt, memberId, name, phone, email, addresses, point } = row;
 
   const mainAddress = Array.isArray(addresses) ? addresses?.find((item) => item?.isDefault) : null;
 
   return (
     <CustomTableRow hover>
-      <TableCell align="center">{formatDate2(date)}</TableCell>
+      <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
       <TableCell align="center">
         <Link component="button" variant="inherit" underline="hover" onClick={onDetailRow}>
@@ -44,32 +44,43 @@ export default function MemberTableRow({ row, onDetailRow, onEditRow, onDeleteRo
 
       <TableCell>{name}</TableCell>
 
-      <TableCell>{!phone?.includes("EM") ? maskedPhone(user.role === "Super Admin", phone) : "-"}</TableCell>
+      <TableCell>{!phone?.includes('EM') ? maskedPhone(user.role === 'Super Admin', phone) : '-'}</TableCell>
 
       <TableCell>{email}</TableCell>
 
-      <TableCell>{mainAddress?.address || "-"}</TableCell>
+      <TableCell>{mainAddress?.address || '-'}</TableCell>
 
-      <TableCell align="center">
+      {/* <TableCell align="center">
         <Label
           variant="ghost"
           color="success"
         >
           <Typography variant="subtitle2" sx={{ fontStyle: "italic" }}>{numberWithCommas(point || 0)}</Typography>
         </Label>
-      </TableCell>
+      </TableCell> */}
 
       <TableCell align="center">
         <Stack direction="row" justifyContent="center" gap={1}>
-          <Button title="Edit" variant="contained" sx={{ p: 0, minWidth: 35, height: 35 }} onClick={() => {
-            onEditRow();
-          }}>
+          <Button
+            title="Edit"
+            variant="contained"
+            sx={{ p: 0, minWidth: 35, height: 35 }}
+            onClick={() => {
+              onEditRow();
+            }}
+          >
             <Iconify icon="eva:edit-outline" sx={{ width: 24, height: 24 }} />
           </Button>
-          {user.role === "Super Admin" && (
-            <Button title="Delete" variant="contained" color="error" sx={{ p: 0, minWidth: 35, height: 35 }} onClick={() => {
-              onDeleteRow();
-            }}>
+          {user.role === 'Super Admin' && (
+            <Button
+              title="Delete"
+              variant="contained"
+              color="error"
+              sx={{ p: 0, minWidth: 35, height: 35 }}
+              onClick={() => {
+                onDeleteRow();
+              }}
+            >
               <Iconify icon="eva:trash-2-outline" sx={{ width: 24, height: 24 }} />
             </Button>
           )}
