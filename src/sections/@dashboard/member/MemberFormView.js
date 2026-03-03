@@ -167,7 +167,7 @@ export default function MemberForm({ currentData }) {
               <Stack>
                 <Typography variant="subtitle2">Phone</Typography>
                 <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                  {!data?.phone?.includes('EM') ? maskedPhone(user?.role === 'Super Admin', data?.phone) || '-' : '-'}
+                  {!data?.phone?.includes('EM') ? maskedPhone(['owner', 'super admin']?.includes(user?.role), data?.phone) || '-' : '-'}
                 </Typography>
               </Stack>
               <Stack>

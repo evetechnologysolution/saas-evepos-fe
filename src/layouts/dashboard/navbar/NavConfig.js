@@ -134,12 +134,12 @@ export const useNavConfig = () => {
         //   icon: ICONS.printCount,
         //   roles: ['super admin'],
         // },
-        // {
-        //   title: 'Cash Cashier',
-        //   path: PATH_DASHBOARD.cashCashier.root,
-        //   icon: ICONS.cashier,
-        //   roles: ['super admin', 'cashier'],
-        // },
+        {
+          title: 'Cash Cashier',
+          path: PATH_DASHBOARD.cashCashier.root,
+          icon: ICONS.cashier,
+          roles: ['owner', 'super admin', 'cashier'],
+        },
         {
           title: 'Expense Data',
           path: PATH_DASHBOARD.expense.root,
@@ -217,17 +217,17 @@ export const useNavConfig = () => {
           ],
         },
         // SETTINGS
-        // {
-        //   title: 'settings',
-        //   path: PATH_DASHBOARD.settings.root,
-        //   icon: ICONS.setting,
-        //   roles: ['super admin', 'admin'],
-        //   children: [
-        //     { title: 'general setting', path: PATH_DASHBOARD.settings.generalSetting },
-        //     { title: 'tax setting', path: PATH_DASHBOARD.settings.tax },
-        //     { title: 'receipt setting', path: PATH_DASHBOARD.settings.receiptSetting },
-        //   ],
-        // },
+        {
+          title: 'settings',
+          path: PATH_DASHBOARD.settings.root,
+          icon: ICONS.setting,
+          roles: ['owner'],
+          children: [
+            { title: 'general setting', path: PATH_DASHBOARD.settings.generalSetting },
+            { title: 'tax setting', path: PATH_DASHBOARD.settings.tax },
+            { title: 'receipt setting', path: PATH_DASHBOARD.settings.receiptSetting },
+          ],
+        },
         // PROFILE
         {
           title: 'profile',

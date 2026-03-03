@@ -162,7 +162,7 @@ export default function ExpenseData() {
     if (selectedId) {
       try {
         await axios.delete(`/expense/${selectedId}`);
-        client.invalidateQueries('listExpense');
+        client.invalidateQueries(['listExpense']);
         enqueueSnackbar('Delete success!');
       } catch (error) {
         console.error(error);

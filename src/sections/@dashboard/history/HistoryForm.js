@@ -282,7 +282,7 @@ export default function HistoryForm() {
                 <Typography variant="subtitle2">Phone</Typography>
                 <Typography variant="body2" sx={{ fontStyle: "italic" }}>
                   {!data?.phone?.includes("EM") ?
-                    maskedPhone(user?.role === "Super Admin", data?.phone) || "-"
+                    maskedPhone(['owner', 'super admin']?.includes(user?.role), data?.phone) || "-"
                     : "-"
                   }
                 </Typography>

@@ -61,12 +61,12 @@ export default function FinishForm() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await axios.patch(`/order/raw/${ctx.currentOrderID}`, { donation });
-      enqueueSnackbar('Submit donation success!');
+      await axios.patch(`/order/raw/${ctx.currentOrderID}`, { roundingAmount: donation });
+      enqueueSnackbar('Submit data success!');
       setIsSubmit(true);
     } catch (error) {
-      console.error('Error submitting donation:', error);
-      enqueueSnackbar('Failed to submit donation. Please try again.', { variant: 'error' });
+      console.error('Error submitting data:', error);
+      enqueueSnackbar('Failed to submit data. Please try again.', { variant: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -102,7 +102,7 @@ export default function FinishForm() {
               Out of Rp. {numberWithCommas(ctx.amountPaid)}
             </Typography>
             <Typography align="center" variant="subtitle1" my={3}>
-              Customer ingin donasi?
+              Kembalian tidak diambil?
             </Typography>
             <Stack justifyContent="center" alignItems="center">
               {!isSubmit ? (

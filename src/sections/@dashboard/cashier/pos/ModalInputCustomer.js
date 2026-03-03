@@ -296,7 +296,7 @@ export default function ModalInputCustomer(props) {
               fullWidth
               autoComplete="off"
               // value={phone}
-              value={!isNew ? (!phone?.includes('EM') ? maskedPhone(user?.role === 'Super Admin', phone) : '-') : phone}
+              value={!isNew ? (!phone?.includes('EM') ? maskedPhone(['owner', 'super admin']?.includes(user?.role), phone) : '-') : phone}
               onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
               error={!phone && alert ? Boolean(true) : Boolean(false)}
               helperText={!phone && alert ? 'Phone is required' : ''}

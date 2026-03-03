@@ -1,21 +1,21 @@
-import PropTypes from "prop-types";
-import { styled, TableRow, TableCell } from "@mui/material";
+import PropTypes from 'prop-types';
+import { styled, TableRow, TableCell } from '@mui/material';
 // hooks
-import useAuth from "../../../../hooks/useAuth";
+import useAuth from '../../../../hooks/useAuth';
 // utils
-import { formatDate2 } from "../../../../utils/getData";
-import { maskedPhone } from "../../../../utils/masked";
+import { formatDate2 } from '../../../../utils/getData';
+import { maskedPhone } from '../../../../utils/masked';
 
 // ----------------------------------------------------------------------
 
 LogVoucherTableRow.propTypes = {
-  row: PropTypes.object
+  row: PropTypes.object,
 };
 
 const CustomTableRow = styled(TableRow)(() => ({
-  "&.MuiTableRow-hover:hover": {
+  '&.MuiTableRow-hover:hover': {
     // boxShadow: "inset 8px 0 0 #fff, inset -8px 0 0 #fff",
-    borderRadius: "8px",
+    borderRadius: '8px',
   },
 }));
 
@@ -32,14 +32,17 @@ export default function LogVoucherTableRow({ row }) {
 
       <TableCell>{voucherCode}</TableCell>
 
-      <TableCell>{voucherType === 1 ? "Diskon" : voucherType === 2 ? "Hadiah" : "Pastcard"}</TableCell>
+      <TableCell>{voucherType === 1 ? 'Diskon' : voucherType === 2 ? 'Hadiah' : 'Pastcard'}</TableCell>
 
       <TableCell>{member.memberId}</TableCell>
 
       <TableCell>{member.name}</TableCell>
 
-      <TableCell>{!member?.phone?.includes("EM") ? maskedPhone(user.role === "Super Admin", member?.phone) : "-"}</TableCell>
-
+      <TableCell>
+        {!member?.phone?.includes('EM')
+          ? maskedPhone(['owner', 'super admin']?.includes(user?.role), member?.phone)
+          : '-'}
+      </TableCell>
     </CustomTableRow>
   );
 }

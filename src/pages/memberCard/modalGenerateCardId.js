@@ -22,7 +22,7 @@ export default function GenerateCardID({ open, onClose }) {
     try {
       setLoading(true);
       await axios.post(`/member-card/generate/${amount}`);
-      client.invalidateQueries('memberCards');
+      client.invalidateQueries(['memberCards']);
       onClose();
     } catch (error) {
       console.warn('An error occurred while generating card ID: ', error);

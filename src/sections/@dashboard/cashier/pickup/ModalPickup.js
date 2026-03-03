@@ -265,7 +265,7 @@ export default function ModalPickup(props) {
         pickupData: objPickUp,
         pickUpStatus: objPickUp.status || 'completed',
       });
-      client.invalidateQueries('pickup');
+      client.invalidateQueries(['pickup']);
       enqueueSnackbar('Order picked up!', { variant: 'success' });
       setIsLoading(false);
       handleClose();

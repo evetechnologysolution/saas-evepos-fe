@@ -123,7 +123,7 @@ export default function ModalChangePayment(props) {
         cardNumber,
       };
       await axios.patch(`/order/raw/${data._id}`, objData);
-      client.invalidateQueries('listOrders');
+      client.invalidateQueries(['listOrders']);
 
       handleClose();
     } catch (error) {
