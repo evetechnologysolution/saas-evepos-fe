@@ -45,7 +45,7 @@ export default function MemberCardsTableRow({ row }) {
   const handleDeleteData = async () => {
     setDelete(false);
     await axios.delete(`/member-card/${_id}`);
-    client.invalidateQueries('memberCards');
+    client.invalidateQueries(['memberCards']);
     enqueueSnackbar(`Deleted Card ID ${cardId} success!`);
   };
 

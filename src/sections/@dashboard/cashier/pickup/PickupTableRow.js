@@ -154,7 +154,7 @@ export default function OrdersTableRow({ row }) {
           {customer?.phone && (
             <p>
               {!customer?.phone?.includes('EM')
-                ? maskedPhone(user?.role === 'Super Admin', customer?.phone) || '-'
+                ? maskedPhone(['owner', 'super admin']?.includes(user?.role), customer?.phone) || '-'
                 : '-'}
             </p>
           )}

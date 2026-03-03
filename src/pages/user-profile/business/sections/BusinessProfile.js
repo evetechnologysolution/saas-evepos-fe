@@ -135,7 +135,7 @@ export default function AccountProfile() {
     await handleMutationFeedback(update.mutateAsync({ id: user?.tenantRef?._id, payload: formData }), {
       successMsg: 'Profil berhasil disimpan!',
       errorMsg: 'Gagal menyimpan profil!',
-      onSuccess: () => queryClient.invalidateQueries('authUser'),
+      onSuccess: () => queryClient.invalidateQueries(['authUser']),
       enqueueSnackbar,
     });
   };

@@ -215,7 +215,7 @@ export default function OrdersForm({ currentData }) {
                     <td>
                       <Typography variant="body2" sx={{ fontStyle: "italic" }}>
                         {data?.customer?.phone && !data?.customer?.phone?.includes("EM") ?
-                          maskedPhone(user?.role === "Super Admin", data?.customer?.phone)
+                          maskedPhone(['owner', 'super admin']?.includes(user?.role), data?.customer?.phone)
                           : "-"
                         }
                       </Typography>

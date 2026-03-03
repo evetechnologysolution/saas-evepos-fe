@@ -343,7 +343,7 @@ export default function ModalScanCustomer(props) {
               label="WA Number"
               fullWidth
               autoComplete="off"
-              value={!phone?.includes('EM') ? maskedPhone(user?.role === 'Super Admin', phone) : '-'}
+              value={!phone?.includes('EM') ? maskedPhone(['owner', 'super admin']?.includes(user?.role), phone) : '-'}
               error={!phone && alert ? Boolean(true) : Boolean(false)}
               helperText={!phone && alert ? 'Phone is required' : ''}
               disabled

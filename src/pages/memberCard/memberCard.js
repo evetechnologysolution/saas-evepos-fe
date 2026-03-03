@@ -156,7 +156,7 @@ export default function CashierOrders() {
     setLoadingDelete(true);
     if (selectedId) {
       await axios.delete(`/order/${selectedId}`);
-      client.invalidateQueries('listOrders');
+      client.invalidateQueries(['listOrders']);
       enqueueSnackbar('Delete success!');
     }
     handleDialog();

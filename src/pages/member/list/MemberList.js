@@ -151,7 +151,7 @@ export default function MemberList() {
     setLoadingDelete(true);
     if (selectedId) {
       await axios.delete(`/member/${selectedId}`);
-      client.invalidateQueries('listMembers');
+      client.invalidateQueries(['listMembers']);
       enqueueSnackbar('Delete success!');
     }
     handleDialog();
