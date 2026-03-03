@@ -112,7 +112,7 @@ export default function HistoryForm() {
       setLoading(true);
       setAlert(false);
 
-      const res = await axios.get('/member/track', {
+      const res = await axios.get('/members/track', {
         params: { search },
       });
 
@@ -148,7 +148,7 @@ export default function HistoryForm() {
   useEffect(() => {
     if (!data?.name) return; // Early return if member ID is not available
 
-    const url = `/order?page=${controllerOrder.page + 1}&perPage=${controllerOrder.rowsPerPage}&search=${data.phone}`;
+    const url = `/orders?page=${controllerOrder.page + 1}&perPage=${controllerOrder.rowsPerPage}&search=${data.phone}`;
     fetchData(url, setOrderData, setCountOrder);
   }, [controllerOrder, data]);
 
@@ -284,7 +284,9 @@ export default function HistoryForm() {
               <Stack>
                 <Typography variant="subtitle2">Phone</Typography>
                 <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                  {!data?.phone?.includes('EM') ? maskedPhone(user?.role === 'Super Admin', data?.phone) || '-' : '-'}
+                  {!data?.phone?.includes('EM')
+                    ? maskedPhone(['owner', 'super admin']?.includes(user?.role), data?.phone) || '-'
+                    : '-'}
                 </Typography>
               </Stack>
               <Stack>
@@ -295,7 +297,7 @@ export default function HistoryForm() {
               </Stack>
             </Stack>
           </Grid>
-          {/* <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={4}>
             <Stack spacing={3}>
               <Stack>
                 <Typography variant="subtitle2">Point</Typography>
@@ -324,7 +326,7 @@ export default function HistoryForm() {
                 </div>
               </Stack>
             </Stack>
-          </Grid> */}
+          </Grid>
         </Grid>
 
         {/* order history */}
@@ -365,7 +367,7 @@ export default function HistoryForm() {
         </div>
 
         {/* point history */}
-        {/* <div>
+        <div>
           <Divider sx={{ my: 3 }} />
           <Typography variant="subtitle1" sx={{ mb: 1 }}>
             Point History
@@ -399,10 +401,10 @@ export default function HistoryForm() {
               />
             </Box>
           </Box>
-        </div> */}
+        </div>
 
         {/* voucher history */}
-        {/* <div>
+        <div>
           <Divider sx={{ my: 3 }} />
           <Typography variant="subtitle1" sx={{ mb: 1 }}>
             Voucher History
@@ -436,7 +438,7 @@ export default function HistoryForm() {
               />
             </Box>
           </Box>
-        </div> */}
+        </div>
       </Card>
     </>
   );
