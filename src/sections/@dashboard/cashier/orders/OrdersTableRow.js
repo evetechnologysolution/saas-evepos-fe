@@ -316,7 +316,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
   const handleCancelOrder = async () => {
     setIsLoading(true);
     await axios.patch(`/order/raw/${_id}`, { status: 'cancel' });
-    client.invalidateQueries('orders');
+    client.invalidateQueries(['orders']);
     setOpenCancel(false);
     setIsLoading(false);
     enqueueSnackbar(`Cancel Order ${orderId || _id} success!`);
@@ -325,7 +325,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
   const handleGeneratePoint = async () => {
     setIsLoading(true);
     await axios.patch(`/order/generate-point/${_id}`);
-    client.invalidateQueries('orders');
+    client.invalidateQueries(['orders']);
     setOpenGenerate(false);
     setIsLoading(false);
     enqueueSnackbar(`Generate Point ${orderId || _id} success!`);
@@ -343,7 +343,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
       cardNumber: '',
     };
     await axios.patch(`/order/raw/${_id}`, updated);
-    client.invalidateQueries('orders');
+    client.invalidateQueries(['orders']);
     setOpenCancelPayment(false);
     setIsLoading(false);
     enqueueSnackbar(`Cancel payment for Order ${orderId || _id} success!`);
@@ -389,7 +389,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
           {customer?.phone && (
             <p>
               {!customer?.phone?.includes('EM')
-                ? maskedPhone(user?.role === 'Super Admin', customer?.phone) || '-'
+                ? maskedPhone(['owner', 'super admin']?.includes(user?.role), customer?.phone) || '-'
                 : '-'}
             </p>
           )}

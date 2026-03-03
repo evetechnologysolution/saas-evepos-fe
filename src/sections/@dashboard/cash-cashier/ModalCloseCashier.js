@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import { useState, useRef, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQueryClient } from 'react-query';
 import { useSnackbar } from 'notistack';
 import { useReactToPrint } from 'react-to-print';
 import {
@@ -36,6 +35,8 @@ import CashCashierPrint from './CashCashierPrint';
 import { formatDate2, numberWithCommas } from '../../../utils/getData';
 // context
 import { mainContext } from '../../../contexts/MainContext';
+// service
+import useCash from './service/useCash';
 
 // ----------------------------------------------------------------------
 
@@ -90,7 +91,7 @@ export default function ModalCloseCashier({ open, handleClose, handleCloseCashie
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const client = useQueryClient();
+  const { closeCashier } = useCash();
 
   let nonCash = 0;
   if (ctx.existCash?.detail) {
@@ -205,14 +206,24 @@ export default function ModalCloseCashier({ open, handleClose, handleCloseCashie
           difference,
           notes,
         };
-        ctx.existCash.cashOut += Number(amount);
-        ctx.existCash.history.push({ date: currDate, title: 'Tutup Kas', isCashOut: true, amount });
-        ctx.existCash.difference = difference;
-        ctx.existCash.notes = notes;
+
+        setCashData((prev) => ({
+          ...prev,
+          cashOut: (prev?.cashOut || 0) + Number(amount),
+          difference,
+          notes,
+          history: [
+            ...(prev?.history || []),
+            {
+              date: currDate,
+              title: 'Tutup Kas',
+              isCashOut: true,
+              amount,
+            },
+          ],
+        }));
       }
-      await setCashData(ctx.existCash);
-      await ctx.closeCash(objData);
-      client.invalidateQueries('listCashCashier');
+      await closeCashier.mutateAsync(objData);
       handleCloseCashier();
       enqueueSnackbar('Close cashier success!');
       setTimeout(() => {

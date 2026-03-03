@@ -299,7 +299,7 @@ export default function ScanProgress() {
                             ) : (
                               <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
                                 {detail?.customer?.phone && !detail?.customer?.phone?.includes('EM')
-                                  ? maskedPhone(user?.role === 'Super Admin', detail?.customer?.phone)
+                                  ? maskedPhone(['owner', 'super admin']?.includes(user?.role), detail?.customer?.phone)
                                   : '-'}
                               </Typography>
                             )}

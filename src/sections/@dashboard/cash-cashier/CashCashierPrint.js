@@ -1,43 +1,65 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-// hooks
 import useAuth from '../../../hooks/useAuth';
-// context
 import { mainContext } from '../../../contexts/MainContext';
-// utils
 import { numberWithCommas, formatDate2 } from '../../../utils/getData';
 import { headerPrint } from '../../../_mock/headerPrint';
 import '../cashier/pos/PrintReceipt.scss';
 
 // ----------------------------------------------------------------------
 
-const CashCashierPrint = React.forwardRef(({ content, items }, ref) => {
+const CashCashierPrint = React.forwardRef(({ content = {}, items = [] }, ref) => {
   const { user } = useAuth();
-
   const ctm = useContext(mainContext);
 
-  const eWallet = content.detail.dana + content.detail.ovo + content.detail.shopeePay + content.detail.qris;
-  const card = content.detail.bri + content.detail.bni + content.detail.bca + content.detail.mandiri;
+  const detail = content.detail || {};
+  const history = content.history || [];
 
-  const closeCashier = content.history.find((item) => item.title === 'Tutup Kas' && item.isCashOut === true);
+  const toNumber = (val) => Number(val || 0);
 
-  const cashOut = closeCashier ? content.cashOut - closeCashier.amount : content.cashOut;
+  // =========================
+  // PAYMENT GROUPING
+  // =========================
+  const eWallet = toNumber(detail.dana) + toNumber(detail.ovo) + toNumber(detail.shopeePay) + toNumber(detail.qris);
 
+  const card = toNumber(detail.bri) + toNumber(detail.bni) + toNumber(detail.bca) + toNumber(detail.mandiri);
+
+  // =========================
+  // CLOSE CASHIER
+  // =========================
+  const closeCashier = history.find((item) => item.title === 'Tutup Kas' && item.isCashOut);
+
+  const totalCashOut = toNumber(content.cashOut);
+  const closeAmount = toNumber(closeCashier?.amount);
+
+  const cashOut = closeCashier ? totalCashOut - closeAmount : totalCashOut;
+
+  // =========================
+  // SETOR & DIFFERENCE
+  // =========================
+  const expectedSetor = toNumber(detail.cash) + toNumber(content.cashIn) + eWallet + card - cashOut;
+
+  const difference = closeCashier ? toNumber(content.difference) : -expectedSetor;
+
+  // =========================
+  // HELPERS
+  // =========================
   const truncateString = (text) => {
     const maxLength = 15;
-    const str = text.toString();
-    const truncatedText = str.length > maxLength ? `${str.substring(0, maxLength)}...` : str;
-
-    return <span>{truncatedText}</span>;
+    const str = text ? text.toString() : '';
+    return <span>{str.length > maxLength ? `${str.substring(0, maxLength)}...` : str}</span>;
   };
 
   const checkPrice = (val) => {
     if (val.promotionType === 1) {
-      return val.price - val.price * (Number(val.discountAmount) / 100);
+      return val.price - val.price * (toNumber(val.discountAmount) / 100);
     }
     return val.price;
   };
 
+  // =========================
+  // RENDER
+  // =========================
   return (
     <div ref={ref} className="no-break">
       <p style={{ textTransform: 'uppercase' }}>{ctm.receiptHeader?.name || headerPrint.name}</p>
@@ -66,63 +88,46 @@ const CashCashierPrint = React.forwardRef(({ content, items }, ref) => {
             </tr>
             <tr>
               <td>Start Shift</td>
-              <td>: {formatDate2(content.startDate)}</td>
+              <td>: {content?.startDate ? formatDate2(content?.startDate) : '-'}</td>
             </tr>
             <tr>
               <td>End Shift</td>
-              <td>: {formatDate2(content.endDate ? content.endDate : new Date())}</td>
+              <td>: {formatDate2(content.endDate || new Date())}</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      {items?.length > 0 && (
+      {items.length > 0 && (
         <div>
           <div style={{ borderBottom: '1.7px dashed #000000', margin: '10px auto' }} />
           <h4>Produk</h4>
           <div style={{ borderBottom: '1.7px dashed #000000', margin: '10px auto' }} />
 
-          {/* {items?.map((item, index) => (
-                        item.status === "Paid" && (
-                            <div key={index}>
-                                {item?.orders?.map((row, idx) => (
-                                    <div key={idx} style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-                                        <div style={{ textAlign: "left" }}>
-                                            <p>{formatDate2(item.date)}</p>
-                                            <p>{truncateString(row.name)}</p>
-                                        </div>
-                                        <div style={{ textAlign: "right" }}>
-                                            <p>{`${row.qty}x ${numberWithCommas(checkPrice(row))}`}</p>
-                                            <p>Rp. {numberWithCommas(row.qty * checkPrice(row))}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )
-                    ))} */}
-
-          {items?.map(
-            (item, index) =>
-              item.status === 'Paid' && (
-                <div key={index} style={{ marginBottom: '10px' }}>
-                  <div>
-                    <p style={{ textAlign: 'left' }}>{formatDate2(item.date)}</p>
-                    {item?.orders?.map((row, idx) => (
+          {items
+            .filter((item) => item.status === 'Paid')
+            .map((item, index) => (
+              <div key={index} style={{ marginBottom: '10px' }}>
+                <div>
+                  <p style={{ textAlign: 'left' }}>{formatDate2(item.date)}</p>
+                  {item.orders?.map((row, idx) => {
+                    const price = checkPrice(row);
+                    return (
                       <div key={idx} style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <div style={{ textAlign: 'left' }}>
                           <p>{truncateString(row.name)}</p>
-                          <p>{`${row.qty}x ${numberWithCommas(checkPrice(row))}`}</p>
+                          <p>{`${row.qty}x ${numberWithCommas(price)}`}</p>
                         </div>
                         <div style={{ textAlign: 'right' }}>
                           <br />
-                          <p>Rp. {numberWithCommas(row.qty * checkPrice(row))}</p>
+                          <p>Rp. {numberWithCommas(toNumber(row.qty) * price)}</p>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
-              )
-          )}
+              </div>
+            ))}
         </div>
       )}
 
@@ -132,25 +137,30 @@ const CashCashierPrint = React.forwardRef(({ content, items }, ref) => {
 
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <p>Sales</p>
-        <p>Rp. {numberWithCommas(content.sales)}</p>
+        <p>Rp. {numberWithCommas(toNumber(content.sales))}</p>
       </div>
 
-      {content.history.length > 0 &&
-        content.history.map((item, i) => (
-          <div key={i} style={{ margin: '5px auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <p style={{ textAlign: 'left' }}>
-                {item.isCashOut ? 'Cash Out' : 'Cash In'} <br />
-                <span style={{ fontSize: '9px', fontStyle: 'italic' }}>({truncateString(item.title)})</span>
-              </p>
-              {item.isCashOut ? (
-                <p>(-Rp. {numberWithCommas(item.amount)})</p>
-              ) : (
-                <p>Rp. {numberWithCommas(item.amount)}</p>
-              )}
-            </div>
+      {history.map((item, i) => (
+        <div key={i} style={{ margin: '5px auto' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <p style={{ textAlign: 'left' }}>
+              {item.isCashOut ? 'Cash Out' : 'Cash In'} <br />
+              <span style={{ fontSize: '9px', fontStyle: 'italic' }}>({truncateString(item.title)})</span>
+            </p>
+            {item.isCashOut ? (
+              <p>(-Rp. {numberWithCommas(toNumber(item.amount))})</p>
+            ) : (
+              <p>Rp. {numberWithCommas(toNumber(item.amount))}</p>
+            )}
           </div>
-        ))}
+        </div>
+      ))}
 
       <div style={{ borderBottom: '1.7px dashed #000000', margin: '10px auto' }} />
       <h4>Pajak & Lain-lain</h4>
@@ -159,17 +169,17 @@ const CashCashierPrint = React.forwardRef(({ content, items }, ref) => {
       <div style={{ margin: '5px auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <p>Tax</p>
-          <p>Rp. {numberWithCommas(content.tax)}</p>
+          <p>Rp. {numberWithCommas(toNumber(content.tax))}</p>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <p>Service Charge</p>
-          <p>Rp. {numberWithCommas(content.serviceCharge)}</p>
+          <p>Rp. {numberWithCommas(toNumber(content.serviceCharge))}</p>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <p>Refund</p>
-          <p>Rp. {numberWithCommas(content.refund)}</p>
+          <p>Rp. {numberWithCommas(toNumber(content.refund))}</p>
         </div>
       </div>
 
@@ -180,7 +190,7 @@ const CashCashierPrint = React.forwardRef(({ content, items }, ref) => {
       <div style={{ margin: '5px auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <p>Cash</p>
-          <p>Rp. {numberWithCommas(content.detail.cash)}</p>
+          <p>Rp. {numberWithCommas(toNumber(detail.cash))}</p>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -199,24 +209,17 @@ const CashCashierPrint = React.forwardRef(({ content, items }, ref) => {
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <p style={{ textAlign: 'left', fontSize: '9px', fontStyle: 'italic' }}>(diharapkan)</p>
-          <p>Rp. {numberWithCommas(content.detail.cash + content.cashIn + eWallet + card - cashOut)}</p>
+          <p>Rp. {numberWithCommas(expectedSetor)}</p>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <p style={{ textAlign: 'left', fontSize: '9px', fontStyle: 'italic' }}>(realisasi)</p>
-          <p>Rp. {numberWithCommas(closeCashier?.amount || 0)}</p>
+          <p>Rp. {numberWithCommas(closeAmount)}</p>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <p>Selisih</p>
-          <p>
-            Rp.{' '}
-            {numberWithCommas(
-              closeCashier?.amount
-                ? content?.difference || 0
-                : -(content.detail.cash + content.cashIn + eWallet + card) - cashOut
-            )}
-          </p>
+          <p>Rp. {numberWithCommas(difference)}</p>
         </div>
 
         {content.notes && (
@@ -228,7 +231,6 @@ const CashCashierPrint = React.forwardRef(({ content, items }, ref) => {
       </div>
 
       <div style={{ borderBottom: '1.7px dashed #000000', margin: '10px auto' }} />
-
       <p className="powered">Powered by EvePOS</p>
     </div>
   );

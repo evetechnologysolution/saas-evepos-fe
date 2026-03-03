@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from 'react-query';
 import axios from 'src/utils/axios';
 
 const QUERY_KEY = ['categories'];
+const QUERY_KEY_ALL = ['allCategory'];
 
 export default function useCategory() {
   const queryClient = useQueryClient();
@@ -32,8 +33,9 @@ export default function useCategory() {
       const { data } = await axios.post('/category', payload);
       return data;
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    onSuccess: () => {
+      queryClient.invalidateQueries(QUERY_KEY);
+      queryClient.invalidateQueries(QUERY_KEY_ALL);
     },
   });
 
@@ -45,8 +47,9 @@ export default function useCategory() {
       const { data } = await axios.patch(`/category/${id}`, payload);
       return data;
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    onSuccess: () => {
+      queryClient.invalidateQueries(QUERY_KEY);
+      queryClient.invalidateQueries(QUERY_KEY_ALL);
     },
   });
 
@@ -58,8 +61,9 @@ export default function useCategory() {
       const { data } = await axios.delete(`/category/${id}`);
       return data;
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    onSuccess: () => {
+      queryClient.invalidateQueries(QUERY_KEY);
+      queryClient.invalidateQueries(QUERY_KEY_ALL);
     },
   });
 

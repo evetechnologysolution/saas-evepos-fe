@@ -269,7 +269,7 @@ export default function Dashboard() {
             <YearlyWidgetSummary
               title="Donation"
               subtitle={getTopCurrentFilterLabel()}
-              total={dashboardRevenue?.totalDonation || 0}
+              total={dashboardRevenue?.roundingAmount || 0}
               type="currency"
               color="success"
               icon={'heroicons-solid:currency-dollar'}

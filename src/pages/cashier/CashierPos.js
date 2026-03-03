@@ -77,9 +77,6 @@ export default function CashierPos() {
 
   useEffect(() => {
     const fetchData = async () => {
-      await ctm.getGeneralSettings();
-      await ctm.getExistCash();
-
       if (ctm.generalSettings?.cashBalance && !ctm.existCash?.isOpen) {
         setOpenCashier(true);
       }
@@ -651,7 +648,6 @@ export default function CashierPos() {
       <ModalCashCashier
         open={openCashier}
         onClose={() => setOpenCashier(false)}
-        addTransaction={ctm.existCash?.isOpen}
         required
       />
 

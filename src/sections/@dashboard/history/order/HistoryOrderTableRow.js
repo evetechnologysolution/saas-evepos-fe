@@ -49,7 +49,9 @@ export default function OrderTableRow({ row }) {
         <p>{customer?.name || '-'}</p>
         {customer?.phone && (
           <p>
-            {!customer?.phone?.includes('EM') ? maskedPhone(user?.role === 'Super Admin', customer?.phone) || '-' : '-'}
+            {!customer?.phone?.includes('EM')
+              ? maskedPhone(['owner', 'super admin']?.includes(user?.role), customer?.phone) || '-'
+              : '-'}
           </p>
         )}
       </TableCell>

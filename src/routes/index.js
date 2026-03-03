@@ -605,7 +605,7 @@ export default function Router() {
             {
               path: 'cash-cashier',
               element: (
-                <RoleBasedGuard hasContent roles={['super admin', 'Cashier']}>
+                <RoleBasedGuard hasContent roles={['owner', 'super admin', 'admin', 'cashier']}>
                   <CashCashier />
                 </RoleBasedGuard>
               ),
@@ -649,7 +649,7 @@ export default function Router() {
                 {
                   path: 'cash-flow',
                   element: (
-                    <RoleBasedGuard hasContent roles={['super admin', 'admin']}>
+                    <RoleBasedGuard hasContent roles={['owner', 'super admin', 'admin']}>
                       <CashFlow />
                     </RoleBasedGuard>
                   ),
@@ -695,7 +695,7 @@ export default function Router() {
                 {
                   path: 'general-setting',
                   element: (
-                    <RoleBasedGuard hasContent roles={['super admin', 'admin']}>
+                    <RoleBasedGuard hasContent roles={['owner']}>
                       <Settings />
                     </RoleBasedGuard>
                   ),
@@ -703,7 +703,7 @@ export default function Router() {
                 {
                   path: 'tax',
                   element: (
-                    <RoleBasedGuard hasContent roles={['super admin', 'admin']}>
+                    <RoleBasedGuard hasContent roles={['owner']}>
                       <Tax />
                     </RoleBasedGuard>
                   ),
@@ -711,7 +711,7 @@ export default function Router() {
                 {
                   path: 'receipt-setting',
                   element: (
-                    <RoleBasedGuard hasContent roles={['super admin', 'admin']}>
+                    <RoleBasedGuard hasContent roles={['owner']}>
                       <ReceiptSetting />
                     </RoleBasedGuard>
                   ),

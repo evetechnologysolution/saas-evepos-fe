@@ -44,7 +44,7 @@ export default function MemberTableRow({ row, onDetailRow, onEditRow, onDeleteRo
 
       <TableCell>{name}</TableCell>
 
-      <TableCell>{!phone?.includes('EM') ? maskedPhone(user.role === 'Super Admin', phone) : '-'}</TableCell>
+      <TableCell>{!phone?.includes('EM') ? maskedPhone(['owner', 'super admin']?.includes(user?.role), phone) : '-'}</TableCell>
 
       <TableCell>{email}</TableCell>
 
