@@ -148,7 +148,7 @@ export default function HistoryForm() {
   useEffect(() => {
     if (!data?.name) return; // Early return if member ID is not available
 
-    const url = `/orders?page=${controllerOrder.page + 1}&perPage=${controllerOrder.rowsPerPage}&search=${data.phone}`;
+    const url = `/order?page=${controllerOrder.page + 1}&perPage=${controllerOrder.rowsPerPage}&search=${data.phone}`;
     fetchData(url, setOrderData, setCountOrder);
   }, [controllerOrder, data]);
 
@@ -295,7 +295,7 @@ export default function HistoryForm() {
               </Stack>
             </Stack>
           </Grid>
-          <Grid item xs={12} md={4}>
+          {/* <Grid item xs={12} md={4}>
             <Stack spacing={3}>
               <Stack>
                 <Typography variant="subtitle2">Point</Typography>
@@ -324,7 +324,7 @@ export default function HistoryForm() {
                 </div>
               </Stack>
             </Stack>
-          </Grid>
+          </Grid> */}
         </Grid>
 
         {/* order history */}
@@ -365,7 +365,7 @@ export default function HistoryForm() {
         </div>
 
         {/* point history */}
-        <div>
+        {/* <div>
           <Divider sx={{ my: 3 }} />
           <Typography variant="subtitle1" sx={{ mb: 1 }}>
             Point History
@@ -399,10 +399,10 @@ export default function HistoryForm() {
               />
             </Box>
           </Box>
-        </div>
+        </div> */}
 
         {/* voucher history */}
-        <div>
+        {/* <div>
           <Divider sx={{ my: 3 }} />
           <Typography variant="subtitle1" sx={{ mb: 1 }}>
             Voucher History
@@ -436,7 +436,7 @@ export default function HistoryForm() {
               />
             </Box>
           </Box>
-        </div>
+        </div> */}
       </Card>
     </>
   );
