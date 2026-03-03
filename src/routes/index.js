@@ -117,6 +117,22 @@ export default function Router() {
               ),
             },
             {
+              path: 'track-history',
+              element: (
+                <RoleBasedGuard hasContent roles={['owner', 'staff', 'cashier', 'admin']}>
+                  <TrackHistory />
+                </RoleBasedGuard>
+              ),
+            },
+            {
+              path: 'track-order',
+              element: (
+                <RoleBasedGuard hasContent roles={['owner', 'staff', 'cashier', 'admin']}>
+                  <TrackOrderHistory />
+                </RoleBasedGuard>
+              ),
+            },
+            {
               path: 'scan-voucher',
               element: (
                 <RoleBasedGuard hasContent roles={['super admin', 'admin', 'Cashier', 'Admin Bazaar', 'Staff Bazaar']}>
@@ -876,3 +892,7 @@ const VoucherScan = Loadable(lazy(() => import('../pages/scanVoucher')));
 
 // Chat
 const ChatPage = Loadable(lazy(() => import('../pages/chat/Chat')));
+
+// Track Order
+const TrackOrderHistory = Loadable(lazy(() => import('../pages/history/HistoryOrderView')));
+const TrackHistory = Loadable(lazy(() => import('../pages/history/HistoryView')));
