@@ -33,7 +33,7 @@ import { cashierContext } from '../../contexts/CashierContext';
 import { mainContext } from '../../contexts/MainContext';
 // utils
 // import { numberWithCommas, formatDay, randomCustomer } from "../../utils/getData";
-import { generateRandomId } from '../../utils/generateRandom';
+import { generateRandomOrderId } from '../../utils/generateRandom';
 import { numberWithCommas, formatDay } from '../../utils/getData';
 import CashierPosProduct from './CashierPosProduct';
 import PrintReceipt from '../../sections/@dashboard/cashier/pos/PrintReceipt';
@@ -253,7 +253,7 @@ export default function CashierPos() {
         enqueueSnackbar('Update success!');
       } else {
         const orderUid = uuid(); // for orders _id
-        const orderId = generateRandomId(6);
+        const orderId = generateRandomOrderId();
 
         setCurrUid(orderUid);
         ctx.setDisplayOrderID(orderId);
