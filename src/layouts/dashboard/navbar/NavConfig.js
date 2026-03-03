@@ -91,18 +91,18 @@ export const useNavConfig = () => {
         //   roles: ['super admin', 'cashier'],
         //   total: ctx?.allNotif?.unreadMessage || 0,
         // },
-        // {
-        //   title: 'Track History',
-        //   path: PATH_DASHBOARD.history.root,
-        //   icon: ICONS.history,
-        //   roles: ['super admin'],
-        // },
-        // {
-        //   title: 'Track Order',
-        //   path: PATH_DASHBOARD.history.order,
-        //   icon: ICONS.history,
-        //   roles: ['super admin'],
-        // },
+        {
+          title: 'Track History',
+          path: PATH_DASHBOARD.history.root,
+          icon: ICONS.history,
+          roles: ['owner', 'admin', 'cashier', 'staff'],
+        },
+        {
+          title: 'Track Order',
+          path: PATH_DASHBOARD.history.order,
+          icon: ICONS.history,
+          roles: ['owner', 'admin', 'cashier', 'staff'],
+        },
         // {
         //   title: 'Customer',
         //   path: PATH_DASHBOARD.customer.root,
