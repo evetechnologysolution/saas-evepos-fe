@@ -346,6 +346,30 @@ export default function Router() {
                   ),
                 },
                 {
+                  path: 'status-scan',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <LibraryStatusScan />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'status-scan/new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <LibraryStatusScanCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'status-scan/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
+                      <LibraryStatusScanEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
                   path: 'subcategory',
                   element: (
                     <RoleBasedGuard hasContent roles={['owner', 'staff', 'admin']}>
@@ -838,6 +862,9 @@ const LibraryVoucher = Loadable(lazy(() => import('../pages/library/voucher/Libr
 const LibraryVoucherCreate = Loadable(lazy(() => import('../pages/library/voucher/LibraryVoucherCreate')));
 const LibraryVoucherEdit = Loadable(lazy(() => import('../pages/library/voucher/LibraryVoucherEdit')));
 const LibraryDiscount = Loadable(lazy(() => import('../pages/library/discount/LibraryDiscount')));
+const LibraryStatusScan = Loadable(lazy(() => import('../pages/library/status-scan/StatusScan')));
+const LibraryStatusScanCreate = Loadable(lazy(() => import('../pages/library/status-scan/StatusCreate')));
+const LibraryStatusScanEdit = Loadable(lazy(() => import('../pages/library/status-scan/StatusEdit')));
 
 // User
 const UserList = Loadable(lazy(() => import('../pages/user/UserList')));
