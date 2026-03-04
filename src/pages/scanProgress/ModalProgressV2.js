@@ -25,7 +25,7 @@ import Iconify from 'src/components/Iconify';
 import axiosInstance from 'src/utils/axios';
 import { handleMutationFeedback } from 'src/utils/mutationfeedback';
 
-export default function ModalProgress({ open, onClose, detail, currProgress, refetch }) {
+export default function ModalProgress({ open, onClose, detail, currProgress, refetch, currentStatusId }) {
   const { enqueueSnackbar } = useSnackbar();
 
   const {
@@ -61,6 +61,7 @@ export default function ModalProgress({ open, onClose, detail, currProgress, ref
           qty: '',
           notes: '',
           isChecked: false,
+          statusRef: currentStatusId,
         })),
       });
     }
@@ -78,8 +79,6 @@ export default function ModalProgress({ open, onClose, detail, currProgress, ref
       const finalPayload = {
         log: filteredProcess,
       };
-
-      //   console.log(finalPayload);
 
       const mutation = axiosInstance.post(`/progress/${detail?._id}`, finalPayload);
       await handleMutationFeedback(mutation, {

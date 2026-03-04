@@ -52,6 +52,7 @@ export default function ScanProgress() {
   const [isEdit, setIsEdit] = useState(false);
   const [currentDataEdit, setCurrentDataEdit] = useState(null);
   const [currentDataProgress, setCurrentDataProgress] = useState(null);
+  const [currentStatusId, setCurrentStatusId] = useState(null);
 
   const fetchOrderDetail = async (search) => {
     if (!search) throw new Error('No search term');
@@ -185,11 +186,12 @@ export default function ScanProgress() {
     };
   }, [isCameraOpen]);
 
-  const handleSubmit = async (val) => {
+  const handleSubmit = async (val, id) => {
     if (!val) {
       return;
     }
 
+    setCurrentStatusId(id);
     setCurrentDataProgress(val);
     setTimeout(() => {
       setOpenModal(true);
@@ -393,33 +395,35 @@ export default function ScanProgress() {
                       <Stack flexDirection="row" gap={1.5} flexWrap="wrap" justifyContent="space-between">
                         <Stack flexDirection="row" gap={1.5}>
                           {!isEdit &&
-                            listStatus?.map((opt, n) => {
-                              const statusKey = opt.name?.toLowerCase();
-                              const progressDetail = detail?.progressDetail || [];
+                            listStatus
+                              ?.sort((a, b) => a.listNumber - b.listNumber)
+                              ?.map((opt, n) => {
+                                const statusKey = opt.name?.toLowerCase();
+                                const progressDetail = detail?.progressDetail || [];
 
-                              const isDisabled =
-                                !detail?._id ||
-                                (progressDetail.length > 0 &&
-                                  progressDetail.every((row) => {
-                                    const totalProgress = row?.progressByStatus?.[statusKey] || 0;
-                                    const orderedQty = row?.orderedQty || 0;
+                                const isDisabled =
+                                  !detail?._id ||
+                                  (progressDetail.length > 0 &&
+                                    progressDetail.every((row) => {
+                                      const totalProgress = row?.progressByStatus?.[statusKey] || 0;
+                                      const orderedQty = row?.orderedQty || 0;
 
-                                    return totalProgress >= orderedQty;
-                                  }));
+                                      return totalProgress >= orderedQty;
+                                    }));
 
-                              return (
-                                <LoadingButton
-                                  key={n}
-                                  variant="outlined"
-                                  onClick={() => handleSubmit(opt.name)}
-                                  sx={{ textTransform: 'capitalize' }}
-                                  disabled={isDisabled}
-                                  type="button"
-                                >
-                                  {opt.name}
-                                </LoadingButton>
-                              );
-                            })}
+                                return (
+                                  <LoadingButton
+                                    key={n}
+                                    variant="outlined"
+                                    onClick={() => handleSubmit(opt.name, opt._id)}
+                                    sx={{ textTransform: 'capitalize' }}
+                                    disabled={isDisabled}
+                                    type="button"
+                                  >
+                                    {opt.name}
+                                  </LoadingButton>
+                                );
+                              })}
                           {isEdit &&
                             listStatus?.map((opt, n) => (
                               <LoadingButton
@@ -436,7 +440,7 @@ export default function ScanProgress() {
                               </LoadingButton>
                             ))}
                         </Stack>
-                        <Stack direction="row" gap={1.5}>
+                        {/* <Stack direction="row" gap={1.5}>
                           <Button onClick={() => setIsEdit(!isEdit)}>
                             <EditNote sx={{ mr: 1.2 }} />
                             <span>Edit</span>
@@ -445,7 +449,7 @@ export default function ScanProgress() {
                             <Add sx={{ mr: 1.2 }} />
                             <span>Add Status</span>
                           </Button>
-                        </Stack>
+                        </Stack> */}
                       </Stack>
                     )}
                   </Stack>
@@ -540,6 +544,7 @@ export default function ScanProgress() {
         open={openModal}
         onClose={() => setOpenModal(false)}
         currProgress={currentDataProgress}
+        currentStatusId={currentStatusId}
         detail={detail}
         refetch={refetch}
       />

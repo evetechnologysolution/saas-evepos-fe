@@ -318,17 +318,16 @@ export default function StaffPerformance() {
                     ) : (
                       <Grid container spacing={2}>
                         {summaryData?.topPerformance?.map((item, i) => {
-                          const detail = summaryData?.detail?.find((row) => row?.status === item?.status);
+                          const detail = summaryData?.detail?.find((row) => row?.labelId === item?.labelId); // FIX: match by _id
                           const totalKg = detail?.qtyKg || 0;
                           const totalPcs = detail?.qtyPcs || 0;
                           const qtyKg = item?.qtyKg || 0;
                           const qtyPcs = item?.qtyPcs || 0;
                           return (
-                            <Grid item xs={12} md={6} lg={6} key={i}>
+                            <Grid item xs={12} md={6} lg={6} key={item?.labelId ?? i}>
                               <WidgetPerformance
                                 title={item?.staffRef?.fullname || '-'}
                                 subtitle={item?.status}
-                                // qtyOrder={item?.qty || 0}
                                 qtyKg={qtyKg}
                                 qtyPcs={qtyPcs}
                                 total={qtyKg + qtyPcs}

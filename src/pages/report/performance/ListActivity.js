@@ -120,8 +120,6 @@ export default function ListActivity() {
     }
   };
 
-  console.log(tableData?.docs);
-
   return (
     <>
       <Card>
