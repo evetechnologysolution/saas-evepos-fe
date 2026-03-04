@@ -50,9 +50,9 @@ export default function LibraryCategoryCreate() {
   const liveFormState = watch();
 
   useEffect(() => {
-    if (!tableData?.docs) return;
+    if (!tableData) return;
 
-    const ids = tableData.docs.map((item) => item.listNumber);
+    const ids = tableData?.map((item) => item.listNumber);
     setValue('selectedList', ids);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tableData]);

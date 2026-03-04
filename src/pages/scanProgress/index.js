@@ -52,6 +52,7 @@ export default function ScanProgress() {
   const [isEdit, setIsEdit] = useState(false);
   const [currentDataEdit, setCurrentDataEdit] = useState(null);
   const [currentDataProgress, setCurrentDataProgress] = useState(null);
+  const [currentStatusId, setCurrentStatusId] = useState(null);
 
   const fetchOrderDetail = async (search) => {
     if (!search) throw new Error('No search term');
@@ -185,11 +186,12 @@ export default function ScanProgress() {
     };
   }, [isCameraOpen]);
 
-  const handleSubmit = async (val) => {
+  const handleSubmit = async (val, id) => {
     if (!val) {
       return;
     }
 
+    setCurrentStatusId(id);
     setCurrentDataProgress(val);
     setTimeout(() => {
       setOpenModal(true);
@@ -413,7 +415,7 @@ export default function ScanProgress() {
                                   <LoadingButton
                                     key={n}
                                     variant="outlined"
-                                    onClick={() => handleSubmit(opt.name)}
+                                    onClick={() => handleSubmit(opt.name, opt._id)}
                                     sx={{ textTransform: 'capitalize' }}
                                     disabled={isDisabled}
                                     type="button"
@@ -542,6 +544,7 @@ export default function ScanProgress() {
         open={openModal}
         onClose={() => setOpenModal(false)}
         currProgress={currentDataProgress}
+        currentStatusId={currentStatusId}
         detail={detail}
         refetch={refetch}
       />

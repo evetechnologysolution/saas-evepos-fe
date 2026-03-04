@@ -11,7 +11,7 @@ export function handleMutationFeedback(
     .catch((error) => {
       const msg = error?.response?.data?.message || error?.message || errorMsg;
 
-      enqueueSnackbar?.(msg, { variant: 'error' });
-      throw error;
+      enqueueSnackbar?.(String(msg), { variant: 'error' });
+      // throw error;
     });
 }
