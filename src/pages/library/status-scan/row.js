@@ -21,7 +21,7 @@ const CustomTableRow = styled(TableRow)(() => ({
 }));
 
 export default function StatusTableRow({ row, onEditRow, onDeleteRow }) {
-  const { createdAt, name, previousName, listNumber } = row;
+  const { createdAt, name, previousName, listNumber, archived } = row;
 
   return (
     <CustomTableRow hover>
@@ -31,20 +31,21 @@ export default function StatusTableRow({ row, onEditRow, onDeleteRow }) {
       <TableCell>{previousName || '-'}</TableCell>
 
       <TableCell align="center">{listNumber}</TableCell>
+      <TableCell align="center">{archived ? 'Yes' : 'No'}</TableCell>
 
       <TableCell align="center">
         <Stack direction="row" justifyContent="center" gap={1}>
           <Button
-            title="Edit"
+            title="Archive"
             variant="contained"
             sx={{ p: 0, minWidth: 35, height: 35 }}
             onClick={() => {
               onEditRow();
             }}
           >
-            <Iconify icon="eva:edit-outline" sx={{ width: 24, height: 24 }} />
+            <Iconify icon="eva:archive-outline" sx={{ width: 24, height: 24 }} />
           </Button>
-          <Button
+          {/* <Button
             title="Delete"
             variant="contained"
             color="error"
@@ -54,7 +55,7 @@ export default function StatusTableRow({ row, onEditRow, onDeleteRow }) {
             }}
           >
             <Iconify icon="eva:trash-2-outline" sx={{ width: 24, height: 24 }} />
-          </Button>
+          </Button> */}
         </Stack>
       </TableCell>
     </CustomTableRow>

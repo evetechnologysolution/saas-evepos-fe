@@ -396,6 +396,7 @@ export default function ScanProgress() {
                         <Stack flexDirection="row" gap={1.5}>
                           {!isEdit &&
                             listStatus
+                              ?.filter((r) => !r.archived)
                               ?.sort((a, b) => a.listNumber - b.listNumber)
                               ?.map((opt, n) => {
                                 const statusKey = opt.name?.toLowerCase();
