@@ -466,7 +466,7 @@ export default function PromotionForm({ currentData, isEdit }) {
               )}
 
               {values.type === 2 && (
-                <Box sx={{ mt: 4 }}>
+                <Box>
                   <Typography sx={{ mb: 1 }}>Image (max size: 900KB)</Typography>
                   <RHFUploadSingleFile name="image" accept="image/*" maxSize={900000} onDrop={handleDrop} />
                 </Box>
@@ -522,7 +522,7 @@ export default function PromotionForm({ currentData, isEdit }) {
               />
 
               {isEdit && (
-                <Box sx={{ mt: 4 }}>
+                <Box sx={{ mt: 3 }}>
                   <RHFSwitch
                     name="isAvailable"
                     labelPlacement="start"
@@ -536,7 +536,7 @@ export default function PromotionForm({ currentData, isEdit }) {
                 </Box>
               )}
 
-              <Stack direction="row" justifyContent="flex-end" sx={{ mt: 3 }} gap={1}>
+              <Stack direction="row" justifyContent="flex-end" sx={{ pt: 3 }} gap={1}>
                 <Button variant="outlined" onClick={() => navigate(PATH_DASHBOARD.library.promotion)}>
                   Cancel
                 </Button>
