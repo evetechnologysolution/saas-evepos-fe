@@ -28,11 +28,13 @@ import Iconify from '../../../components/Iconify';
 import Scrollbar from '../../../components/Scrollbar';
 import { TableHeadCustom, TableLoading, TableNoData } from '../../../components/table';
 import ConfirmDelete from '../../../components/ConfirmDelete';
+import ConfirmDialog from 'src/components/ConfirmDialog';
 // sections
 import StatusTableRow from './row';
 import { CategoryTableToolbar, CategoryTableRow } from '../../../sections/@dashboard/library/category';
 // utils
 import useStatus from './service/useCategory';
+import { handleMutationFeedback } from 'src/utils/mutationfeedback';
 
 // ----------------------------------------------------------------------
 
@@ -41,6 +43,7 @@ const TABLE_HEAD = [
   { id: 'name', label: 'Status Name', align: 'left' },
   { id: 'name', label: 'Previous Status Name', align: 'left' },
   { id: 'listNumber', label: 'List Number', align: 'center' },
+  { id: 'archived', label: 'Archived', align: 'center' },
   { id: '', label: 'Action', align: 'center' },
 ];
 
@@ -51,7 +54,7 @@ export default function LibraryCategory() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { dense, onChangeDense } = useTable();
-  const { list, remove } = useStatus();
+  const { list, remove, update } = useStatus();
 
   const [controller, setController] = useState({
     page: 0,
@@ -67,6 +70,8 @@ export default function LibraryCategory() {
 
   const [selectedId, setSelectedId] = useState('');
   const [open, setOpen] = useState(false);
+  const [openArchive, setOpenArchive] = useState(false);
+  const [currentArchive, setCurrentArchive] = useState(null);
 
   const [search, setSearch] = useState('');
 
@@ -99,8 +104,12 @@ export default function LibraryCategory() {
     }
   };
 
-  const handleEditRow = (id) => {
-    navigate(`/dashboard/library/status-scan/${id}/edit`);
+  const handleEditRow = (id, current) => {
+    // navigate(`/dashboard/library/status-scan/${id}/edit`);
+    const prev = Boolean(current);
+    setSelectedId(id);
+    setCurrentArchive(!prev);
+    setOpenArchive(!openArchive);
   };
 
   const handleDialog = (id) => {
@@ -113,13 +122,25 @@ export default function LibraryCategory() {
 
     remove.mutate(selectedId, {
       onSuccess: () => {
-        enqueueSnackbar('Category deleted!', { variant: 'success' });
+        enqueueSnackbar('Status deleted!', { variant: 'success' });
         setOpen(false);
       },
       onError: (err) => {
         enqueueSnackbar(err?.message || 'Failed to delete', { variant: 'error' });
       },
     });
+  };
+
+  const handleArchive = async () => {
+    if (!selectedId) return;
+
+    await handleMutationFeedback(update.mutateAsync({ id: selectedId, payload: { archived: currentArchive } }), {
+      successMsg: 'Status berhasil disimpan!',
+      errorMsg: 'Gagal menyimpan status!',
+      onSuccess: () => setOpenArchive(false),
+      enqueueSnackbar,
+    });
+    setCurrentArchive(null);
   };
 
   return (
@@ -164,7 +185,7 @@ export default function LibraryCategory() {
                           <StatusTableRow
                             key={row._id}
                             row={row}
-                            onEditRow={() => handleEditRow(row._id)}
+                            onEditRow={() => handleEditRow(row._id, row.archived)}
                             onDeleteRow={() => handleDialog(row._id)}
                           />
                         ))}
@@ -200,6 +221,13 @@ export default function LibraryCategory() {
         </Container>
       </Page>
 
+      <ConfirmDialog
+        title="Archive"
+        text="Are you sure want to archive this status ?"
+        open={openArchive}
+        onClose={handleEditRow}
+        onClick={handleArchive}
+      />
       <ConfirmDelete open={open} onClose={handleDialog} onDelete={handleDelete} isLoading={remove.isLoading} />
     </>
   );
