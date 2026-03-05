@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState, useEffect, useContext } from 'react';
+import React, { useCallback, useMemo, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router';
 import PropTypes from 'prop-types';
 import { useSnackbar } from 'notistack';
@@ -18,6 +18,8 @@ import {
   Checkbox,
   FormGroup,
   FormControlLabel,
+  Autocomplete,
+  Chip,
 } from '@mui/material';
 import { NumericFormat } from 'react-number-format';
 import { LoadingButton } from '@mui/lab';
@@ -26,7 +28,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 
 // form
-import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { handleMutationFeedback } from 'src/utils/mutationfeedback';
 import schema from '../../../../pages/library/promotion/schema';
@@ -41,7 +43,6 @@ import {
   RHFSwitch,
   RHFDaySelect,
 } from '../../../../components/hook-form';
-import Iconify from '../../../../components/Iconify';
 
 // hook
 import useResponsive from '../../../../hooks/useResponsive';
@@ -77,6 +78,12 @@ export default function PromotionForm({ currentData, isEdit }) {
       isAvailable: currentData?.isAvailable ?? true,
       image: currentData?.image ?? '',
       products: currentData?.products ?? [],
+      conditional: {
+        label: currentData?.conditional?.label ?? '',
+        notes: currentData?.conditional?.notes ?? '',
+        otherNotes: currentData?.conditional?.otherNotes ?? '',
+        isActive: currentData?.conditional?.isActive ?? false,
+      },
     }),
     [currentData]
   );
@@ -97,13 +104,15 @@ export default function PromotionForm({ currentData, isEdit }) {
     formState: { isSubmitting },
   } = methods;
 
-  const { append, replace, remove, fields } = useFieldArray({ control, name: 'products' });
-
   const { enqueueSnackbar } = useSnackbar();
 
   const values = watch();
 
   const ctx = useContext(mainContext);
+
+  const isAllSelected = useMemo(() => {
+    return values?.products?.length === ctx?.product?.length;
+  }, [values?.products, ctx.product]);
 
   const handleDrop = useCallback(
     (acceptedFiles) => {
@@ -120,29 +129,6 @@ export default function PromotionForm({ currentData, isEdit }) {
     },
     [setValue]
   );
-
-  const handleProductAdd = () => {
-    append('');
-  };
-
-  const handleOptionRemove = (index) => {
-    remove(index);
-  };
-
-  const handleProductsChange = (e, index) => {
-    const { value } = e.target;
-    const updatedProducts = [...fields];
-    updatedProducts[index] = { ...updatedProducts[index], id: updatedProducts[index].id, value };
-    replace(updatedProducts.map((item) => item.value));
-  };
-
-  const handleAllProductsCheckbox = (e) => {
-    if (e.target.checked) {
-      replace(ctx?.product?.map((row) => row?._id) || ['']);
-    } else {
-      replace(['']);
-    }
-  };
 
   useEffect(() => {
     if (isEdit && currentData) {
@@ -220,6 +206,11 @@ export default function PromotionForm({ currentData, isEdit }) {
 
       formData.append('isAvailable', isEdit ? data.isAvailable : true);
 
+      formData.append('conditional.label', Number(data.type) === 1 ? data.conditional.label : '');
+      formData.append('conditional.notes', Number(data.type) === 1 ? data.conditional.notes : '');
+      formData.append('conditional.otherNotes', Number(data.type) === 1 ? data.conditional.otherNotes : '');
+      formData.append('conditional.isActive', Number(data.type) === 1 ? data.conditional.isActive : false);
+
       if (data.image instanceof File) {
         formData.append('image', data.image);
       }
@@ -249,9 +240,9 @@ export default function PromotionForm({ currentData, isEdit }) {
       <Card sx={{ p: 3 }}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
-            <Stack sx={{ mb: isMobile && 2 }}>
+            <Stack sx={{ mb: isMobile && 2 }} spacing={3}>
               <RHFTextField name="name" label="Promotion Name" autoComplete="off" />
-              <Box sx={{ mt: 3, mb: 1 }}>
+              <Box>
                 <RHFSwitch
                   name="validUntil"
                   sx={{ mx: 0 }}
@@ -336,54 +327,56 @@ export default function PromotionForm({ currentData, isEdit }) {
                   </Grid>
                 </Grid>
               </Box>
-              <Grid container spacing={3} sx={{ mt: 2 }}>
-                <Grid item xs={12} md={6}>
-                  <RHFSelect
-                    name="type"
-                    label="Promotion Type"
-                    placeholder="Promotion Type"
-                    SelectProps={{ native: false }}
-                  >
-                    <MenuItem
-                      value=""
-                      sx={{
-                        mx: 1,
-                        borderRadius: 0.75,
-                        typography: 'body2',
-                        fontStyle: 'italic',
-                        color: 'text.secondary',
-                      }}
-                      disabled
-                    >
-                      Select One
-                    </MenuItem>
-                    <Divider />
 
-                    <MenuItem
-                      value={1}
-                      sx={{
-                        mx: 1,
-                        my: 0.5,
-                        borderRadius: 0.75,
-                        typography: 'body2',
-                      }}
+              <Box>
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    <RHFSelect
+                      name="type"
+                      label="Promotion Type"
+                      placeholder="Promotion Type"
+                      SelectProps={{ native: false }}
                     >
-                      Discount
-                    </MenuItem>
+                      <MenuItem
+                        value=""
+                        sx={{
+                          mx: 1,
+                          borderRadius: 0.75,
+                          typography: 'body2',
+                          fontStyle: 'italic',
+                          color: 'text.secondary',
+                        }}
+                        disabled
+                      >
+                        Select One
+                      </MenuItem>
+                      <Divider />
 
-                    <MenuItem
-                      value={3}
-                      sx={{
-                        mx: 1,
-                        my: 0.5,
-                        borderRadius: 0.75,
-                        typography: 'body2',
-                      }}
-                    >
-                      Bundle
-                    </MenuItem>
+                      <MenuItem
+                        value={1}
+                        sx={{
+                          mx: 1,
+                          my: 0.5,
+                          borderRadius: 0.75,
+                          typography: 'body2',
+                        }}
+                      >
+                        Discount
+                      </MenuItem>
 
-                    {/* <MenuItem
+                      <MenuItem
+                        value={3}
+                        sx={{
+                          mx: 1,
+                          my: 0.5,
+                          borderRadius: 0.75,
+                          typography: 'body2',
+                        }}
+                      >
+                        Bundle
+                      </MenuItem>
+
+                      {/* <MenuItem
                       value={2}
                       sx={{
                         mx: 1,
@@ -394,42 +387,84 @@ export default function PromotionForm({ currentData, isEdit }) {
                     >
                       Package
                     </MenuItem> */}
-                  </RHFSelect>
+                    </RHFSelect>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Stack flexDirection="row" gap={3}>
+                      {handleTypeLabel(values.type)}
+                      {values.type === 3 && (
+                        <>
+                          <NumericFormat
+                            customInput={RHFTextField}
+                            name="qtyMin"
+                            label="Qty Min Buy"
+                            autoComplete="off"
+                            decimalScale={2}
+                            decimalSeparator="."
+                            thousandSeparator=","
+                            allowNegative={false}
+                            value={getValues('qtyMin') === 0 ? '' : getValues('qtyMin')}
+                            onValueChange={(values) => setValue('qtyMin', Number(values.value))}
+                          />
+                          <NumericFormat
+                            customInput={RHFTextField}
+                            name="qtyFree"
+                            label="Qty Free"
+                            autoComplete="off"
+                            decimalScale={2}
+                            decimalSeparator="."
+                            thousandSeparator=","
+                            allowNegative={false}
+                            value={getValues('qtyFree') === 0 ? '' : getValues('qtyFree')}
+                            onValueChange={(values) => setValue('qtyFree', Number(values.value))}
+                          />
+                        </>
+                      )}
+                    </Stack>
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} md={6}>
-                  <Stack spacing={3}>
-                    {handleTypeLabel(values.type)}
-                    {values.type === 3 && (
-                      <>
-                        <NumericFormat
-                          customInput={RHFTextField}
-                          name="qtyMin"
-                          label="Qty Min Buy"
-                          autoComplete="off"
-                          decimalScale={2}
-                          decimalSeparator="."
-                          thousandSeparator=","
-                          allowNegative={false}
-                          value={getValues('qtyMin') === 0 ? '' : getValues('qtyMin')}
-                          onValueChange={(values) => setValue('qtyMin', Number(values.value))}
+              </Box>
+
+              {values.type === 1 && (
+                <Box>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} md={6}>
+                      <Box mb={1}>
+                        <RHFSwitch
+                          name="conditional.isActive"
+                          sx={{ mx: 0 }}
+                          labelPlacement="start"
+                          label={
+                            <>
+                              <Typography variant="subtitle2">Promotion Condition</Typography>
+                            </>
+                          }
                         />
-                        <NumericFormat
-                          customInput={RHFTextField}
-                          name="qtyFree"
-                          label="Qty Free"
-                          autoComplete="off"
-                          decimalScale={2}
-                          decimalSeparator="."
-                          thousandSeparator=","
-                          allowNegative={false}
-                          value={getValues('qtyFree') === 0 ? '' : getValues('qtyFree')}
-                          onValueChange={(values) => setValue('qtyFree', Number(values.value))}
-                        />
-                      </>
-                    )}
-                  </Stack>
-                </Grid>
-              </Grid>
+                      </Box>
+                      <RHFTextField name="conditional.label" label="Conditional Label" autoComplete="off" />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <RHFTextField
+                        name="conditional.notes"
+                        label="Conditional Notes"
+                        autoComplete="off"
+                        multiline
+                        rows={3}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <RHFTextField
+                        name="conditional.otherNotes"
+                        label="Conditional Warning"
+                        autoComplete="off"
+                        multiline
+                        rows={3}
+                      />
+                    </Grid>
+                  </Grid>
+                </Box>
+              )}
+
               {values.type === 2 && (
                 <Box sx={{ mt: 4 }}>
                   <Typography sx={{ mb: 1 }}>Image (max size: 900KB)</Typography>
@@ -438,86 +473,53 @@ export default function PromotionForm({ currentData, isEdit }) {
               )}
             </Stack>
 
-            <Stack spacing={3} mt={2}>
-              <Stack flexDirection="row" alignItems="center" gap={3}>
-                <Typography variant="subtitle1">List of Products</Typography>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox onChange={handleAllProductsCheckbox} />} label="All Products" />
-                </FormGroup>
-              </Stack>
-
-              {fields.map((field, index) => (
-                <Stack key={field.id} flexDirection="row" alignItems="center" justifyContent="center" gap={2}>
-                  <RHFSelect
-                    name={`products.${index}`}
-                    SelectProps={{ native: false }}
-                    onChange={(e) => handleProductsChange(e, index)}
-                    required
-                  >
-                    <MenuItem
-                      value=""
-                      sx={{
-                        mx: 1,
-                        borderRadius: 0.75,
-                        typography: 'body2',
-                        fontStyle: 'italic',
-                        color: 'text.secondary',
+            <Stack spacing={1} mt={3}>
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={isAllSelected}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setValue(
+                            'products',
+                            ctx.product.map((p) => p._id)
+                          );
+                        } else {
+                          setValue('products', []);
+                        }
                       }}
-                      disabled
-                    >
-                      Select One
-                    </MenuItem>
-                    <Divider />
-                    {ctx.product.map((item, n) => (
-                      <MenuItem
-                        key={n}
-                        value={item._id}
-                        sx={{
-                          mx: 1,
-                          my: 0.5,
-                          borderRadius: 0.75,
-                          typography: 'body2',
-                        }}
-                      >
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <Typography variant="body2">{item.name}</Typography>
-                        </div>
-                      </MenuItem>
-                    ))}
-                  </RHFSelect>
+                    />
+                  }
+                  label="All Products"
+                />
+              </FormGroup>
 
-                  {fields.length !== 1 && (
-                    <Stack alignItems="flex-end">
-                      <Button
-                        color="error"
-                        variant="contained"
-                        sx={{
-                          boxShadow: '0',
-                          p: 0,
-                          minWidth: 30,
-                          height: 30,
-                          mb: 0.5,
-                          bgcolor: '#FFC2B4',
-                          color: 'red',
-                          '&:hover': {
-                            bgcolor: '#FFC2B4',
-                          },
-                        }}
-                        size="large"
-                        onClick={() => handleOptionRemove(index)}
-                      >
-                        <Iconify icon="eva:trash-2-outline" width={20} height={20} />
-                      </Button>
-                    </Stack>
-                  )}
-                </Stack>
-              ))}
-
-              <Stack alignItems="center">
-                <Button variant="text" onClick={handleProductAdd}>
-                  <Iconify icon="eva:plus-fill" width={20} height={20} /> Add Product
-                </Button>
-              </Stack>
+              <Controller
+                name="products"
+                control={control}
+                defaultValue={[]}
+                render={({ field, fieldState: { error } }) => (
+                  <Autocomplete
+                    multiple
+                    filterSelectedOptions
+                    disableCloseOnSelect
+                    options={ctx.product || []}
+                    value={(ctx.product || []).filter((option) => field.value?.includes(option._id))}
+                    getOptionLabel={(option) => option?.name || ''}
+                    isOptionEqualToValue={(option, value) => option._id === value._id}
+                    onChange={(event, newValue) => field.onChange(newValue.map((item) => item._id))}
+                    renderTags={(value, getTagProps) =>
+                      value.map((option, index) => (
+                        <Chip {...getTagProps({ index })} key={option._id} size="small" label={option.name} />
+                      ))
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Select Products" error={!!error} helperText={error?.message} />
+                    )}
+                  />
+                )}
+              />
 
               {isEdit && (
                 <Box sx={{ mt: 4 }}>
@@ -538,7 +540,12 @@ export default function PromotionForm({ currentData, isEdit }) {
                 <Button variant="outlined" onClick={() => navigate(PATH_DASHBOARD.library.promotion)}>
                   Cancel
                 </Button>
-                <LoadingButton type="submit" variant="contained" loading={isSubmitting} disabled={fields.length === 0}>
+                <LoadingButton
+                  type="submit"
+                  variant="contained"
+                  loading={isSubmitting}
+                  disabled={values?.products?.length === 0}
+                >
                   {!isEdit ? 'New Promotion' : 'Save Changes'}
                 </LoadingButton>
               </Stack>

@@ -309,10 +309,7 @@ export default function OrdersForm({ currentData }) {
                     </thead>
                     <tbody>
                       {data?.orders?.map((item, i) => {
-                        let originPrice = item.price;
-                        if (item.isLaundryBag) {
-                          originPrice += item.discountLaundryBag;
-                        }
+                        const originPrice = item.price;
                         return (
                           <tr key={i}>
                             <td>
@@ -325,11 +322,9 @@ export default function OrdersForm({ currentData }) {
                                     <em>{`${field.name} : ${field.option}`}</em>
                                   </Typography>
                                 ))}
-                              {item.isLaundryBag && (
+                              {item.promotionLabel && (
                                 <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                                  <em>{`Laundry Bag Day : (-Rp. ${numberWithCommas(
-                                    Math.round(item.qty * item.discountLaundryBag)
-                                  )})`}</em>
+                                  <em>{`(${item.promotionLabel})`}</em>
                                 </Typography>
                               )}
                             </td>
@@ -339,31 +334,13 @@ export default function OrdersForm({ currentData }) {
                                   variant="body2"
                                   sx={{
                                     fontStyle: 'italic',
-                                    color:
-                                      item.promotionType === 1 || item.promotionType === 2 || item.isLaundryBag
-                                        ? 'red'
-                                        : '#212B36',
+                                    color: item.promotionType === 1 || item.promotionType === 2 ? 'red' : '#212B36',
                                     textDecoration:
-                                      item.promotionType === 1 || item.promotionType === 2 || item.isLaundryBag
-                                        ? 'line-through'
-                                        : 'none',
+                                      item.promotionType === 1 || item.promotionType === 2 ? 'line-through' : 'none',
                                   }}
                                 >
                                   Rp. {numberWithCommas(Math.round(item.qty * originPrice))}
                                 </Typography>
-                                {item.isLaundryBag && item.discountLaundryBag && (
-                                  <Typography
-                                    variant="body2"
-                                    sx={{
-                                      fontStyle: 'italic',
-                                      color: item.promotionType === 1 && item.isLaundryBag ? 'red' : '#212B36',
-                                      textDecoration:
-                                        item.promotionType === 1 && item.isLaundryBag ? 'line-through' : 'none',
-                                    }}
-                                  >
-                                    Rp. {numberWithCommas(Math.round(item.qty * item.price))}
-                                  </Typography>
-                                )}
                                 {item.promotionType === 1 && (
                                   <>
                                     <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'red' }}>
