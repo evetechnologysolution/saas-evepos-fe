@@ -150,7 +150,7 @@ export default function OrdersTableRow({ row, local, closeLocal, onDeleteRow }) 
     statusColor = 'error';
   }
 
-  const isBagDay = orders.find((row) => row.isLaundryBag);
+  const isConditional = orders.find((row) => row.promotionLabel !== '');
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -360,9 +360,9 @@ Terima kasih telah menggunakan layanan kami 🙏`;
               <Label variant="ghost" color={showOrderType() === 'Onsite' ? 'default' : 'info'}>
                 {showOrderType()}
               </Label>
-              {isBagDay && (
+              {isConditional?.promotionLabel && (
                 <Label variant="ghost" color="warning">
-                  Laundry Bag
+                  {isConditional?.promotionLabel}
                 </Label>
               )}
             </Stack>
@@ -412,30 +412,24 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                   )}
                   {orders[0].variant.length > 0 &&
                     orders[0].variant.map((item, i) => (
-                      <span key={i}>
-                        <br />
+                      <p key={i}>
                         <em>{`${item?.name} : ${item?.option} ${item?.qty > 1 ? `(x${item?.qty})` : ''}`}</em>
-                      </span>
+                      </p>
                     ))}
                   {orders[0].notes && (
-                    <span>
-                      <br />
+                    <p>
                       <em>Notes : {orders[0].notes}</em>
-                    </span>
+                    </p>
                   )}
-                  {orders[0].isLaundryBag && orders[0].discountLaundryBag && (
-                    <span>
-                      <br />
-                      <em>Laundry Bag Day</em>
-                    </span>
+                  {orders[0].promotionLabel && (
+                    <p>
+                      <em>{`(${orders[0].promotionLabel})`}</em>
+                    </p>
                   )}
                   {orders.length > 1 && (
-                    <>
-                      <br />
-                      <Link component="button" variant="inherit" underline="hover" onClick={handleOpen}>
-                        {`+${orders.length - 1} produk lainnya`}
-                      </Link>
-                    </>
+                    <Link component="button" variant="inherit" underline="hover" onClick={handleOpen}>
+                      {`+${orders.length - 1} produk lainnya`}
+                    </Link>
                   )}
                 </>
               ) : (
@@ -517,7 +511,6 @@ Terima kasih telah menggunakan layanan kami 🙏`;
 
         {!local && (
           <TableCell align="center">
-            {/* <Button type="button" variant="contained" title="Print Laundry" onClick={() => handlePrintLaundry()}> */}
             <Button type="button" variant="contained" title="Print Laundry" onClick={() => setOpenPrintLaundry(true)}>
               <Iconify icon="solar:printer-outline" sx={{ width: 24, height: 24 }} />
             </Button>
@@ -665,35 +658,26 @@ Terima kasih telah menggunakan layanan kami 🙏`;
             </thead>
             <tbody style={{ fontSize: '0.85rem' }}>
               {orders?.map((item, i) => {
-                let originPrice = item?.price;
-                if (item?.isLaundryBag) {
-                  originPrice += item?.discountLaundryBag;
-                }
+                const originPrice = item?.price;
                 return (
                   <tr key={i}>
                     <td style={{ padding: '0.2rem 0' }}>
-                      {item?.name}
+                      <p>{item?.name}</p>
                       {item?.variant?.length > 0 &&
                         item?.variant?.map((field, v) => (
-                          <span key={v}>
-                            <br />
+                          <p key={v}>
                             <em>{`${field?.name} : ${field?.option} ${field?.qty > 1 ? `(x${field?.qty})` : ''}`}</em>
-                          </span>
+                          </p>
                         ))}
                       {item?.notes && (
-                        <span>
-                          <br />
+                        <p>
                           <em>Notes : {item?.notes}</em>
-                        </span>
+                        </p>
                       )}
-                      {item?.isLaundryBag && item?.discountLaundryBag && (
-                        <span>
-                          <br />
-                          <em>
-                            Laundry Bag Day :{' '}
-                            {`(-Rp. ${numberWithCommas(Math.round(item?.discountLaundryBag * item?.qty))})`}
-                          </em>
-                        </span>
+                      {item?.promotionLabel && (
+                        <p>
+                          <em>{`(${item?.promotionLabel})`}</em>
+                        </p>
                       )}
                     </td>
                     <td align="center">
@@ -706,31 +690,13 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                     <td align="right">
                       <span
                         style={{
-                          color:
-                            item?.promotionType === 1 || item?.promotionType === 2 || item?.isLaundryBag
-                              ? 'red'
-                              : '#212B36',
+                          color: item?.promotionType === 1 || item?.promotionType === 2 ? 'red' : '#212B36',
                           textDecoration:
-                            item?.promotionType === 1 || item?.promotionType === 2 || item?.isLaundryBag
-                              ? 'line-through'
-                              : 'none',
+                            item?.promotionType === 1 || item?.promotionType === 2 ? 'line-through' : 'none',
                         }}
                       >
                         Rp. {numberWithCommas(Math.round(item?.qty * originPrice))}
                       </span>
-                      {item?.isLaundryBag && item?.discountLaundryBag && (
-                        <>
-                          <br />
-                          <span
-                            style={{
-                              textDecoration: item?.promotionType === 1 && item?.isLaundryBag ? 'line-through' : 'none',
-                            }}
-                          >
-                            Rp. {numberWithCommas(Math.round(item?.qty * item?.price))}
-                          </span>
-                          <br />
-                        </>
-                      )}
                       {item?.promotionType === 1 && (
                         <>
                           <br />

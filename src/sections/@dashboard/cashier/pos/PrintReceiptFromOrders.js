@@ -87,10 +87,7 @@ const PrintReceiptFromOrders = React.forwardRef(({ data }, ref) => {
       <table style={{ width: '100%' }}>
         <tbody>
           {data.orders.map((item, i) => {
-            let originPrice = item.price;
-            if (item.isLaundryBag) {
-              originPrice += item.discountLaundryBag;
-            }
+            const originPrice = item.price;
 
             return (
               <React.Fragment key={i}>
@@ -122,38 +119,21 @@ const PrintReceiptFromOrders = React.forwardRef(({ data }, ref) => {
                   <td
                     style={{
                       textAlign: 'right',
-                      textDecoration:
-                        item.promotionType === 1 || item.promotionType === 2 || item.isLaundryBag
-                          ? 'line-through'
-                          : 'none',
+                      textDecoration: item.promotionType === 1 || item.promotionType === 2 ? 'line-through' : 'none',
                     }}
                   >
                     Rp. {numberWithCommas(Math.round(item.qty * originPrice))}
                   </td>
                 </tr>
 
-                {/* Diskon Laundry Bag */}
-                {item.isLaundryBag && item.discountLaundryBag && (
-                  <tr>
-                    <td style={{ textAlign: 'left' }}>
-                      <em>Laundry Bag Day: (-Rp. {numberWithCommas(item.discountLaundryBag * item.qty)})</em>
-                    </td>
-                    <td
-                      style={{
-                        textAlign: 'right',
-                        textDecoration: item.promotionType === 1 ? 'line-through' : 'none',
-                      }}
-                    >
-                      Rp. {numberWithCommas(Math.round(item.qty * item.price))}
-                    </td>
-                  </tr>
-                )}
-
                 {/* Diskon Promo */}
                 {item.promotionType === 1 && (
                   <tr>
                     <td style={{ textAlign: 'left' }}>
-                      <em>Disc {item.discountAmount}%</em>
+                      <em>
+                        <p>Disc {item.discountAmount}%</p>
+                        {item.promotionLabel && <p>{`(${item.promotionLabel})`}</p>}
+                      </em>
                     </td>
                     <td style={{ textAlign: 'right' }}>
                       Rp.{' '}
