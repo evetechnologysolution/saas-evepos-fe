@@ -85,7 +85,7 @@ export default function OrdersTableRow({ row }) {
     _id,
     orderId,
     bookingDate,
-    date,
+    createdAt,
     customer,
     orders,
     status,
@@ -137,7 +137,7 @@ export default function OrdersTableRow({ row }) {
   //   progressColor = "default";
   // }
 
-  const isConditional = orders.find((row) => row.promotionLabel !== '');
+  // const isConditional = orders.find((row) => row.promotionLabel !== '');
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -146,17 +146,17 @@ export default function OrdersTableRow({ row }) {
   return (
     <>
       <CustomTableRow hover>
-        <TableCell align="center">{formatDate2(bookingDate || date)}</TableCell>
+        <TableCell align="center">{formatDate2(bookingDate || createdAt)}</TableCell>
 
         <TableCell>
-          {isConditional?.promotionLabel && (
+          {/* {isConditional?.promotionLabel && (
             <>
               <Label variant="ghost" color="warning">
                 {isConditional?.promotionLabel}
               </Label>
               <br />
             </>
-          )}
+          )} */}
           {!orderId ? _id : orderId}
         </TableCell>
 

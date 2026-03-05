@@ -109,7 +109,6 @@ export default function OrdersTableRow({ row, local, closeLocal, onDeleteRow }) 
     _id,
     orderId,
     createdAt,
-    date,
     // staff,
     customer,
     customerRef,
@@ -150,7 +149,7 @@ export default function OrdersTableRow({ row, local, closeLocal, onDeleteRow }) 
     statusColor = 'error';
   }
 
-  const isConditional = orders.find((row) => row.promotionLabel !== '');
+  // const isConditional = orders.find((row) => row.promotionLabel !== '');
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -260,7 +259,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
     ctx.setDisplayOrderID(orderId);
     ctx.setBill(orders);
     ctx.setProgress(progressRef?.log?.length > 0 ? progressRef?.log : []);
-    ctx.setOrderDate(createdAt || date);
+    ctx.setOrderDate(createdAt);
     if (customer.name) {
       ctx.setCustomerData(customer);
       ctx.setCustomerName(customer.name);
@@ -352,7 +351,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
   return (
     <>
       <CustomTableRow hover>
-        <TableCell align="center">{formatDate2(createdAt || date)}</TableCell>
+        <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
         {!local && (
           <TableCell>
@@ -360,11 +359,11 @@ Terima kasih telah menggunakan layanan kami 🙏`;
               <Label variant="ghost" color={showOrderType() === 'Onsite' ? 'default' : 'info'}>
                 {showOrderType()}
               </Label>
-              {isConditional?.promotionLabel && (
+              {/* {isConditional?.promotionLabel && (
                 <Label variant="ghost" color="warning">
                   {isConditional?.promotionLabel}
                 </Label>
-              )}
+              )} */}
             </Stack>
             {user?.role?.toLowerCase() === 'admin' || user?.role?.toLowerCase() === 'owner' ? (
               <Link
@@ -573,7 +572,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                   )} */}
                   <MenuItem
                     disabled={
-                      status?.toLowerCase() === 'paid' && formatDate(createdAt || date) === formatDate(new Date())
+                      status?.toLowerCase() === 'paid' && formatDate(createdAt) === formatDate(new Date())
                         ? Boolean(false)
                         : Boolean(true)
                     }
