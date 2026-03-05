@@ -18,6 +18,8 @@ import {
   Typography,
 } from '@mui/material';
 // routes
+import ConfirmDialog from 'src/components/ConfirmDialog';
+import { handleMutationFeedback } from 'src/utils/mutationfeedback';
 import { PATH_DASHBOARD } from '../../../routes/paths';
 // hooks
 import useSettings from '../../../hooks/useSettings';
@@ -28,13 +30,10 @@ import Iconify from '../../../components/Iconify';
 import Scrollbar from '../../../components/Scrollbar';
 import { TableHeadCustom, TableLoading, TableNoData } from '../../../components/table';
 import ConfirmDelete from '../../../components/ConfirmDelete';
-import ConfirmDialog from 'src/components/ConfirmDialog';
 // sections
 import StatusTableRow from './row';
-import { CategoryTableToolbar, CategoryTableRow } from '../../../sections/@dashboard/library/category';
 // utils
 import useStatus from './service/useCategory';
-import { handleMutationFeedback } from 'src/utils/mutationfeedback';
 
 // ----------------------------------------------------------------------
 
