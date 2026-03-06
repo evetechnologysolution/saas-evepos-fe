@@ -52,6 +52,21 @@ const schema = yup.object().shape({
   isAvailable: yup.boolean().required(),
 
   products: yup.array().of(yup.string().required()).min(1, 'Minimal pilih 1 produk').required('Produk wajib dipilih'),
+
+  conditional: yup.object().shape({
+    label: yup
+      .string()
+      .trim()
+      .when('isActive', {
+        is: true,
+        then: (schema) => schema.required('Label kondisi wajib diisi'),
+        otherwise: (schema) => schema.default('').nullable(),
+      }),
+
+    notes: yup.string().trim().default('').nullable(),
+
+    isActive: yup.boolean().default(false),
+  }),
 });
 
 export default schema;

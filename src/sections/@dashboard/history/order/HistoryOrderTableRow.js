@@ -22,7 +22,7 @@ const CustomTableRow = styled(TableRow)(() => ({
 export default function OrderTableRow({ row }) {
   const { user } = useAuth();
 
-  const { date, createdAt, paymentDate, orderId, customer, firstOrder, status, billedAmount } = row;
+  const { createdAt, paymentDate, orderId, customer, firstOrder, status, billedAmount } = row;
 
   let statusColor;
   if (status?.toLowerCase() === 'paid') {

@@ -450,7 +450,7 @@ export default function TableComponent() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={tableData?.totalPages}
+            count={Number(tableData?.totalDocs || 0)}
             rowsPerPage={controller.rowsPerPage}
             page={controller.page}
             onPageChange={handlePageChange}

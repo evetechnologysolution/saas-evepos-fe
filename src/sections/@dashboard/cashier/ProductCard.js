@@ -21,6 +21,7 @@ ProductCard.propTypes = {
   productionPrice: PropTypes.number,
   variant: PropTypes.array,
   discount: PropTypes.any,
+  conditional: PropTypes.any,
   category: PropTypes.string,
   unit: PropTypes.string,
   notes: PropTypes.any,
@@ -37,6 +38,7 @@ export default function ProductCard({
   productionPrice,
   variant,
   discount,
+  conditional,
   category,
   unit,
   notes,
@@ -90,32 +92,71 @@ export default function ProductCard({
 
   const handleClick = () => {
     if (isAvailable) {
-      if ((variant.length === 0 && !notes) || (variant.length === 0 && !notes)) {
-        let promoType = 0;
-        let promoQtyMin = 0;
-        let promoAmount = 0;
-        if (discount.isAvailable && discount.amount) {
-          promoType = 1;
-          promoAmount = discount.amount;
-        }
+      if (conditional?.isActive || variant?.length > 0 || notes) {
+        setOpenDialog(!openDialog);
+        return;
+      }
 
-        if (discount.isAvailable && discount.qtyMin) {
-          const totalQty = findQty() + 1;
-          if (totalQty >= discount.qtyMin) {
-            const qtyFree = Math.floor(totalQty / discount.qtyMin);
-            const priceFree = price * qtyFree;
-            const priceTotal = price * totalQty;
-            const percentFree = (priceFree / priceTotal) * 100;
-            promoType = 2;
-            promoQtyMin = discount.qtyMin;
-            promoAmount = priceFree;
-            // promoAmount = percentFree;
-            // console.log(priceTotal, priceFree, priceTotal - priceFree);
-          }
-        }
+      let promoType = 0;
+      let promoQtyMin = 0;
+      let promoAmount = 0;
+      if (discount.isAvailable && discount.amount) {
+        promoType = 1;
+        promoAmount = discount.amount;
+      }
 
-        if (findQty() === 0) {
-          ctx.setBill((arr) => [
+      if (discount.isAvailable && discount.qtyMin) {
+        const totalQty = findQty() + 1;
+        if (totalQty >= discount.qtyMin) {
+          const qtyFree = Math.floor(totalQty / discount.qtyMin);
+          const priceFree = price * qtyFree;
+          const priceTotal = price * totalQty;
+          const percentFree = (priceFree / priceTotal) * 100;
+          promoType = 2;
+          promoQtyMin = discount.qtyMin;
+          promoAmount = priceFree;
+          // promoAmount = percentFree;
+          // console.log(priceTotal, priceFree, priceTotal - priceFree);
+        }
+      }
+
+      if (findQty() === 0) {
+        ctx.setBill((arr) => [
+          ...arr,
+          {
+            id,
+            name,
+            price,
+            productionPrice,
+            qty: 1,
+            category,
+            unit,
+            promotionType: promoType,
+            promotionQtyMin: promoQtyMin,
+            discountAmount: promoAmount,
+            isDailyPromotion: discount.isDailyPromotion,
+            isLaundryBag,
+          },
+        ]);
+      } else {
+        ctx.setBill((currentBill) =>
+          currentBill.map((item) =>
+            item.id === id
+              ? {
+                  ...item,
+                  qty: item.qty + 1,
+                  promotionType: promoType,
+                  promotionQtyMin: promoQtyMin,
+                  discountAmount: promoAmount,
+                }
+              : item
+          )
+        );
+      }
+
+      if (ctx.currentOrderID !== '') {
+        if (findQtyUpdatedBill() === 0) {
+          ctx.setUpdatedBill((arr) => [
             ...arr,
             {
               id,
@@ -126,60 +167,22 @@ export default function ProductCard({
               category,
               unit,
               promotionType: promoType,
-              promotionQtyMin: promoQtyMin,
               discountAmount: promoAmount,
-              isDailyPromotion: discount.isDailyPromotion,
               isLaundryBag,
             },
           ]);
         } else {
-          ctx.setBill((currentBill) =>
+          ctx.setUpdatedBill((currentBill) =>
             currentBill.map((item) =>
               item.id === id
                 ? {
                     ...item,
                     qty: item.qty + 1,
-                    promotionType: promoType,
-                    promotionQtyMin: promoQtyMin,
-                    discountAmount: promoAmount,
                   }
                 : item
             )
           );
         }
-
-        if (ctx.currentOrderID !== '') {
-          if (findQtyUpdatedBill() === 0) {
-            ctx.setUpdatedBill((arr) => [
-              ...arr,
-              {
-                id,
-                name,
-                price,
-                productionPrice,
-                qty: 1,
-                category,
-                unit,
-                promotionType: promoType,
-                discountAmount: promoAmount,
-                isLaundryBag,
-              },
-            ]);
-          } else {
-            ctx.setUpdatedBill((currentBill) =>
-              currentBill.map((item) =>
-                item.id === id
-                  ? {
-                      ...item,
-                      qty: item.qty + 1,
-                    }
-                  : item
-              )
-            );
-          }
-        }
-      } else {
-        setOpenDialog(!openDialog);
       }
     }
   };
@@ -333,6 +336,7 @@ export default function ProductCard({
         price={price}
         productionPrice={productionPrice}
         discount={discount}
+        conditional={conditional}
         category={category}
         unit={unit}
         variant={variant}
