@@ -44,20 +44,21 @@ export default function MemberTableRow({ row, onDetailRow, onEditRow, onDeleteRo
 
       <TableCell>{name}</TableCell>
 
-      <TableCell>{!phone?.includes('EM') ? maskedPhone(['owner', 'super admin']?.includes(user?.role), phone) : '-'}</TableCell>
+      <TableCell>
+        {!phone?.includes('EM') ? maskedPhone(['owner', 'super admin']?.includes(user?.role), phone) : '-'}
+      </TableCell>
 
       <TableCell>{email}</TableCell>
 
       <TableCell>{mainAddress?.address || '-'}</TableCell>
 
-      {/* <TableCell align="center">
-        <Label
-          variant="ghost"
-          color="success"
-        >
-          <Typography variant="subtitle2" sx={{ fontStyle: "italic" }}>{numberWithCommas(point || 0)}</Typography>
+      <TableCell align="center">
+        <Label variant="ghost" color="success">
+          <Typography variant="subtitle2" sx={{ fontStyle: 'italic' }}>
+            {numberWithCommas(point || 0)}
+          </Typography>
         </Label>
-      </TableCell> */}
+      </TableCell>
 
       <TableCell align="center">
         <Stack direction="row" justifyContent="center" gap={1}>

@@ -42,7 +42,7 @@ const TABLE_HEAD = [
   { id: 'phone', label: 'Phone', align: 'left' },
   { id: 'email', label: 'Email', align: 'left' },
   { id: 'address', label: 'Address', align: 'left', width: 400 },
-  // { id: "point", label: "Point", align: "center" },
+  { id: 'point', label: 'Point', align: 'center' },
   { id: '', label: 'Action', align: 'center' },
 ];
 
