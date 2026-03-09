@@ -194,7 +194,7 @@ export default function SalesOverview({ title, ...other }) {
     },
     chart: {
       toolbar: {
-        show: true,
+        show: false,
       },
     },
   });
