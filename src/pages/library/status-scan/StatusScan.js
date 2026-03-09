@@ -1,4 +1,3 @@
-import { paramCase } from 'change-case';
 import { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
@@ -20,7 +19,6 @@ import {
 // routes
 import ConfirmDialog from 'src/components/ConfirmDialog';
 import { handleMutationFeedback } from 'src/utils/mutationfeedback';
-import { PATH_DASHBOARD } from '../../../routes/paths';
 // hooks
 import useSettings from '../../../hooks/useSettings';
 import useTable from '../../../hooks/useTable';
@@ -33,7 +31,7 @@ import ConfirmDelete from '../../../components/ConfirmDelete';
 // sections
 import StatusTableRow from './row';
 // utils
-import useStatus from './service/useCategory';
+import useStatus from './service/useService';
 
 // ----------------------------------------------------------------------
 
@@ -168,7 +166,7 @@ export default function LibraryCategory() {
                 component={RouterLink}
                 to={'/dashboard/library/status-scan/new'}
               >
-                New Category
+                New Status
               </Button>
             </Stack>
 
@@ -180,7 +178,7 @@ export default function LibraryCategory() {
                   <TableBody>
                     {!isLoading ? (
                       <>
-                        {tableData?.map((row) => (
+                        {tableData?.docs?.map((row) => (
                           <StatusTableRow
                             key={row._id}
                             row={row}

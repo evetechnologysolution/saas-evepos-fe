@@ -31,7 +31,7 @@ import ConfirmDelete from '../../../components/ConfirmDelete';
 // sections
 import { CategoryTableToolbar, CategoryTableRow } from '../../../sections/@dashboard/library/category';
 // utils
-import useCategory from './service/useCategory';
+import useCategory from './service/useService';
 
 // ----------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-export default function LibraryCategory() {
+export default function LibrarySubCategory() {
   const { themeStretch } = useSettings();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();

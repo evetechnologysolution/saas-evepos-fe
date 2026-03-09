@@ -8,13 +8,12 @@ import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { LoadingButton } from '@mui/lab';
 import { styled, Typography, Card, Grid, Stack, Button, InputAdornment, FormControlLabel, Switch } from '@mui/material';
-import { NumericFormat } from 'react-number-format';
 // routes
 import { handleMutationFeedback } from 'src/utils/mutationfeedback';
 import { PATH_DASHBOARD } from '../../../../routes/paths';
 // components
 import Iconify from '../../../../components/Iconify';
-import { FormProvider, RHFTextField } from '../../../../components/hook-form';
+import { FormProvider, RHFTextField, RHFNumericFormat } from '../../../../components/hook-form';
 // context
 import schema from '../../../../pages/library/variant/schema';
 import useVariant from '../../../../pages/library/variant/service/useVariant';
@@ -133,42 +132,28 @@ export default function VariantForm({ isEdit, currentData }) {
                       autoComplete="off"
                     />
 
-                    <Controller
+                    <RHFNumericFormat
                       name={`options.${index}.price`}
-                      control={control}
-                      render={({ field }) => (
-                        <NumericFormat
-                          {...field}
-                          thousandSeparator=","
-                          decimalSeparator="."
-                          label="Price"
-                          customInput={RHFTextField}
-                          allowNegative={false}
-                          decimalScale={2}
-                          onValueChange={(v) => field.onChange(Number(v.value))}
-                        />
-                      )}
+                      label="Price"
+                      thousandSeparator=","
+                      decimalScale={2}
+                      allowNegative={false}
+                      InputProps={{
+                        startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
+                      }}
                     />
                   </Stack>
 
                   <Stack direction={{ xs: 'column', sm: 'row' }} gap={3}>
-                    <Controller
+                    <RHFNumericFormat
                       name={`options.${index}.productionPrice`}
-                      control={control}
-                      render={({ field }) => (
-                        <NumericFormat
-                          {...field}
-                          customInput={RHFTextField}
-                          label="Production Cost"
-                          decimalScale={2}
-                          thousandSeparator=","
-                          allowNegative={false}
-                          InputProps={{
-                            startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
-                          }}
-                          onValueChange={(v) => field.onChange(Number(v.value))}
-                        />
-                      )}
+                      label="Production Cost"
+                      thousandSeparator=","
+                      decimalScale={2}
+                      allowNegative={false}
+                      InputProps={{
+                        startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
+                      }}
                     />
 
                     <Controller

@@ -95,6 +95,7 @@ export default function MemberForm({ isEdit, currentData, isLoading }) {
       navigate(PATH_DASHBOARD.member.list);
     } catch (error) {
       console.error(error);
+      enqueueSnackbar(error?.message || 'Server error!', { variant: 'error' });
     } finally {
       setLoading(false);
     }

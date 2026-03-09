@@ -480,7 +480,7 @@ export default function ModalPayment(props) {
     if (voucherCode && voucherCode !== ctx.voucherCode) {
       setLoading(true);
       try {
-        const res = await axiosInstance.get(`/member-vouchers/scan/${voucherCode}`);
+        const res = await axiosInstance.get(`/member-voucher/scan/${voucherCode}`);
         if (res?.status === 200 && res?.data) {
           if (res?.data?.voucherType !== 1) {
             setError(true);

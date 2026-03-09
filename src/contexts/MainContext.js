@@ -26,7 +26,7 @@ const MainContextProvider = ({ children }) => {
   const { data: product = [], isLoading: loadingProduct } = useProduct();
   const { data: category = [] } = useCategory();
   const { data: subcategory = [] } = useSubcategory();
-  const { data: variant = [] } = useVariant();
+  const { data: variant = [], isLoading: loadVariant = false } = useVariant();
   const { data: existCash = {} } = useCashBalance();
   const { data: receiptHeader = {} } = useReceiptSetting();
   const { data: generalSettings = {} } = useGeneralSetting();
@@ -46,6 +46,7 @@ const MainContextProvider = ({ children }) => {
       category,
       subcategory,
       variant,
+      loadVariant,
       existCash,
       receiptHeader,
       generalSettings,
@@ -61,6 +62,7 @@ const MainContextProvider = ({ children }) => {
       category,
       subcategory,
       variant,
+      loadVariant,
       existCash,
       receiptHeader,
       generalSettings,

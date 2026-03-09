@@ -10,7 +10,7 @@ import { FormProvider, RHFTextField } from '../../../../components/hook-form';
 
 // ----------------------------------------------------------------------
 
-CategoryForm.propTypes = {
+StatusForm.propTypes = {
   methods: PropTypes.any,
   onSubmit: PropTypes.any,
   type: PropTypes.string,
@@ -19,7 +19,7 @@ CategoryForm.propTypes = {
   formState: PropTypes.any,
 };
 
-export default function CategoryForm({ methods, onSubmit, type, isSubmitting, setValue, formState }) {
+export default function StatusForm({ methods, onSubmit, type, isSubmitting, setValue, formState }) {
   const navigate = useNavigate();
   const button_label = type === 'create' ? 'Simpan data' : 'Simpan perubahan';
 

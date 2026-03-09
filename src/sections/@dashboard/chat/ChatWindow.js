@@ -91,7 +91,7 @@ export default function ChatWindow() {
     const [, id, params] = queryKey; // Extract query params
     const queryString = new URLSearchParams(params).toString(); // Build query string
     try {
-      const res = await axios.get(`/members/${id}?${queryString}`);
+      const res = await axios.get(`/member/${id}?${queryString}`);
       return res.data;
     } catch (error) {
       console.error("Error fetching data:", error);

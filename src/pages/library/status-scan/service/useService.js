@@ -12,7 +12,7 @@ export default function useStatus() {
       queryKey: [...queryKey, params],
       queryFn: async () => {
         const qs = new URLSearchParams(params).toString();
-        const { data } = await axios.get(`/progress-label/all`);
+        const { data } = await axios.get(`/progress-label`);
         return data;
       },
       keepPreviousData: false,

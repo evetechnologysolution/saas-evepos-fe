@@ -17,7 +17,7 @@ const CustomTableRow = styled(TableRow)(() => ({
 }));
 
 export default function OrderTableRow({ row }) {
-  const { date, createdAt, paymentDate, orderId, orderType, status, billedAmount } = row;
+  const { createdAt, paymentDate, orderId, orderType, status, billedAmount } = row;
 
   let statusColor;
   if (status?.toLowerCase() === 'paid') {
