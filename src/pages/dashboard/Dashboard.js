@@ -88,7 +88,7 @@ export default function Dashboard() {
     queryFn: () =>
       axios
         .get(`/revenue?filter=${topFilterParams.filter}&start=${topFilterParams.start}&end=${topFilterParams.end}`)
-        .then((res) => res.data[0]),
+        .then((res) => res.data),
     ...queryOptions,
   });
 
@@ -255,7 +255,7 @@ export default function Dashboard() {
         )}
 
         <Grid container spacing={4}>
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid item xs={12} sm={4} md={2.4}>
             <YearlyWidgetSummary
               title="Revenue"
               subtitle={getTopCurrentFilterLabel()}
@@ -265,7 +265,18 @@ export default function Dashboard() {
               isLoading={loadingDashboardRevenue}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid item xs={12} sm={4} md={2.4}>
+            <YearlyWidgetSummary
+              title="Sales"
+              subtitle={getTopCurrentFilterLabel()}
+              total={dashboardRevenue?.totalSales || 0}
+              type="other"
+              color="info"
+              icon={'heroicons-solid:trending-up'}
+              isLoading={loadingDashboardRevenue}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4} md={2.4}>
             <YearlyWidgetSummary
               title="Donation"
               subtitle={getTopCurrentFilterLabel()}
@@ -276,14 +287,29 @@ export default function Dashboard() {
               isLoading={loadingDashboardRevenue}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid item xs={12} sm={4} md={2.4}>
             <YearlyWidgetSummary
-              title="Sales"
+              title="Expense"
               subtitle={getTopCurrentFilterLabel()}
-              total={dashboardRevenue?.totalSales || 0}
-              type="other"
+              total={dashboardRevenue?.expense?.totalExpense || 0}
+              type="currency"
+              color="warning"
+              icon={'heroicons-solid:currency-dollar'}
+              isLoading={loadingDashboardRevenue}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4} md={2.4}>
+            <YearlyWidgetSummary
+              title="Profit"
+              subtitle={getTopCurrentFilterLabel()}
+              total={
+                dashboardRevenue?.totalRevenue +
+                  dashboardRevenue?.totalRounding -
+                  dashboardRevenue?.expense?.totalExpense || 0
+              }
+              type="currency"
               color="info"
-              icon={'heroicons-solid:trending-up'}
+              icon={'heroicons-solid:currency-dollar'}
               isLoading={loadingDashboardRevenue}
             />
           </Grid>
