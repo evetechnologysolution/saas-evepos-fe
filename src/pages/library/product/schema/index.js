@@ -32,6 +32,9 @@ const ProductSchema = Yup.object({
     })
     .default(''),
 
+  minimumOrderQty: Yup.number().default(0),
+  isHaveMinimumQty: Yup.boolean().default(false),
+
   variant: Yup.array()
     .of(
       Yup.object({

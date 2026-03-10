@@ -103,6 +103,8 @@ export default function ProductForm({ isEdit, currentData }) {
       extraNotes: currentData?.extraNotes ?? false,
       isRecommended: currentData?.isRecommended ?? false,
       isAvailable: currentData?.isAvailable ?? true,
+      minimumOrderQty: currentData?.minimumOrderQty || 0,
+      isHaveMinimumQty: currentData?.minimumOrderQty > 0,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentData]
@@ -195,6 +197,7 @@ export default function ProductForm({ isEdit, currentData }) {
       formData.append('productionNotes', data.productionNotes || '');
       formData.append('description', data.description || '');
       formData.append('unit', data.unit);
+      formData.append('minimumOrderQty', data.minimumOrderQty);
 
       // relasi
       formData.append('category', data.category || '');
@@ -360,7 +363,6 @@ export default function ProductForm({ isEdit, currentData }) {
                   setValue('productionPrice', Number(values.value));
                 }}
               />
-
               {/* <RHFTextField name="productionNotes" label="Production Notes" autoComplete="off" multiline rows={5} /> */}
 
               <RHFSelect name="unit" label="Unit" placeholder="Unit" SelectProps={{ native: false }}>
@@ -393,6 +395,41 @@ export default function ProductForm({ isEdit, currentData }) {
                   </MenuItem>
                 ))}
               </RHFSelect>
+
+              <RHFSwitch
+                name="isHaveMinimumQty"
+                labelPlacement="start"
+                label={
+                  <>
+                    <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                      Minimum Qty
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                      Turn off if the product has no minimum qty
+                    </Typography>
+                  </>
+                }
+                sx={{ mx: 0, width: 1, justifyContent: 'space-between' }}
+              />
+              {getValues('isHaveMinimumQty') && (
+                <NumericFormat
+                  customInput={RHFTextField}
+                  name="minimumOrderQty"
+                  label="Minimum Order"
+                  autoComplete="off"
+                  decimalScale={2}
+                  decimalSeparator="."
+                  thousandSeparator=","
+                  allowNegative={false}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="start">{getValues('unit')}</InputAdornment>,
+                  }}
+                  value={getValues('minimumOrderQty') === 0 ? '' : getValues('minimumOrderQty')}
+                  onValueChange={(values) => {
+                    setValue('minimumOrderQty', Number(values.value));
+                  }}
+                />
+              )}
 
               <div>
                 <Typography variant="subtitle2" sx={{ mb: 1 }}>

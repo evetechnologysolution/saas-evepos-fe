@@ -30,6 +30,7 @@ function Products({ items }) {
             image={showImage(item.image)}
             price={item.price}
             productionPrice={item?.productionPrice || 0}
+            minimumOrderQty={item.minimumOrderQty}
             discount={item?.discount && !item?.discount?.conditional?.isActive ? item?.discount : {}}
             conditional={
               item?.discount?.conditional?.isActive
