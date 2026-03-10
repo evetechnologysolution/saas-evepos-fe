@@ -164,7 +164,7 @@ export default function HistoryForm() {
   useEffect(() => {
     if (!data?._id) return; // Early return if member ID is not available
 
-    const url = `/member-vouchers?page=${controllerVoucher.page + 1}&perPage=${controllerVoucher.rowsPerPage}&member=${
+    const url = `/member-voucher?page=${controllerVoucher.page + 1}&perPage=${controllerVoucher.rowsPerPage}&member=${
       data._id
     }`;
     fetchData(url, setVoucherData, setCountVoucher);
@@ -297,7 +297,7 @@ export default function HistoryForm() {
               </Stack>
             </Stack>
           </Grid>
-          {/* <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={4}>
             <Stack spacing={3}>
               <Stack>
                 <Typography variant="subtitle2">Point</Typography>
@@ -326,7 +326,7 @@ export default function HistoryForm() {
                 </div>
               </Stack>
             </Stack>
-          </Grid> */}
+          </Grid>
         </Grid>
 
         {/* order history */}
@@ -367,7 +367,7 @@ export default function HistoryForm() {
         </div>
 
         {/* point history */}
-        {/* <div>
+        <div>
           <Divider sx={{ my: 3 }} />
           <Typography variant="subtitle1" sx={{ mb: 1 }}>
             Point History
@@ -401,10 +401,10 @@ export default function HistoryForm() {
               />
             </Box>
           </Box>
-        </div> */}
+        </div>
 
         {/* voucher history */}
-        {/* <div>
+        <div>
           <Divider sx={{ my: 3 }} />
           <Typography variant="subtitle1" sx={{ mb: 1 }}>
             Voucher History
@@ -438,7 +438,7 @@ export default function HistoryForm() {
               />
             </Box>
           </Box>
-        </div> */}
+        </div>
       </Card>
     </>
   );

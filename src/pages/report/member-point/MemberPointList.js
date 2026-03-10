@@ -77,7 +77,7 @@ export default function MemberPointList() {
     const [, params] = queryKey; // Extract query params
     const queryString = new URLSearchParams(params).toString(); // Build query string
     try {
-      const res = await axios.get(`/members/point?${queryString}`);
+      const res = await axios.get(`/member/point?${queryString}`);
       setCountData(res?.data?.totalDocs || 0);
       return res.data;
     } catch (error) {

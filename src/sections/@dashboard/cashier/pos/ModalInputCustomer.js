@@ -92,7 +92,7 @@ export default function ModalInputCustomer(props) {
     if (query) {
       setLoading(true);
       try {
-        const res = await axios.get(`/members?search=${query}`);
+        const res = await axios.get(`/member?search=${query}`);
         setMembers(res?.data?.docs || []);
       } catch (error) {
         console.error('Error fetching members:', error);
@@ -100,7 +100,7 @@ export default function ModalInputCustomer(props) {
         setLoading(false);
       }
     } else {
-      const res = await axios.get('/members');
+      const res = await axios.get('/member');
       setMembers(res?.data?.docs || []);
     }
   };

@@ -14,9 +14,9 @@ import useSettings from '../../../hooks/useSettings';
 import Page from '../../../components/Page';
 import HeaderBreadcrumbs from '../../../components/HeaderBreadcrumbs';
 // sections
-import CategoryForm from './form/CategoryForm';
+import StatusForm from './form/StatusForm';
 import schema from './schema';
-import useStatus from './service/useCategory';
+import useStatus from './service/useService';
 // ----------------------------------------------------------------------
 export default function LibraryCategoryCreate() {
   const { themeStretch } = useSettings();
@@ -48,7 +48,7 @@ export default function LibraryCategoryCreate() {
   useEffect(() => {
     if (!isSuccessById || !tableData) return;
 
-    const ids = tableData.map((item) => item.listNumber);
+    const ids = tableData?.docs?.map((item) => item.listNumber);
 
     reset({
       ...categoryById,
@@ -89,7 +89,7 @@ export default function LibraryCategoryCreate() {
             <CircularProgress />
           </Box>
         ) : (
-          <CategoryForm
+          <StatusForm
             type="edit"
             methods={methods}
             isSubmitting={isSubmitting}

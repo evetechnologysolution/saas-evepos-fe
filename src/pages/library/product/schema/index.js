@@ -1,21 +1,21 @@
 import * as Yup from 'yup';
 
 const ProductSchema = Yup.object({
-  name: Yup.string().required('Name wajib diisi'),
-  price: Yup.number().min(0, 'Price tidak boleh negatif').required('Price wajib diisi'),
+  name: Yup.string().required('Name wajib diisi').default(''),
+  price: Yup.number().min(0, 'Price tidak boleh negatif').required('Price wajib diisi').default(''),
   productionPrice: Yup.number().min(0).default(0),
   productionNotes: Yup.string().nullable().default(''),
   description: Yup.string().nullable().default(''),
 
-  category: Yup.string().nullable(),
-  subcategory: Yup.string().nullable(),
+  category: Yup.string().nullable().default(''),
+  subcategory: Yup.string().nullable().default(''),
 
-  unit: Yup.string().required('Unit wajib diisi'),
+  unit: Yup.string().required('Unit wajib diisi').default(''),
 
-  isAvailable: Yup.boolean().required(),
-  extraNotes: Yup.boolean().required(),
-  listNumber: Yup.number().min(0).required(),
-  isRecommended: Yup.boolean().required(),
+  isAvailable: Yup.boolean().required().default(true),
+  extraNotes: Yup.boolean().required().default(false),
+  listNumber: Yup.number().min(0).required().default(''),
+  isRecommended: Yup.boolean().required().default(false),
 
   // file image (opsional)
   image: Yup.mixed()
@@ -29,7 +29,8 @@ const ProductSchema = Yup.object({
     .test('fileSize', 'Ukuran file max 2MB', (val) => {
       if (!val || typeof val === 'string') return true;
       return val.size <= 2 * 1024 * 1024;
-    }),
+    })
+    .default(''),
 
   variant: Yup.array()
     .of(

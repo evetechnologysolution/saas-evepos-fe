@@ -14,9 +14,9 @@ import useSettings from '../../../hooks/useSettings';
 import Page from '../../../components/Page';
 import HeaderBreadcrumbs from '../../../components/HeaderBreadcrumbs';
 // sections
-import CategoryForm from './form/CategoryForm';
+import StatusForm from './form/StatusForm';
 import schema from './schema';
-import useStatus from './service/useCategory';
+import useStatus from './service/useService';
 
 // ----------------------------------------------------------------------
 
@@ -52,7 +52,7 @@ export default function LibraryCategoryCreate() {
   useEffect(() => {
     if (!tableData) return;
 
-    const ids = tableData?.map((item) => item.listNumber);
+    const ids = tableData?.docs?.map((item) => item.listNumber);
     setValue('selectedList', ids);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tableData]);
@@ -84,7 +84,7 @@ export default function LibraryCategoryCreate() {
             <CircularProgress />
           </Box>
         ) : (
-          <CategoryForm
+          <StatusForm
             type="create"
             methods={methods}
             isSubmitting={isSubmitting}

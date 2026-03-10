@@ -255,7 +255,7 @@ export default function LogVoucherTableRow({ row }) {
 
       if (!isPrinted) {
         try {
-          await axiosInstance.patch(`/member-vouchers/${_id}`, { isPrinted: true });
+          await axiosInstance.patch(`/member-voucher/${_id}`, { isPrinted: true });
           queryClient.invalidateQueries('allNotif');
           queryClient.invalidateQueries('listPostcard');
         } catch (error) {

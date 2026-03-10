@@ -842,9 +842,9 @@ const LibraryProductEdit = Loadable(lazy(() => import('../pages/library/product/
 const LibraryCategory = Loadable(lazy(() => import('../pages/library/category/LibraryCategory')));
 const LibraryCategoryCreate = Loadable(lazy(() => import('../pages/library/category/LibraryCategoryCreate')));
 const LibraryCategoryEdit = Loadable(lazy(() => import('../pages/library/category/LibraryCategoryEdit')));
-const LibrarySubCategory = Loadable(lazy(() => import('../pages/library/subcategory/LibraryCategory')));
-const LibrarySubCategoryCreate = Loadable(lazy(() => import('../pages/library/subcategory/LibraryCategoryCreate')));
-const LibrarySubCategoryEdit = Loadable(lazy(() => import('../pages/library/subcategory/LibraryCategoryEdit')));
+const LibrarySubCategory = Loadable(lazy(() => import('../pages/library/subcategory/LibrarySubCategory')));
+const LibrarySubCategoryCreate = Loadable(lazy(() => import('../pages/library/subcategory/LibrarySubCategoryCreate')));
+const LibrarySubCategoryEdit = Loadable(lazy(() => import('../pages/library/subcategory/LibrarySubCategoryEdit')));
 const LibraryVariant = Loadable(lazy(() => import('../pages/library/variant/LibraryVariant')));
 const LibraryVariantCreate = Loadable(lazy(() => import('../pages/library/variant/LibraryVariantCreate')));
 const LibraryVariantEdit = Loadable(lazy(() => import('../pages/library/variant/LibraryVariantEdit')));
