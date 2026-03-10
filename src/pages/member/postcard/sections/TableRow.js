@@ -30,7 +30,7 @@ export default function LogVoucherTableRow({ row }) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { _id, date, name, option, member, isPrinted } = row;
+  const { _id, createdAt, name, option, member, isPrinted } = row;
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -271,7 +271,7 @@ export default function LogVoucherTableRow({ row }) {
 
   return (
     <CustomTableRow hover>
-      <TableCell align="center">{formatDate2(date)}</TableCell>
+      <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
       <TableCell>{name}</TableCell>
 

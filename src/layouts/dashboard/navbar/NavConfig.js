@@ -1,6 +1,8 @@
+import { useContext } from 'react';
 import { PATH_DASHBOARD } from '../../../routes/paths';
 // components
 import SvgIconStyle from '../../../components/SvgIconStyle';
+import { mainContext } from '../../../contexts/MainContext';
 
 // ----------------------------------------------------------------------
 
@@ -29,6 +31,8 @@ const ICONS = {
 };
 
 export const useNavConfig = () => {
+  const ctx = useContext(mainContext);
+
   return [
     // GENERAL
     // ----------------------------------------------------------------------
@@ -53,13 +57,13 @@ export const useNavConfig = () => {
           icon: ICONS.order,
           roles: ['owner', 'admin', 'cashier', 'staff'],
         },
-        // {
-        //   title: 'Delivery',
-        //   path: PATH_DASHBOARD.cashier.delivery,
-        //   icon: ICONS.delivery,
-        //   roles: ['super admin', 'cashier'],
-        //   total: ctx?.allNotif?.backlogDelivery || 0,
-        // },
+        {
+          title: 'Delivery',
+          path: PATH_DASHBOARD.cashier.delivery,
+          icon: ICONS.delivery,
+          roles: ['owner', 'admin', 'cashier'],
+          total: ctx?.allNotif?.backlogDelivery || 0,
+        },
         {
           title: 'PickUp',
           path: PATH_DASHBOARD.pickup.root,
@@ -78,17 +82,17 @@ export const useNavConfig = () => {
           icon: ICONS.setting,
           roles: ['owner'],
         },
-        // {
-        //   title: 'Scan Voucher',
-        //   path: PATH_DASHBOARD.voucherScan,
-        //   icon: ICONS.scan,
-        //   roles: ['super admin', 'admin', 'cashier'],
-        // },
+        {
+          title: 'Scan Voucher',
+          path: PATH_DASHBOARD.voucherScan,
+          icon: ICONS.scan,
+          roles: ['owner', 'admin', 'cashier'],
+        },
         // {
         //   title: 'Chat',
         //   path: PATH_DASHBOARD.chat.root,
         //   icon: ICONS.chat,
-        //   roles: ['super admin', 'cashier'],
+        //   roles: ['owner', 'cashier'],
         //   total: ctx?.allNotif?.unreadMessage || 0,
         // },
         {
@@ -107,7 +111,7 @@ export const useNavConfig = () => {
         //   title: 'Customer',
         //   path: PATH_DASHBOARD.customer.root,
         //   icon: ICONS.customer,
-        //   // roles: ["super admin", "Cashier"],
+        //   // roles: ['owner', 'admin', 'cashier'],
         //   roles: ['Forbidden'],
         // },
         {
@@ -118,27 +122,27 @@ export const useNavConfig = () => {
           children: [
             { title: 'list member', path: PATH_DASHBOARD.member.list },
             // { title: 'member card', path: PATH_DASHBOARD.member.memberCard },
-            // { title: 'log voucher', path: PATH_DASHBOARD.member.logVoucher },
+            { title: 'log voucher', path: PATH_DASHBOARD.member.logVoucher },
           ],
         },
         // {
         //   title: 'Postcard',
         //   path: PATH_DASHBOARD.postCard.root,
         //   icon: ICONS.member,
-        //   roles: ['super admin', 'cashier'],
+        //   roles: ['owner', 'admin', 'cashier'],
         //   total: ctx?.allNotif?.newPostcard || 0,
         // },
         // {
         //   title: 'Print Count',
         //   path: PATH_DASHBOARD.printCout.root,
         //   icon: ICONS.printCount,
-        //   roles: ['super admin'],
+        //   roles: ['owner'],
         // },
         {
           title: 'Cash Cashier',
           path: PATH_DASHBOARD.cashCashier.root,
           icon: ICONS.cashier,
-          roles: ['owner', 'super admin', 'cashier'],
+          roles: ['owner', 'admin', 'cashier'],
         },
         {
           title: 'Expense Data',
@@ -155,25 +159,12 @@ export const useNavConfig = () => {
     {
       subheader: 'management',
       items: [
-        // BAZAAR
-        // {
-        //   title: 'bazaar',
-        //   path: PATH_DASHBOARD.bazaar.root,
-        //   icon: ICONS.library,
-        //   roles: ['super admin', 'admin'],
-        //   children: [
-        //     { title: 'stand bazaar', path: PATH_DASHBOARD.bazaar.stand },
-        //     { title: 'voucher', path: PATH_DASHBOARD.bazaar.voucher },
-        //     { title: 'log bazaar', path: PATH_DASHBOARD.bazaar.log },
-        //     { title: 'log voucher bazaar', path: PATH_DASHBOARD.bazaar.logVoucher },
-        //   ],
-        // },
         // // CONTENT MANAGER
         // {
         //   title: 'Content Manager',
         //   path: PATH_DASHBOARD.content.root,
         //   icon: ICONS.content,
-        //   roles: ['super admin', 'Content Writer'],
+        //   roles: ['owner', 'content writer'],
         //   children: [
         //     { title: 'blog', path: PATH_DASHBOARD.content.blog },
         //     { title: 'gallery', path: PATH_DASHBOARD.content.gallery },
@@ -187,10 +178,10 @@ export const useNavConfig = () => {
           icon: ICONS.report,
           roles: ['owner', 'admin'],
           children: [
-            // { title: 'member point', path: PATH_DASHBOARD.report.memberPoint },
-            // { title: "neraca", path: PATH_DASHBOARD.report.neraca },
-            // { title: 'profit loss', path: PATH_DASHBOARD.report.profitLoss },
-            // { title: 'cash flow', path: PATH_DASHBOARD.report.cashFlow },
+            { title: 'member point', path: PATH_DASHBOARD.report.memberPoint },
+            // { title: 'neraca', path: PATH_DASHBOARD.report.neraca },
+            { title: 'profit loss', path: PATH_DASHBOARD.report.profitLoss },
+            { title: 'cash flow', path: PATH_DASHBOARD.report.cashFlow },
             { title: 'sales report', path: PATH_DASHBOARD.report.sales },
             { title: 'popular product', path: PATH_DASHBOARD.report.popular },
             { title: 'payment overview', path: PATH_DASHBOARD.report.paymentOverview },
@@ -213,7 +204,7 @@ export const useNavConfig = () => {
             // { title: 'perfume', path: PATH_DASHBOARD.library.perfume },
             { title: 'promotion', path: PATH_DASHBOARD.library.promotion },
             // { title: 'special promotion', path: PATH_DASHBOARD.library.specialPromotion },
-            // { title: 'voucher', path: PATH_DASHBOARD.library.voucher },
+            { title: 'voucher', path: PATH_DASHBOARD.library.voucher },
             // { title: 'discount', path: PATH_DASHBOARD.library.discount },
           ],
         },

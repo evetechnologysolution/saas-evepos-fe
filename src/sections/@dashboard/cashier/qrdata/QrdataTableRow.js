@@ -76,7 +76,7 @@ BootstrapDialogTitle.propTypes = {
 
 export default function QrdataTableRow({ row, onCloseRow }) {
 
-    const { date, qrKey, tableName, pax, image, status } = row;
+    const { createdAt, qrKey, tableName, pax, image, status } = row;
 
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
@@ -99,7 +99,7 @@ export default function QrdataTableRow({ row, onCloseRow }) {
         <>
             <CustomTableRow hover>
 
-                <TableCell align="center">{formatDate2(date)}</TableCell>
+                <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
                 <TableCell>
                     <Link component="button" variant="inherit" underline="hover" onClick={handleOpen}>

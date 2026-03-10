@@ -29,7 +29,7 @@ const CustomTableRow = styled(TableRow)(() => ({
 
 export default function ActivityTableRow({ row }) {
   const {
-    date,
+    createdAt,
     name,
     unit,
     qty,
@@ -41,7 +41,7 @@ export default function ActivityTableRow({ row }) {
   const navigate = useNavigate();
   return (
     <CustomTableRow hover>
-      <TableCell align="center">{formatDate2(date)}</TableCell>
+      <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
       <TableCell>{row?.staffRef?.fullname || '-'}</TableCell>
 

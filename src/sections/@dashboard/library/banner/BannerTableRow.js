@@ -29,12 +29,12 @@ const CustomTableRow = styled(TableRow)(() => ({
 export default function BannerTableRow({ row, onEditRow, onDeleteRow }) {
     const theme = useTheme();
 
-    const { date, name, image, listNumber, isAvailable } = row;
+    const { createdAt, name, image, listNumber, isAvailable } = row;
 
     return (
         <CustomTableRow hover >
 
-            <TableCell align="center">{formatDate2(date)}</TableCell>
+            <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
             <TableCell>
                 <div style={{ display: "flex", alignItems: "center" }}>

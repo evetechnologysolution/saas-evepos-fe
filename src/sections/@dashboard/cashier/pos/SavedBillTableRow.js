@@ -20,12 +20,12 @@ const CustomTableRow = styled(TableRow)(() => ({
 
 export default function SavedBillTableRow({ row, onClickRow }) {
 
-    const { date, billName, tableName, orderType } = row;
+    const { createdAt, billName, tableName, orderType } = row;
 
     return (
         <CustomTableRow hover onClick={() => { onClickRow(); }} sx={{ cursor: "pointer" }} >
 
-            <TableCell align="center">{formatDate2(date)}</TableCell>
+            <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
             <TableCell>{billName}</TableCell>
 
@@ -33,7 +33,7 @@ export default function SavedBillTableRow({ row, onClickRow }) {
 
             <TableCell align="center">{orderType}</TableCell>
 
-            <TableCell align="center">{formatTime(date)}</TableCell>
+            <TableCell align="center">{formatTime(createdAt)}</TableCell>
 
         </CustomTableRow>
     );

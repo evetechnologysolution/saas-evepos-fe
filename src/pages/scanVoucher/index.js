@@ -326,7 +326,7 @@ export default function ScanVoucher() {
                     {loading ? (
                       <Skeleton variant="text" />
                     ) : (
-                      <Typography variant="body2" sx={{ fontStyle: "italic" }}>{voucherDetail?.member?.memberId || "-"}</Typography>
+                      <Typography variant="body2" sx={{ fontStyle: "italic" }}>{voucherDetail?.memberRef?.memberId || "-"}</Typography>
                     )}
                   </Stack>
                   <Stack>
@@ -334,7 +334,7 @@ export default function ScanVoucher() {
                     {loading ? (
                       <Skeleton variant="text" />
                     ) : (
-                      <Typography variant="body2" sx={{ fontStyle: "italic" }}>{voucherDetail?.member?.name || "-"}</Typography>
+                      <Typography variant="body2" sx={{ fontStyle: "italic" }}>{voucherDetail?.memberRef?.name || "-"}</Typography>
                     )}
                   </Stack>
                   <Stack>
@@ -342,7 +342,7 @@ export default function ScanVoucher() {
                     {loading ? (
                       <Skeleton variant="text" />
                     ) : (
-                      <Typography variant="body2" sx={{ fontStyle: "italic" }}>{voucherDetail?.member?.phone || "-"}</Typography>
+                      <Typography variant="body2" sx={{ fontStyle: "italic" }}>{voucherDetail?.memberRef?.phone || "-"}</Typography>
                     )}
                   </Stack>
                 </Stack>

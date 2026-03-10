@@ -26,7 +26,7 @@ const CustomTableRow = styled(TableRow)(() => ({
 }));
 
 export default function GalleryTableRow({ row, onEditRow, onDeleteRow }) {
-  const { date, name, image, section } = row;
+  const { createdAt, name, image, section } = row;
   const { enqueueSnackbar } = useSnackbar();
 
   const showImage = () => {
@@ -41,7 +41,7 @@ export default function GalleryTableRow({ row, onEditRow, onDeleteRow }) {
 
   return (
     <CustomTableRow hover>
-      <TableCell align="center">{formatDate2(date)}</TableCell>
+      <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
       <TableCell>
         <div style={{ display: 'flex', alignItems: 'center' }}>
