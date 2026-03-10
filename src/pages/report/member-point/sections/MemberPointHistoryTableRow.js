@@ -18,7 +18,7 @@ const CustomTableRow = styled(TableRow)(() => ({
 
 export default function MemberPointHistoryTableRow({ row }) {
 
-  const { createdAt, pointExpiry, point, status, order } = row;
+  const { createdAt, pointExpiry, point, status, orderRef } = row;
 
   return (
     <CustomTableRow hover>
@@ -26,13 +26,13 @@ export default function MemberPointHistoryTableRow({ row }) {
 
       <TableCell align="left">
         {status === "in" ? (
-          `Transaksi ${order?.orderId} - ${numberWithCommas(order?.billedAmount || 0)}`
+          `Transaksi ${orderRef?.orderId} - ${numberWithCommas(orderRef?.billedAmount || 0)}`
         ) : (
           "Voucher Redeem"
         )}
       </TableCell>
 
-      <TableCell align="center">{order?.date ? formatDate2(order?.date) : "-"}</TableCell>
+      <TableCell align="center">{orderRef?.date ? formatDate2(orderRef?.date) : "-"}</TableCell>
 
       <TableCell align="center">
         {status === "in" ? (

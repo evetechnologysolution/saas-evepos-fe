@@ -43,7 +43,6 @@ import {
   RHFUploadSingleFile,
   RHFSwitch,
 } from '../../../../components/hook-form';
-import Iconify from '../../../../components/Iconify';
 
 // routes
 import { PATH_DASHBOARD } from '../../../../routes/paths';
