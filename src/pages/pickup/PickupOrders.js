@@ -134,8 +134,6 @@ export default function PickupOrders() {
     });
   };
 
-  console.log(tableData?.docs);
-
   return (
     <Page title="Pickup Orders">
       <Container maxWidth={themeStretch ? false : 'xl'}>

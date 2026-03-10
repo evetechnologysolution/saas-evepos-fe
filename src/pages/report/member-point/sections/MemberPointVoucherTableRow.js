@@ -19,7 +19,7 @@ const CustomTableRow = styled(TableRow)(() => ({
 
 export default function MemberPointVoucherTableRow({ row }) {
 
-  const { date, expiry, voucherCode, name, isUsed } = row;
+  const { createdAt, expiry, voucherCode, name, isUsed } = row;
 
   function isExpiredTime(expiry) {
     const expiryDate = new Date(expiry);
@@ -34,7 +34,7 @@ export default function MemberPointVoucherTableRow({ row }) {
 
   return (
     <CustomTableRow hover>
-      <TableCell align="center">{formatDate2(date)}</TableCell>
+      <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
       <TableCell align="left">{name}</TableCell>
 

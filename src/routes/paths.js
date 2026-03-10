@@ -97,7 +97,7 @@ export const PATH_DASHBOARD = {
     root: path(ROOTS_DASHBOARD, '/report'),
     memberPoint: path(ROOTS_DASHBOARD, '/report/member-point'),
     memberPointView: (id) => path(ROOTS_DASHBOARD, `/report/member-point/${id}/view`),
-    // neraca: path(ROOTS_DASHBOARD, "/report/neraca"),
+    // neraca: path(ROOTS_DASHBOARD, '/report/neraca'),
     profitLoss: path(ROOTS_DASHBOARD, '/report/profit-loss'),
     cashFlow: path(ROOTS_DASHBOARD, '/report/cash-flow'),
     sales: path(ROOTS_DASHBOARD, '/report/sales'),

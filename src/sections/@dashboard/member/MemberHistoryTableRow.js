@@ -18,11 +18,11 @@ const CustomTableRow = styled(TableRow)(() => ({
 
 export default function MemberTableRow({ row }) {
 
-  const { date, pointExpiry, point, status, order } = row;
+  const { createdAt, pointExpiry, point, status, order } = row;
 
   return (
     <CustomTableRow hover>
-      <TableCell align="center">{formatDate2(date)}</TableCell>
+      <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
       <TableCell align="left">
         {status === "in" ? (

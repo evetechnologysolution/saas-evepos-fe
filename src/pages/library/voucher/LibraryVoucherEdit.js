@@ -28,7 +28,7 @@ export default function LibraryVoucherEdit() {
   useEffect(() => {
     const getData = async () => {
       try {
-        await axios.get(`/vouchers/${id}`).then((response) => {
+        await axios.get(`/voucher/${id}`).then((response) => {
           setCurrentData(response.data);
         });
       } catch (error) {

@@ -22,7 +22,7 @@ const CustomTableRow = styled(TableRow)(() => ({
 }));
 
 export default function ExpenseTableRow({ row, onDeleteRow }) {
-  const { date, createdAt, code, description, amount } = row;
+  const { createdAt, code, description, amount } = row;
 
   const getExpense = (val) => {
     const expenseMap = {

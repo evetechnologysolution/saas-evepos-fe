@@ -18,11 +18,11 @@ const CustomTableRow = styled(TableRow)(() => ({
 
 export default function CustomerTableRow({ row }) {
 
-  const { date, customer, orders } = row;
+  const { createdAt, customer, orders } = row;
 
   return (
     <CustomTableRow hover>
-      <TableCell align="center">{formatDate2(date)}</TableCell>
+      <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
       <TableCell align="left">
         <p>{customer?.name || "-"}</p>

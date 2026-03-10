@@ -28,7 +28,7 @@ const CustomTableRow = styled(TableRow)(() => ({
 export default function MemberTableRow({ row, onDetailRow, onEditRow, onDeleteRow }) {
   const { user } = useAuth();
 
-  const { date, createdAt, memberId, name, phone, email, addresses, point } = row;
+  const { createdAt, memberId, name, phone, email, addresses, point } = row;
 
   const mainAddress = Array.isArray(addresses) ? addresses?.find((item) => item?.isDefault) : null;
 
