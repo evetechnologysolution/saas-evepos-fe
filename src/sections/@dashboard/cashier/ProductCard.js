@@ -299,10 +299,12 @@ export default function ProductCard({
           >
             {isOverflow ? (
               <Marquee>
-                <span style={{ marginRight: 10 }}>{`${name} (min ${minimumOrderQty}${unit})`}</span>
+                <span style={{ marginRight: 10 }}>{`${name} ${
+                  minimumOrderQty > 0 ? `(min ${minimumOrderQty}${unit})` : ''
+                }`}</span>
               </Marquee>
             ) : (
-              <span>{`${name} (min ${minimumOrderQty}${unit})`}</span>
+              <span>{`${name} ${minimumOrderQty > 0 ? `(min ${minimumOrderQty}${unit})` : ''}`}</span>
             )}
           </Typography>
         </Tooltip>

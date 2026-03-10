@@ -197,7 +197,7 @@ export default function ProductForm({ isEdit, currentData }) {
       formData.append('productionNotes', data.productionNotes || '');
       formData.append('description', data.description || '');
       formData.append('unit', data.unit);
-      formData.append('minimumOrderQty', data.minimumOrderQty);
+      formData.append('minimumOrderQty', data.isHaveMinimumQty ? data.minimumOrderQty : 0);
 
       // relasi
       formData.append('category', data.category || '');
