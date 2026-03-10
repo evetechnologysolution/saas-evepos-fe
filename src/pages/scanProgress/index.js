@@ -11,7 +11,6 @@ import {
   Grid,
   Skeleton,
   IconButton,
-  Button,
   CircularProgress,
   Box,
 } from '@mui/material';
@@ -27,7 +26,11 @@ import axiosInstance from 'src/utils/axios';
 import { formatDate2 } from 'src/utils/getData';
 import { maskedPhone } from 'src/utils/masked';
 import Iconify from 'src/components/Iconify';
-import { Add, EditNote, ModeEdit } from '@mui/icons-material';
+import {
+  // Add,
+  // EditNote,
+  ModeEdit,
+} from '@mui/icons-material';
 import useStatus from './service/useStatus';
 import ModalProgress from './ModalProgressV2';
 import ModalAddStatus from './ModalStatus';
@@ -482,6 +485,11 @@ export default function ScanProgress() {
                             Proses
                           </Typography>
                         </th>
+                        <th>
+                          <Typography variant="subtitle2" align="center">
+                            Notes
+                          </Typography>
+                        </th>
                         {/* <th width={100}><Typography variant="subtitle2" align="center">Qty</Typography></th> */}
                       </tr>
                     </thead>
@@ -513,6 +521,9 @@ export default function ScanProgress() {
                                   <Label variant="ghost" color="warning" sx={{ textTransform: 'capitalize' }}>
                                     {item?.status || '-'}
                                   </Label>
+                                </td>
+                                <td style={{ textAlign: 'center' }}>
+                                  <Typography variant="body2">{item?.notes || '-'}</Typography>
                                 </td>
                               </tr>
                             ))
