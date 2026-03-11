@@ -10,6 +10,7 @@ import DashboardLayout from '../layouts/dashboard';
 import LogoOnlyLayout from '../layouts/LogoOnlyLayout';
 // components
 import LoadingScreen from '../components/LoadingScreen';
+import useAuth from '../hooks/useAuth';
 
 // ----------------------------------------------------------------------
 
@@ -25,6 +26,12 @@ const Loadable = (Component) => (props) => {
 };
 
 export default function Router() {
+  const { user } = useAuth();
+
+  const evewashAllowed = (roles = []) => {
+    return user?.tenantRef?.isEvewash ? roles : ['forbidden'];
+  };
+
   return useRoutes([
     {
       path: 'auth',
@@ -119,7 +126,7 @@ export default function Router() {
             {
               path: 'track-history',
               element: (
-                <RoleBasedGuard hasContent roles={['owner', 'admin', 'cashier', 'staff']}>
+                <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin', 'cashier', 'staff'])}>
                   <TrackHistory />
                 </RoleBasedGuard>
               ),
@@ -135,7 +142,7 @@ export default function Router() {
             {
               path: 'scan-voucher',
               element: (
-                <RoleBasedGuard hasContent roles={['owner', 'admin', 'staff', 'cashier']}>
+                <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin', 'staff', 'cashier'])}>
                   <VoucherScan />
                 </RoleBasedGuard>
               ),
@@ -171,7 +178,7 @@ export default function Router() {
                 {
                   path: 'delivery',
                   element: (
-                    <RoleBasedGuard hasContent roles={['owner', 'admin', 'cashier', 'staff']}>
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin', 'cashier', 'staff'])}>
                       <CashierDelivery />
                     </RoleBasedGuard>
                   ),
@@ -179,7 +186,7 @@ export default function Router() {
                 {
                   path: 'delivery/:id/edit',
                   element: (
-                    <RoleBasedGuard hasContent roles={['owner', 'admin', 'cashier', 'staff']}>
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin', 'cashier', 'staff'])}>
                       <CashierDeliveryEdit />
                     </RoleBasedGuard>
                   ),
@@ -197,9 +204,30 @@ export default function Router() {
             {
               path: 'chat',
               children: [
-                { element: <ChatPage />, index: true },
-                { path: 'new', element: <ChatPage /> },
-                { path: ':id', element: <ChatPage /> },
+                {
+                  element: (
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin', 'cashier', 'staff'])}>
+                      <ChatPage />
+                    </RoleBasedGuard>
+                  ),
+                  index: true,
+                },
+                {
+                  path: 'new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin', 'cashier', 'staff'])}>
+                      <ChatPage />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: ':id',
+                  element: (
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin', 'cashier', 'staff'])}>
+                      <ChatPage />
+                    </RoleBasedGuard>
+                  ),
+                },
               ],
             },
             {
@@ -254,7 +282,7 @@ export default function Router() {
                 {
                   path: 'log-voucher',
                   element: (
-                    <RoleBasedGuard hasContent roles={['owner', 'admin', 'cashier', 'staff']}>
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin', 'cashier', 'staff'])}>
                       <MemberLogVoucher />
                     </RoleBasedGuard>
                   ),
@@ -468,7 +496,7 @@ export default function Router() {
                 {
                   path: 'voucher',
                   element: (
-                    <RoleBasedGuard hasContent roles={['owner', 'admin']}>
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin'])}>
                       <LibraryVoucher />
                     </RoleBasedGuard>
                   ),
@@ -476,7 +504,7 @@ export default function Router() {
                 {
                   path: 'voucher/new',
                   element: (
-                    <RoleBasedGuard hasContent roles={['owner', 'admin']}>
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin'])}>
                       <LibraryVoucherCreate />
                     </RoleBasedGuard>
                   ),
@@ -484,7 +512,7 @@ export default function Router() {
                 {
                   path: 'voucher/:id/edit',
                   element: (
-                    <RoleBasedGuard hasContent roles={['owner', 'admin']}>
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin'])}>
                       <LibraryVoucherEdit />
                     </RoleBasedGuard>
                   ),
@@ -641,7 +669,7 @@ export default function Router() {
                 {
                   path: 'member-point',
                   element: (
-                    <RoleBasedGuard hasContent roles={['owner', 'admin']}>
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin'])}>
                       <MemberPointList />
                     </RoleBasedGuard>
                   ),
@@ -649,7 +677,7 @@ export default function Router() {
                 {
                   path: 'member-point/:id/view',
                   element: (
-                    <RoleBasedGuard hasContent roles={['owner', 'admin']}>
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin'])}>
                       <MemberPointView />
                     </RoleBasedGuard>
                   ),

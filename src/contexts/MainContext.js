@@ -1,5 +1,8 @@
 import PropTypes from 'prop-types';
-import React, { createContext, useState, useMemo } from 'react';
+import React, { createContext, useState, useMemo, useEffect } from 'react';
+import { useQueryClient } from 'react-query';
+// hooks
+import useAuth from '../hooks/useAuth';
 // queries
 // import { useAllNotif } from '../hooks/queries/useAllNotif';
 import { useProduct } from '../hooks/queries/useProduct';
@@ -14,6 +17,8 @@ import { useGeneralPerfume } from '../hooks/queries/useGeneralPerfume';
 export const mainContext = createContext({});
 
 const MainContextProvider = ({ children }) => {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [socket, setSocket] = useState(null);
 
   const [currentAccount, setCurrentAccount] = useState(process.env.REACT_APP_ACCOUNT_TYPE || 'basic');
@@ -31,6 +36,16 @@ const MainContextProvider = ({ children }) => {
   const { data: receiptHeader = {} } = useReceiptSetting();
   const { data: generalSettings = {} } = useGeneralSetting();
   const { data: generalPerfume = {} } = useGeneralPerfume();
+
+  useEffect(() => {
+    if (!user?._id || !user?.role) return;
+
+    queryClient.invalidateQueries('allProduct');
+    queryClient.invalidateQueries('allCategory');
+    queryClient.invalidateQueries('allSubcategory');
+    queryClient.invalidateQueries('generalSettings');
+    queryClient.invalidateQueries('receiptHeader');
+  }, [user?._id, user?.role]);
 
   const value = useMemo(
     () => ({

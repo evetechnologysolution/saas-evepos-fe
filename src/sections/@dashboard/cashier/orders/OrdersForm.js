@@ -1,12 +1,11 @@
 import PropTypes from 'prop-types';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { sumBy } from 'lodash';
 // import Zoom from "react-medium-image-zoom";
 import 'react-medium-image-zoom/dist/styles.css';
 // @mui
-import { useTheme } from '@mui/material/styles';
 import { LoadingButton } from '@mui/lab';
 import {
   Card,
@@ -33,19 +32,11 @@ import useAuth from '../../../../hooks/useAuth';
 import Label from '../../../../components/Label';
 // import Image from "../../../../components/Image";
 import ConfirmDialog from '../../../../components/ConfirmDialog';
-import {
-  formatDate,
-  formatDate2,
-  numberWithCommas,
-  cardNumberFormat,
-  resetCardNumberFormat,
-} from '../../../../utils/getData';
+import { numberWithCommas, cardNumberFormat, resetCardNumberFormat } from '../../../../utils/getData';
 import { maskedPhone } from '../../../../utils/masked';
 // routes
 import { PATH_DASHBOARD } from '../../../../routes/paths';
 // context
-import { cashierContext } from '../../../../contexts/CashierContext';
-import { progress } from '../../../../_mock/progressStatus';
 import './OrdersForm.scss';
 
 // ----------------------------------------------------------------------
@@ -56,9 +47,7 @@ OrdersForm.propTypes = {
 
 export default function OrdersForm({ currentData }) {
   const { user } = useAuth();
-  const currTheme = useTheme();
   const navigate = useNavigate();
-  const ctx = useContext(cashierContext);
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -103,7 +92,7 @@ export default function OrdersForm({ currentData }) {
 
     setRegion(regionParts.filter((part) => part).join(', '));
     setData(currentData);
-    setOrderDate(new Date(currentData?.date));
+    setOrderDate(new Date(currentData?.createdAt));
     setOriginPayDate(new Date(currentData?.paymentDate));
     setPayDate(new Date(currentData?.paymentDate));
     setPayment(currentData?.payment || '');
@@ -177,7 +166,7 @@ export default function OrdersForm({ currentData }) {
   const handleUpdate = async () => {
     setLoading(true);
     const updatedOrder = {
-      date: orderDate,
+      createdAt: orderDate,
       paymentDate: payDate,
       payment,
       cardBankName,

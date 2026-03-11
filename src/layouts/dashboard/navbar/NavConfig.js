@@ -3,6 +3,7 @@ import { PATH_DASHBOARD } from '../../../routes/paths';
 // components
 import SvgIconStyle from '../../../components/SvgIconStyle';
 import { mainContext } from '../../../contexts/MainContext';
+import useAuth from '../../../hooks/useAuth';
 
 // ----------------------------------------------------------------------
 
@@ -31,7 +32,12 @@ const ICONS = {
 };
 
 export const useNavConfig = () => {
+  const { user } = useAuth();
   const ctx = useContext(mainContext);
+
+  const evewashAllowed = (roles = []) => {
+    return user?.tenantRef?.isEvewash ? roles : ['forbidden'];
+  };
 
   return [
     // GENERAL
@@ -61,7 +67,7 @@ export const useNavConfig = () => {
           title: 'Delivery',
           path: PATH_DASHBOARD.cashier.delivery,
           icon: ICONS.delivery,
-          roles: ['owner', 'admin', 'cashier'],
+          roles: evewashAllowed(['owner', 'admin', 'cashier']),
           total: ctx?.allNotif?.backlogDelivery || 0,
         },
         {
@@ -86,20 +92,20 @@ export const useNavConfig = () => {
           title: 'Scan Voucher',
           path: PATH_DASHBOARD.voucherScan,
           icon: ICONS.scan,
-          roles: ['owner', 'admin', 'cashier'],
+          roles: evewashAllowed(['owner', 'admin', 'cashier']),
         },
         // {
         //   title: 'Chat',
         //   path: PATH_DASHBOARD.chat.root,
         //   icon: ICONS.chat,
-        //   roles: ['owner', 'cashier'],
+        //   roles: evewashAllowed(['owner', 'cashier']),
         //   total: ctx?.allNotif?.unreadMessage || 0,
         // },
         {
           title: 'Track History',
           path: PATH_DASHBOARD.history.root,
           icon: ICONS.history,
-          roles: ['owner', 'admin', 'cashier', 'staff'],
+          roles: evewashAllowed(['owner', 'admin', 'cashier', 'staff']),
         },
         {
           title: 'Track Order',
@@ -111,8 +117,8 @@ export const useNavConfig = () => {
         //   title: 'Customer',
         //   path: PATH_DASHBOARD.customer.root,
         //   icon: ICONS.customer,
-        //   // roles: ['owner', 'admin', 'cashier'],
-        //   roles: ['Forbidden'],
+        //   roles: ['owner', 'admin', 'cashier'],
+        //   roles: ['forbidden'],
         // },
         {
           title: 'Member',
@@ -122,7 +128,7 @@ export const useNavConfig = () => {
           children: [
             { title: 'list member', path: PATH_DASHBOARD.member.list },
             // { title: 'member card', path: PATH_DASHBOARD.member.memberCard },
-            { title: 'log voucher', path: PATH_DASHBOARD.member.logVoucher },
+            ...(user?.tenantRef?.isEvewash ? [{ title: 'log voucher', path: PATH_DASHBOARD.member.logVoucher }] : []),
           ],
         },
         // {
@@ -178,7 +184,7 @@ export const useNavConfig = () => {
           icon: ICONS.report,
           roles: ['owner', 'admin'],
           children: [
-            { title: 'member point', path: PATH_DASHBOARD.report.memberPoint },
+            ...(user?.tenantRef?.isEvewash ? [{ title: 'member point', path: PATH_DASHBOARD.report.memberPoint }] : []),
             // { title: 'neraca', path: PATH_DASHBOARD.report.neraca },
             { title: 'profit loss', path: PATH_DASHBOARD.report.profitLoss },
             { title: 'cash flow', path: PATH_DASHBOARD.report.cashFlow },
@@ -204,7 +210,7 @@ export const useNavConfig = () => {
             // { title: 'perfume', path: PATH_DASHBOARD.library.perfume },
             { title: 'promotion', path: PATH_DASHBOARD.library.promotion },
             // { title: 'special promotion', path: PATH_DASHBOARD.library.specialPromotion },
-            { title: 'voucher', path: PATH_DASHBOARD.library.voucher },
+            ...(user?.tenantRef?.isEvewash ? [{ title: 'voucher', path: PATH_DASHBOARD.library.voucher }] : []),
             // { title: 'discount', path: PATH_DASHBOARD.library.discount },
           ],
         },
