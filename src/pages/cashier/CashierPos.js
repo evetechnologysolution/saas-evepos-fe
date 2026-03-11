@@ -361,7 +361,17 @@ export default function CashierPos() {
                     <Button
                       variant="contained"
                       size="large"
-                      sx={{ boxShadow: 0, p: 0, width: '100%', height: 80, overflow: 'hidden', borderRadius: 0 }}
+                      sx={{
+                        boxShadow: 0,
+                        p: 0,
+                        width: '100%',
+                        height: 80,
+                        overflow: 'hidden',
+                        borderRadius: user?.tenantRef?.isEvewash ? 0 : undefined,
+                        borderTopLeftRadius: user?.tenantRef?.isEvewash ? undefined : 0,
+                        borderBottomLeftRadius: user?.tenantRef?.isEvewash ? undefined : 0,
+                        paddingRight: user?.tenantRef?.isEvewash ? undefined : 8,
+                      }}
                       onClick={() => handleOpenInput()}
                     >
                       <div style={{ width: 50 }} />
@@ -373,27 +383,26 @@ export default function CashierPos() {
                         </Stack>
                       </Stack>
                     </Button>
-                    <Tooltip title={user?.tenantRef?.isEvewash ? 'Scan Customer' : ''} placement="top" arrow>
-                      <Button
-                        variant="contained"
-                        size="large"
-                        sx={{
-                          boxShadow: 0,
-                          p: 0,
-                          width: 50,
-                          height: 80,
-                          overflow: 'hidden',
-                          borderTopLeftRadius: 0,
-                          borderBottomLeftRadius: 0,
-                        }}
-                        onClick={() => setOpenScanCustomer(true)}
-                        disabled={!user?.tenantRef?.isEvewash}
-                      >
-                        {user?.tenantRef?.isEvewash ? (
+                    {user?.tenantRef?.isEvewash ? (
+                      <Tooltip title="Scan Customer" placement="top" arrow>
+                        <Button
+                          variant="contained"
+                          size="large"
+                          sx={{
+                            boxShadow: 0,
+                            p: 0,
+                            width: 50,
+                            height: 80,
+                            overflow: 'hidden',
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                          }}
+                          onClick={() => setOpenScanCustomer(true)}
+                        >
                           <Iconify icon="si:barcode-scan-alt-line" width={30} height={30} />
-                        ) : null}
-                      </Button>
-                    </Tooltip>
+                        </Button>
+                      </Tooltip>
+                    ) : null}
                   </Stack>
 
                   {user?.tenantRef?.isEvewash ? (
