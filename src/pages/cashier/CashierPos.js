@@ -373,7 +373,7 @@ export default function CashierPos() {
                         </Stack>
                       </Stack>
                     </Button>
-                    <Tooltip title="Scan Customer" placement="top" arrow>
+                    <Tooltip title={user?.tenantRef?.isEvewash ? 'Scan Customer' : ''} placement="top" arrow>
                       <Button
                         variant="contained"
                         size="large"
@@ -387,20 +387,25 @@ export default function CashierPos() {
                           borderBottomLeftRadius: 0,
                         }}
                         onClick={() => setOpenScanCustomer(true)}
+                        disabled={!user?.tenantRef?.isEvewash}
                       >
-                        <Iconify icon="si:barcode-scan-alt-line" width={30} height={30} />
+                        {user?.tenantRef?.isEvewash ? (
+                          <Iconify icon="si:barcode-scan-alt-line" width={30} height={30} />
+                        ) : null}
                       </Button>
                     </Tooltip>
                   </Stack>
 
-                  <Stack flexDirection="row" px={1} mt={1} gap={1}>
-                    <Typography variant="body2">Status:</Typography>
-                    <Label variant="ghost" color={ctx.customerScan ? 'success' : 'warning'}>
-                      {ctx.customerScan
-                        ? `Sudah Scan | Total Point: ${numberWithCommas(ctx.customerPoint || 0)}`
-                        : 'Tidak Scan'}
-                    </Label>
-                  </Stack>
+                  {user?.tenantRef?.isEvewash ? (
+                    <Stack flexDirection="row" px={1} mt={1} gap={1}>
+                      <Typography variant="body2">Status:</Typography>
+                      <Label variant="ghost" color={ctx.customerScan ? 'success' : 'warning'}>
+                        {ctx.customerScan
+                          ? `Sudah Scan | Total Point: ${numberWithCommas(ctx.customerPoint || 0)}`
+                          : 'Tidak Scan'}
+                      </Label>
+                    </Stack>
+                  ) : null}
 
                   <Stack flexDirection="row" justifyContent="space-between" px={1} mt={1}>
                     <Stack flexDirection="row" gap={1} bgcolor={theme.palette.primary.light} p={1} borderRadius={100}>
@@ -645,11 +650,7 @@ export default function CashierPos() {
 
       <ModalPayment open={openPayment} onClose={handleClosePayment} />
 
-      <ModalCashCashier
-        open={openCashier}
-        onClose={() => setOpenCashier(false)}
-        required
-      />
+      <ModalCashCashier open={openCashier} onClose={() => setOpenCashier(false)} required />
 
       <ModalAlertCashCashier open={alertCashier} />
     </Page>
