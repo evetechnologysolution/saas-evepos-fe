@@ -28,6 +28,7 @@ ProductCard.propTypes = {
   amountKg: PropTypes.number,
   isLaundryBag: PropTypes.bool,
   isAvailable: PropTypes.bool,
+  minimumOrderQty: PropTypes.number,
 };
 
 export default function ProductCard({
@@ -45,6 +46,7 @@ export default function ProductCard({
   amountKg,
   isLaundryBag,
   isAvailable,
+  minimumOrderQty,
 }) {
   const ctx = useContext(cashierContext);
 
@@ -245,6 +247,7 @@ export default function ProductCard({
               </>
             )
           )}
+
           {/* <Image src={image} alt={image} ratio="4/3" sx={{ opacity: isAvailable ? "1" : "0.5" }} /> */}
           <Box
             component="span"
@@ -296,10 +299,12 @@ export default function ProductCard({
           >
             {isOverflow ? (
               <Marquee>
-                <span style={{ marginRight: 10 }}>{name}</span>
+                <span style={{ marginRight: 10 }}>{`${name} ${
+                  minimumOrderQty > 0 ? `(min ${minimumOrderQty}${unit})` : ''
+                }`}</span>
               </Marquee>
             ) : (
-              <span>{name}</span>
+              <span>{`${name} ${minimumOrderQty > 0 ? `(min ${minimumOrderQty}${unit})` : ''}`}</span>
             )}
           </Typography>
         </Tooltip>
@@ -344,6 +349,7 @@ export default function ProductCard({
         amountKg={amountKg}
         isLaundryBag={isLaundryBag}
         isAvailable={isAvailable}
+        minimumOrderQty={minimumOrderQty}
       />
     </>
   );

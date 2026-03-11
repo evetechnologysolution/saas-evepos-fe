@@ -46,6 +46,7 @@ ProductDialog.propTypes = {
   discount: PropTypes.any,
   conditional: PropTypes.any,
   amountKg: PropTypes.number,
+  minimumOrderQty: PropTypes.number,
 };
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -107,6 +108,7 @@ export default function ProductDialog({
   discount,
   conditional,
   amountKg,
+  minimumOrderQty,
 }) {
   const ctx = useContext(cashierContext);
   const currTheme = useTheme();
@@ -531,7 +533,7 @@ export default function ProductDialog({
                 },
               }}
               InputProps={{
-                inputProps: { min: category?.toLowerCase() === 'kiloan' ? 3 : 1, style: { textAlign: 'center' } },
+                inputProps: { min: minimumOrderQty, style: { textAlign: 'center' } },
                 endAdornment: <InputAdornment position="end">{unit || 'pcs'}</InputAdornment>,
               }}
               value={quantity === 0 ? '' : quantity}
@@ -549,9 +551,9 @@ export default function ProductDialog({
               <Typography variant="h5">+</Typography>
               </Button> */}
           </Box>
-          {category?.toLowerCase() === 'kiloan' && (
+          {minimumOrderQty > 0 && (
             <Typography variant="body2" color="error" fontStyle="italic" textAlign="center">
-              *Jika <b>{`< 3kg`}</b>, mohon bulatkan ke 3kg
+              {`Minimal order adalah ${minimumOrderQty} ${unit}`}
             </Typography>
           )}
         </Container>
