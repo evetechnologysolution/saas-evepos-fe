@@ -1,12 +1,11 @@
-// hooks/queries/useCategory.js
 import { useQuery } from 'react-query';
 import axios from '../../utils/axios';
 
-export const useSubcategory = (options = {}) => {
+export const useTax = (options = {}) => {
   return useQuery(
-    ['allSubcategory'],
+    ['taxSetting'],
     async () => {
-      const res = await axios.get('/subcategory/all');
+      const res = await axios.get('/tax');
       return res.data;
     },
     {

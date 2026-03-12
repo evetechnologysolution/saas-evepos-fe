@@ -2,7 +2,7 @@
 import { useQuery } from 'react-query';
 import axios from '../../utils/axios';
 
-export const useCashBalance = () => {
+export const useCashBalance = (options = {}) => {
   return useQuery(
     ['existCash'],
     async () => {
@@ -11,6 +11,7 @@ export const useCashBalance = () => {
     },
     {
       refetchOnWindowFocus: false,
+      ...options,
     }
   );
 };

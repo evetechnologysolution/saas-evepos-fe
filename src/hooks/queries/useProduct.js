@@ -2,7 +2,7 @@
 import { useQuery } from 'react-query';
 import axios from '../../utils/axios';
 
-export const useProduct = () => {
+export const useProduct = (options = {}) => {
   return useQuery(
     ['allProduct'],
     async () => {
@@ -11,6 +11,7 @@ export const useProduct = () => {
     },
     {
       refetchOnWindowFocus: false,
+      ...options,
     }
   );
 };

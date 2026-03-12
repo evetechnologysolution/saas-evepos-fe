@@ -14,12 +14,13 @@ import { useReceiptSetting } from '../hooks/queries/useReceiptSetting';
 import { useGeneralSetting } from '../hooks/queries/useGeneralSetting';
 import { useGeneralPerfume } from '../hooks/queries/useGeneralPerfume';
 
-export const mainContext = createContext({});
+export const mainContext = createContext(null);
 
 const MainContextProvider = ({ children }) => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [socket, setSocket] = useState(null);
+  const isUserReady = !!user?._id;
 
   const [currentAccount, setCurrentAccount] = useState(process.env.REACT_APP_ACCOUNT_TYPE || 'basic');
 
@@ -28,23 +29,46 @@ const MainContextProvider = ({ children }) => {
   // queries
   // const { data: allNotif = null } = useAllNotif();
   const allNotif = null;
-  const { data: product = [], isLoading: loadingProduct } = useProduct();
-  const { data: category = [] } = useCategory();
-  const { data: subcategory = [] } = useSubcategory();
-  const { data: variant = [], isLoading: loadVariant = false } = useVariant();
-  const { data: existCash = {} } = useCashBalance();
-  const { data: receiptHeader = {} } = useReceiptSetting();
-  const { data: generalSettings = {} } = useGeneralSetting();
-  const { data: generalPerfume = {} } = useGeneralPerfume();
+  const { data: product = [], isLoading: loadingProduct } = useProduct({
+    enabled: isUserReady,
+  });
+
+  const { data: category = [] } = useCategory({
+    enabled: isUserReady,
+  });
+
+  const { data: subcategory = [] } = useSubcategory({
+    enabled: isUserReady,
+  });
+
+  const { data: variant = [], isLoading: loadVariant = false } = useVariant({
+    enabled: isUserReady,
+  });
+
+  const { data: existCash = {} } = useCashBalance({
+    enabled: isUserReady,
+  });
+
+  const { data: receiptHeader = {} } = useReceiptSetting({
+    enabled: isUserReady,
+  });
+
+  const { data: generalSettings = {} } = useGeneralSetting({
+    enabled: isUserReady,
+  });
+
+  const { data: generalPerfume = {} } = useGeneralPerfume({
+    enabled: isUserReady,
+  });
 
   useEffect(() => {
     if (!user?._id || !user?.role) return;
 
-    queryClient.invalidateQueries('allProduct');
-    queryClient.invalidateQueries('allCategory');
-    queryClient.invalidateQueries('allSubcategory');
-    queryClient.invalidateQueries('generalSettings');
-    queryClient.invalidateQueries('receiptHeader');
+    const keys = ['allProduct', 'allCategory', 'allSubcategory', 'generalSettings', 'receiptHeader'];
+
+    keys.forEach((key) => {
+      queryClient.invalidateQueries(key);
+    });
   }, [user?._id, user?.role]);
 
   const value = useMemo(

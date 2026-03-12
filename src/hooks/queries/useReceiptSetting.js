@@ -2,7 +2,7 @@
 import { useQuery } from 'react-query';
 import axios from '../../utils/axios';
 
-export const useReceiptSetting = () => {
+export const useReceiptSetting = (options = {}) => {
   return useQuery(
     ['receiptHeader'],
     async () => {
@@ -11,6 +11,7 @@ export const useReceiptSetting = () => {
     },
     {
       refetchOnWindowFocus: false,
+      ...options,
     }
   );
 };
