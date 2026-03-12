@@ -29,7 +29,7 @@ export default function LibraryBannerEdit() {
     useEffect(() => {
         const getData = async () => {
             try {
-                await axios.get(`/banners/${id}`).then((response) => {
+                await axios.get(`/banner/${id}`).then((response) => {
                     setCurrentData(response.data);
                 });
             } catch (error) {

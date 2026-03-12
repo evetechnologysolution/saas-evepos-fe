@@ -64,7 +64,7 @@ const MainContextProvider = ({ children }) => {
   useEffect(() => {
     if (!user?._id || !user?.role) return;
 
-    const keys = ['allProduct', 'allCategory', 'allSubcategory', 'generalSettings', 'receiptHeader'];
+    const keys = ['allProduct', 'allCategory', 'allSubcategory', 'receiptHeader', 'generalSettings', 'generalPerfume'];
 
     keys.forEach((key) => {
       queryClient.invalidateQueries(key);

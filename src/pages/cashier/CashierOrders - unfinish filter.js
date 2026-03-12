@@ -70,7 +70,7 @@ export default function CashierOrders() {
 
   useEffect(() => {
     const getData = async () => {
-      let url = `/orders?page=${controller.page + 1}&perPage=${controller.rowsPerPage}`;
+      let url = `/order?page=${controller.page + 1}&perPage=${controller.rowsPerPage}`;
       if (controller.search) {
         url = `${url}&search=${controller.search}`;
       }

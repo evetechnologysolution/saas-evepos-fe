@@ -155,25 +155,51 @@ export default function VariantForm({ isEdit, currentData }) {
                         startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
                       }}
                     />
+                    <Stack
+                      flexDirection="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      gap={1}
+                      sx={{ width: '100%' }}
+                    >
+                      <Controller
+                        name={`options.${index}.isMultiple`}
+                        control={control}
+                        render={({ field }) => (
+                          <FormControlLabel
+                            label={
+                              <>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                                  Multiple Qty
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                  Enable for multiple
+                                </Typography>
+                              </>
+                            }
+                            control={
+                              <CustomSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
+                            }
+                          />
+                        )}
+                      />
 
-                    <Controller
-                      name={`options.${index}.isMultiple`}
-                      control={control}
-                      render={({ field }) => (
-                        <FormControlLabel
-                          label="Multiple Qty"
-                          control={
-                            <CustomSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
-                          }
-                        />
+                      {fields.length > 1 && (
+                        <Button
+                          sx={{
+                            boxShadow: '0',
+                            p: 0,
+                            minWidth: 30,
+                            height: 30,
+                          }}
+                          size="large"
+                          color="error"
+                          onClick={() => remove(index)}
+                        >
+                          <Iconify icon="eva:trash-2-outline" width={20} height={20} />
+                        </Button>
                       )}
-                    />
-
-                    {fields.length > 1 && (
-                      <Button color="error" onClick={() => remove(index)}>
-                        <Iconify icon="eva:trash-2-outline" />
-                      </Button>
-                    )}
+                    </Stack>
                   </Stack>
                 </Stack>
               ))}

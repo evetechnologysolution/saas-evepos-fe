@@ -59,7 +59,7 @@ export default function CustomerForm({ currentData }) {
 
   useEffect(() => {
     const getData = async () => {
-      const url = `/orders?page=${controller.page + 1}&perPage=${controller.rowsPerPage}&search=${data?.phone || data?.name}`;
+      const url = `/order?page=${controller.page + 1}&perPage=${controller.rowsPerPage}&search=${data?.phone || data?.name}`;
       try {
         if (data?.phone || data?.name) {
           const res = await axios.get(url);

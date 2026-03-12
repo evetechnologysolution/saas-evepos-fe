@@ -53,8 +53,8 @@ export default function ChatMessageInput({ disabled, member, onSend, loading }) 
     }
     if (onSend && member?._id) {
       onSend({
-        member: member?._id,
-        admin: user?._id,
+        memberRef: member?._id,
+        adminRef: user?._id,
         text: message,
       });
     }
