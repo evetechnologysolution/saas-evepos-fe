@@ -137,10 +137,7 @@ const PrintReceipt = React.forwardRef(({ bill, status = 'paid' }, ref) => {
       <table style={{ width: '100%' }}>
         <tbody>
           {bill.map((item, i) => {
-            let originPrice = item.price;
-            if (item.isLaundryBag) {
-              originPrice += item.discountLaundryBag;
-            }
+            const originPrice = item.price;
 
             return (
               <React.Fragment key={i}>
@@ -172,38 +169,21 @@ const PrintReceipt = React.forwardRef(({ bill, status = 'paid' }, ref) => {
                   <td
                     style={{
                       textAlign: 'right',
-                      textDecoration:
-                        item.promotionType === 1 || item.promotionType === 2 || item.isLaundryBag
-                          ? 'line-through'
-                          : 'none',
+                      textDecoration: item.promotionType === 1 || item.promotionType === 2 ? 'line-through' : 'none',
                     }}
                   >
                     Rp. {numberWithCommas(Math.round(item.qty * originPrice))}
                   </td>
                 </tr>
 
-                {/* Diskon Laundry Bag */}
-                {item.isLaundryBag && item.discountLaundryBag > 0 && (
-                  <tr>
-                    <td style={{ textAlign: 'left' }}>
-                      <em>Laundry Bag Day</em>
-                    </td>
-                    <td
-                      style={{
-                        textAlign: 'right',
-                        textDecoration: item.promotionType === 1 ? 'line-through' : 'none',
-                      }}
-                    >
-                      Rp. {numberWithCommas(Math.round(item.qty * item.price))}
-                    </td>
-                  </tr>
-                )}
-
                 {/* Diskon Promosi */}
                 {item.promotionType === 1 && (
                   <tr>
                     <td style={{ textAlign: 'left' }}>
-                      <em>Disc {item.discountAmount}%</em>
+                      <em>
+                        <p>Disc {item.discountAmount}%</p>
+                        {item.promotionLabel && <p>{`(${item.promotionLabel})`}</p>}
+                      </em>
                     </td>
                     <td style={{ textAlign: 'right' }}>
                       Rp.{' '}
@@ -362,10 +342,47 @@ const PrintReceipt = React.forwardRef(({ bill, status = 'paid' }, ref) => {
       <p style={{ fontSize: '8px', fontStyle: 'italic' }}>
         Bawa nota saat pengambilan laundry. Tanpa nota, wajib menyertakan nama lengkap & nomor HP.
       </p>
-      <Divider />
-      <Divider />
-      <br />
-      <br />
+
+      {ctx.progress?.length > 0 ? (
+        <>
+          <Divider />
+          <p style={{ fontSize: '8px' }}>Proses Pengerjaan</p>
+          <Divider />
+          <table style={{ width: '100%', fontSize: '6px' }}>
+            <tbody>
+              {ctx.progress?.map((row, i) => {
+                return (
+                  <tr key={i}>
+                    <td style={{ textAlign: 'left', verticalAlign: 'top' }}>-</td>
+                    <td style={{ textAlign: 'left', verticalAlign: 'top' }}>
+                      <div style={{ paddingBottom: '5px' }}>
+                        <p style={{ textTransform: 'capitalize' }}>{row?.status}</p>
+                        <p>{formatDate2(row?.date)}</p>
+                        <p>
+                          by : <span style={{ textTransform: 'capitalize' }}>{row?.staffRef?.fullname}</span>
+                        </p>
+                      </div>
+                    </td>
+                    <td style={{ textAlign: 'right', verticalAlign: 'top' }}>
+                      <p>{row?.name}</p>
+                      <p>
+                        {row?.qty} {row?.unit}
+                      </p>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </>
+      ) : (
+        <>
+          <Divider />
+          <Divider />
+          <br />
+          <br />
+        </>
+      )}
     </div>
   );
 });

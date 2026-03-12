@@ -72,7 +72,7 @@ export default function PrintCountTableRow({ row }) {
 
   const {
     orderId,
-    date,
+    createdAt,
     customer,
     printCount,
     printLaundry,
@@ -87,7 +87,7 @@ export default function PrintCountTableRow({ row }) {
     <>
       <CustomTableRow hover>
         <TableCell align="center">
-          {formatDate2(date)}
+          {formatDate2(createdAt)}
         </TableCell>
 
         <TableCell>{orderId}</TableCell>

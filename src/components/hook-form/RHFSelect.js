@@ -2,17 +2,22 @@ import PropTypes from 'prop-types';
 // form
 import { useFormContext, Controller } from 'react-hook-form';
 // @mui
-import { TextField } from '@mui/material';
+import { TextField, Skeleton } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
 RHFSelect.propTypes = {
   children: PropTypes.node,
   name: PropTypes.string,
+  loading: PropTypes.bool,
 };
 
-export default function RHFSelect({ name, children, ...other }) {
+export default function RHFSelect({ name, loading = false, children, ...other }) {
   const { control } = useFormContext();
+
+  if (loading) {
+    return <Skeleton variant="rectangular" sx={{ borderRadius: 1, width: '100%', minHeight: '56px', height: '100%' }} />;
+  }
 
   return (
     <Controller

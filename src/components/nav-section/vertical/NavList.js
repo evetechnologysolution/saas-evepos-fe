@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 // @mui
 import { List, Collapse } from '@mui/material';
+// hooks
+import useAuth from '../../../hooks/useAuth';
 //
 import { NavItemRoot, NavItemSub } from './NavItem';
 import { getActive } from '..';
@@ -16,6 +18,9 @@ NavListRoot.propTypes = {
 
 export function NavListRoot({ list, isCollapse }) {
   const { pathname } = useLocation();
+
+  const { user } = useAuth();
+  const currentRole = user?.role;
 
   const active = getActive(list.path, pathname);
 
@@ -31,9 +36,11 @@ export function NavListRoot({ list, isCollapse }) {
         {!isCollapse && (
           <Collapse in={open} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
-              {(list.children || []).map((item) => (
-                <NavListSub key={item.title + item.path} list={item} />
-              ))}
+              {(list.children || [])
+                .filter((data) => !data?.roles || data.roles.includes(currentRole)) // menampilkan data yang diset rolesnya maupun tidak
+                .map((item) => (
+                  <NavListSub key={item.title + item.path} list={item} />
+                ))}
             </List>
           </Collapse>
         )}

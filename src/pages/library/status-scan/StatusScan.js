@@ -1,4 +1,3 @@
-import { paramCase } from 'change-case';
 import { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
@@ -18,7 +17,8 @@ import {
   Typography,
 } from '@mui/material';
 // routes
-import { PATH_DASHBOARD } from '../../../routes/paths';
+import ConfirmDialog from 'src/components/ConfirmDialog';
+import { handleMutationFeedback } from 'src/utils/mutationfeedback';
 // hooks
 import useSettings from '../../../hooks/useSettings';
 import useTable from '../../../hooks/useTable';
@@ -29,16 +29,18 @@ import Scrollbar from '../../../components/Scrollbar';
 import { TableHeadCustom, TableLoading, TableNoData } from '../../../components/table';
 import ConfirmDelete from '../../../components/ConfirmDelete';
 // sections
-import { CategoryTableToolbar, CategoryTableRow } from '../../../sections/@dashboard/library/category';
+import StatusTableRow from './row';
 // utils
-import useCategory from './service/useCategory';
+import useStatus from './service/useService';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'date', label: 'Date', align: 'center' },
-  { id: 'name', label: 'Category Name', align: 'left' },
+  { id: 'name', label: 'Status Name', align: 'left' },
+  { id: 'name', label: 'Previous Status Name', align: 'left' },
   { id: 'listNumber', label: 'List Number', align: 'center' },
+  { id: 'archived', label: 'Archived', align: 'center' },
   { id: '', label: 'Action', align: 'center' },
 ];
 
@@ -49,7 +51,7 @@ export default function LibraryCategory() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { dense, onChangeDense } = useTable();
-  const { list, remove } = useCategory();
+  const { list, remove, update } = useStatus();
 
   const [controller, setController] = useState({
     page: 0,
@@ -65,6 +67,8 @@ export default function LibraryCategory() {
 
   const [selectedId, setSelectedId] = useState('');
   const [open, setOpen] = useState(false);
+  const [openArchive, setOpenArchive] = useState(false);
+  const [currentArchive, setCurrentArchive] = useState(null);
 
   const [search, setSearch] = useState('');
 
@@ -97,8 +101,12 @@ export default function LibraryCategory() {
     }
   };
 
-  const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.library.subcategoryEdit(paramCase(id)));
+  const handleEditRow = (id, current) => {
+    // navigate(`/dashboard/library/status-scan/${id}/edit`);
+    const prev = Boolean(current);
+    setSelectedId(id);
+    setCurrentArchive(!prev);
+    setOpenArchive(!openArchive);
   };
 
   const handleDialog = (id) => {
@@ -111,7 +119,7 @@ export default function LibraryCategory() {
 
     remove.mutate(selectedId, {
       onSuccess: () => {
-        enqueueSnackbar('Subcategory deleted!', { variant: 'success' });
+        enqueueSnackbar('Status deleted!', { variant: 'success' });
         setOpen(false);
       },
       onError: (err) => {
@@ -120,13 +128,25 @@ export default function LibraryCategory() {
     });
   };
 
+  const handleArchive = async () => {
+    if (!selectedId) return;
+
+    await handleMutationFeedback(update.mutateAsync({ id: selectedId, payload: { archived: currentArchive } }), {
+      successMsg: 'Status berhasil disimpan!',
+      errorMsg: 'Gagal menyimpan status!',
+      onSuccess: () => setOpenArchive(false),
+      enqueueSnackbar,
+    });
+    setCurrentArchive(null);
+  };
+
   return (
     <>
-      <Page title="Category">
+      <Page title="Status Scan">
         <Container maxWidth={themeStretch ? false : 'xl'}>
           <Card>
             <Typography variant="h6" mx={1}>
-              Sub Category
+              Status Scan
             </Typography>
 
             <Stack
@@ -135,18 +155,18 @@ export default function LibraryCategory() {
               alignItems={{ sm: 'center' }}
               justifyContent={{ sm: 'space-between' }}
               mr={1}
-              mb={{ xs: 2, sm: 0 }}
+              mb={{ xs: 2 }}
             >
               <div style={{ minWidth: '40%' }}>
-                <CategoryTableToolbar filterName={search} onFilterName={handleSearch} onEnter={handleOnKeyPress} />
+                {/* <CategoryTableToolbar filterName={search} onFilterName={handleSearch} onEnter={handleOnKeyPress} /> */}
               </div>
               <Button
                 variant="contained"
                 startIcon={<Iconify icon="eva:plus-fill" />}
                 component={RouterLink}
-                to={PATH_DASHBOARD.library.subcategoryCreate}
+                to={'/dashboard/library/status-scan/new'}
               >
-                New Sub Category
+                New Status
               </Button>
             </Stack>
 
@@ -159,10 +179,10 @@ export default function LibraryCategory() {
                     {!isLoading ? (
                       <>
                         {tableData?.docs?.map((row) => (
-                          <CategoryTableRow
+                          <StatusTableRow
                             key={row._id}
                             row={row}
-                            onEditRow={() => handleEditRow(row._id)}
+                            onEditRow={() => handleEditRow(row._id, row.archived)}
                             onDeleteRow={() => handleDialog(row._id)}
                           />
                         ))}
@@ -181,7 +201,7 @@ export default function LibraryCategory() {
               <TablePagination
                 rowsPerPageOptions={[1, 5, 10, 25]}
                 component="div"
-                count={Number(tableData?.totalPages || 0)}
+                count={Number(tableData?.totalDocs || 0)}
                 rowsPerPage={controller.rowsPerPage}
                 page={controller.page}
                 onPageChange={handlePageChange}
@@ -198,6 +218,13 @@ export default function LibraryCategory() {
         </Container>
       </Page>
 
+      <ConfirmDialog
+        title="Archive"
+        text="Are you sure want to archive this status ?"
+        open={openArchive}
+        onClose={handleEditRow}
+        onClick={handleArchive}
+      />
       <ConfirmDelete open={open} onClose={handleDialog} onDelete={handleDelete} isLoading={remove.isLoading} />
     </>
   );

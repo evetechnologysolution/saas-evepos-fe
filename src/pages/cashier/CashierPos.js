@@ -33,7 +33,7 @@ import { cashierContext } from '../../contexts/CashierContext';
 import { mainContext } from '../../contexts/MainContext';
 // utils
 // import { numberWithCommas, formatDay, randomCustomer } from "../../utils/getData";
-import { generateRandomId } from '../../utils/generateRandom';
+import { generateRandomOrderId } from '../../utils/generateRandom';
 import { numberWithCommas, formatDay } from '../../utils/getData';
 import CashierPosProduct from './CashierPosProduct';
 import PrintReceipt from '../../sections/@dashboard/cashier/pos/PrintReceipt';
@@ -77,9 +77,6 @@ export default function CashierPos() {
 
   useEffect(() => {
     const fetchData = async () => {
-      await ctm.getGeneralSettings();
-      await ctm.getExistCash();
-
       if (ctm.generalSettings?.cashBalance && !ctm.existCash?.isOpen) {
         setOpenCashier(true);
       }
@@ -241,6 +238,7 @@ export default function CashierPos() {
           objData = Object.assign(objData, {
             customer: {
               ...(ctx.customerData || {}), // Pastikan customerData bukan undefined/null
+              memberId: undefined, // reset karena dicek lagi di BE
               name: ctx.customerName,
               phone: ctx.customerPhone,
               notes: ctx.customerNotes,
@@ -252,7 +250,7 @@ export default function CashierPos() {
         enqueueSnackbar('Update success!');
       } else {
         const orderUid = uuid(); // for orders _id
-        const orderId = generateRandomId(6);
+        const orderId = generateRandomOrderId();
 
         setCurrUid(orderUid);
         ctx.setDisplayOrderID(orderId);
@@ -282,6 +280,7 @@ export default function CashierPos() {
           objData = Object.assign(objData, {
             customer: {
               ...(ctx.customerData || {}), // Pastikan customerData bukan undefined/null
+              memberId: undefined, // reset karena dicek lagi di BE
               name: ctx.customerName,
               phone: ctx.customerPhone,
               notes: ctx.customerNotes,
@@ -362,7 +361,17 @@ export default function CashierPos() {
                     <Button
                       variant="contained"
                       size="large"
-                      sx={{ boxShadow: 0, p: 0, width: '100%', height: 80, overflow: 'hidden', borderRadius: 0 }}
+                      sx={{
+                        boxShadow: 0,
+                        p: 0,
+                        width: '100%',
+                        height: 80,
+                        overflow: 'hidden',
+                        borderRadius: user?.tenantRef?.isEvewash ? 0 : undefined,
+                        borderTopLeftRadius: user?.tenantRef?.isEvewash ? undefined : 0,
+                        borderBottomLeftRadius: user?.tenantRef?.isEvewash ? undefined : 0,
+                        paddingRight: user?.tenantRef?.isEvewash ? undefined : 8,
+                      }}
                       onClick={() => handleOpenInput()}
                     >
                       <div style={{ width: 50 }} />
@@ -374,34 +383,38 @@ export default function CashierPos() {
                         </Stack>
                       </Stack>
                     </Button>
-                    <Tooltip title="Scan Customer" placement="top" arrow>
-                      <Button
-                        variant="contained"
-                        size="large"
-                        sx={{
-                          boxShadow: 0,
-                          p: 0,
-                          width: 50,
-                          height: 80,
-                          overflow: 'hidden',
-                          borderTopLeftRadius: 0,
-                          borderBottomLeftRadius: 0,
-                        }}
-                        onClick={() => setOpenScanCustomer(true)}
-                      >
-                        <Iconify icon="si:barcode-scan-alt-line" width={30} height={30} />
-                      </Button>
-                    </Tooltip>
+                    {user?.tenantRef?.isEvewash ? (
+                      <Tooltip title="Scan Customer" placement="top" arrow>
+                        <Button
+                          variant="contained"
+                          size="large"
+                          sx={{
+                            boxShadow: 0,
+                            p: 0,
+                            width: 50,
+                            height: 80,
+                            overflow: 'hidden',
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                          }}
+                          onClick={() => setOpenScanCustomer(true)}
+                        >
+                          <Iconify icon="si:barcode-scan-alt-line" width={30} height={30} />
+                        </Button>
+                      </Tooltip>
+                    ) : null}
                   </Stack>
 
-                  <Stack flexDirection="row" px={1} mt={1} gap={1}>
-                    <Typography variant="body2">Status:</Typography>
-                    <Label variant="ghost" color={ctx.customerScan ? 'success' : 'warning'}>
-                      {ctx.customerScan
-                        ? `Sudah Scan | Total Point: ${numberWithCommas(ctx.customerPoint || 0)}`
-                        : 'Tidak Scan'}
-                    </Label>
-                  </Stack>
+                  {user?.tenantRef?.isEvewash ? (
+                    <Stack flexDirection="row" px={1} mt={1} gap={1}>
+                      <Typography variant="body2">Status:</Typography>
+                      <Label variant="ghost" color={ctx.customerScan ? 'success' : 'warning'}>
+                        {ctx.customerScan
+                          ? `Sudah Scan | Total Point: ${numberWithCommas(ctx.customerPoint || 0)}`
+                          : 'Tidak Scan'}
+                      </Label>
+                    </Stack>
+                  ) : null}
 
                   <Stack flexDirection="row" justifyContent="space-between" px={1} mt={1}>
                     <Stack flexDirection="row" gap={1} bgcolor={theme.palette.primary.light} p={1} borderRadius={100}>
@@ -646,12 +659,7 @@ export default function CashierPos() {
 
       <ModalPayment open={openPayment} onClose={handleClosePayment} />
 
-      <ModalCashCashier
-        open={openCashier}
-        onClose={() => setOpenCashier(false)}
-        addTransaction={ctm.existCash?.isOpen}
-        required
-      />
+      <ModalCashCashier open={openCashier} onClose={() => setOpenCashier(false)} required />
 
       <ModalAlertCashCashier open={alertCashier} />
     </Page>

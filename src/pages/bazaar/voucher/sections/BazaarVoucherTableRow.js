@@ -64,12 +64,12 @@ BootstrapDialogTitle.propTypes = {
 export default function BazaarVoucherTableRow({ row, onEditRow, onDeleteRow }) {
   const theme = useTheme();
 
-  const { date, name, voucherType, start, end, isAvailable, worthPoint, isBazaar, isLimited, quota, quotaUsed, quotaValidated } = row;
+  const { createdAt, name, voucherType, start, end, isAvailable, worthPoint, isBazaar, isLimited, quota, quotaUsed, quotaValidated } = row;
 
   return (
     <>
       <CustomTableRow hover>
-        <TableCell align="center">{formatDate2(date)}</TableCell>
+        <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
         <TableCell align="left">
           <Stack>

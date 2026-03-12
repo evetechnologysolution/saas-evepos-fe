@@ -38,8 +38,7 @@ const TABLE_HEAD = [
   { id: '', label: 'Customer', align: 'left', width: 80 },
   { id: '', label: 'Orders', align: 'left', width: 200 },
   { id: '', label: 'Picked Up By', align: 'left', width: 200 },
-  { id: '', label: 'Notes', align: 'center', width: 100 },
-  { id: 'status', label: 'Status', align: 'center', width: 80 },
+  { id: '', label: 'Progress', align: 'center', width: 100 },
   { id: 'billedAmount', label: 'Total', align: 'center', width: 100 },
   { id: '', label: 'Payment', align: 'center', width: 100 },
   { id: '', label: 'Action', align: 'center', width: 10 },
@@ -63,7 +62,7 @@ export default function PickupOrders() {
   const [controller, setController] = useState({
     page: 0,
     rowsPerPage: 10,
-    pickupStatus: 'pending',
+    pickup: 'pending',
     search: '',
   });
 
@@ -71,7 +70,7 @@ export default function PickupOrders() {
     page: controller.page + 1,
     perPage: controller.rowsPerPage,
     search: controller.search,
-    pickupStatus: controller.pickupStatus,
+    pickup: controller.pickup,
   });
 
   const handlePageChange = (event, newPage) => {
@@ -133,8 +132,6 @@ export default function PickupOrders() {
       },
     });
   };
-
-  console.log(tableData?.docs);
 
   return (
     <Page title="Pickup Orders">
@@ -208,7 +205,7 @@ export default function PickupOrders() {
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"
-              count={Number(tableData?.totalPages || 0)}
+              count={Number(tableData?.totalDocs || 0)}
               rowsPerPage={controller.rowsPerPage}
               page={controller.page}
               onPageChange={handlePageChange}

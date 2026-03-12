@@ -16,8 +16,10 @@ import {
 // hooks
 import useAuth from '../../../../hooks/useAuth';
 // components
+import Scrollbar from '../../../../components/Scrollbar';
 import Iconify from '../../../../components/Iconify';
 import Label from '../../../../components/Label';
+import EmptyContent from '../../../../components/EmptyContent';
 // utils
 import { formatDate2, numberWithCommas } from '../../../../utils/getData';
 import { maskedPhone } from '../../../../utils/masked';
@@ -86,7 +88,6 @@ export default function OrdersTableRow({ row }) {
     customer,
     orders,
     orderType,
-    notes,
     status,
     discountPrice,
     voucherDiscPrice,
@@ -100,23 +101,10 @@ export default function OrdersTableRow({ row }) {
     progressRef,
   } = row;
 
-  let statusColor;
-  if (status?.toLowerCase() === 'paid') {
-    statusColor = 'success';
-  } else if (status?.toLowerCase() === 'half paid') {
-    statusColor = 'secondary';
-  } else if (status?.toLowerCase() === 'unpaid') {
-    statusColor = 'warning';
-  } else if (status?.toLowerCase() === 'refund') {
-    statusColor = 'default';
-  } else {
-    statusColor = 'error';
-  }
-
   const isBagDay = orders.find((row) => row.isLaundryBag);
 
   const [open, setOpen] = useState(false);
-
+  const [openProgress, setOpenProgress] = useState(false);
   const [openPickup, setOpenPickup] = useState(false);
 
   const showOrderType = () => {
@@ -154,7 +142,7 @@ export default function OrdersTableRow({ row }) {
           {customer?.phone && (
             <p>
               {!customer?.phone?.includes('EM')
-                ? maskedPhone(user?.role === 'Super Admin', customer?.phone) || '-'
+                ? maskedPhone(['owner', 'super admin']?.includes(user?.role), customer?.phone) || '-'
                 : '-'}
             </p>
           )}
@@ -208,13 +196,10 @@ export default function OrdersTableRow({ row }) {
           )}
         </TableCell>
 
-        <TableCell align="center">{progressRef?.latestNotes || '-'}</TableCell>
-
         <TableCell align="center">
-          <Label variant="ghost" color={statusColor} sx={{ textTransform: 'capitalize' }}>
-            {/* {status === 'unpaid' ? 'unpaid' : status} */}
-            {progressRef?.latestStatus}
-          </Label>
+          <Link component="button" variant="inherit" underline="hover" onClick={() => setOpenProgress(true)}>
+            Detail Progress
+          </Link>
         </TableCell>
 
         <TableCell align="center">
@@ -277,9 +262,9 @@ export default function OrdersTableRow({ row }) {
           <table style={{ width: '100%' }}>
             <thead style={{ color: '#6c757d!important', fontSize: '0.9rem' }}>
               <tr>
-                <th align="left">ITEMS</th>
-                <th>QUANTITY</th>
-                <th align="right">PRICE</th>
+                <th align="left">Items</th>
+                <th>Qty</th>
+                <th align="right">Price</th>
                 <th> </th>
               </tr>
             </thead>
@@ -379,6 +364,82 @@ export default function OrdersTableRow({ row }) {
               })}
             </tbody>
           </table>
+        </DialogContent>
+      </BootstrapDialog>
+
+      <BootstrapDialog
+        aria-labelledby="customized-dialog-title"
+        fullWidth
+        maxWidth="sm"
+        open={openProgress}
+        className="saved-modal"
+      >
+        <BootstrapDialogTitle
+          id="customized-dialog-title"
+          onClose={() => setOpenProgress(!openProgress)}
+          style={{ borderBottom: '1px solid #CCCCCC' }}
+        >
+          Detail Progress
+        </BootstrapDialogTitle>
+        <DialogContent dividers>
+          <Scrollbar>
+            <table style={{ width: '100%' }}>
+              <thead style={{ color: '#6c757d!important', fontSize: '0.9rem' }}>
+                <tr>
+                  <th style={{ padding: '0.5rem', minWidth: 100 }}>Date</th>
+                  <th style={{ padding: '0.5rem', minWidth: 150 }} align="left">
+                    Item
+                  </th>
+                  <th style={{ padding: '0.5rem' }}>Staff</th>
+                  <th style={{ padding: '0.5rem', minWidth: 200 }}>Notes</th>
+                </tr>
+              </thead>
+              <tbody style={{ fontSize: '0.85rem' }}>
+                {progressRef?.log?.length > 0 ? (
+                  progressRef?.log
+                    ?.sort((a, b) => new Date(b.date) - new Date(a.date))
+                    ?.map((item, i) => {
+                      return (
+                        <tr key={i}>
+                          <td style={{ padding: '0.5rem' }} align="center" valign="top">
+                            {item?.date ? formatDate2(item?.date) : '-'}
+                          </td>
+                          <td style={{ padding: '0.5rem' }} align="left" valign="top">
+                            <p>{item?.name || '-'}</p>
+                            <Stack flexDirection="row" gap={1}>
+                              <p>
+                                <em>{item?.qty ? `${item?.qty} ${item?.unit}` : '-'}</em>
+                              </p>
+                              <Label variant="ghost" color="warning" sx={{ textTransform: 'capitalize' }}>
+                                {item?.status || '-'}
+                              </Label>
+                            </Stack>
+                            <br />
+                          </td>
+                          <td style={{ padding: '0.5rem' }} align="center" valign="top">
+                            {item?.staffRef?.fullname || '-'}
+                          </td>
+                          <td style={{ padding: '0.5rem' }} align="center" valign="top">
+                            {item?.notes || '-'}
+                          </td>
+                        </tr>
+                      );
+                    })
+                ) : (
+                  <tr>
+                    <td align="center" colSpan={100}>
+                      <EmptyContent
+                        title="No Data"
+                        sx={{
+                          '& span.MuiBox-root': { height: 100 },
+                        }}
+                      />
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </Scrollbar>
         </DialogContent>
       </BootstrapDialog>
 

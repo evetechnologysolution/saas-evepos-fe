@@ -25,13 +25,13 @@ const CustomTableRow = styled(TableRow)(() => ({
 export default function MemberPointTableRow({ row, onDetailRow }) {
   const { user } = useAuth();
 
-  const { date, latestOrder, memberId, name, phone, email, addresses, point } = row;
+  const { createdAt, latestOrder, memberId, name, phone, email, addresses, point } = row;
 
   // const mainAddress = Array.isArray(addresses) ? addresses?.find((item) => item?.isDefault) : null;
 
   return (
     <CustomTableRow hover>
-      <TableCell align="center">{formatDate2(date)}</TableCell>
+      <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
       <TableCell align="center">
         <Link component="button" variant="inherit" underline="hover" onClick={onDetailRow}>
@@ -41,7 +41,7 @@ export default function MemberPointTableRow({ row, onDetailRow }) {
 
       <TableCell>{name}</TableCell>
 
-      <TableCell>{!phone?.includes("EM") ? maskedPhone(user.role === "Super Admin", phone) : "-"}</TableCell>
+      <TableCell>{!phone?.includes("EM") ? maskedPhone(['owner', 'super admin']?.includes(user?.role), phone) : "-"}</TableCell>
 
       <TableCell>{email}</TableCell>
 

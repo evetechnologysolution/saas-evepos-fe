@@ -30,7 +30,18 @@ function Products({ items }) {
             image={showImage(item.image)}
             price={item.price}
             productionPrice={item?.productionPrice || 0}
-            discount={item?.discount || {}}
+            minimumOrderQty={item.minimumOrderQty}
+            discount={item?.discount && !item?.discount?.conditional?.isActive ? item?.discount : {}}
+            conditional={
+              item?.discount?.conditional?.isActive
+                ? {
+                    ...item?.discount?.conditional,
+                    name: item?.discount?.name,
+                    amount: item?.discount?.amount,
+                    isAvailable: item?.discount?.isAvailable,
+                  }
+                : {}
+            }
             category={item?.category?.name}
             unit={item?.unit || 'pcs'}
             variant={item?.variant || []}

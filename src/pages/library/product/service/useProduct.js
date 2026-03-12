@@ -6,6 +6,7 @@ import axios from 'src/utils/axios';
 export default function useProduct() {
   const queryClient = useQueryClient();
   const queryKey = ['products'];
+  const queryKeyAll = ['allProduct'];
 
   const list = (params) =>
     useQuery({
@@ -25,6 +26,7 @@ export default function useProduct() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(queryKeyAll);
     },
   });
 
@@ -35,6 +37,7 @@ export default function useProduct() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(queryKeyAll);
     },
   });
 
@@ -55,6 +58,7 @@ export default function useProduct() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(queryKeyAll);
     },
   });
 

@@ -20,6 +20,8 @@ export const cashierContext = createContext({
   setQrKey: () => {},
   savedOrders: [],
   setSavedOrders: () => {},
+  progress: [],
+  setProgress: () => {},
   bill: [],
   setBill: () => {},
   splitBill: [],
@@ -144,6 +146,7 @@ const CashierContextProvider = ({ children }) => {
   const [pax, setPax] = useState(1);
   const [qrKey, setQrKey] = useState('');
   const [savedOrders, setSavedOrders] = useLocalStorage('savedOrders', []);
+  const [progress, setProgress] = useState([]);
   const [bill, setBill] = useState([]);
   const [splitBill, setSplitBill] = useState([]);
   const [savedBillID, setSavedBillID] = useState('');
@@ -258,7 +261,7 @@ const CashierContextProvider = ({ children }) => {
   // for Saved Bill
   // const getSavedBill = async () => {
   //     try {
-  //         await axios.get("/orders/saved-bill").then((response) => {
+  //         await axios.get("/order/saved-bill").then((response) => {
   //             setSavedBill(response.data);
   //         });
   //     } catch (error) {
@@ -481,6 +484,7 @@ const CashierContextProvider = ({ children }) => {
     setDisplayOrderID('');
     setPax(1);
     setQrKey('');
+    setProgress([]);
     setBill([]);
     setSplitBill([]);
     setSavedBillID('');
@@ -543,6 +547,8 @@ const CashierContextProvider = ({ children }) => {
         setQrKey,
         savedOrders,
         setSavedOrders,
+        progress,
+        setProgress,
         bill,
         setBill,
         splitBill,

@@ -80,7 +80,7 @@ const dayOptions = [
 export default function PromotionTableRow({ row, onEditRow, onDeleteRow }) {
   const theme = useTheme();
 
-  const { date, name, products, type, selectedDay, startDate, endDate, isAvailable, amount, qtyMin, qtyFree } = row;
+  const { createdAt, name, products, type, selectedDay, startDate, endDate, isAvailable, amount, qtyMin, qtyFree } = row;
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -99,7 +99,7 @@ export default function PromotionTableRow({ row, onEditRow, onDeleteRow }) {
   return (
     <>
       <CustomTableRow hover>
-        <TableCell align="center">{formatDate2(date)}</TableCell>
+        <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
         <TableCell align="left">{name}</TableCell>
 

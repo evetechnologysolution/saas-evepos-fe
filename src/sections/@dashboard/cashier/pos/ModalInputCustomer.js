@@ -92,7 +92,7 @@ export default function ModalInputCustomer(props) {
     if (query) {
       setLoading(true);
       try {
-        const res = await axios.get(`/members?search=${query}`);
+        const res = await axios.get(`/member?search=${query}`);
         setMembers(res?.data?.docs || []);
       } catch (error) {
         console.error('Error fetching members:', error);
@@ -100,7 +100,7 @@ export default function ModalInputCustomer(props) {
         setLoading(false);
       }
     } else {
-      const res = await axios.get('/members');
+      const res = await axios.get('/member');
       setMembers(res?.data?.docs || []);
     }
   };
@@ -296,7 +296,7 @@ export default function ModalInputCustomer(props) {
               fullWidth
               autoComplete="off"
               // value={phone}
-              value={!isNew ? (!phone?.includes('EM') ? maskedPhone(user?.role === 'Super Admin', phone) : '-') : phone}
+              value={!isNew ? (!phone?.includes('EM') ? maskedPhone(['owner', 'super admin']?.includes(user?.role), phone) : '-') : phone}
               onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
               error={!phone && alert ? Boolean(true) : Boolean(false)}
               helperText={!phone && alert ? 'Phone is required' : ''}

@@ -2,11 +2,11 @@
 import * as Yup from 'yup';
 
 const VariantSchema = Yup.object({
-  name: Yup.string().required('Nama wajib diisi'),
+  name: Yup.string().required('Nama wajib diisi').default(''),
   options: Yup.array()
     .of(
       Yup.object({
-        name: Yup.string().required('Nama opsi wajib diisi'),
+        name: Yup.string().required('Nama opsi wajib diisi').default(''),
         price: Yup.number()
           .transform((value, originalValue) => {
             if (typeof originalValue === 'string') {
@@ -17,7 +17,8 @@ const VariantSchema = Yup.object({
             return value;
           })
           .min(0, 'Harga tidak boleh negatif')
-          .required('Harga wajib diisi'),
+          .required('Harga wajib diisi')
+          .default(0),
         productionPrice: Yup.number()
           .transform((value, originalValue) => {
             if (typeof originalValue === 'string') {
@@ -28,13 +29,15 @@ const VariantSchema = Yup.object({
             return value;
           })
           .min(0, 'Production price tidak boleh negatif')
-          .required('Production price wajib diisi'),
-        productionNotes: Yup.string().nullable(),
+          .required('Production price wajib diisi')
+          .default(0),
+        productionNotes: Yup.string().nullable().default(''),
         isMultiple: Yup.boolean().default(false),
       })
     )
     .min(1, 'Minimal terdapat 1 opsi')
-    .required('Options wajib diisi'),
+    .required('Options wajib diisi')
+    .default([]),
 });
 
 export default VariantSchema;

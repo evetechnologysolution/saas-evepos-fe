@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { useReactToPrint } from "react-to-print";
+import { useReactToPrint } from 'react-to-print';
 // @mui
 import {
   styled,
@@ -15,7 +15,7 @@ import {
   Grid,
   Box,
   Stack,
-  Typography
+  Typography,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import axios from '../../../utils/axios';
@@ -82,15 +82,28 @@ BootstrapDialogTitle.propTypes = {
 };
 
 export default function OrdersTableRow({ row, onDeleteRow }) {
-
-  const { startDate, endDate, cashIn, sales, cashOut, tax, serviceCharge, refund, detail, total, history, isOpen, notes } = row;
+  const {
+    startDate,
+    endDate,
+    cashIn,
+    sales,
+    cashOut,
+    tax,
+    serviceCharge,
+    refund,
+    detail,
+    total,
+    history,
+    isOpen,
+    notes,
+  } = row;
 
   const eWallet = detail.dana + detail.ovo + detail.shopeePay + detail.qris;
   const card = detail.bri + detail.bni + detail.bca + detail.mandiri;
 
   const closeCashier = history.find((item) => item.title === 'Tutup Kas' && item.isCashOut === true);
   const fixCashOut = closeCashier ? cashOut - closeCashier.amount : cashOut;
-  const expected = (detail.cash + cashIn + eWallet + card) - fixCashOut;
+  const expected = detail.cash + cashIn + eWallet + card - fixCashOut;
 
   const { user } = useAuth();
 
@@ -118,7 +131,7 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
   const handlePrint = async () => {
     try {
       setPrintLoading(true);
-      const response = await axios.get(`/orders/close-cashier?start=${startDate}&end=${endDate}`);
+      const response = await axios.get(`/order/close-cashier?start=${startDate}&end=${endDate}`);
       if (response.status === 200) {
         setOrders(response.data.docs);
       }
@@ -131,7 +144,7 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
       console.error('Error:', error);
       setPrintLoading(false);
     }
-  }
+  };
 
   return (
     <>
@@ -149,11 +162,11 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
               {formatDate(endDate)}, {formatOnlyTime(endDate)}
             </>
           ) : (
-            "-"
+            '-'
           )}
         </TableCell>
         <TableCell align="center">
-          <div style={{ overflow: "hidden", height: 0, width: 0 }}>
+          <div style={{ overflow: 'hidden', height: 0, width: 0 }}>
             <CashCashierPrint ref={printRef} content={row} items={orders} />
           </div>
           <TableMoreMenu
@@ -162,15 +175,11 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
             onClose={handleCloseAction}
             actions={
               <>
-                <MenuItem
-                  onClick={() => setOpenDetail(true)}
-                >
+                <MenuItem onClick={() => setOpenDetail(true)}>
                   <Iconify icon="fluent:text-bullet-list-square-sparkle-24-regular" sx={{ width: 24, height: 24 }} />
                   Detail
                 </MenuItem>
-                <MenuItem
-                  onClick={() => setOpenHistory(true)}
-                >
+                <MenuItem onClick={() => setOpenHistory(true)}>
                   <Iconify icon="fluent:apps-list-detail-24-regular" sx={{ width: 24, height: 24 }} />
                   History
                 </MenuItem>
@@ -179,10 +188,11 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
                   onClick={() => handlePrint()}
                 >
                   <Iconify icon="solar:printer-outline" sx={{ width: 24, height: 24 }} />
-                  {printLoading ? "Loading..." : "Print"}
+                  {printLoading ? 'Loading...' : 'Print'}
                 </MenuItem>
                 {user.role === 'Super Admin' && (
-                  <MenuItem sx={{ color: 'red' }}
+                  <MenuItem
+                    sx={{ color: 'red' }}
                     onClick={() => {
                       onDeleteRow();
                     }}
@@ -221,14 +231,16 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
               </Stack>
               <Stack alignItems="center">
                 <Typography variant="subtitle2">End Shift</Typography>
-                <Typography variant="subtitle1">{endDate ? formatDate2(endDate) : "-"}</Typography>
+                <Typography variant="subtitle1">{endDate ? formatDate2(endDate) : '-'}</Typography>
               </Stack>
             </Stack>
           </Box>
           <br />
           <Grid container spacing={6}>
             <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle1"><i>#Kas Kasir</i></Typography>
+              <Typography variant="subtitle1">
+                <i>#Kas Kasir</i>
+              </Typography>
               <Grid container>
                 <Grid item xs={6}>
                   <Stack>
@@ -264,7 +276,9 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
               </Grid>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle1"><i>#Pajak & Lain-lain</i></Typography>
+              <Typography variant="subtitle1">
+                <i>#Pajak & Lain-lain</i>
+              </Typography>
               <Grid container>
                 <Grid item xs={6}>
                   <Stack>
@@ -282,15 +296,21 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
                 </Grid>
               </Grid>
               <br />
-              <Typography variant="subtitle1"><i>#Setor Tunai</i></Typography>
+              <Typography variant="subtitle1">
+                <i>#Setor Tunai</i>
+              </Typography>
               <Grid container>
                 <Grid item xs={6}>
                   <Stack>
                     <Typography variant="body1">{`(Diharapkan)`}</Typography>
                     <Typography variant="body1">{`(Realisasi)`}</Typography>
-                    <Typography variant="subtitle1"><i>#Selisih</i></Typography>
+                    <Typography variant="subtitle1">
+                      <i>#Selisih</i>
+                    </Typography>
                     {notes && (
-                      <Typography variant="subtitle1"><i>*Catatan</i></Typography>
+                      <Typography variant="subtitle1">
+                        <i>*Catatan</i>
+                      </Typography>
                     )}
                   </Stack>
                 </Grid>
@@ -298,9 +318,13 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
                   <Stack>
                     <Typography variant="body1">: {`Rp. ${numberWithCommas(expected)}`}</Typography>
                     <Typography variant="body1">: {`Rp. ${numberWithCommas(closeCashier?.amount || 0)}`}</Typography>
-                    <Typography variant="body1">: {`Rp. ${numberWithCommas((closeCashier?.amount || 0) - expected)}`}</Typography>
+                    <Typography variant="body1">
+                      : {`Rp. ${numberWithCommas((closeCashier?.amount || 0) - expected)}`}
+                    </Typography>
                     {notes && (
-                      <Typography variant="body1">: <i>{notes}</i></Typography>
+                      <Typography variant="body1">
+                        : <i>{notes}</i>
+                      </Typography>
                     )}
                   </Stack>
                 </Grid>
@@ -353,7 +377,9 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
                       {/* {endDate ? formatDate2(endDate) : formatDate2(startDate)} */}
                       {formatDate2(startDate)}
                     </td>
-                    <td align="left" style={{ textTransform: "capitalize" }}>Sales</td>
+                    <td align="left" style={{ textTransform: 'capitalize' }}>
+                      Sales
+                    </td>
                     <td align="center">Rp. {numberWithCommas(sales)}</td>
                     <td align="center">
                       <Label variant="ghost" color="warning" sx={{ textTransform: 'capitalize' }}>
@@ -363,12 +389,20 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
                   </tr>
                   {history.map((item, i) => (
                     <tr key={i}>
-                      <td align="center" style={{ padding: '0.5rem 0' }}>{formatDate2(item.date)}</td>
-                      <td align="left" style={{ textTransform: "capitalize" }}>{item.title}</td>
+                      <td align="center" style={{ padding: '0.5rem 0' }}>
+                        {formatDate2(item.date)}
+                      </td>
+                      <td align="left" style={{ textTransform: 'capitalize' }}>
+                        {item.title}
+                      </td>
                       <td align="center">Rp. {numberWithCommas(item.amount)}</td>
                       <td align="center">
-                        <Label variant="ghost" color={item.isCashOut ? "error" : "success"} sx={{ textTransform: 'capitalize' }}>
-                          {item.isCashOut ? "Cash Out" : "Cash In"}
+                        <Label
+                          variant="ghost"
+                          color={item.isCashOut ? 'error' : 'success'}
+                          sx={{ textTransform: 'capitalize' }}
+                        >
+                          {item.isCashOut ? 'Cash Out' : 'Cash In'}
                         </Label>
                       </td>
                     </tr>
@@ -376,7 +410,9 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
                 </>
               ) : (
                 <tr>
-                  <td align="center" colSpan={4} style={{ padding: '0.5rem 0' }}>No data available</td>
+                  <td align="center" colSpan={4} style={{ padding: '0.5rem 0' }}>
+                    No data available
+                  </td>
                 </tr>
               )}
             </tbody>

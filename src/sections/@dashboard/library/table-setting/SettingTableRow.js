@@ -26,12 +26,12 @@ const CustomTableRow = styled(TableRow)(() => ({
 export default function SettingTableRow({ row, onEditRow, onDeleteRow }) {
     const theme = useTheme();
 
-    const { date, room, isActive } = row;
+    const { createdAt, room, isActive } = row;
 
     return (
         <CustomTableRow hover >
 
-            <TableCell align="center">{formatDate2(date)}</TableCell>
+            <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
             <TableCell>{room}</TableCell>
 

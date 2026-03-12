@@ -206,11 +206,11 @@ export default function MemberForm({ isEdit, currentData }) {
 
       if (!isEdit) {
         data.addresses = [formatAddressData(data)];
-        await axiosApi.post(`/members`, data);
+        await axiosApi.post(`/member`, data);
       } else {
         const previousAddresses = currentData?.addresses?.filter((val) => !val.isDefault) || [];
         data.addresses = [...previousAddresses, formatAddressData(data)];
-        await axiosApi.patch(`/members/${currentData._id}`, data);
+        await axiosApi.patch(`/member/${currentData._id}`, data);
       }
 
       reset();

@@ -10,7 +10,7 @@ import { FormProvider, RHFTextField } from '../../../../components/hook-form';
 
 // ----------------------------------------------------------------------
 
-CategoryForm.propTypes = {
+SubCategoryForm.propTypes = {
   methods: PropTypes.any,
   onSubmit: PropTypes.any,
   type: PropTypes.string,
@@ -19,7 +19,7 @@ CategoryForm.propTypes = {
   formState: PropTypes.any,
 };
 
-export default function CategoryForm({ methods, onSubmit, type, isSubmitting, setValue, formState }) {
+export default function SubCategoryForm({ methods, onSubmit, type, isSubmitting, setValue, formState }) {
   const navigate = useNavigate();
   const button_label = type === 'create' ? 'Simpan data' : 'Simpan perubahan';
 
@@ -30,7 +30,7 @@ export default function CategoryForm({ methods, onSubmit, type, isSubmitting, se
           <Grid item xs={12} md={5}>
             <Card sx={{ p: 3 }}>
               <Stack spacing={3}>
-                <RHFTextField name="name" label="Category Name" autoComplete="off" />
+                <RHFTextField name="name" label="Sub Category Name" autoComplete="off" />
                 <div>
                   <Typography sx={{ mb: 1, ml: 2 }}>List Number</Typography>
                   <Stack display="grid" gap={1} gridTemplateColumns="repeat(auto-fit, 80px)">

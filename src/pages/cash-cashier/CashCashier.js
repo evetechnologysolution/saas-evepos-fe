@@ -1,6 +1,5 @@
-import { useState, useEffect, useContext } from "react";
-import { useQuery, useQueryClient } from "react-query";
-import { useSnackbar } from "notistack";
+import { useState, useContext } from 'react';
+import { useSnackbar } from 'notistack';
 // @mui
 import {
   Box,
@@ -15,35 +14,40 @@ import {
   Button,
   Stack,
   Typography,
-} from "@mui/material";
-import axios from "../../utils/axios";
-import Iconify from "../../components/Iconify";
-import { formatQDate } from "../../utils/getData";
+} from '@mui/material';
+import Iconify from '../../components/Iconify';
+import { formatQDate } from '../../utils/getData';
 // routes
-import ModalCashCashier from "../../sections/@dashboard/cash-cashier/ModalCashCashier";
+import ModalCashCashier from '../../sections/@dashboard/cash-cashier/ModalCashCashier';
 // hooks
-import useSettings from "../../hooks/useSettings";
-import useTable from "../../hooks/useTable";
+import useSettings from '../../hooks/useSettings';
+import useTable from '../../hooks/useTable';
 // components
-import Page from "../../components/Page";
-import Scrollbar from "../../components/Scrollbar";
-import { TableHeadCustom, TableLoading, TableNoData } from "../../components/table";
-import ConfirmDelete from "../../components/ConfirmDelete";
+import Page from '../../components/Page';
+import Scrollbar from '../../components/Scrollbar';
+import { TableHeadCustom, TableLoading, TableNoData } from '../../components/table';
+import ConfirmDelete from '../../components/ConfirmDelete';
 // sections
-import { CashCashierTableToolbar, CashCashierTableRow, ModalCloseCashier } from "../../sections/@dashboard/cash-cashier";
+import {
+  CashCashierTableToolbar,
+  CashCashierTableRow,
+  ModalCloseCashier,
+} from '../../sections/@dashboard/cash-cashier';
 // context
-import { mainContext } from "../../contexts/MainContext";
+import { mainContext } from '../../contexts/MainContext';
+// service
+import useCash from './service/useCash';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: "startDate", label: "Start Date", align: "center", width: 80 },
-  { id: "cashIn", label: "Cash In", align: "center", width: 80 },
-  { id: "sales", label: "Sales", align: "center", width: 200 },
-  { id: "cashOut", label: "Cash Out", align: "center", width: 80 },
-  { id: "total", label: "Total", align: "center", width: 80 },
-  { id: "endDate", label: "End Date", align: "center", width: 80 },
-  { id: "", label: "Action", align: "center", width: 10 },
+  { id: 'startDate', label: 'Start Date', align: 'center', width: 80 },
+  { id: 'cashIn', label: 'Cash In', align: 'center', width: 80 },
+  { id: 'sales', label: 'Sales', align: 'center', width: 200 },
+  { id: 'cashOut', label: 'Cash Out', align: 'center', width: 80 },
+  { id: 'total', label: 'Total', align: 'center', width: 80 },
+  { id: 'endDate', label: 'End Date', align: 'center', width: 80 },
+  { id: '', label: 'Action', align: 'center', width: 10 },
 ];
 
 // ----------------------------------------------------------------------
@@ -57,48 +61,25 @@ export default function CashCashier() {
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const client = useQueryClient();
-
-  const [countData, setCountData] = useState(0);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [openCashier, setOpenCashier] = useState(false);
 
+  const { list, remove } = useCash();
+
   const [controller, setController] = useState({
     page: 0,
     rowsPerPage: 10,
-    search: ""
+    search: '',
   });
 
-  useEffect(() => {
-    ctx.getExistCash();
-  }, []);
-
-  const getData = async ({ queryKey }) => {
-    const [, params] = queryKey; // Extract query params
-    const queryString = new URLSearchParams(params).toString(); // Build query string
-    try {
-      const res = await axios.get(`/cash-balance?${queryString}`);
-      setCountData(res?.data?.totalDocs || 0);
-      return res.data;
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      throw new Error(error.response?.data?.message || "Failed to fetch orders");
-    }
-  };
-
-  const { isLoading, data: tableData } = useQuery(
-    [
-      "listCashCashier",
-      {
-        page: controller.page + 1,
-        perPage: controller.rowsPerPage,
-        start: controller.start || "",
-        end: controller.end || ""
-      },
-    ],
-    getData
-  );
+  const { data: tableData, isLoading } = list({
+    page: controller.page + 1,
+    perPage: controller.rowsPerPage,
+    search: controller.search,
+    start: controller.start || '',
+    end: controller.end || '',
+  });
 
   const handleCLoseModal = () => {
     setOpenCashier(false);
@@ -132,7 +113,7 @@ export default function CashCashier() {
     setEndDate(null);
     setController({
       page: 0,
-      rowsPerPage: controller.rowsPerPage
+      rowsPerPage: controller.rowsPerPage,
     });
   };
 
@@ -140,14 +121,14 @@ export default function CashCashier() {
     let params = {
       page: 0,
       rowsPerPage: controller.rowsPerPage,
-    }
+    };
 
     if (startDate && endDate) {
       params = {
         ...params,
         start: formatQDate(startDate),
-        end: formatQDate(endDate)
-      }
+        end: formatQDate(endDate),
+      };
     }
 
     setController(params);
@@ -160,11 +141,11 @@ export default function CashCashier() {
     // get data by current page
     setController({
       ...controller,
-      page: controller.page
+      page: controller.page,
     });
   };
 
-  const [selectedId, setSelectedId] = useState("");
+  const [selectedId, setSelectedId] = useState('');
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
 
@@ -176,36 +157,35 @@ export default function CashCashier() {
   const handleDelete = async () => {
     setLoadingDelete(true);
     if (selectedId) {
-      await ctx.deleteCash(selectedId);
-      client.invalidateQueries("listCashCashier");
-      enqueueSnackbar("Delete success!");
+      await remove.mutateAsync(selectedId);
+      enqueueSnackbar('Delete success!');
     }
     handleDialogDelete();
     setLoadingDelete(false);
     // get data by current page
     setController({
       ...controller,
-      page: controller.page
+      page: controller.page,
     });
   };
 
   return (
     <Page title="Cashier History">
-      <Container maxWidth={themeStretch ? false : "xl"}>
+      <Container maxWidth={themeStretch ? false : 'xl'}>
         <Card>
           <Typography variant="h6" mx={1}>
             Cashier History
           </Typography>
 
           <Stack
-            flexDirection={{ sm: "row" }}
+            flexDirection={{ sm: 'row' }}
             flexWrap="wrap"
-            alignItems={{ sm: "center" }}
-            justifyContent={{ sm: "space-between" }}
+            alignItems={{ sm: 'center' }}
+            justifyContent={{ sm: 'space-between' }}
             mr={1}
             mb={{ xs: 2, sm: 0 }}
           >
-            <div style={{ minWidth: "40%" }}>
+            <div style={{ minWidth: '40%' }}>
               <CashCashierTableToolbar
                 filterStartDate={startDate}
                 onFilterStartDate={handleStartDate}
@@ -215,7 +195,7 @@ export default function CashCashier() {
                 handleSubmit={handleSearch}
               />
             </div>
-            <Stack flexDirection="row" gap={1} >
+            <Stack flexDirection="row" gap={1}>
               {ctx.existCash?.isOpen ? (
                 <Button
                   variant="contained"
@@ -232,8 +212,7 @@ export default function CashCashier() {
                 >
                   Open Cashier
                 </Button>
-              )
-              }
+              )}
               {ctx.existCash?.isOpen && (
                 <Button
                   variant="contained"
@@ -248,19 +227,15 @@ export default function CashCashier() {
           </Stack>
 
           <Scrollbar>
-            <TableContainer sx={{ minWidth: 1200, position: "relative" }}>
-              <Table size={dense ? "small" : "medium"}>
+            <TableContainer sx={{ minWidth: 1200, position: 'relative' }}>
+              <Table size={dense ? 'small' : 'medium'}>
                 <TableHeadCustom headLabel={TABLE_HEAD} rowCount={tableData?.docs?.length || 0} />
 
                 <TableBody>
                   {!isLoading ? (
                     <>
                       {tableData?.docs?.map((row) => (
-                        <CashCashierTableRow
-                          key={row._id}
-                          row={row}
-                          onDeleteRow={() => handleDialogDelete(row._id)}
-                        />
+                        <CashCashierTableRow key={row._id} row={row} onDeleteRow={() => handleDialogDelete(row._id)} />
                       ))}
 
                       <TableNoData isNotFound={tableData?.docs?.length === 0} />
@@ -273,11 +248,11 @@ export default function CashCashier() {
             </TableContainer>
           </Scrollbar>
 
-          <Box sx={{ position: "relative" }}>
+          <Box sx={{ position: 'relative' }}>
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"
-              count={countData}
+              count={tableData?.docs?.length || 0}
               rowsPerPage={controller.rowsPerPage}
               page={controller.page}
               onPageChange={handlePageChange}
@@ -287,17 +262,13 @@ export default function CashCashier() {
             <FormControlLabel
               control={<Switch checked={dense} onChange={onChangeDense} />}
               label="Dense"
-              sx={{ px: 3, py: 1.5, top: 0, position: { md: "absolute" } }}
+              sx={{ px: 3, py: 1.5, top: 0, position: { md: 'absolute' } }}
             />
           </Box>
         </Card>
       </Container>
 
-      <ModalCashCashier
-        open={openCashier}
-        onClose={handleCLoseModal}
-        addTransaction={ctx.existCash?.isOpen}
-      />
+      <ModalCashCashier open={openCashier} onClose={handleCLoseModal} />
 
       <ModalCloseCashier
         open={openCloseCashier}
@@ -305,12 +276,7 @@ export default function CashCashier() {
         handleCloseCashier={handleCloseCashier}
       />
 
-      <ConfirmDelete
-        open={openDelete}
-        onClose={handleDialogDelete}
-        onDelete={handleDelete}
-        isLoading={loadingDelete}
-      />
+      <ConfirmDelete open={openDelete} onClose={handleDialogDelete} onDelete={handleDelete} isLoading={loadingDelete} />
     </Page>
   );
 }

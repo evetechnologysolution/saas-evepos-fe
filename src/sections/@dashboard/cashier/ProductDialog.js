@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect } from "react";
-import PropTypes from "prop-types";
+import React, { useState, useContext, useEffect } from 'react';
+import PropTypes from 'prop-types';
 // @mui
 import {
   Container,
@@ -17,17 +17,17 @@ import {
   TextField,
   Stack,
   Alert,
-  InputAdornment
-} from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+  InputAdornment,
+} from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 // context
-import { cashierContext } from "../../../contexts/CashierContext";
+import { cashierContext } from '../../../contexts/CashierContext';
 // components
-import Iconify from "../../../components/Iconify";
+import Iconify from '../../../components/Iconify';
 // utils
-import numberWithCommas from "../../../utils/numberWithCommas";
+import numberWithCommas from '../../../utils/numberWithCommas';
 
-import OptionCard from "./OptionCard";
+import OptionCard from './OptionCard';
 
 // ----------------------------------------------------------------------
 
@@ -44,15 +44,16 @@ ProductDialog.propTypes = {
   unit: PropTypes.string,
   notes: PropTypes.any,
   discount: PropTypes.any,
+  conditional: PropTypes.any,
   amountKg: PropTypes.number,
-  isLaundryBag: PropTypes.bool,
+  minimumOrderQty: PropTypes.number,
 };
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-  "& .MuiDialogContent-root": {
+  '& .MuiDialogContent-root': {
     padding: theme.spacing(2),
   },
-  "& .MuiDialogActions-root": {
+  '& .MuiDialogActions-root': {
     padding: theme.spacing(1),
   },
 }));
@@ -68,7 +69,7 @@ const BootstrapDialogTitle = (props) => {
           aria-label="close"
           onClick={onClose}
           sx={{
-            position: "absolute",
+            position: 'absolute',
             right: 8,
             top: 8,
             color: (theme) => theme.palette.grey[500],
@@ -87,25 +88,39 @@ BootstrapDialogTitle.propTypes = {
 };
 
 const QuantityButton = styled(Button)(() => ({
-  cursor: "default",
-  "&:hover": {
-    backgroundColor: "transparent",
+  cursor: 'default',
+  '&:hover': {
+    backgroundColor: 'transparent',
   },
 }));
 
-export default function ProductDialog({ open, onClose, id, name, price, productionPrice, variant, category, unit, notes, discount, amountKg, isLaundryBag }) {
+export default function ProductDialog({
+  open,
+  onClose,
+  id,
+  name,
+  price,
+  productionPrice,
+  variant,
+  category,
+  unit,
+  notes,
+  discount,
+  conditional,
+  amountKg,
+  minimumOrderQty,
+}) {
   const ctx = useContext(cashierContext);
   const currTheme = useTheme();
-  const discBag = 0.15;
 
-  const [selectedLaundryBag, setSelectedLaundryBag] = useState(false);
+  const [selectedConditional, setSelectedConditional] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState([]);
   const [quantity, setQuantity] = useState(0);
   const [currPrice, setCurrPrice] = useState(0);
   const [variantTotalPrice, setVariantTotalPrice] = useState(0);
   const [variantTotalProductionPrice, setVariantTotalProductionPrice] = useState(0);
   const [totalProductionPrice, setTotalProductionPrice] = useState(productionPrice);
-  const [currNotes, setCurrNotes] = useState("");
+  const [currNotes, setCurrNotes] = useState('');
   const [defaultMandatory, setDefaultMandatory] = useState(0);
   const [totalMandatory, setTotalMandatory] = useState(0);
 
@@ -119,28 +134,27 @@ export default function ProductDialog({ open, onClose, id, name, price, producti
 
   useEffect(() => {
     const sumVariantPrice = selectedVariant.reduce((acc, i) => {
-      return acc + ((Math.round(i.price * i.qty)) * (amountKg > 0 ? amountKg : 1));
+      return acc + Math.round(i.price * i.qty) * (amountKg > 0 ? amountKg : 1);
     }, 0);
     const sumVariantProductionPrice = selectedVariant.reduce((acc, i) => {
-      return acc + ((Math.round(i.productionPrice * i.qty)) * (amountKg > 0 ? amountKg : 1));
+      return acc + Math.round(i.productionPrice * i.qty) * (amountKg > 0 ? amountKg : 1);
     }, 0);
     const tPrice = price + sumVariantPrice;
     setVariantTotalPrice(sumVariantPrice);
     setVariantTotalProductionPrice(sumVariantProductionPrice);
-    setCurrPrice((selectedLaundryBag ? (tPrice - (tPrice * discBag)) : tPrice) * (quantity > 0 ? quantity : 1));
-
-  }, [selectedVariant, selectedLaundryBag]);
+    setCurrPrice(tPrice * (quantity > 0 ? quantity : 1));
+  }, [selectedVariant, selectedConditional]);
 
   const handleClose = () => {
     onClose();
     setTimeout(() => {
-      setSelectedLaundryBag(false);
+      setSelectedConditional(false);
       setQuantity(0);
       setCurrPrice(price);
       setVariantTotalPrice(0);
       setVariantTotalProductionPrice(0);
       setTotalProductionPrice(0);
-      setCurrNotes("");
+      setCurrNotes('');
       setSelectedVariant([]);
       setTotalMandatory(0);
     }, 100);
@@ -149,9 +163,9 @@ export default function ProductDialog({ open, onClose, id, name, price, producti
   useEffect(() => {
     const tPrice = price + variantTotalPrice;
     if (quantity > 0) {
-      setCurrPrice(Math.round((selectedLaundryBag ? (tPrice - (tPrice * discBag)) : tPrice) * quantity));
+      setCurrPrice(Math.round(tPrice * quantity));
     } else {
-      setCurrPrice(selectedLaundryBag ? (tPrice - (tPrice * discBag)) : tPrice);
+      setCurrPrice(tPrice);
     }
   }, [quantity]);
 
@@ -159,7 +173,9 @@ export default function ProductDialog({ open, onClose, id, name, price, producti
     if (selectedVariant.find((data) => data.name.toLowerCase().indexOf(variant.variantRef.name.toLowerCase()) !== -1)) {
       // jika variant option yang dipilih sama
       if (selectedVariant.find((data) => data.name === variant.variantRef.name && data.option === option)) {
-        const filteredData = selectedVariant.filter((row) => row.name !== variant.variantRef.name || row.option !== option);
+        const filteredData = selectedVariant.filter(
+          (row) => row.name !== variant.variantRef.name || row.option !== option
+        );
         setSelectedVariant(filteredData);
         if (variant.isMandatory) {
           const check = filteredData.find((data) => data.name === variant.variantRef.name);
@@ -174,7 +190,9 @@ export default function ProductDialog({ open, onClose, id, name, price, producti
           }
         }
         if (!variant.isMultiple) {
-          setSelectedVariant((arr) => arr.filter((row) => row.name.toLowerCase().indexOf(variant.variantRef.name.toLowerCase()) === -1));
+          setSelectedVariant((arr) =>
+            arr.filter((row) => row.name.toLowerCase().indexOf(variant.variantRef.name.toLowerCase()) === -1)
+          );
         }
         setSelectedVariant((arr) => [
           ...arr,
@@ -183,8 +201,8 @@ export default function ProductDialog({ open, onClose, id, name, price, producti
             option,
             price: variantPrice,
             productionPrice: variantProductionPrice,
-            qty: variantQty
-          }
+            qty: variantQty,
+          },
         ]);
       }
     } else {
@@ -198,14 +216,14 @@ export default function ProductDialog({ open, onClose, id, name, price, producti
           option,
           price: variantPrice,
           productionPrice: variantProductionPrice,
-          qty: variantQty
-        }
+          qty: variantQty,
+        },
       ]);
     }
   };
 
   const handleDecreaseVariant = (index) => {
-    setSelectedVariant(prev => {
+    setSelectedVariant((prev) => {
       const updated = [...prev];
 
       // Cek apakah data pada index ada
@@ -223,7 +241,7 @@ export default function ProductDialog({ open, onClose, id, name, price, producti
   };
 
   const handleIncreaseVariant = (index) => {
-    setSelectedVariant(prev => {
+    setSelectedVariant((prev) => {
       const updated = [...prev];
 
       // Cek apakah data pada index ada
@@ -238,30 +256,36 @@ export default function ProductDialog({ open, onClose, id, name, price, producti
     });
   };
 
-
-
   const handleClick = () => {
     const tPrice = price + variantTotalPrice;
 
     let promoType = 0;
+    let promoLabel = '';
     let promoQtyMin = 0;
     let promoAmount = 0;
-    if (discount.isAvailable && discount.amount) {
-      promoType = 1;
-      promoAmount = discount.amount;
-    }
-    if (discount.isAvailable && discount.qtyMin) {
-      if (quantity >= discount.qtyMin) {
-        const qtyFree = Math.floor(quantity / discount.qtyMin);
-        const priceFree = tPrice * qtyFree;
-        const priceTotal = tPrice * quantity;
-        const percentFree = (priceFree / priceTotal) * 100;
-        promoType = 2;
-        promoQtyMin = discount.qtyMin;
-        promoAmount = priceFree;
-        // promoAmount = percentFree;
-        console.log(priceTotal, priceFree, priceTotal - priceFree);
+
+    if (!conditional?.isActive) {
+      if (discount.isAvailable && discount.amount) {
+        promoType = 1;
+        promoAmount = discount.amount;
       }
+      if (discount.isAvailable && discount.qtyMin) {
+        if (quantity >= discount.qtyMin) {
+          const qtyFree = Math.floor(quantity / discount.qtyMin);
+          const priceFree = tPrice * qtyFree;
+          const priceTotal = tPrice * quantity;
+          const percentFree = (priceFree / priceTotal) * 100;
+          promoType = 2;
+          promoQtyMin = discount.qtyMin;
+          promoAmount = priceFree;
+          // promoAmount = percentFree;
+          // console.log(priceTotal, priceFree, priceTotal - priceFree);
+        }
+      }
+    } else {
+      promoType = selectedConditional ? 1 : 0;
+      promoLabel = selectedConditional ? conditional.name : '';
+      promoAmount = selectedConditional ? conditional.amount : 0;
     }
 
     ctx.setBill((arr) => [
@@ -269,41 +293,39 @@ export default function ProductDialog({ open, onClose, id, name, price, producti
       {
         id,
         name,
-        price: selectedLaundryBag ? (tPrice - (tPrice * discBag)) : tPrice,
+        price: tPrice,
         productionPrice: totalProductionPrice + variantTotalProductionPrice,
         qty: quantity,
         category,
         unit,
         promotionType: promoType,
+        promotionLabel: promoLabel,
         promotionQtyMin: promoQtyMin,
         discountAmount: promoAmount,
-        isDailyPromotion: selectedLaundryBag ? true : discount.isDailyPromotion,
+        isDailyPromotion: selectedConditional ? true : discount.isDailyPromotion,
         variant: selectedVariant,
         notes: currNotes,
-        discountLaundryBag: selectedLaundryBag ? (tPrice * discBag) : 0,
-        isLaundryBag: selectedLaundryBag
-      }
+      },
     ]);
 
-    if (ctx.currentOrderID !== "") {
+    if (ctx.currentOrderID !== '') {
       ctx.setUpdatedBill((arr) => [
         ...arr,
         {
           id,
           name,
-          price: selectedLaundryBag ? (tPrice - (tPrice * discBag)) : tPrice,
+          price: tPrice,
           productionPrice: totalProductionPrice + variantTotalProductionPrice,
           qty: quantity,
           category,
           unit,
           promotionType: promoType,
+          promotionLabel: promoLabel,
           promotionQtyMin: promoQtyMin,
           discountAmount: promoAmount,
-          isDailyPromotion: selectedLaundryBag ? true : discount.isDailyPromotion,
+          isDailyPromotion: selectedConditional ? true : discount.isDailyPromotion,
           variant: selectedVariant,
           notes: currNotes,
-          discountLaundryBag: selectedLaundryBag ? (tPrice * discBag) : 0,
-          isLaundryBag: selectedLaundryBag
         },
       ]);
     }
@@ -316,30 +338,27 @@ export default function ProductDialog({ open, onClose, id, name, price, producti
       <BootstrapDialogTitle
         id="customized-dialog-title"
         onClose={handleClose}
-        style={{ borderBottom: "1px solid #ccc", textAlign: "center", fontSize: "calc(1rem + 0.5vw)" }}
+        style={{ borderBottom: '1px solid #ccc', textAlign: 'center', fontSize: 'calc(1rem + 0.5vw)' }}
       >
         {name} - Rp. {numberWithCommas(currPrice)}
       </BootstrapDialogTitle>
       <DialogContent dividers>
         <Container>
           {variant.length > 0 &&
-            variant.map((variant, v) => (
+            variant.map((variant, v) =>
               variant.variantRef ? (
                 <Box key={v}>
                   <Stack flexDirection="row" gap={1} sx={{ mb: 1 }}>
-                    <Typography variant="subtitle2">
-                      {variant.variantRef.name.toUpperCase()}
-                    </Typography>
+                    <Typography variant="subtitle2">{variant.variantRef.name.toUpperCase()}</Typography>
                     <Typography variant="body2" color="primary">
-                      ({variant.isMandatory ? "Wajib" : "Optional"}, {variant.isMultiple ? "Bisa Beberapa" : "Pilih Satu"})
+                      ({variant.isMandatory ? 'Wajib' : 'Optional'},{' '}
+                      {variant.isMultiple ? 'Bisa Beberapa' : 'Pilih Satu'})
                     </Typography>
                   </Stack>
-                  <Grid container spacing={3} sx={{ mb: 3, height: "auto" }}>
+                  <Grid container spacing={3} sx={{ mb: 3, height: 'auto' }}>
                     {variant.variantRef.options.map((option, n) => {
                       const checkIndex = selectedVariant.findIndex(
-                        (data) =>
-                          data.name === variant.variantRef.name &&
-                          data.option === option.name
+                        (data) => data.name === variant.variantRef.name && data.option === option.name
                       );
 
                       const checkData = checkIndex !== -1 ? selectedVariant[checkIndex] : null;
@@ -347,7 +366,9 @@ export default function ProductDialog({ open, onClose, id, name, price, producti
                         <Grid item xs={6} sm={4} key={n}>
                           <FormControl fullWidth>
                             <OptionCard
-                              onClick={() => handleSelectedVariant(variant, option.name, option.price, option.productionPrice)}
+                              onClick={() =>
+                                handleSelectedVariant(variant, option.name, option.price, option.productionPrice)
+                              }
                               active={checkData ? Boolean(true) : Boolean(false)}
                               title={option.name}
                               price={option.price}
@@ -364,7 +385,7 @@ export default function ProductDialog({ open, onClose, id, name, price, producti
                                     borderBottomRightRadius: 0,
                                     height: 30,
                                     minWidth: 2,
-                                    fontSize: "x-large"
+                                    fontSize: 'x-large',
                                   }}
                                   fullWidth
                                   onClick={() => handleDecreaseVariant(checkIndex)}
@@ -374,7 +395,7 @@ export default function ProductDialog({ open, onClose, id, name, price, producti
                                 <QuantityButton
                                   variant="outlined"
                                   size="small"
-                                  sx={{ borderRadius: 0, height: 30, fontSize: "medium" }}
+                                  sx={{ borderRadius: 0, height: 30, fontSize: 'medium' }}
                                   fullWidth
                                 >
                                   {checkData?.qty}
@@ -388,7 +409,7 @@ export default function ProductDialog({ open, onClose, id, name, price, producti
                                     borderBottomLeftRadius: 0,
                                     height: 30,
                                     minWidth: 2,
-                                    fontSize: "x-large"
+                                    fontSize: 'x-large',
                                   }}
                                   fullWidth
                                   onClick={() => handleIncreaseVariant(checkIndex)}
@@ -399,50 +420,53 @@ export default function ProductDialog({ open, onClose, id, name, price, producti
                             )}
                           </FormControl>
                         </Grid>
-                      )
+                      );
                     })}
                   </Grid>
                 </Box>
               ) : (
-                <Alert key={v} severity="error" sx={{ mb: 2 }}>Data variant terhapus, silakan atur ulang di library product.</Alert>
+                <Alert key={v} severity="error" sx={{ mb: 2 }}>
+                  Data variant terhapus, silakan atur ulang di library product.
+                </Alert>
               )
-            ))
-          }
+            )}
 
-          {isLaundryBag && (
+          {conditional?.isActive && (
             <Box>
               <Stack flexDirection="column" gap={0} sx={{ mb: 1 }}>
                 <Stack flexDirection="row" gap={1}>
-                  <Typography variant="subtitle2">
-                    LAUNDRY BAG DAY
+                  <Typography variant="subtitle2" textTransform="capitalize">
+                    {conditional?.label}
                   </Typography>
-                  <Typography variant="body2" color="primary">
-                    {`(Diskon 15%, Setiap Selasa)`}
+                  <Typography variant="body2" color="primary" textTransform="capitalize">
+                    {/* {`(Diskon 15%, Setiap Selasa)`} */}
+                    {`(${conditional?.notes})`}
                   </Typography>
                 </Stack>
                 <Typography variant="body2" color="error" fontStyle="italic">
-                  *Jika menggunakan Laundry Bag <b>di hari lain</b>, harap tulis di notes.
+                  {/* *Jika menggunakan Laundry Bag <b>di hari lain</b>, harap tulis di notes. */}
+                  {conditional?.otherNotes}
                 </Typography>
               </Stack>
               <Grid container spacing={3} sx={{ mb: 3 }}>
                 <Grid item xs={6} sm={4}>
                   <FormControl fullWidth>
                     <OptionCard
-                      onClick={() => setSelectedLaundryBag(false)}
-                      active={!selectedLaundryBag ? Boolean(true) : Boolean(false)}
+                      onClick={() => setSelectedConditional(false)}
+                      active={!selectedConditional ? Boolean(true) : Boolean(false)}
                       title="Tidak"
-                      isBag
+                      isConditional
                     />
                   </FormControl>
                 </Grid>
                 <Grid item xs={6} sm={4}>
                   <FormControl fullWidth>
                     <OptionCard
-                      onClick={() => setSelectedLaundryBag(true)}
-                      active={selectedLaundryBag ? Boolean(true) : Boolean(false)}
+                      onClick={() => setSelectedConditional(true)}
+                      active={selectedConditional ? Boolean(true) : Boolean(false)}
                       title="Ya"
-                      isBag
-                      disabled={!ctx.isLaundryBagDay}
+                      isConditional
+                      disabled={!conditional?.isAvailable}
                     />
                   </FormControl>
                 </Grid>
@@ -470,7 +494,7 @@ export default function ProductDialog({ open, onClose, id, name, price, producti
               </Grid>
             </Box>
           )}
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {/* <Button
               variant="outlined"
               size="large"
@@ -489,33 +513,33 @@ export default function ProductDialog({ open, onClose, id, name, price, producti
               autoFocus
               type="number"
               sx={{
-                width: "100px",
-                "& .MuiOutlinedInput-root": {
+                width: '100px',
+                '& .MuiOutlinedInput-root': {
                   // borderRadius: "0px",
-                  paddingRight: "10px",
-                  "& fieldset": {
+                  paddingRight: '10px',
+                  '& fieldset': {
                     borderColor: currTheme.palette.primary.light,
                   },
-                  "&:hover fieldset": {
+                  '&:hover fieldset': {
                     borderColor: currTheme.palette.primary.light,
                   },
-                  "&.Mui-focused fieldset": {
+                  '&.Mui-focused fieldset': {
                     borderColor: currTheme.palette.primary.light,
-                    border: `1px solid ${currTheme.palette.primary.main}`
+                    border: `1px solid ${currTheme.palette.primary.main}`,
                   },
                 },
-                "& .MuiOutlinedInput-input": {
-                  padding: "12.5px 10px"
-                }
+                '& .MuiOutlinedInput-input': {
+                  padding: '12.5px 10px',
+                },
               }}
               InputProps={{
-                inputProps: { min: category?.toLowerCase() === "kiloan" ? 3 : 1, style: { textAlign: "center" } },
-                endAdornment: <InputAdornment position="end">{unit || "pcs"}</InputAdornment>
+                inputProps: { min: minimumOrderQty, style: { textAlign: 'center' } },
+                endAdornment: <InputAdornment position="end">{unit || 'pcs'}</InputAdornment>,
               }}
-              value={quantity === 0 ? "" : quantity}
+              value={quantity === 0 ? '' : quantity}
               onChange={(e) => {
-                const value = e.target.value.replace(/^0+/, "");
-                setQuantity(value === "" ? "" : Number(value));
+                const value = e.target.value.replace(/^0+/, '');
+                setQuantity(value === '' ? '' : Number(value));
               }}
             />
             {/* <Button
@@ -527,20 +551,26 @@ export default function ProductDialog({ open, onClose, id, name, price, producti
               <Typography variant="h5">+</Typography>
               </Button> */}
           </Box>
-          {category?.toLowerCase() === "kiloan" && (
+          {minimumOrderQty > 0 && (
             <Typography variant="body2" color="error" fontStyle="italic" textAlign="center">
-              *Jika <b>{`< 3kg`}</b>, mohon bulatkan ke 3kg
+              {`Minimal order adalah ${minimumOrderQty} ${unit}`}
             </Typography>
           )}
         </Container>
       </DialogContent>
-      <DialogActions sx={{ justifyContent: "center" }}>
+      <DialogActions sx={{ justifyContent: 'center' }}>
         <Button variant="outlined" onClick={handleClose}>
           Cancel
         </Button>
         <Button
           variant="contained"
-          disabled={quantity === "" || (category?.toLowerCase() === "kiloan" ? quantity < 3 : quantity === 0) || defaultMandatory > totalMandatory ? Boolean(true) : Boolean(false)}
+          disabled={
+            quantity === '' ||
+            (category?.toLowerCase() === 'kiloan' ? quantity < 3 : quantity === 0) ||
+            defaultMandatory > totalMandatory
+              ? Boolean(true)
+              : Boolean(false)
+          }
           onClick={() => handleClick()}
         >
           Save

@@ -6,6 +6,7 @@ import axios from 'src/utils/axios';
 export default function usePromotion() {
   const queryClient = useQueryClient();
   const queryKey = ['promotions'];
+  const queryKeyProduct = ['allProduct'];
 
   const list = (params) =>
     useQuery({
@@ -25,6 +26,7 @@ export default function usePromotion() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(queryKeyProduct);
     },
   });
 
@@ -35,6 +37,7 @@ export default function usePromotion() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(queryKeyProduct);
     },
   });
 
@@ -55,6 +58,7 @@ export default function usePromotion() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(queryKeyProduct);
     },
   });
 

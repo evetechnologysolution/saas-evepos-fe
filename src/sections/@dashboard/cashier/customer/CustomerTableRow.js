@@ -24,13 +24,13 @@ const CustomTableRow = styled(TableRow)(() => ({
 
 export default function CustomerTableRow({ row, onEditRow, cashier, onClickRow }) {
 
-    const { date, name, phone } = row;
+    const { createdAt, name, phone } = row;
 
     return (
         <CustomTableRow hover onClick={!cashier ? null : () => { onClickRow(); }} sx={{ cursor: !cashier ? "default" : "pointer" }} >
 
             {!cashier && (
-                <TableCell align="center">{formatDate2(date)}</TableCell>
+                <TableCell align="center">{formatDate2(createdAt)}</TableCell>
             )}
 
             <TableCell>

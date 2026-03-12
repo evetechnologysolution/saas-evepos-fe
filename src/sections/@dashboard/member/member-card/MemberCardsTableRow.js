@@ -24,7 +24,7 @@ export default function MemberCardsTableRow({ row }) {
   const { enqueueSnackbar } = useSnackbar();
   const client = useQueryClient();
 
-  const { _id, date, cardId } = row;
+  const { _id, createdAt, cardId } = row;
 
   const [deleteData, setDelete] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
@@ -45,7 +45,7 @@ export default function MemberCardsTableRow({ row }) {
   const handleDeleteData = async () => {
     setDelete(false);
     await axios.delete(`/member-card/${_id}`);
-    client.invalidateQueries('memberCards');
+    client.invalidateQueries(['memberCards']);
     enqueueSnackbar(`Deleted Card ID ${cardId} success!`);
   };
 
@@ -63,7 +63,7 @@ export default function MemberCardsTableRow({ row }) {
   return (
     <>
       <CustomTableRow hover>
-        <TableCell align="center">{formatDate2(date)}</TableCell>
+        <TableCell align="center">{formatDate2(createdAt)}</TableCell>
         <TableCell>{cardId}</TableCell>
         <TableCell align="center">
           <Stack direction="column" alignItems="center" spacing={2}>

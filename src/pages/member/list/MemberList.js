@@ -1,8 +1,8 @@
-import { paramCase } from "change-case";
-import { useState } from "react";
-import { useNavigate, Link as RouterLink } from "react-router-dom";
-import { useQuery, useQueryClient } from "react-query";
-import { useSnackbar } from "notistack";
+import { paramCase } from 'change-case';
+import { useState } from 'react';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useQuery, useQueryClient } from 'react-query';
+import { useSnackbar } from 'notistack';
 // @mui
 import {
   Box,
@@ -17,42 +17,39 @@ import {
   Button,
   Stack,
   Typography,
-} from "@mui/material";
-import axios from "../../../utils/axios";
+} from '@mui/material';
+import axios from '../../../utils/axios';
 // routes
-import { PATH_DASHBOARD } from "../../../routes/paths";
+import { PATH_DASHBOARD } from '../../../routes/paths';
 // hooks
-import useSettings from "../../../hooks/useSettings";
-import useTable from "../../../hooks/useTable";
+import useSettings from '../../../hooks/useSettings';
+import useTable from '../../../hooks/useTable';
 // components
-import Page from "../../../components/Page";
-import Iconify from "../../../components/Iconify";
-import Scrollbar from "../../../components/Scrollbar";
-import { TableHeadCustom, TableLoading, TableNoData } from "../../../components/table";
-import ConfirmDelete from "../../../components/ConfirmDelete";
+import Page from '../../../components/Page';
+import Iconify from '../../../components/Iconify';
+import Scrollbar from '../../../components/Scrollbar';
+import { TableHeadCustom, TableLoading, TableNoData } from '../../../components/table';
+import ConfirmDelete from '../../../components/ConfirmDelete';
 // sections
-import { MemberTableToolbar, MemberTableRow } from "../../../sections/@dashboard/member";
+import { MemberTableToolbar, MemberTableRow } from '../../../sections/@dashboard/member';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: "date", label: "Date", align: "center" },
-  { id: "memberId", label: "Member ID", align: "center" },
-  { id: "name", label: "Name", align: "left" },
-  { id: "phone", label: "Phone", align: "left" },
-  { id: "email", label: "Email", align: "left" },
-  { id: "address", label: "Address", align: "left", width: 400 },
-  { id: "point", label: "Point", align: "center" },
-  { id: "", label: "Action", align: "center" },
+  { id: 'date', label: 'Date', align: 'center' },
+  { id: 'memberId', label: 'Member ID', align: 'center' },
+  { id: 'name', label: 'Name', align: 'left' },
+  { id: 'phone', label: 'Phone', align: 'left' },
+  { id: 'email', label: 'Email', align: 'left' },
+  { id: 'address', label: 'Address', align: 'left', width: 400 },
+  { id: 'point', label: 'Point', align: 'center' },
+  { id: '', label: 'Action', align: 'center' },
 ];
 
 // ----------------------------------------------------------------------
 
 export default function MemberList() {
-  const {
-    dense,
-    onChangeDense,
-  } = useTable();
+  const { dense, onChangeDense } = useTable();
 
   const { themeStretch } = useSettings();
 
@@ -62,39 +59,39 @@ export default function MemberList() {
 
   const client = useQueryClient();
 
-  const [selectedId, setSelectedId] = useState("");
+  const [selectedId, setSelectedId] = useState('');
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [open, setOpen] = useState(false);
 
   const [countData, setCountData] = useState(0);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
 
   const [controller, setController] = useState({
     page: 0,
     rowsPerPage: 10,
-    search: ""
+    search: '',
   });
 
   const getData = async ({ queryKey }) => {
     const [, params] = queryKey; // Extract query params
     const queryString = new URLSearchParams(params).toString(); // Build query string
     try {
-      const res = await axios.get(`/members?${queryString}`);
+      const res = await axios.get(`/member?${queryString}`);
       setCountData(res?.data?.totalDocs || 0);
       return res.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw new Error(error.response?.data?.message || "Failed to fetch orders");
+      console.error('Error fetching data:', error);
+      throw new Error(error.response?.data?.message || 'Failed to fetch orders');
     }
   };
 
   const { isLoading, data: tableData } = useQuery(
     [
-      "listMembers",
+      'listMembers',
       {
         page: controller.page + 1,
         perPage: controller.rowsPerPage,
-        search: controller.search || ""
+        search: controller.search || '',
       },
     ],
     getData
@@ -103,7 +100,7 @@ export default function MemberList() {
   const handlePageChange = (event, newPage) => {
     setController({
       ...controller,
-      page: newPage
+      page: newPage,
     });
   };
 
@@ -111,7 +108,7 @@ export default function MemberList() {
     setController({
       ...controller,
       rowsPerPage: parseInt(event.target.value, 10),
-      page: 0
+      page: 0,
     });
   };
 
@@ -120,18 +117,18 @@ export default function MemberList() {
   };
 
   const handleOnKeyPress = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       if (search) {
         setController({
           page: 0,
           rowsPerPage: controller.rowsPerPage,
-          search
+          search,
         });
       } else {
         setController({
           page: 0,
           rowsPerPage: controller.rowsPerPage,
-          search: ""
+          search: '',
         });
       }
     }
@@ -153,37 +150,37 @@ export default function MemberList() {
   const handleDelete = async () => {
     setLoadingDelete(true);
     if (selectedId) {
-      await axios.delete(`/members/${selectedId}`);
-      client.invalidateQueries("listMembers");
-      enqueueSnackbar("Delete success!");
+      await axios.delete(`/member/${selectedId}`);
+      client.invalidateQueries(['listMembers']);
+      enqueueSnackbar('Delete success!');
     }
     handleDialog();
     setLoadingDelete(false);
     // get data by current page
     setController({
       ...controller,
-      page: controller.page
+      page: controller.page,
     });
   };
 
   return (
     <>
       <Page title="Member">
-        <Container maxWidth={themeStretch ? false : "xl"}>
+        <Container maxWidth={themeStretch ? false : 'xl'}>
           <Card>
             <Typography variant="h6" mx={1}>
               Member
             </Typography>
 
             <Stack
-              flexDirection={{ sm: "row" }}
+              flexDirection={{ sm: 'row' }}
               flexWrap="wrap"
-              alignItems={{ sm: "center" }}
-              justifyContent={{ sm: "space-between" }}
+              alignItems={{ sm: 'center' }}
+              justifyContent={{ sm: 'space-between' }}
               mr={1}
               mb={{ xs: 2, sm: 0 }}
             >
-              <div style={{ minWidth: "40%" }}>
+              <div style={{ minWidth: '40%' }}>
                 <MemberTableToolbar filterName={search} onFilterName={handleSearch} onEnter={handleOnKeyPress} />
               </div>
               <Button
@@ -197,12 +194,9 @@ export default function MemberList() {
             </Stack>
 
             <Scrollbar>
-              <TableContainer sx={{ minWidth: 980, position: "relative" }}>
-                <Table size={dense ? "small" : "medium"}>
-                  <TableHeadCustom
-                    headLabel={TABLE_HEAD}
-                    rowCount={tableData?.docs?.length || 0}
-                  />
+              <TableContainer sx={{ minWidth: 980, position: 'relative' }}>
+                <Table size={dense ? 'small' : 'medium'}>
+                  <TableHeadCustom headLabel={TABLE_HEAD} rowCount={tableData?.docs?.length || 0} />
 
                   <TableBody>
                     {!isLoading ? (
@@ -227,7 +221,7 @@ export default function MemberList() {
               </TableContainer>
             </Scrollbar>
 
-            <Box sx={{ position: "relative" }}>
+            <Box sx={{ position: 'relative' }}>
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
                 component="div"
@@ -241,19 +235,14 @@ export default function MemberList() {
               <FormControlLabel
                 control={<Switch checked={dense} onChange={onChangeDense} />}
                 label="Dense"
-                sx={{ px: 3, py: 1.5, top: 0, position: { md: "absolute" } }}
+                sx={{ px: 3, py: 1.5, top: 0, position: { md: 'absolute' } }}
               />
             </Box>
           </Card>
         </Container>
       </Page>
 
-      <ConfirmDelete
-        open={open}
-        onClose={handleDialog}
-        onDelete={handleDelete}
-        isLoading={loadingDelete}
-      />
+      <ConfirmDelete open={open} onClose={handleDialog} onDelete={handleDelete} isLoading={loadingDelete} />
     </>
   );
 }

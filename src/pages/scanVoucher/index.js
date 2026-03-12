@@ -133,7 +133,7 @@ export default function ScanVoucher() {
       setFailed(false);
       setLoadingValidate(false);
       setLoading(true);
-      const res = await axiosInstance.get(`/member-vouchers/scan/${voucherCode}`);
+      const res = await axiosInstance.get(`/member-voucher/scan/${voucherCode}`);
       if (res?.status === 200 && res?.data) {
         setVoucherDetail(res?.data);
 
@@ -176,7 +176,7 @@ export default function ScanVoucher() {
   const handleValidate = async (id) => {
     setLoadingValidate(true);
     const today = new Date();
-    const res = await axiosInstance.patch(`/member-vouchers/${id}`, { scanDate: today, isUsed: true });
+    const res = await axiosInstance.patch(`/member-voucher/${id}`, { scanDate: today, isUsed: true });
     if (res.status === 200) {
       setSuccess(true);
       setVoucherDetail((prev) => ({ ...prev, scanDate: today }));
@@ -326,7 +326,7 @@ export default function ScanVoucher() {
                     {loading ? (
                       <Skeleton variant="text" />
                     ) : (
-                      <Typography variant="body2" sx={{ fontStyle: "italic" }}>{voucherDetail?.member?.memberId || "-"}</Typography>
+                      <Typography variant="body2" sx={{ fontStyle: "italic" }}>{voucherDetail?.memberRef?.memberId || "-"}</Typography>
                     )}
                   </Stack>
                   <Stack>
@@ -334,7 +334,7 @@ export default function ScanVoucher() {
                     {loading ? (
                       <Skeleton variant="text" />
                     ) : (
-                      <Typography variant="body2" sx={{ fontStyle: "italic" }}>{voucherDetail?.member?.name || "-"}</Typography>
+                      <Typography variant="body2" sx={{ fontStyle: "italic" }}>{voucherDetail?.memberRef?.name || "-"}</Typography>
                     )}
                   </Stack>
                   <Stack>
@@ -342,7 +342,7 @@ export default function ScanVoucher() {
                     {loading ? (
                       <Skeleton variant="text" />
                     ) : (
-                      <Typography variant="body2" sx={{ fontStyle: "italic" }}>{voucherDetail?.member?.phone || "-"}</Typography>
+                      <Typography variant="body2" sx={{ fontStyle: "italic" }}>{voucherDetail?.memberRef?.phone || "-"}</Typography>
                     )}
                   </Stack>
                 </Stack>

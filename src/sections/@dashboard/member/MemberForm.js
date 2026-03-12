@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { LoadingButton } from '@mui/lab';
-import { Card, Grid, Stack, Button } from '@mui/material';
+import { Card, Grid, Stack, Button, CircularProgress } from '@mui/material';
 // routes
 import { PATH_DASHBOARD } from '../../../routes/paths';
 import { FormProvider, RHFTextField } from '../../../components/hook-form';
@@ -21,9 +21,10 @@ import splitName from '../../../utils/splitName';
 MemberForm.propTypes = {
   isEdit: PropTypes.bool,
   currentData: PropTypes.object,
+  isLoading: PropTypes.bool,
 };
 
-export default function MemberForm({ isEdit, currentData }) {
+export default function MemberForm({ isEdit, currentData, isLoading }) {
   const navigate = useNavigate();
 
   const { enqueueSnackbar } = useSnackbar();
@@ -39,13 +40,13 @@ export default function MemberForm({ isEdit, currentData }) {
     email: Yup.string().email(),
     password: isEdit
       ? Yup.string()
-        .test('is-password-present', 'Must be at least 6 characters', (value) => {
-          if (value && value.length > 0) {
-            return value.length >= 6;
-          }
-          return true; // If password is empty, don't enforce the 6 char rule
-        })
-        .notRequired() // password not required if empty
+          .test('is-password-present', 'Must be at least 6 characters', (value) => {
+            if (value && value.length > 0) {
+              return value.length >= 6;
+            }
+            return true; // If password is empty, don't enforce the 6 char rule
+          })
+          .notRequired() // password not required if empty
       : Yup.string().required('Password is required').min(6, 'Must be at least 6 characters'),
   });
 
@@ -84,9 +85,9 @@ export default function MemberForm({ isEdit, currentData }) {
 
     try {
       if (!isEdit) {
-        await axiosApi.post(`/members`, data);
+        await axiosApi.post(`/member`, data);
       } else {
-        await axiosApi.patch(`/members/${currentData._id}`, data);
+        await axiosApi.patch(`/member/${currentData._id}`, data);
       }
 
       reset();
@@ -94,6 +95,7 @@ export default function MemberForm({ isEdit, currentData }) {
       navigate(PATH_DASHBOARD.member.list);
     } catch (error) {
       console.error(error);
+      enqueueSnackbar(error?.message || 'Server error!', { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -101,44 +103,48 @@ export default function MemberForm({ isEdit, currentData }) {
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-      <Card sx={{ p: 3 }}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <Stack spacing={3}>
-              {isEdit && (
-                <>
-                  {/* <RHFTextField name="id" label="ID" disabled /> */}
-                  <RHFTextField name="memberId" label="Member ID" disabled />
-                </>
-              )}
-              <Stack gap={3} flexDirection="row">
-                <RHFTextField name="firstName" label="First Name" autoComplete="off" />
-                <RHFTextField name="lastName" label="Last Name" autoComplete="off" />
+      {isLoading ? (
+        <CircularProgress />
+      ) : (
+        <Card sx={{ p: 3 }}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Stack spacing={3}>
+                {isEdit && (
+                  <>
+                    {/* <RHFTextField name="id" label="ID" disabled /> */}
+                    <RHFTextField name="memberId" label="Member ID" disabled />
+                  </>
+                )}
+                <Stack gap={3} flexDirection="row">
+                  <RHFTextField name="firstName" label="First Name" autoComplete="off" />
+                  <RHFTextField name="lastName" label="Last Name" autoComplete="off" />
+                </Stack>
+                <RHFTextField name="phone" label="Phone" autoComplete="off" />
               </Stack>
-              <RHFTextField name="phone" label="Phone" autoComplete="off" />
-            </Stack>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Stack spacing={3}>
+                <RHFTextField name="email" label="Email" type="email" autoComplete="off" />
+                <RHFTextField
+                  name="password"
+                  label={`Password ${isEdit ? '(Biarkan kosong jika tidak diganti)' : ''}`}
+                  type="password"
+                  autoComplete="new-password"
+                />
+              </Stack>
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={6}>
-            <Stack spacing={3}>
-              <RHFTextField name="email" label="Email" type="email" autoComplete="off" />
-              <RHFTextField
-                name="password"
-                label={`Password ${isEdit ? '(Biarkan kosong jika tidak diganti)' : ''}`}
-                type="password"
-                autoComplete="new-password"
-              />
-            </Stack>
-          </Grid>
-        </Grid>
-        <Stack direction="row" justifyContent="flex-end" sx={{ mt: 3 }} gap={1}>
-          <Button variant="outlined" onClick={() => navigate(PATH_DASHBOARD.member.list)}>
-            Back
-          </Button>
-          <LoadingButton type="submit" variant="contained" loading={loading}>
-            {!isEdit ? 'New Member' : 'Save Changes'}
-          </LoadingButton>
-        </Stack>
-      </Card>
+          <Stack direction="row" justifyContent="flex-end" sx={{ mt: 3 }} gap={1}>
+            <Button variant="outlined" onClick={() => navigate(PATH_DASHBOARD.member.list)}>
+              Back
+            </Button>
+            <LoadingButton type="submit" variant="contained" loading={loading}>
+              {!isEdit ? 'New Member' : 'Save Changes'}
+            </LoadingButton>
+          </Stack>
+        </Card>
+      )}
     </FormProvider>
   );
 }

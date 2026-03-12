@@ -14,13 +14,13 @@ import useSettings from '../../../hooks/useSettings';
 import Page from '../../../components/Page';
 import HeaderBreadcrumbs from '../../../components/HeaderBreadcrumbs';
 // sections
-import CategoryForm from './form/CategoryForm';
+import CategoryForm from './form/SubCategoryForm';
 import schema from './schema';
-import useCategory from './service/useCategory';
+import useCategory from './service/useService';
 
 // ----------------------------------------------------------------------
 
-export default function LibraryCategoryCreate() {
+export default function LibrarySubCategoryCreate() {
   const { themeStretch } = useSettings();
   const { create, list } = useCategory();
   const { enqueueSnackbar } = useSnackbar();

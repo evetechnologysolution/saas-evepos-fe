@@ -84,7 +84,7 @@ export default function VoucherList() {
     const [, params] = queryKey; // Extract query params
     const queryString = new URLSearchParams(params).toString(); // Build query string
     try {
-      const res = await axios.get(`/vouchers?${queryString}`);
+      const res = await axios.get(`/voucher?${queryString}`);
       setCountData(res?.data?.totalDocs || 0);
       return res.data;
     } catch (error) {
@@ -102,7 +102,7 @@ export default function VoucherList() {
         search: controller.search || "",
         bazaar: "no",
         // sort: "isBazaar:desc,date:desc"
-        sort: "date:desc"
+        sort: "createdAt:desc"
       },
     ],
     getData
@@ -149,7 +149,7 @@ export default function VoucherList() {
   const handleDelete = async () => {
     setLoadingDelete(true);
     if (selectedId) {
-      await axios.delete(`/vouchers/${selectedId}`);
+      await axios.delete(`/voucher/${selectedId}`);
       client.invalidateQueries("listVoucher");
       enqueueSnackbar("Delete success!");
     }

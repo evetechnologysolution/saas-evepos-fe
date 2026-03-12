@@ -1,6 +1,6 @@
-import PropTypes from "prop-types";
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 // @mui
 import {
   Box,
@@ -14,21 +14,21 @@ import {
   Typography,
   TableContainer,
   TablePagination,
-} from "@mui/material";
-import Scrollbar from "../../../components/Scrollbar";
-import Label from "../../../components/Label";
-import Iconify from "../../../components/Iconify";
-import { TableHeadCustom, TableNoData } from "../../../components/table";
+} from '@mui/material';
+import Scrollbar from '../../../components/Scrollbar';
+import Label from '../../../components/Label';
+import Iconify from '../../../components/Iconify';
+import { TableHeadCustom, TableNoData } from '../../../components/table';
 // sections
-import MemberHistoryTableRow from "./MemberHistoryTableRow";
-import MemberVoucherTableRow from "./MemberVoucherTableRow";
+import MemberHistoryTableRow from './MemberHistoryTableRow';
+import MemberVoucherTableRow from './MemberVoucherTableRow';
 // routes
-import { PATH_DASHBOARD } from "../../../routes/paths";
+import { PATH_DASHBOARD } from '../../../routes/paths';
 // utils
-import useAuth from "../../../hooks/useAuth";
-import axios from "../../../utils/axios";
-import { numberWithCommas } from "../../../utils/getData";
-import { maskedPhone } from "../../../utils/masked";
+import useAuth from '../../../hooks/useAuth';
+import axios from '../../../utils/axios';
+import { numberWithCommas } from '../../../utils/getData';
+import { maskedPhone } from '../../../utils/masked';
 
 // ----------------------------------------------------------------------
 
@@ -39,18 +39,18 @@ MemberForm.propTypes = {
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: "date", label: "Date", align: "center" },
-  { id: "description", label: "Description", align: "left" },
-  { id: "point", label: "Point", align: "center" },
-  { id: "expiry", label: "Expiry Date", align: "center" },
+  { id: 'date', label: 'Date', align: 'center' },
+  { id: 'description', label: 'Description', align: 'left' },
+  { id: 'point', label: 'Point', align: 'center' },
+  { id: 'expiry', label: 'Expiry Date', align: 'center' },
 ];
 
 const VOUCHER_TABLE_HEAD = [
-  { id: "date", label: "Date", align: "center" },
-  { id: "name", label: "Voucher", align: "left" },
-  { id: "voucherCode", label: "Voucher Code", align: "left" },
-  { id: "isUsed", label: "Status", align: "center" },
-  { id: "expiry", label: "Expiry Date", align: "center" },
+  { id: 'date', label: 'Date', align: 'center' },
+  { id: 'name', label: 'Voucher', align: 'left' },
+  { id: 'voucherCode', label: 'Voucher Code', align: 'left' },
+  { id: 'isUsed', label: 'Status', align: 'center' },
+  { id: 'expiry', label: 'Expiry Date', align: 'center' },
 ];
 
 // ----------------------------------------------------------------------
@@ -66,12 +66,12 @@ export default function MemberForm({ currentData }) {
 
   const [controller, setController] = useState({
     page: 0,
-    rowsPerPage: 25
+    rowsPerPage: 25,
   });
 
   const [controllerVoucher, setControllerVoucher] = useState({
     page: 0,
-    rowsPerPage: 25
+    rowsPerPage: 25,
   });
 
   const isNotFound = !tableData.length;
@@ -87,7 +87,7 @@ export default function MemberForm({ currentData }) {
       setResult(res.data.docs);
       setCountResult(res.data.totalDocs);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error('Error fetching data:', error);
     }
   };
 
@@ -101,14 +101,16 @@ export default function MemberForm({ currentData }) {
   useEffect(() => {
     if (!data?._id) return; // Early return if member ID is not available
 
-    const url = `/member-vouchers?page=${controllerVoucher.page + 1}&perPage=${controllerVoucher.rowsPerPage}&member=${data._id}`;
+    const url = `/member-voucher?page=${controllerVoucher.page + 1}&perPage=${controllerVoucher.rowsPerPage}&member=${
+      data._id
+    }`;
     fetchData(url, setTableVoucherData, setCountVoucherData);
   }, [controllerVoucher, data]);
 
   const handlePageChange = (event, newPage) => {
     setController({
       ...controller,
-      page: newPage
+      page: newPage,
     });
   };
 
@@ -116,14 +118,14 @@ export default function MemberForm({ currentData }) {
     setController({
       ...controller,
       rowsPerPage: parseInt(event.target.value, 10),
-      page: 0
+      page: 0,
     });
   };
 
   const handleVoucherPageChange = (event, newPage) => {
     setControllerVoucher({
       ...controllerVoucher,
-      page: newPage
+      page: newPage,
     });
   };
 
@@ -131,7 +133,7 @@ export default function MemberForm({ currentData }) {
     setControllerVoucher({
       ...controllerVoucher,
       rowsPerPage: parseInt(event.target.value, 10),
-      page: 0
+      page: 0,
     });
   };
 
@@ -139,18 +141,24 @@ export default function MemberForm({ currentData }) {
     <>
       <Card sx={{ p: 3 }}>
         <Stack direction="row" justifyContent="flex-end" sx={{ mb: 3 }} gap={1}>
-          <Button variant="outlined" onClick={() => navigate(PATH_DASHBOARD.member.list)}>Back</Button>
+          <Button variant="outlined" onClick={() => navigate(PATH_DASHBOARD.member.list)}>
+            Back
+          </Button>
         </Stack>
         <Grid container spacing={3}>
           <Grid item xs={12} md={4}>
             <Stack spacing={3}>
               <Stack>
                 <Typography variant="subtitle2">Member ID</Typography>
-                <Typography variant="body2" sx={{ fontStyle: "italic" }}>{data?.memberId || "-"}</Typography>
+                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                  {data?.memberId || '-'}
+                </Typography>
               </Stack>
               <Stack>
                 <Typography variant="subtitle2">Name</Typography>
-                <Typography variant="body2" sx={{ fontStyle: "italic" }}>{data?.name || "-"}</Typography>
+                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                  {data?.name || '-'}
+                </Typography>
               </Stack>
             </Stack>
           </Grid>
@@ -158,20 +166,19 @@ export default function MemberForm({ currentData }) {
             <Stack spacing={3}>
               <Stack>
                 <Typography variant="subtitle2">Phone</Typography>
-                <Typography variant="body2" sx={{ fontStyle: "italic" }}>
-                  {!data?.phone?.includes("EM") ?
-                    maskedPhone(user?.role === "Super Admin", data?.phone) || "-"
-                    : "-"
-                  }
+                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                  {!data?.phone?.includes('EM') ? maskedPhone(['owner', 'super admin']?.includes(user?.role), data?.phone) || '-' : '-'}
                 </Typography>
               </Stack>
               <Stack>
                 <Typography variant="subtitle2">Address</Typography>
-                <Typography variant="body2" sx={{ fontStyle: "italic" }}>{data?.address || "-"}</Typography>
+                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                  {data?.address || '-'}
+                </Typography>
               </Stack>
             </Stack>
           </Grid>
-          <Grid item xs={12} md={4}>
+          {/* <Grid item xs={12} md={4}>
             <Stack spacing={3}>
               <Stack>
                 <Typography variant="subtitle2">Point</Typography>
@@ -204,11 +211,11 @@ export default function MemberForm({ currentData }) {
                 </div>
               </Stack>
             </Stack>
-          </Grid>
+          </Grid> */}
         </Grid>
 
         {/* point history */}
-        <div>
+        {/* <div>
           <Divider sx={{ my: 3 }} />
           <Typography variant="subtitle1" sx={{ mb: 1 }}>Point History</Typography>
           <Box>
@@ -246,27 +253,23 @@ export default function MemberForm({ currentData }) {
               />
             </Box>
           </Box>
-        </div>
+        </div> */}
 
         {/* voucher history */}
         <div>
           <Divider sx={{ my: 3 }} />
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>Voucher History</Typography>
+          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+            Voucher History
+          </Typography>
           <Box>
             <Scrollbar>
-              <TableContainer sx={{ minWidth: 980, position: "relative" }}>
+              <TableContainer sx={{ minWidth: 980, position: 'relative' }}>
                 <Table size="small">
-                  <TableHeadCustom
-                    headLabel={VOUCHER_TABLE_HEAD}
-                    rowCount={tableVoucherData.length}
-                  />
+                  <TableHeadCustom headLabel={VOUCHER_TABLE_HEAD} rowCount={tableVoucherData.length} />
 
                   <TableBody>
                     {tableVoucherData.map((row) => (
-                      <MemberVoucherTableRow
-                        key={row._id}
-                        row={row}
-                      />
+                      <MemberVoucherTableRow key={row._id} row={row} />
                     ))}
 
                     <TableNoData isNotFound={isNotFoundVoucher} />
@@ -275,7 +278,7 @@ export default function MemberForm({ currentData }) {
               </TableContainer>
             </Scrollbar>
 
-            <Box sx={{ position: "relative" }}>
+            <Box sx={{ position: 'relative' }}>
               <TablePagination
                 rowsPerPageOptions={[25, 50, 100]}
                 component="div"

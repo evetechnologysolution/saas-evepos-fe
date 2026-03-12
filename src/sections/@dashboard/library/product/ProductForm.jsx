@@ -96,13 +96,15 @@ export default function ProductForm({ isEdit, currentData }) {
       description: currentData?.description || '',
       productionPrice: currentData?.productionPrice || 0,
       productionNotes: currentData?.productionNotes || '',
-      category: currentData?.category || null,
-      subcategory: currentData?.subcategory || null,
+      category: currentData?.category || '',
+      subcategory: currentData?.subcategory || '',
       unit: currentData?.unit || 'pcs',
       listNumber: currentData?.listNumber || '',
-      extraNotes: currentData?.extraNotes || false,
-      isRecommended: currentData?.isRecommended || false,
-      isAvailable: currentData?.isAvailable || false,
+      extraNotes: currentData?.extraNotes ?? false,
+      isRecommended: currentData?.isRecommended ?? false,
+      isAvailable: currentData?.isAvailable ?? true,
+      minimumOrderQty: currentData?.minimumOrderQty || 0,
+      isHaveMinimumQty: currentData?.minimumOrderQty > 0,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentData]
@@ -195,6 +197,7 @@ export default function ProductForm({ isEdit, currentData }) {
       formData.append('productionNotes', data.productionNotes || '');
       formData.append('description', data.description || '');
       formData.append('unit', data.unit);
+      formData.append('minimumOrderQty', data.isHaveMinimumQty ? data.minimumOrderQty : 0);
 
       // relasi
       formData.append('category', data.category || '');
@@ -360,7 +363,6 @@ export default function ProductForm({ isEdit, currentData }) {
                   setValue('productionPrice', Number(values.value));
                 }}
               />
-
               {/* <RHFTextField name="productionNotes" label="Production Notes" autoComplete="off" multiline rows={5} /> */}
 
               <RHFSelect name="unit" label="Unit" placeholder="Unit" SelectProps={{ native: false }}>
@@ -394,6 +396,41 @@ export default function ProductForm({ isEdit, currentData }) {
                 ))}
               </RHFSelect>
 
+              <RHFSwitch
+                name="isHaveMinimumQty"
+                labelPlacement="start"
+                label={
+                  <>
+                    <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                      Minimum Qty
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                      Turn off if the product has no minimum qty
+                    </Typography>
+                  </>
+                }
+                sx={{ mx: 0, width: 1, justifyContent: 'space-between' }}
+              />
+              {getValues('isHaveMinimumQty') && (
+                <NumericFormat
+                  customInput={RHFTextField}
+                  name="minimumOrderQty"
+                  label="Minimum Order"
+                  autoComplete="off"
+                  decimalScale={2}
+                  decimalSeparator="."
+                  thousandSeparator=","
+                  allowNegative={false}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="start">{getValues('unit')}</InputAdornment>,
+                  }}
+                  value={getValues('minimumOrderQty') === 0 ? '' : getValues('minimumOrderQty')}
+                  onValueChange={(values) => {
+                    setValue('minimumOrderQty', Number(values.value));
+                  }}
+                />
+              )}
+
               <div>
                 <Typography variant="subtitle2" sx={{ mb: 1 }}>
                   List Number
@@ -424,124 +461,133 @@ export default function ProductForm({ isEdit, currentData }) {
                 )}
               </div>
 
-              <Typography variant="subtitle1">List of Variant</Typography>
-              {ctx.variant?.length === 0 && <CircularProgress />}
-              {ctx.variant?.length > 0 &&
-                variantList?.map((variant, index) => (
-                  <Stack key={index} flexDirection="row" alignItems="center" justifyContent="center" gap={2}>
-                    <RHFSelect
-                      name={`variant${index}`}
-                      SelectProps={{ native: false }}
-                      onChange={(e) => handleVariantChange(e, index)}
-                      value={variant?.variantRef || ''}
-                      required
-                    >
-                      <MenuItem
-                        value=""
-                        sx={{
-                          mx: 1,
-                          borderRadius: 0.75,
-                          typography: 'body2',
-                          fontStyle: 'italic',
-                          color: 'text.secondary',
-                        }}
-                        disabled
-                      >
-                        Select One
-                      </MenuItem>
-                      <Divider />
-                      {ctx.variant.map((item, n) => (
-                        <MenuItem
-                          key={n}
-                          value={item._id}
-                          sx={{
-                            mx: 1,
-                            my: 0.5,
-                            borderRadius: 0.75,
-                            typography: 'body2',
-                          }}
-                          disabled={variantList.some((v) => v.variantRef === item._id)}
+              <div>
+                <Typography variant="subtitle1">List of Variant</Typography>
+                {ctx.loadVariant && <CircularProgress />}
+                {!ctx.loadVariant &&
+                  (ctx.variant?.length > 0 ? (
+                    variantList?.map((variant, index) => (
+                      <Stack key={index} flexDirection="row" alignItems="center" justifyContent="center" gap={2}>
+                        <RHFSelect
+                          name={`variant${index}`}
+                          SelectProps={{ native: false }}
+                          onChange={(e) => handleVariantChange(e, index)}
+                          value={variant?.variantRef || ''}
+                          required
                         >
-                          <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <Typography variant="body2">{item.name}</Typography>
-                            <Typography variant="body2" color="primary">
-                              {item.options.map((field, i) => (
-                                <span key={i}>
-                                  {field.name}
-                                  {item.options.length > 1 && i !== item.options.length - 1 && ', '}
-                                </span>
-                              ))}
-                            </Typography>
-                          </div>
-                        </MenuItem>
-                      ))}
-                    </RHFSelect>
-                    <FormControlLabel
-                      name={`isRequired[${index}]`}
-                      labelPlacement="start"
-                      sx={{ mx: 0, width: 0.5, justifyContent: 'space-between' }}
-                      control={
-                        <CustomSwitch
-                          checked={Boolean(variant.isMandatory)}
-                          onChange={(e) => handleVariantMandatory(e.target.checked, index)}
+                          <MenuItem
+                            value=""
+                            sx={{
+                              mx: 1,
+                              borderRadius: 0.75,
+                              typography: 'body2',
+                              fontStyle: 'italic',
+                              color: 'text.secondary',
+                            }}
+                            disabled
+                          >
+                            Select One
+                          </MenuItem>
+                          <Divider />
+                          {ctx.variant.map((item, n) => (
+                            <MenuItem
+                              key={n}
+                              value={item._id}
+                              sx={{
+                                mx: 1,
+                                my: 0.5,
+                                borderRadius: 0.75,
+                                typography: 'body2',
+                              }}
+                              disabled={variantList.some((v) => v.variantRef === item._id)}
+                            >
+                              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <Typography variant="body2">{item.name}</Typography>
+                                <Typography variant="body2" color="primary">
+                                  {item.options.map((field, i) => (
+                                    <span key={i}>
+                                      {field.name}
+                                      {item.options.length > 1 && i !== item.options.length - 1 && ', '}
+                                    </span>
+                                  ))}
+                                </Typography>
+                              </div>
+                            </MenuItem>
+                          ))}
+                        </RHFSelect>
+                        <FormControlLabel
+                          name={`isRequired[${index}]`}
+                          labelPlacement="start"
+                          sx={{ mx: 0, width: 0.5, justifyContent: 'space-between' }}
+                          control={
+                            <CustomSwitch
+                              checked={Boolean(variant.isMandatory)}
+                              onChange={(e) => handleVariantMandatory(e.target.checked, index)}
+                            />
+                          }
+                          label={
+                            <>
+                              <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                                Mandatory
+                              </Typography>
+                              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                Enable for mandatory
+                              </Typography>
+                            </>
+                          }
                         />
-                      }
-                      label={
-                        <>
-                          <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                            Mandatory
-                          </Typography>
-                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            Enable for mandatory
-                          </Typography>
-                        </>
-                      }
-                    />
-                    <FormControlLabel
-                      name={`isMultiple[${index}]`}
-                      labelPlacement="start"
-                      sx={{ mx: 0, width: 0.5, justifyContent: 'space-between' }}
-                      control={
-                        <CustomSwitch
-                          checked={Boolean(variant.isMultiple)}
-                          onChange={(e) => handleVariantMultiple(e.target.checked, index)}
+                        <FormControlLabel
+                          name={`isMultiple[${index}]`}
+                          labelPlacement="start"
+                          sx={{ mx: 0, width: 0.5, justifyContent: 'space-between' }}
+                          control={
+                            <CustomSwitch
+                              checked={Boolean(variant.isMultiple)}
+                              onChange={(e) => handleVariantMultiple(e.target.checked, index)}
+                            />
+                          }
+                          label={
+                            <>
+                              <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                                Multiple Select
+                              </Typography>
+                              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                Enable for multiple
+                              </Typography>
+                            </>
+                          }
                         />
-                      }
-                      label={
-                        <>
-                          <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                            Multiple Select
-                          </Typography>
-                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            Enable for multiple
-                          </Typography>
-                        </>
-                      }
-                    />
-                    <Stack alignItems="flex-end">
-                      <Button
-                        color="error"
-                        variant="contained"
-                        sx={{
-                          boxShadow: '0',
-                          p: 0,
-                          minWidth: 30,
-                          height: 30,
-                          mb: 0.5,
-                          bgcolor: '#FFC2B4',
-                          color: 'red',
-                          '&:hover': {
-                            bgcolor: '#FFC2B4',
-                          },
-                        }}
-                        size="large"
-                        onClick={() => handleOptionRemove(index)}
-                      >
-                        <Iconify icon="eva:trash-2-outline" width={20} height={20} />
-                      </Button>
-                    </Stack>
-                  </Stack>
-                ))}
+                        <Stack alignItems="flex-end">
+                          <Button
+                            color="error"
+                            variant="contained"
+                            sx={{
+                              boxShadow: '0',
+                              p: 0,
+                              minWidth: 30,
+                              height: 30,
+                              mb: 0.5,
+                              bgcolor: '#FFC2B4',
+                              color: 'red',
+                              '&:hover': {
+                                bgcolor: '#FFC2B4',
+                              },
+                            }}
+                            size="large"
+                            onClick={() => handleOptionRemove(index)}
+                          >
+                            <Iconify icon="eva:trash-2-outline" width={20} height={20} />
+                          </Button>
+                        </Stack>
+                      </Stack>
+                    ))
+                  ) : (
+                    <Typography variant="body2" fontStyle="italic" color="text.secondary">
+                      Variant is empty
+                    </Typography>
+                  ))}
+              </div>
+
               <Stack alignItems="flex-end">
                 <Button variant="text" onClick={handleVariantAdd} disabled={ctx.variant?.length === 0}>
                   <Iconify icon="eva:plus-fill" width={20} height={20} /> Add Variant

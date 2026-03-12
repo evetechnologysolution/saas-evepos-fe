@@ -1,17 +1,17 @@
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 // @mui
-import { Box, Typography } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { Box, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 // utils
-import numberWithCommas from "../../../utils/numberWithCommas";
+import numberWithCommas from '../../../utils/numberWithCommas';
 
-import "./OptionCard.scss";
+import './OptionCard.scss';
 
 // ----------------------------------------------------------------------
 
 OptionCard.propTypes = {
   active: PropTypes.bool,
-  isBag: PropTypes.bool,
+  isConditional: PropTypes.bool,
   disabled: PropTypes.bool,
   onClick: PropTypes.func,
   title: PropTypes.string,
@@ -30,23 +30,25 @@ export default function OptionCard(props) {
 
   return (
     <Box
-      className={`option-cards ${props.disabled ? "disabled" : ""}`}
+      className={`option-cards ${props.disabled ? 'disabled' : ''}`}
       onClick={handleClick}
       sx={{
-        border: props.active ? `2px solid ${theme.palette.primary.main}` : "2px solid #ffffff",
-        height: "100%",
-        minHeight: "70px",
+        border: props.active ? `2px solid ${theme.palette.primary.main}` : '2px solid #ffffff',
+        height: '100%',
+        minHeight: '70px',
         ...(props.isMultiple && {
-          borderBottomLeftRadius: "0 !important",
-          borderBottomRightRadius: "0 !important",
+          borderBottomLeftRadius: '0 !important',
+          borderBottomRightRadius: '0 !important',
         }),
       }}
     >
       {props.title && (
-        <div className="option-cards__description" style={{ textAlign: "center" }}>
+        <div className="option-cards__description" style={{ textAlign: 'center' }}>
           <Typography variant="subtitle1">{props.title}</Typography>
-          {!props.isBag && (
-            <Typography variant="body2" color="primary">Rp. {numberWithCommas(props.price)}</Typography>
+          {!props.isConditional && (
+            <Typography variant="body2" color="primary">
+              Rp. {numberWithCommas(props.price || 0)}
+            </Typography>
           )}
         </div>
       )}

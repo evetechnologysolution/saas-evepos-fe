@@ -1,10 +1,15 @@
-export const generateRandomId = (limitChar = 10) => {
-    const randomNum = Math.floor(Math.random() * Date.now()) + Math.floor(Math.random() * 1000000);
+export const generateRandomOrderId = (randomLength = 5) => {
+  const now = new Date();
 
-    // Mengubah angka menjadi string dan mengambil limit karakter pertama
-    const id = randomNum.toString().slice(0, limitChar);
+  const currYear = now.getFullYear().toString().slice(-2);
+  const currMonth = String(now.getMonth() + 1).padStart(2, '0');
+  const currDate = String(now.getDate()).padStart(2, '0');
 
-    const currYear = new Date().getFullYear();
+  const max = 10 ** randomLength;
 
-    return `ORD${currYear}${id}`;
-}
+  const random = Math.floor(Math.random() * max)
+    .toString()
+    .padStart(randomLength, '0');
+
+  return `OR${currYear}${currMonth}${currDate}${random}`;
+};

@@ -4,17 +4,8 @@
     "browser": true,
     "node": true
   },
-  "extends": [
-    "airbnb",
-    "plugin:jsx-a11y/recommended",
-    "plugin:react-hooks/recommended",
-    "prettier"
-  ],
-  "plugins": [
-    "react",
-    "react-hooks",
-    "prettier"
-  ],
+  "extends": ["airbnb", "plugin:jsx-a11y/recommended", "plugin:react-hooks/recommended", "prettier"],
+  "plugins": ["react", "react-hooks", "prettier"],
   "parser": "@babel/eslint-parser",
   "parserOptions": {
     "ecmaVersion": 8,
@@ -22,9 +13,13 @@
     "ecmaFeatures": {
       "experimentalObjectRestSpread": true,
       "impliedStrict": true
+    },
+    "babelOptions": {
+      "presets": ["@babel/preset-react"]
     }
   },
   "rules": {
+    // "import/order": "off",
     "no-shadow": 0,
     "no-console": 0,
     "react/jsx-key": 1,

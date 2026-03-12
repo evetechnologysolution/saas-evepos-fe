@@ -1,19 +1,17 @@
-export function handleMutationFeedback(promise, { successMsg, errorMsg, enqueueSnackbar, onSuccess }) {
+export function handleMutationFeedback(
+  promise,
+  { successMsg = 'Berhasil disimpan', errorMsg = 'Terjadi kesalahan!', enqueueSnackbar, onSuccess } = {} // <-- penting supaya tidak error
+) {
   return promise
     .then((res) => {
-      enqueueSnackbar(successMsg, { variant: 'success' });
-
-      if (typeof onSuccess === 'function') {
-        onSuccess(res);
-      }
-
+      enqueueSnackbar?.(successMsg, { variant: 'success' });
+      onSuccess?.(res);
       return res;
     })
     .catch((error) => {
-      const msg = error?.response?.data?.message || error?.message || errorMsg || 'Terjadi kesalahan!';
+      const msg = error?.response?.data?.message || error?.message || errorMsg;
 
-      enqueueSnackbar(msg, { variant: 'error' });
-
-      throw error;
+      enqueueSnackbar?.(String(msg), { variant: 'error' });
+      // throw error;
     });
 }

@@ -1,0 +1,63 @@
+import PropTypes from 'prop-types';
+// @mui
+import { styled, Stack, TableRow, TableCell, Button } from '@mui/material';
+import Iconify from 'src/components/Iconify';
+
+import { formatDate2 } from 'src/utils/getData';
+
+// ----------------------------------------------------------------------
+
+StatusTableRow.propTypes = {
+  row: PropTypes.object,
+  onEditRow: PropTypes.func,
+  onDeleteRow: PropTypes.func,
+};
+
+const CustomTableRow = styled(TableRow)(() => ({
+  '&.MuiTableRow-hover:hover': {
+    // boxShadow: 'inset 8px 0 0 #fff, inset -8px 0 0 #fff',
+    borderRadius: '8px',
+  },
+}));
+
+export default function StatusTableRow({ row, onEditRow, onDeleteRow }) {
+  const { createdAt, name, previousName, listNumber, archived } = row;
+
+  return (
+    <CustomTableRow hover>
+      <TableCell align="center">{formatDate2(createdAt)}</TableCell>
+
+      <TableCell>{name}</TableCell>
+      <TableCell>{previousName || '-'}</TableCell>
+
+      <TableCell align="center">{listNumber}</TableCell>
+      <TableCell align="center">{archived ? 'Yes' : 'No'}</TableCell>
+
+      <TableCell align="center">
+        <Stack direction="row" justifyContent="center" gap={1}>
+          <Button
+            title="Archive"
+            variant="contained"
+            sx={{ p: 0, minWidth: 35, height: 35 }}
+            onClick={() => {
+              onEditRow();
+            }}
+          >
+            <Iconify icon="eva:archive-outline" sx={{ width: 24, height: 24 }} />
+          </Button>
+          {/* <Button
+            title="Delete"
+            variant="contained"
+            color="error"
+            sx={{ p: 0, minWidth: 35, height: 35 }}
+            onClick={() => {
+              onDeleteRow();
+            }}
+          >
+            <Iconify icon="eva:trash-2-outline" sx={{ width: 24, height: 24 }} />
+          </Button> */}
+        </Stack>
+      </TableCell>
+    </CustomTableRow>
+  );
+}

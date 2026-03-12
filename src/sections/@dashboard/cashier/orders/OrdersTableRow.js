@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useState, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { paramCase } from 'change-case';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from 'react-query';
 import { useSnackbar } from 'notistack';
@@ -110,7 +109,6 @@ export default function OrdersTableRow({ row, local, closeLocal, onDeleteRow }) 
     _id,
     orderId,
     createdAt,
-    date,
     // staff,
     customer,
     customerRef,
@@ -135,6 +133,7 @@ export default function OrdersTableRow({ row, local, closeLocal, onDeleteRow }) 
     cardAccountName,
     cardNumber,
     isScan,
+    progressRef,
   } = row;
 
   let statusColor;
@@ -150,7 +149,7 @@ export default function OrdersTableRow({ row, local, closeLocal, onDeleteRow }) 
     statusColor = 'error';
   }
 
-  const isBagDay = orders.find((row) => row.isLaundryBag);
+  // const isConditional = orders.find((row) => row.promotionLabel !== '');
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -259,7 +258,8 @@ Terima kasih telah menggunakan layanan kami 🙏`;
     ctx.setCurrentOrderID(_id);
     ctx.setDisplayOrderID(orderId);
     ctx.setBill(orders);
-    ctx.setOrderDate(createdAt || date);
+    ctx.setProgress(progressRef?.log?.length > 0 ? progressRef?.log : []);
+    ctx.setOrderDate(createdAt);
     if (customer.name) {
       ctx.setCustomerData(customer);
       ctx.setCustomerName(customer.name);
@@ -315,7 +315,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
   const handleCancelOrder = async () => {
     setIsLoading(true);
     await axios.patch(`/order/raw/${_id}`, { status: 'cancel' });
-    client.invalidateQueries('orders');
+    client.invalidateQueries(['orders']);
     setOpenCancel(false);
     setIsLoading(false);
     enqueueSnackbar(`Cancel Order ${orderId || _id} success!`);
@@ -324,7 +324,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
   const handleGeneratePoint = async () => {
     setIsLoading(true);
     await axios.patch(`/order/generate-point/${_id}`);
-    client.invalidateQueries('orders');
+    client.invalidateQueries(['orders']);
     setOpenGenerate(false);
     setIsLoading(false);
     enqueueSnackbar(`Generate Point ${orderId || _id} success!`);
@@ -342,7 +342,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
       cardNumber: '',
     };
     await axios.patch(`/order/raw/${_id}`, updated);
-    client.invalidateQueries('orders');
+    client.invalidateQueries(['orders']);
     setOpenCancelPayment(false);
     setIsLoading(false);
     enqueueSnackbar(`Cancel payment for Order ${orderId || _id} success!`);
@@ -351,7 +351,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
   return (
     <>
       <CustomTableRow hover>
-        <TableCell align="center">{formatDate2(createdAt || date)}</TableCell>
+        <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
         {!local && (
           <TableCell>
@@ -359,18 +359,19 @@ Terima kasih telah menggunakan layanan kami 🙏`;
               <Label variant="ghost" color={showOrderType() === 'Onsite' ? 'default' : 'info'}>
                 {showOrderType()}
               </Label>
-              {isBagDay && (
+              {/* {isConditional?.promotionLabel && (
                 <Label variant="ghost" color="warning">
-                  Laundry Bag
+                  {isConditional?.promotionLabel}
                 </Label>
-              )}
+              )} */}
             </Stack>
             {user?.role?.toLowerCase() === 'admin' || user?.role?.toLowerCase() === 'owner' ? (
               <Link
                 component="button"
                 variant="subtitle2"
                 underline="hover"
-                onClick={() => navigate(PATH_DASHBOARD.cashier.ordersEdit(paramCase(_id)))}
+                // onClick={() => navigate(PATH_DASHBOARD.cashier.ordersEdit(paramCase(_id)))}
+                onClick={() => navigate(`/dashboard/cashier/orders/${_id}/edit`)}
               >
                 {!orderId ? _id : orderId}
               </Link>
@@ -387,7 +388,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
           {customer?.phone && (
             <p>
               {!customer?.phone?.includes('EM')
-                ? maskedPhone(user?.role === 'Super Admin', customer?.phone) || '-'
+                ? maskedPhone(['owner', 'super admin']?.includes(user?.role), customer?.phone) || '-'
                 : '-'}
             </p>
           )}
@@ -410,30 +411,24 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                   )}
                   {orders[0].variant.length > 0 &&
                     orders[0].variant.map((item, i) => (
-                      <span key={i}>
-                        <br />
+                      <p key={i}>
                         <em>{`${item?.name} : ${item?.option} ${item?.qty > 1 ? `(x${item?.qty})` : ''}`}</em>
-                      </span>
+                      </p>
                     ))}
                   {orders[0].notes && (
-                    <span>
-                      <br />
+                    <p>
                       <em>Notes : {orders[0].notes}</em>
-                    </span>
+                    </p>
                   )}
-                  {orders[0].isLaundryBag && orders[0].discountLaundryBag && (
-                    <span>
-                      <br />
-                      <em>Laundry Bag Day</em>
-                    </span>
+                  {orders[0].promotionLabel && (
+                    <p>
+                      <em>{`(${orders[0].promotionLabel})`}</em>
+                    </p>
                   )}
                   {orders.length > 1 && (
-                    <>
-                      <br />
-                      <Link component="button" variant="inherit" underline="hover" onClick={handleOpen}>
-                        {`+${orders.length - 1} produk lainnya`}
-                      </Link>
-                    </>
+                    <Link component="button" variant="inherit" underline="hover" onClick={handleOpen}>
+                      {`+${orders.length - 1} produk lainnya`}
+                    </Link>
                   )}
                 </>
               ) : (
@@ -515,7 +510,6 @@ Terima kasih telah menggunakan layanan kami 🙏`;
 
         {!local && (
           <TableCell align="center">
-            {/* <Button type="button" variant="contained" title="Print Laundry" onClick={() => handlePrintLaundry()}> */}
             <Button type="button" variant="contained" title="Print Laundry" onClick={() => setOpenPrintLaundry(true)}>
               <Iconify icon="solar:printer-outline" sx={{ width: 24, height: 24 }} />
             </Button>
@@ -564,7 +558,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                     <Iconify icon="solar:printer-outline" sx={{ width: 24, height: 24 }} />
                     Print Nota
                   </MenuItem>
-                  {/* {(user?.role?.toLowerCase() === 'admin' || user?.role?.toLowerCase() === 'owner') && (
+                  {['owner', 'admin']?.includes(user?.role?.toLowerCase()) && (
                     <MenuItem
                       disabled={status?.toLowerCase() === 'paid' && isScan !== true ? Boolean(false) : Boolean(true)}
                       onClick={() => {
@@ -575,10 +569,10 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                       <Iconify icon="bi:coin" sx={{ width: 24, height: 24 }} />
                       Generate Point
                     </MenuItem>
-                  )} */}
+                  )}
                   <MenuItem
                     disabled={
-                      status?.toLowerCase() === 'paid' && formatDate(createdAt || date) === formatDate(new Date())
+                      status?.toLowerCase() === 'paid' && formatDate(createdAt) === formatDate(new Date())
                         ? Boolean(false)
                         : Boolean(true)
                     }
@@ -663,35 +657,26 @@ Terima kasih telah menggunakan layanan kami 🙏`;
             </thead>
             <tbody style={{ fontSize: '0.85rem' }}>
               {orders?.map((item, i) => {
-                let originPrice = item?.price;
-                if (item?.isLaundryBag) {
-                  originPrice += item?.discountLaundryBag;
-                }
+                const originPrice = item?.price;
                 return (
                   <tr key={i}>
                     <td style={{ padding: '0.2rem 0' }}>
-                      {item?.name}
+                      <p>{item?.name}</p>
                       {item?.variant?.length > 0 &&
                         item?.variant?.map((field, v) => (
-                          <span key={v}>
-                            <br />
+                          <p key={v}>
                             <em>{`${field?.name} : ${field?.option} ${field?.qty > 1 ? `(x${field?.qty})` : ''}`}</em>
-                          </span>
+                          </p>
                         ))}
                       {item?.notes && (
-                        <span>
-                          <br />
+                        <p>
                           <em>Notes : {item?.notes}</em>
-                        </span>
+                        </p>
                       )}
-                      {item?.isLaundryBag && item?.discountLaundryBag && (
-                        <span>
-                          <br />
-                          <em>
-                            Laundry Bag Day :{' '}
-                            {`(-Rp. ${numberWithCommas(Math.round(item?.discountLaundryBag * item?.qty))})`}
-                          </em>
-                        </span>
+                      {item?.promotionLabel && (
+                        <p>
+                          <em>{`(${item?.promotionLabel})`}</em>
+                        </p>
                       )}
                     </td>
                     <td align="center">
@@ -704,31 +689,13 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                     <td align="right">
                       <span
                         style={{
-                          color:
-                            item?.promotionType === 1 || item?.promotionType === 2 || item?.isLaundryBag
-                              ? 'red'
-                              : '#212B36',
+                          color: item?.promotionType === 1 || item?.promotionType === 2 ? 'red' : '#212B36',
                           textDecoration:
-                            item?.promotionType === 1 || item?.promotionType === 2 || item?.isLaundryBag
-                              ? 'line-through'
-                              : 'none',
+                            item?.promotionType === 1 || item?.promotionType === 2 ? 'line-through' : 'none',
                         }}
                       >
                         Rp. {numberWithCommas(Math.round(item?.qty * originPrice))}
                       </span>
-                      {item?.isLaundryBag && item?.discountLaundryBag && (
-                        <>
-                          <br />
-                          <span
-                            style={{
-                              textDecoration: item?.promotionType === 1 && item?.isLaundryBag ? 'line-through' : 'none',
-                            }}
-                          >
-                            Rp. {numberWithCommas(Math.round(item?.qty * item?.price))}
-                          </span>
-                          <br />
-                        </>
-                      )}
                       {item?.promotionType === 1 && (
                         <>
                           <br />

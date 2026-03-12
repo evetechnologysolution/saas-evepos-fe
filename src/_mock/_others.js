@@ -14,7 +14,7 @@ export const _carouselsMembers = [...Array(5)].map((_, index) => ({
   id: _mock.id(index),
   name: _mock.name.fullName(index),
   role: _mock.role(index),
-  avatar: `https://minimal-assets-api-dev.vercel.app/assets/images/members/member-${index + 1}.jpg`,
+  avatar: `https://minimal-assets-api-dev.vercel.app/assets/images/member/member-${index + 1}.jpg`,
 }));
 
 // ----------------------------------------------------------------------

@@ -27,7 +27,7 @@ const CustomTableRow = styled(TableRow)(() => ({
 }));
 
 export default function BlogTableRow({ row, onEditRow, onDeleteRow }) {
-  const { date, title, image, spoiler, views, slug, section } = row;
+  const { createdAt, title, image, spoiler, views, slug, section } = row;
 
   const showImage = () => {
     if (!image && section === 'Kitchen') {
@@ -41,7 +41,7 @@ export default function BlogTableRow({ row, onEditRow, onDeleteRow }) {
 
   return (
     <CustomTableRow hover>
-      <TableCell align="center">{formatDate2(date)}</TableCell>
+      <TableCell align="center">{formatDate2(createdAt)}</TableCell>
       <TableCell>
 
         <Image

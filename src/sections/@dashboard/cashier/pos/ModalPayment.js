@@ -51,7 +51,7 @@ import {
   combinedDateTime,
   formatDate2,
 } from '../../../../utils/getData';
-import { generateRandomId } from '../../../../utils/generateRandom';
+import { generateRandomOrderId } from '../../../../utils/generateRandom';
 import PaymentType from './PaymentType';
 import PaymentItem from './PaymentItem';
 import PrintReceipt from './PrintReceipt';
@@ -480,7 +480,7 @@ export default function ModalPayment(props) {
     if (voucherCode && voucherCode !== ctx.voucherCode) {
       setLoading(true);
       try {
-        const res = await axiosInstance.get(`/member-vouchers/scan/${voucherCode}`);
+        const res = await axiosInstance.get(`/member-voucher/scan/${voucherCode}`);
         if (res?.status === 200 && res?.data) {
           if (res?.data?.voucherType !== 1) {
             setError(true);
@@ -585,7 +585,7 @@ export default function ModalPayment(props) {
 
     const isUpdate = ctx.currentOrderID !== '';
     const orderUid = isUpdate ? ctx.currentOrderID : uuid();
-    const orderId = isUpdate ? ctx.displayOrderID : generateRandomId(6);
+    const orderId = isUpdate ? ctx.displayOrderID : generateRandomOrderId();
 
     if (type === 'save') {
       setCurrUid(orderUid);
@@ -612,8 +612,8 @@ export default function ModalPayment(props) {
       discount,
       discountPrice,
       deliveryPrice,
-      donation,
       billedAmount: ctx.actualPrice,
+      roundingAmount: donation,
       productionAmount: ctx.productionAmount,
       notes,
       isScan: ctx?.customerScan || false,
@@ -636,6 +636,7 @@ export default function ModalPayment(props) {
     if (ctx.customerName) {
       objData.customer = {
         ...(ctx.customerData || {}),
+        memberId: undefined, // reset karena dicek lagi di BE
         name: ctx.customerName,
         phone: ctx.customerPhone,
         notes: ctx.customerNotes,

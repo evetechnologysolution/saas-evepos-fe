@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 // @mui
 import {
   Alert,
@@ -14,47 +14,47 @@ import {
   Typography,
   TableContainer,
   TablePagination,
-  InputAdornment
-} from "@mui/material";
-import { LoadingButton } from "@mui/lab";
-import Scrollbar from "../../../components/Scrollbar";
-import Label from "../../../components/Label";
-import Iconify from "../../../components/Iconify";
-import { TableHeadCustom, TableNoData } from "../../../components/table";
+  InputAdornment,
+} from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import Scrollbar from '../../../components/Scrollbar';
+import Label from '../../../components/Label';
+import Iconify from '../../../components/Iconify';
+import { TableHeadCustom, TableNoData } from '../../../components/table';
 // sections
-import HistoryOrderTableRow from "./HistoryOrderTableRow";
-import HistoryPointTableRow from "./HistoryPointTableRow";
-import HistoryVoucherTableRow from "./HistoryVoucherTableRow";
+import HistoryOrderTableRow from './HistoryOrderTableRow';
+import HistoryPointTableRow from './HistoryPointTableRow';
+import HistoryVoucherTableRow from './HistoryVoucherTableRow';
 // utils
-import useAuth from "../../../hooks/useAuth";
-import axios from "../../../utils/axios";
-import { numberWithCommas } from "../../../utils/getData";
-import { maskedPhone } from "../../../utils/masked";
+import useAuth from '../../../hooks/useAuth';
+import axios from '../../../utils/axios';
+import { numberWithCommas } from '../../../utils/getData';
+import { maskedPhone } from '../../../utils/masked';
 
 // ----------------------------------------------------------------------
 
 const ORDER_THEAD = [
-  { id: "date", label: "Order Date", align: "center" },
-  { id: "paymentDate", label: "Payment Date", align: "center" },
-  { id: "orderId", label: "Order ID", align: "left" },
-  { id: "orderType", label: "Order Type", align: "center" },
-  { id: "status", label: "Status", align: "center" },
-  { id: "billedAmount", label: "Total", align: "center" },
+  { id: 'date', label: 'Order Date', align: 'center' },
+  { id: 'paymentDate', label: 'Payment Date', align: 'center' },
+  { id: 'orderId', label: 'Order ID', align: 'left' },
+  { id: 'orderType', label: 'Order Type', align: 'center' },
+  { id: 'status', label: 'Status', align: 'center' },
+  { id: 'billedAmount', label: 'Total', align: 'center' },
 ];
 
 const POINT_THEAD = [
-  { id: "date", label: "Date", align: "center" },
-  { id: "description", label: "Description", align: "left" },
-  { id: "point", label: "Point", align: "center" },
-  { id: "expiry", label: "Expiry Date", align: "center" },
+  { id: 'date', label: 'Date', align: 'center' },
+  { id: 'description', label: 'Description', align: 'left' },
+  { id: 'point', label: 'Point', align: 'center' },
+  { id: 'expiry', label: 'Expiry Date', align: 'center' },
 ];
 
 const VOUCHER_THEAD = [
-  { id: "date", label: "Date", align: "center" },
-  { id: "name", label: "Voucher", align: "left" },
-  { id: "voucherCode", label: "Voucher Code", align: "left" },
-  { id: "isUsed", label: "Status", align: "center" },
-  { id: "expiry", label: "Expiry Date", align: "center" },
+  { id: 'date', label: 'Date', align: 'center' },
+  { id: 'name', label: 'Voucher', align: 'left' },
+  { id: 'voucherCode', label: 'Voucher Code', align: 'left' },
+  { id: 'isUsed', label: 'Status', align: 'center' },
+  { id: 'expiry', label: 'Expiry Date', align: 'center' },
 ];
 
 // ----------------------------------------------------------------------
@@ -64,7 +64,7 @@ export default function HistoryForm() {
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState(false);
   const [isEmpty, setIsEmpty] = useState(false);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [data, setData] = useState({});
   const [orderData, setOrderData] = useState([]);
   const [countOrder, setCountOrder] = useState(0);
@@ -75,17 +75,17 @@ export default function HistoryForm() {
 
   const [controllerOrder, setControllerOrder] = useState({
     page: 0,
-    rowsPerPage: 25
+    rowsPerPage: 25,
   });
 
   const [controllerPoint, setControllerPoint] = useState({
     page: 0,
-    rowsPerPage: 25
+    rowsPerPage: 25,
   });
 
   const [controllerVoucher, setControllerVoucher] = useState({
     page: 0,
-    rowsPerPage: 25
+    rowsPerPage: 25,
   });
 
   const isNotFoundOrder = !orderData.length;
@@ -100,7 +100,7 @@ export default function HistoryForm() {
     setCountPoint(0);
     setVoucherData([]);
     setCountVoucher(0);
-  }
+  };
 
   const handleSearch = async () => {
     if (!search) {
@@ -112,14 +112,14 @@ export default function HistoryForm() {
       setLoading(true);
       setAlert(false);
 
-      const res = await axios.get("/members/track", {
-        params: { search }
+      const res = await axios.get('/member/track', {
+        params: { search },
       });
 
       setData(res.data);
-      setIsEmpty(false)
+      setIsEmpty(false);
     } catch (error) {
-      if (error.message === "Data not found") {
+      if (error.message === 'Data not found') {
         setIsEmpty(true);
         resetData();
       }
@@ -130,7 +130,7 @@ export default function HistoryForm() {
   };
 
   const handleOnKeyPress = (e) => {
-    if (e.key === "Enter" && search) {
+    if (e.key === 'Enter' && search) {
       handleSearch();
     }
   };
@@ -141,35 +141,39 @@ export default function HistoryForm() {
       setResult(res.data.docs);
       setCountResult(res.data.totalDocs);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error('Error fetching data:', error);
     }
   };
 
   useEffect(() => {
     if (!data?.name) return; // Early return if member ID is not available
 
-    const url = `/orders?page=${controllerOrder.page + 1}&perPage=${controllerOrder.rowsPerPage}&search=${data.phone}`;
+    const url = `/order?page=${controllerOrder.page + 1}&perPage=${controllerOrder.rowsPerPage}&search=${data.phone}`;
     fetchData(url, setOrderData, setCountOrder);
   }, [controllerOrder, data]);
 
   useEffect(() => {
     if (!data?._id) return; // Early return if member ID is not available
 
-    const url = `/point-history?page=${controllerPoint.page + 1}&perPage=${controllerPoint.rowsPerPage}&member=${data._id}`;
+    const url = `/point-history?page=${controllerPoint.page + 1}&perPage=${controllerPoint.rowsPerPage}&member=${
+      data._id
+    }`;
     fetchData(url, setPointData, setCountPoint);
   }, [controllerPoint, data]);
 
   useEffect(() => {
     if (!data?._id) return; // Early return if member ID is not available
 
-    const url = `/member-vouchers?page=${controllerVoucher.page + 1}&perPage=${controllerVoucher.rowsPerPage}&member=${data._id}`;
+    const url = `/member-voucher?page=${controllerVoucher.page + 1}&perPage=${controllerVoucher.rowsPerPage}&member=${
+      data._id
+    }`;
     fetchData(url, setVoucherData, setCountVoucher);
   }, [controllerVoucher, data]);
 
   const handlePageChangeOrder = (event, newPage) => {
     setControllerOrder({
       ...controllerOrder,
-      page: newPage
+      page: newPage,
     });
   };
 
@@ -177,14 +181,14 @@ export default function HistoryForm() {
     setControllerOrder({
       ...controllerOrder,
       rowsPerPage: parseInt(event.target.value, 10),
-      page: 0
+      page: 0,
     });
   };
 
   const handlePageChangePoint = (event, newPage) => {
     setControllerPoint({
       ...controllerPoint,
-      page: newPage
+      page: newPage,
     });
   };
 
@@ -192,14 +196,14 @@ export default function HistoryForm() {
     setControllerPoint({
       ...controllerPoint,
       rowsPerPage: parseInt(event.target.value, 10),
-      page: 0
+      page: 0,
     });
   };
 
   const handleVoucherPageChange = (event, newPage) => {
     setControllerVoucher({
       ...controllerVoucher,
-      page: newPage
+      page: newPage,
     });
   };
 
@@ -207,7 +211,7 @@ export default function HistoryForm() {
     setControllerVoucher({
       ...controllerVoucher,
       rowsPerPage: parseInt(event.target.value, 10),
-      page: 0
+      page: 0,
     });
   };
 
@@ -224,32 +228,27 @@ export default function HistoryForm() {
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={handleOnKeyPress}
             error={!search && alert ? Boolean(true) : Boolean(false)}
-            helperText={!search && alert ? "Search value is required" : ""}
+            helperText={!search && alert ? 'Search value is required' : ''}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Iconify icon="eva:search-fill" sx={{ color: "text.disabled", width: 20, height: 20 }} />
+                  <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
                 </InputAdornment>
               ),
             }}
-            sx={{ width: { md: "50%" } }}
+            sx={{ width: { md: '50%' } }}
           />
           <Stack direction="row" alignItems="center" gap={1}>
-            <LoadingButton
-              title="Search"
-              variant="contained"
-              loading={loading}
-              onClick={() => handleSearch()}
-            >
+            <LoadingButton title="Search" variant="contained" loading={loading} onClick={() => handleSearch()}>
               <Iconify icon="eva:search-fill" sx={{ width: 25, height: 25 }} />
             </LoadingButton>
             <Button
               title="Reset"
               variant="contained"
               color="warning"
-              sx={{ color: "white" }}
+              sx={{ color: 'white' }}
               onClick={() => {
-                setSearch("");
+                setSearch('');
                 setIsEmpty(false);
                 resetData();
               }}
@@ -268,11 +267,15 @@ export default function HistoryForm() {
             <Stack spacing={3}>
               <Stack>
                 <Typography variant="subtitle2">Member ID</Typography>
-                <Typography variant="body2" sx={{ fontStyle: "italic" }}>{data?.memberId || "-"}</Typography>
+                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                  {data?.memberId || '-'}
+                </Typography>
               </Stack>
               <Stack>
                 <Typography variant="subtitle2">Name</Typography>
-                <Typography variant="body2" sx={{ fontStyle: "italic" }}>{data?.name || "-"}</Typography>
+                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                  {data?.name || '-'}
+                </Typography>
               </Stack>
             </Stack>
           </Grid>
@@ -280,16 +283,17 @@ export default function HistoryForm() {
             <Stack spacing={3}>
               <Stack>
                 <Typography variant="subtitle2">Phone</Typography>
-                <Typography variant="body2" sx={{ fontStyle: "italic" }}>
-                  {!data?.phone?.includes("EM") ?
-                    maskedPhone(user?.role === "Super Admin", data?.phone) || "-"
-                    : "-"
-                  }
+                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                  {!data?.phone?.includes('EM')
+                    ? maskedPhone(['owner', 'super admin']?.includes(user?.role), data?.phone) || '-'
+                    : '-'}
                 </Typography>
               </Stack>
               <Stack>
                 <Typography variant="subtitle2">Address</Typography>
-                <Typography variant="body2" sx={{ fontStyle: "italic" }}>{data?.address || "-"}</Typography>
+                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                  {data?.address || '-'}
+                </Typography>
               </Stack>
             </Stack>
           </Grid>
@@ -298,14 +302,12 @@ export default function HistoryForm() {
               <Stack>
                 <Typography variant="subtitle2">Point</Typography>
                 <div>
-                  <Label
-                    variant="ghost"
-                    color="success"
-                    sx={{ minWidth: 60 }}
-                  >
+                  <Label variant="ghost" color="success" sx={{ minWidth: 60 }}>
                     <Stack flexDirection="row" justifyContent="space-between" width="100%">
-                      <Iconify icon="tabler:coin-filled" sx={{ width: 20, height: 20 }} />{" "}
-                      <Typography variant="subtitle2" sx={{ fontStyle: "italic" }}>{numberWithCommas(data?.point || 0)}</Typography>
+                      <Iconify icon="tabler:coin-filled" sx={{ width: 20, height: 20 }} />{' '}
+                      <Typography variant="subtitle2" sx={{ fontStyle: 'italic' }}>
+                        {numberWithCommas(data?.point || 0)}
+                      </Typography>
                     </Stack>
                   </Label>
                 </div>
@@ -313,14 +315,12 @@ export default function HistoryForm() {
               <Stack>
                 <Typography variant="subtitle2">Voucher</Typography>
                 <div>
-                  <Label
-                    variant="ghost"
-                    color="warning"
-                    sx={{ minWidth: 60 }}
-                  >
+                  <Label variant="ghost" color="warning" sx={{ minWidth: 60 }}>
                     <Stack flexDirection="row" justifyContent="space-between" width="100%">
-                      <Iconify icon="mdi:voucher" sx={{ width: 20, height: 20 }} />{" "}
-                      <Typography variant="subtitle2" sx={{ fontStyle: "italic" }}>{numberWithCommas(data?.voucher || 0)}</Typography>
+                      <Iconify icon="mdi:voucher" sx={{ width: 20, height: 20 }} />{' '}
+                      <Typography variant="subtitle2" sx={{ fontStyle: 'italic' }}>
+                        {numberWithCommas(data?.voucher || 0)}
+                      </Typography>
                     </Stack>
                   </Label>
                 </div>
@@ -332,22 +332,18 @@ export default function HistoryForm() {
         {/* order history */}
         <div>
           <Divider sx={{ my: 3 }} />
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>Order History</Typography>
+          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+            Order History
+          </Typography>
           <Box>
             <Scrollbar>
-              <TableContainer sx={{ minWidth: 980, position: "relative" }}>
+              <TableContainer sx={{ minWidth: 980, position: 'relative' }}>
                 <Table size="small">
-                  <TableHeadCustom
-                    headLabel={ORDER_THEAD}
-                    rowCount={orderData.length}
-                  />
+                  <TableHeadCustom headLabel={ORDER_THEAD} rowCount={orderData.length} />
 
                   <TableBody>
                     {orderData.map((row) => (
-                      <HistoryOrderTableRow
-                        key={row._id}
-                        row={row}
-                      />
+                      <HistoryOrderTableRow key={row._id} row={row} />
                     ))}
 
                     <TableNoData isNotFound={isNotFoundOrder} />
@@ -356,7 +352,7 @@ export default function HistoryForm() {
               </TableContainer>
             </Scrollbar>
 
-            <Box sx={{ position: "relative" }}>
+            <Box sx={{ position: 'relative' }}>
               <TablePagination
                 rowsPerPageOptions={[25, 50, 100]}
                 component="div"
@@ -373,22 +369,18 @@ export default function HistoryForm() {
         {/* point history */}
         <div>
           <Divider sx={{ my: 3 }} />
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>Point History</Typography>
+          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+            Point History
+          </Typography>
           <Box>
             <Scrollbar>
-              <TableContainer sx={{ minWidth: 980, position: "relative" }}>
+              <TableContainer sx={{ minWidth: 980, position: 'relative' }}>
                 <Table size="small">
-                  <TableHeadCustom
-                    headLabel={POINT_THEAD}
-                    rowCount={pointData.length}
-                  />
+                  <TableHeadCustom headLabel={POINT_THEAD} rowCount={pointData.length} />
 
                   <TableBody>
                     {pointData.map((row) => (
-                      <HistoryPointTableRow
-                        key={row._id}
-                        row={row}
-                      />
+                      <HistoryPointTableRow key={row._id} row={row} />
                     ))}
 
                     <TableNoData isNotFound={isNotFoundPoint} />
@@ -397,7 +389,7 @@ export default function HistoryForm() {
               </TableContainer>
             </Scrollbar>
 
-            <Box sx={{ position: "relative" }}>
+            <Box sx={{ position: 'relative' }}>
               <TablePagination
                 rowsPerPageOptions={[25, 50, 100]}
                 component="div"
@@ -414,22 +406,18 @@ export default function HistoryForm() {
         {/* voucher history */}
         <div>
           <Divider sx={{ my: 3 }} />
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>Voucher History</Typography>
+          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+            Voucher History
+          </Typography>
           <Box>
             <Scrollbar>
-              <TableContainer sx={{ minWidth: 980, position: "relative" }}>
+              <TableContainer sx={{ minWidth: 980, position: 'relative' }}>
                 <Table size="small">
-                  <TableHeadCustom
-                    headLabel={VOUCHER_THEAD}
-                    rowCount={voucherData.length}
-                  />
+                  <TableHeadCustom headLabel={VOUCHER_THEAD} rowCount={voucherData.length} />
 
                   <TableBody>
                     {voucherData.map((row) => (
-                      <HistoryVoucherTableRow
-                        key={row._id}
-                        row={row}
-                      />
+                      <HistoryVoucherTableRow key={row._id} row={row} />
                     ))}
 
                     <TableNoData isNotFound={isNotFoundVoucher} />
@@ -438,7 +426,7 @@ export default function HistoryForm() {
               </TableContainer>
             </Scrollbar>
 
-            <Box sx={{ position: "relative" }}>
+            <Box sx={{ position: 'relative' }}>
               <TablePagination
                 rowsPerPageOptions={[25, 50, 100]}
                 component="div"

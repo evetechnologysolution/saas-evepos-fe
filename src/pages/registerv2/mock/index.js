@@ -149,6 +149,7 @@ export const cities = {
   'jawa tengah': [
     { name: 'Semarang', value: 'semarang' },
     { name: 'Surakarta', value: 'surakarta' },
+    { name: 'Sukoharjo', value: 'sukoharjo' },
     { name: 'Pekalongan', value: 'pekalongan' },
     { name: 'Tegal', value: 'tegal' },
     { name: 'Salatiga', value: 'salatiga' },
@@ -169,6 +170,7 @@ export const cities = {
     { name: 'Blitar', value: 'blitar' },
     { name: 'Bojonegoro', value: 'bojonegoro' },
     { name: 'Madiun', value: 'madiun' },
+    { name: 'Ngawi', value: 'ngawi' },
     { name: 'Mojokerto', value: 'mojokerto' },
   ],
 
