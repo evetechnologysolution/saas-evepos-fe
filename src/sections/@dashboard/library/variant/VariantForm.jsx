@@ -61,6 +61,7 @@ export default function VariantForm({ isEdit, currentData }) {
     () => ({
       id: currentData?._id || '',
       name: currentData?.name || '',
+      caption: currentData?.caption || '',
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentData]
@@ -71,6 +72,7 @@ export default function VariantForm({ isEdit, currentData }) {
     defaultValues: {
       id: currentData?._id || '',
       name: currentData?.name || '',
+      caption: currentData?.caption || '',
       options: currentData?.options || [
         { name: '', price: 0, productionPrice: 0, productionNotes: '', isMulti: false },
       ],
@@ -118,7 +120,10 @@ export default function VariantForm({ isEdit, currentData }) {
         <Grid item xs={12} md={8}>
           <Card sx={{ p: 3 }}>
             <Stack spacing={3}>
-              <RHFTextField name="name" label="Variant Name" autoComplete="off" />
+              <Stack direction={{ xs: 'column', sm: 'row' }} gap={3}>
+                <RHFTextField name="name" label="Variant Name" autoComplete="off" />
+                <RHFTextField name="caption" label="Variant Caption" autoComplete="off" />
+              </Stack>
 
               <Typography variant="subtitle1">List of Options</Typography>
 
