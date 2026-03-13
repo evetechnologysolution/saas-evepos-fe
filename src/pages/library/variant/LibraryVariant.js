@@ -66,6 +66,7 @@ export default function LibraryVariant() {
     page: controller.page + 1,
     perPage: controller.rowsPerPage,
     search: controller.search,
+    perfume: 'no',
   });
 
   const handlePageChange = (event, newPage) => {
