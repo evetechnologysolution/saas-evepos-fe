@@ -7,7 +7,7 @@ export const useVariant = (options = {}) => {
   return useQuery(
     ['allVariant'],
     async () => {
-      const res = await axios.get('/variant/all');
+      const res = await axios.get('/variant/all?perfume=no');
       return sortByName(res.data);
     },
     {
