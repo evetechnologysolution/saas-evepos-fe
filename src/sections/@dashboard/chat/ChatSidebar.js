@@ -102,7 +102,7 @@ export default function ChatSidebar() {
     const [, params] = queryKey; // Extract query params
     const queryString = new URLSearchParams(params).toString(); // Build query string
     try {
-      const res = await axios.get(`/messages/conversations?${queryString}`);
+      const res = await axios.get(`/message/conversations?${queryString}`);
       setCountData(res?.data?.totalDocs || 0);
       return res.data;
     } catch (error) {

@@ -4,7 +4,7 @@ import { useQueryClient } from 'react-query';
 // hooks
 import useAuth from '../hooks/useAuth';
 // queries
-// import { useAllNotif } from '../hooks/queries/useAllNotif';
+import { useAllNotif } from '../hooks/queries/useAllNotif';
 import { useProduct } from '../hooks/queries/useProduct';
 import { useCategory } from '../hooks/queries/useCategory';
 import { useSubcategory } from '../hooks/queries/useSubcategory';
@@ -27,8 +27,7 @@ const MainContextProvider = ({ children }) => {
   const [selectedSubs, setSelectedSubs] = useState({});
 
   // queries
-  // const { data: allNotif = null } = useAllNotif();
-  const allNotif = null;
+  const { data: allNotif = null } = useAllNotif();
   const { data: product = [], isLoading: loadingProduct } = useProduct({
     enabled: isUserReady,
   });

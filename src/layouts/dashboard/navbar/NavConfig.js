@@ -94,13 +94,13 @@ export const useNavConfig = () => {
           icon: ICONS.scan,
           roles: evewashAllowed(['owner', 'admin', 'cashier']),
         },
-        // {
-        //   title: 'Chat',
-        //   path: PATH_DASHBOARD.chat.root,
-        //   icon: ICONS.chat,
-        //   roles: evewashAllowed(['owner', 'cashier']),
-        //   total: ctx?.allNotif?.unreadMessage || 0,
-        // },
+        {
+          title: 'Chat',
+          path: PATH_DASHBOARD.chat.root,
+          icon: ICONS.chat,
+          roles: evewashAllowed(['owner', 'cashier']),
+          total: ctx?.allNotif?.unreadMessage || 0,
+        },
         {
           title: 'Track History',
           path: PATH_DASHBOARD.history.root,

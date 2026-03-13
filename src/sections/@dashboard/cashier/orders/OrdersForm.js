@@ -113,7 +113,7 @@ export default function OrdersForm({ currentData }) {
     statusColor = 'success';
   } else if (data?.status?.toLowerCase() === 'half paid') {
     statusColor = 'secondary';
-  } else if (data?.status?.toLowerCase() === 'pending') {
+  } else if (data?.status?.toLowerCase() === 'unpaid') {
     statusColor = 'warning';
   } else if (data?.status?.toLowerCase() === 'refund') {
     statusColor = 'default';

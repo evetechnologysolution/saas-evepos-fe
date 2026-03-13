@@ -42,7 +42,7 @@ export default function ChatWindow() {
   useEffect(() => {
     if (id) {
       const updateStatus = async () => {
-        const res = await axios.patch(`/messages/admin/read/${id}`);
+        const res = await axios.patch(`/message/admin/read/${id}`);
         if (res.status === 200) {
           client.invalidateQueries("listConversations");
           client.invalidateQueries("allNotif");
