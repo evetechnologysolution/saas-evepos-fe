@@ -105,7 +105,7 @@ export default function OrdersForm({ currentData }) {
     statusColor = 'success';
   } else if (data?.status?.toLowerCase() === 'half paid') {
     statusColor = 'secondary';
-  } else if (data?.status?.toLowerCase() === 'pending') {
+  } else if (data?.status?.toLowerCase() === 'unpaid') {
     statusColor = 'warning';
   } else if (data?.status?.toLowerCase() === 'refund') {
     statusColor = 'default';
@@ -149,7 +149,7 @@ export default function OrdersForm({ currentData }) {
     setLoading(true);
     const updatedOrder = {
       date: new Date(),
-      status: 'pending',
+      status: 'unpaid',
       discountPrice,
       productionAmount: sumProductionPrice,
       havePaid: 0,
@@ -364,14 +364,9 @@ export default function OrdersForm({ currentData }) {
                                 variant="body2"
                                 sx={{
                                   fontStyle: 'italic',
-                                  color:
-                                    item.promotionType === 1 || item.promotionType === 2
-                                      ? 'red'
-                                      : '#212B36',
+                                  color: item.promotionType === 1 || item.promotionType === 2 ? 'red' : '#212B36',
                                   textDecoration:
-                                    item.promotionType === 1 || item.promotionType === 2
-                                      ? 'line-through'
-                                      : 'none',
+                                    item.promotionType === 1 || item.promotionType === 2 ? 'line-through' : 'none',
                                 }}
                               >
                                 Rp. {numberWithCommas(Math.round(item.qty * originPrice))}

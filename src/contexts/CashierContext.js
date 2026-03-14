@@ -1,140 +1,16 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { isTuesday } from 'date-fns';
+import { useQueryClient } from 'react-query';
 import axios from '../utils/axios';
 import { useLocalStorage } from '../utils/getData';
+// hooks
+import useAuth from '../hooks/useAuth';
+import { useTax } from '../hooks/queries/useTax';
 // dummyData
 import { tableNameData } from '../dummyData';
 
-export const cashierContext = createContext({
-  isLaundryBagDay: false,
-  orderDate: '',
-  setOrderDate: () => {},
-  currentOrderID: '',
-  setCurrentOrderID: () => {},
-  displayOrderID: '',
-  setDisplayOrderID: () => {},
-  pax: 1,
-  setPax: () => {},
-  qrKey: '',
-  setQrKey: () => {},
-  savedOrders: [],
-  setSavedOrders: () => {},
-  progress: [],
-  setProgress: () => {},
-  bill: [],
-  setBill: () => {},
-  splitBill: [],
-  setSplitBill: () => {},
-  savedBillID: '',
-  setSavedBillID: () => {},
-  savedBill: [],
-  setSavedBill: () => {},
-  selectedBill: '',
-  setSelectedBill: () => {},
-  updatedBill: [],
-  setUpdatedBill: () => {},
-  selectedTable: null,
-  setSelectedTable: () => {},
-  orderType: '',
-  setOrderType: () => {},
-  pickupData: {},
-  setPickupData: () => {},
-  customerData: {},
-  setCustomerData: () => {},
-  customerName: '',
-  setCustomerName: () => {},
-  customerPhone: '',
-  setCustomerPhone: () => {},
-  customerNotes: '',
-  setCustomerNotes: () => {},
-  customerNew: false,
-  setCustomerNew: () => {},
-  customerScan: false,
-  setCustomerScan: () => {},
-  customerPoint: 0,
-  setCustomerPoint: () => {},
-  voucherCode: '',
-  setVoucherCode: () => {},
-  // getSavedBill: () => { },
-  listTable: [],
-  setListTable: () => {},
-  qrdata: [],
-  setQrdata: () => {},
-  getQrdata: () => {},
-  createQrdata: () => {},
-  updateQrdata: () => {},
-  deleteQrdata: () => {},
-  orders: [],
-  setOrders: () => {},
-  getOrders: () => {},
-  createOrders: () => {},
-  updateOrders: () => {},
-  updatePrintCount: () => {},
-  updatePrintLaundry: () => {},
-  deleteOrders: () => {},
-  createReservation: () => {},
-  updateReservation: () => {},
-  deleteReservation: () => {},
-  paymentMethod: '',
-  setPaymentMethod: () => {},
-  cardNumber: '',
-  setCardNumber: () => {},
-  notes: '',
-  setNotes: () => {},
-  dp: 0,
-  setDp: () => {},
-  deliveryPrice: 0,
-  setDeliveryPrice: () => {},
-  donation: 0,
-  setDonation: () => {},
-  discount: 0,
-  setDiscount: () => {},
-  discountPrice: 0,
-  setDiscountPrice: () => {},
-  discountLabel: '',
-  setDiscountLabel: () => {},
-  voucherDiscPrice: 0,
-  setVoucherDiscPrice: () => {},
-  splitServiceCharge: 0,
-  setSplitServiceCharge: () => {},
-  serviceCharge: 0,
-  setServiceCharge: () => {},
-  serviceChargePercentage: 0,
-  setServiceChargePercentage: () => {},
-  splitTax: 0,
-  setSplitTax: () => {},
-  tax: 0,
-  setTax: () => {},
-  taxPercentage: 0,
-  setTaxPercentage: () => {},
-  subtotalPrice: 0,
-  setSubtotalPrice: () => {},
-  actualPrice: 0,
-  setActualPrice: () => {},
-  havePaid: 0,
-  setHavePaid: () => {},
-  totalPrice: 0,
-  productionAmount: 0,
-  setProductionAmount: () => {},
-  splitAmount: 0,
-  setSplitAmount: () => {},
-  amountBill: 0,
-  setAmountBill: () => {},
-  amountPaid: 0,
-  setAmountPaid: () => {},
-  taxSetting: {},
-  setTaxSetting: () => {},
-  globalDisc: {},
-  setGlobalDisc: () => {},
-  getGlobalDisc: () => {},
-  updateGlobalDisc: () => {},
-  isSaved: false,
-  setIsSaved: () => {},
-  isFinished: false,
-  setIsFinished: () => {},
-  handleResetPos: () => {},
-});
+export const cashierContext = createContext(null);
 
 const CashierContextProvider = ({ children }) => {
   // Pos State
@@ -170,7 +46,6 @@ const CashierContextProvider = ({ children }) => {
   const [isSaved, setIsSaved] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
 
-  const [taxSetting, setTaxSetting] = useState({});
   const [globalDisc, setGlobalDisc] = useState({});
 
   const [dp, setDp] = useState(0);
@@ -192,6 +67,24 @@ const CashierContextProvider = ({ children }) => {
   const [havePaid, setHavePaid] = useState(0);
   const totalPrice = actualPrice - havePaid;
   const [productionAmount, setProductionAmount] = useState(0);
+
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const isUserReady = !!user?._id;
+
+  const { data: taxSetting = {} } = useTax({
+    enabled: isUserReady,
+  });
+
+  useEffect(() => {
+    if (!user?._id || !user?.role) return;
+
+    const keys = ['taxSetting'];
+
+    keys.forEach((key) => {
+      queryClient.invalidateQueries(key);
+    });
+  }, [user?._id, user?.role]);
 
   useEffect(() => {
     const sumPrice = bill.reduce((acc, item) => {
@@ -248,7 +141,17 @@ const CashierContextProvider = ({ children }) => {
 
     setSubtotalPrice(sumPrice);
     setActualPrice(sumPrice + serviceAmount + taxAmount - voucherDiscPrice - fixDiscPrice + deliveryPrice);
-  }, [bill, orderType, voucherDiscPrice, discount, discountPrice, discByPrice, deliveryPrice, discountLabel]);
+  }, [
+    bill,
+    orderType,
+    voucherDiscPrice,
+    discount,
+    discountPrice,
+    discByPrice,
+    deliveryPrice,
+    discountLabel,
+    taxSetting,
+  ]);
 
   // Payment State
   const [paymentMethod, setPaymentMethod] = useState('');
@@ -435,20 +338,10 @@ const CashierContextProvider = ({ children }) => {
     }
   };
 
-  const getTaxSetting = async () => {
-    try {
-      await axios.get('/tax').then((response) => {
-        setTaxSetting(response.data);
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const updateTaxSetting = async (data) => {
     try {
       await axios.post('/tax', data);
-      getTaxSetting();
+      queryClient.invalidateQueries('taxSetting');
     } catch (error) {
       console.error(error);
     }
@@ -473,10 +366,9 @@ const CashierContextProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    getTaxSetting();
-    // getGlobalDisc();
-  }, []);
+  // useEffect(() => {
+  //   getGlobalDisc();
+  // }, []);
 
   const handleResetAfterSave = () => {
     setOrderDate(new Date());
@@ -531,145 +423,198 @@ const CashierContextProvider = ({ children }) => {
     setIsFinished(false);
   };
 
-  return (
-    <cashierContext.Provider
-      value={{
-        isLaundryBagDay,
-        orderDate,
-        setOrderDate,
-        currentOrderID,
-        setCurrentOrderID,
-        displayOrderID,
-        setDisplayOrderID,
-        pax,
-        setPax,
-        qrKey,
-        setQrKey,
-        savedOrders,
-        setSavedOrders,
-        progress,
-        setProgress,
-        bill,
-        setBill,
-        splitBill,
-        setSplitBill,
-        savedBillID,
-        setSavedBillID,
-        savedBill,
-        setSavedBill,
-        selectedBill,
-        setSelectedBill,
-        updatedBill,
-        setUpdatedBill,
-        selectedTable,
-        setSelectedTable,
-        // getSavedBill,
-        orderType,
-        setOrderType,
-        pickupData,
-        setPickupData,
-        customerData,
-        setCustomerData,
-        customerName,
-        setCustomerName,
-        customerPhone,
-        setCustomerPhone,
-        customerNotes,
-        setCustomerNotes,
-        customerNew,
-        setCustomerNew,
-        customerScan,
-        setCustomerScan,
-        customerPoint,
-        setCustomerPoint,
-        voucherCode,
-        setVoucherCode,
-        listTable,
-        setListTable,
-        qrdata,
-        setQrdata,
-        getQrdata,
-        createQrdata,
-        updateQrdata,
-        deleteQrdata,
-        orders,
-        setOrders,
-        getOrders,
-        createOrders,
-        updateOrders,
-        updatePrintCount,
-        updatePrintLaundry,
-        deleteOrders,
-        createReservation,
-        updateReservation,
-        deleteReservation,
-        paymentMethod,
-        setPaymentMethod,
-        cardNumber,
-        setCardNumber,
-        notes,
-        setNotes,
-        dp,
-        setDp,
-        deliveryPrice,
-        setDeliveryPrice,
-        donation,
-        setDonation,
-        discByPrice,
-        setDiscByPrice,
-        discount,
-        setDiscount,
-        discountPrice,
-        setDiscountPrice,
-        discountLabel,
-        setDiscountLabel,
-        voucherDiscPrice,
-        setVoucherDiscPrice,
-        splitServiceCharge,
-        setSplitServiceCharge,
-        serviceCharge,
-        setServiceCharge,
-        serviceChargePercentage,
-        setServiceChargePercentage,
-        splitTax,
-        setSplitTax,
-        tax,
-        setTax,
-        taxPercentage,
-        setTaxPercentage,
-        subtotalPrice,
-        setSubtotalPrice,
-        actualPrice,
-        setActualPrice,
-        havePaid,
-        setHavePaid,
-        productionAmount,
-        setProductionAmount,
-        totalPrice,
-        splitAmount,
-        setSplitAmount,
-        amountBill,
-        setAmountBill,
-        amountPaid,
-        setAmountPaid,
-        taxSetting,
-        setTaxSetting,
-        getTaxSetting,
-        updateTaxSetting,
-        globalDisc,
-        setGlobalDisc,
-        // getGlobalDisc,
-        updateGlobalDisc,
-        isSaved,
-        setIsSaved,
-        isFinished,
-        setIsFinished,
-        handleResetPos,
-      }}
-    >
-      {children}
-    </cashierContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      isLaundryBagDay,
+      orderDate,
+      setOrderDate,
+      currentOrderID,
+      setCurrentOrderID,
+      displayOrderID,
+      setDisplayOrderID,
+      pax,
+      setPax,
+      qrKey,
+      setQrKey,
+      savedOrders,
+      setSavedOrders,
+      progress,
+      setProgress,
+      bill,
+      setBill,
+      splitBill,
+      setSplitBill,
+      savedBillID,
+      setSavedBillID,
+      savedBill,
+      setSavedBill,
+      selectedBill,
+      setSelectedBill,
+      updatedBill,
+      setUpdatedBill,
+      selectedTable,
+      setSelectedTable,
+      orderType,
+      setOrderType,
+      pickupData,
+      setPickupData,
+      customerData,
+      setCustomerData,
+      customerName,
+      setCustomerName,
+      customerPhone,
+      setCustomerPhone,
+      customerNotes,
+      setCustomerNotes,
+      customerNew,
+      setCustomerNew,
+      customerScan,
+      setCustomerScan,
+      customerPoint,
+      setCustomerPoint,
+      voucherCode,
+      setVoucherCode,
+      listTable,
+      setListTable,
+      qrdata,
+      setQrdata,
+      getQrdata,
+      createQrdata,
+      updateQrdata,
+      deleteQrdata,
+      orders,
+      setOrders,
+      getOrders,
+      createOrders,
+      updateOrders,
+      updatePrintCount,
+      updatePrintLaundry,
+      deleteOrders,
+      createReservation,
+      updateReservation,
+      deleteReservation,
+      paymentMethod,
+      setPaymentMethod,
+      cardNumber,
+      setCardNumber,
+      notes,
+      setNotes,
+      dp,
+      setDp,
+      deliveryPrice,
+      setDeliveryPrice,
+      donation,
+      setDonation,
+      discByPrice,
+      setDiscByPrice,
+      discount,
+      setDiscount,
+      discountPrice,
+      setDiscountPrice,
+      discountLabel,
+      setDiscountLabel,
+      voucherDiscPrice,
+      setVoucherDiscPrice,
+      splitServiceCharge,
+      setSplitServiceCharge,
+      serviceCharge,
+      setServiceCharge,
+      serviceChargePercentage,
+      setServiceChargePercentage,
+      splitTax,
+      setSplitTax,
+      tax,
+      setTax,
+      taxPercentage,
+      setTaxPercentage,
+      subtotalPrice,
+      setSubtotalPrice,
+      actualPrice,
+      setActualPrice,
+      havePaid,
+      setHavePaid,
+      productionAmount,
+      setProductionAmount,
+      totalPrice,
+      splitAmount,
+      setSplitAmount,
+      amountBill,
+      setAmountBill,
+      amountPaid,
+      setAmountPaid,
+      taxSetting,
+      updateTaxSetting,
+      globalDisc,
+      setGlobalDisc,
+      updateGlobalDisc,
+      isSaved,
+      setIsSaved,
+      isFinished,
+      setIsFinished,
+      handleResetPos,
+    }),
+    [
+      isLaundryBagDay,
+      orderDate,
+      currentOrderID,
+      displayOrderID,
+      pax,
+      qrKey,
+      savedOrders,
+      progress,
+      bill,
+      splitBill,
+      savedBillID,
+      savedBill,
+      selectedBill,
+      updatedBill,
+      selectedTable,
+      orderType,
+      pickupData,
+      customerData,
+      customerName,
+      customerPhone,
+      customerNotes,
+      customerNew,
+      customerScan,
+      customerPoint,
+      voucherCode,
+      listTable,
+      qrdata,
+      orders,
+      paymentMethod,
+      cardNumber,
+      notes,
+      dp,
+      deliveryPrice,
+      donation,
+      discByPrice,
+      discount,
+      discountPrice,
+      discountLabel,
+      voucherDiscPrice,
+      splitServiceCharge,
+      serviceCharge,
+      serviceChargePercentage,
+      splitTax,
+      tax,
+      taxPercentage,
+      subtotalPrice,
+      actualPrice,
+      havePaid,
+      productionAmount,
+      totalPrice,
+      splitAmount,
+      amountBill,
+      amountPaid,
+      taxSetting,
+      globalDisc,
+      isSaved,
+      isFinished,
+    ]
   );
+
+  return <cashierContext.Provider value={contextValue}>{children}</cashierContext.Provider>;
 };
 export default CashierContextProvider;
 

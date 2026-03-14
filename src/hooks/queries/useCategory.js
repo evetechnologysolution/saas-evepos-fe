@@ -2,7 +2,7 @@
 import { useQuery } from 'react-query';
 import axios from '../../utils/axios';
 
-export const useCategory = () => {
+export const useCategory = (options = {}) => {
   return useQuery(
     ['allCategory'],
     async () => {
@@ -11,6 +11,7 @@ export const useCategory = () => {
     },
     {
       refetchOnWindowFocus: false,
+      ...options,
     }
   );
 };

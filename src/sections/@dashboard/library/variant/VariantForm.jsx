@@ -14,7 +14,9 @@ import { PATH_DASHBOARD } from '../../../../routes/paths';
 // components
 import Iconify from '../../../../components/Iconify';
 import { FormProvider, RHFTextField, RHFNumericFormat } from '../../../../components/hook-form';
-// context
+// hook
+import useAuth from '../../../../hooks/useAuth';
+//
 import schema from '../../../../pages/library/variant/schema';
 import useVariant from '../../../../pages/library/variant/service/useVariant';
 // ----------------------------------------------------------------------
@@ -53,6 +55,7 @@ const CustomSwitch = styled(Switch)(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function VariantForm({ isEdit, currentData }) {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { create, update } = useVariant();
@@ -61,6 +64,8 @@ export default function VariantForm({ isEdit, currentData }) {
     () => ({
       id: currentData?._id || '',
       name: currentData?.name || '',
+      caption: currentData?.caption || '',
+      showOnWeb: currentData?.showOnWeb ?? false,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentData]
@@ -71,6 +76,8 @@ export default function VariantForm({ isEdit, currentData }) {
     defaultValues: {
       id: currentData?._id || '',
       name: currentData?.name || '',
+      caption: currentData?.caption || '',
+      showOnWeb: currentData?.showOnWeb ?? false,
       options: currentData?.options || [
         { name: '', price: 0, productionPrice: 0, productionNotes: '', isMulti: false },
       ],
@@ -118,7 +125,36 @@ export default function VariantForm({ isEdit, currentData }) {
         <Grid item xs={12} md={8}>
           <Card sx={{ p: 3 }}>
             <Stack spacing={3}>
-              <RHFTextField name="name" label="Variant Name" autoComplete="off" />
+              {user?.tenantRef?.isEvewash && (
+                <Stack flexDirection="row" justifyContent="flex-end" alignItems="center" gap={1} sx={{ width: '100%' }}>
+                  <Controller
+                    name="showOnWeb"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControlLabel
+                        label={
+                          <>
+                            <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                              Show on Website
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                              Enable to display on the website order page
+                            </Typography>
+                          </>
+                        }
+                        control={
+                          <CustomSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
+                        }
+                      />
+                    )}
+                  />
+                </Stack>
+              )}
+
+              <Stack direction={{ xs: 'column', sm: 'row' }} gap={3}>
+                <RHFTextField name="name" label="Variant Name" autoComplete="off" />
+                <RHFTextField name="caption" label="Variant Caption" autoComplete="off" />
+              </Stack>
 
               <Typography variant="subtitle1">List of Options</Typography>
 
@@ -155,25 +191,51 @@ export default function VariantForm({ isEdit, currentData }) {
                         startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
                       }}
                     />
+                    <Stack
+                      flexDirection="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      gap={1}
+                      sx={{ width: '100%' }}
+                    >
+                      <Controller
+                        name={`options.${index}.isMultiple`}
+                        control={control}
+                        render={({ field }) => (
+                          <FormControlLabel
+                            label={
+                              <>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                                  Multiple Qty
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                  Enable for multiple
+                                </Typography>
+                              </>
+                            }
+                            control={
+                              <CustomSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
+                            }
+                          />
+                        )}
+                      />
 
-                    <Controller
-                      name={`options.${index}.isMultiple`}
-                      control={control}
-                      render={({ field }) => (
-                        <FormControlLabel
-                          label="Multiple Qty"
-                          control={
-                            <CustomSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
-                          }
-                        />
+                      {fields.length > 1 && (
+                        <Button
+                          sx={{
+                            boxShadow: '0',
+                            p: 0,
+                            minWidth: 30,
+                            height: 30,
+                          }}
+                          size="large"
+                          color="error"
+                          onClick={() => remove(index)}
+                        >
+                          <Iconify icon="eva:trash-2-outline" width={20} height={20} />
+                        </Button>
                       )}
-                    />
-
-                    {fields.length > 1 && (
-                      <Button color="error" onClick={() => remove(index)}>
-                        <Iconify icon="eva:trash-2-outline" />
-                      </Button>
-                    )}
+                    </Stack>
                   </Stack>
                 </Stack>
               ))}

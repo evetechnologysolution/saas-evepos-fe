@@ -2,7 +2,7 @@
 import { useQuery } from 'react-query';
 import axios from '../../utils/axios';
 
-export const useGeneralSetting = () => {
+export const useGeneralSetting = (options = {}) => {
   return useQuery(
     ['generalSettings'],
     async () => {
@@ -11,6 +11,7 @@ export const useGeneralSetting = () => {
     },
     {
       refetchOnWindowFocus: false,
+      ...options,
     }
   );
 };

@@ -160,7 +160,7 @@ export default function Router() {
                   ),
                 },
                 {
-                  path: 'orders',
+                  path: 'order',
                   element: (
                     <RoleBasedGuard hasContent roles={['owner', 'admin', 'cashier', 'staff']}>
                       <CashierOrders />
@@ -168,7 +168,7 @@ export default function Router() {
                   ),
                 },
                 {
-                  path: 'orders/:id/edit',
+                  path: 'order/:id/edit',
                   element: (
                     <RoleBasedGuard hasContent roles={['owner', 'admin', 'cashier', 'staff']}>
                       <CashierOrdersEdit />
@@ -446,6 +446,38 @@ export default function Router() {
                   ),
                 },
                 {
+                  path: 'perfume',
+                  element: (
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin'])}>
+                      <LibraryPerfume />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'banner',
+                  element: (
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin'])}>
+                      <LibraryBanner />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'banner/new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin'])}>
+                      <LibraryBannerCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'banner/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin'])}>
+                      <LibraryBannerEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
                   path: 'promotion',
                   element: (
                     <RoleBasedGuard hasContent roles={['owner', 'admin', 'staff']}>
@@ -520,7 +552,7 @@ export default function Router() {
                 {
                   path: 'discount',
                   element: (
-                    <RoleBasedGuard hasContent roles={['forbidden']}>
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin'])}>
                       <LibraryDiscount />
                     </RoleBasedGuard>
                   ),
@@ -876,6 +908,10 @@ const LibrarySubCategoryEdit = Loadable(lazy(() => import('../pages/library/subc
 const LibraryVariant = Loadable(lazy(() => import('../pages/library/variant/LibraryVariant')));
 const LibraryVariantCreate = Loadable(lazy(() => import('../pages/library/variant/LibraryVariantCreate')));
 const LibraryVariantEdit = Loadable(lazy(() => import('../pages/library/variant/LibraryVariantEdit')));
+const LibraryPerfume = Loadable(lazy(() => import('../pages/library/perfume/PerfumeForm')));
+const LibraryBanner = Loadable(lazy(() => import('../pages/library/banner/LibraryBanner')));
+const LibraryBannerCreate = Loadable(lazy(() => import('../pages/library/banner/LibraryBannerCreate')));
+const LibraryBannerEdit = Loadable(lazy(() => import('../pages/library/banner/LibraryBannerEdit')));
 const LibraryPromotion = Loadable(lazy(() => import('../pages/library/promotion/LibraryPromotion')));
 const LibraryPromotionCreate = Loadable(lazy(() => import('../pages/library/promotion/LibraryPromotionCreate')));
 const LibraryPromotionEdit = Loadable(lazy(() => import('../pages/library/promotion/LibraryPromotionEdit')));

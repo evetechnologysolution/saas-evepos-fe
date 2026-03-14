@@ -371,7 +371,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                 variant="subtitle2"
                 underline="hover"
                 // onClick={() => navigate(PATH_DASHBOARD.cashier.ordersEdit(paramCase(_id)))}
-                onClick={() => navigate(`/dashboard/cashier/orders/${_id}/edit`)}
+                onClick={() => navigate(`/dashboard/cashier/order/${_id}/edit`)}
               >
                 {!orderId ? _id : orderId}
               </Link>

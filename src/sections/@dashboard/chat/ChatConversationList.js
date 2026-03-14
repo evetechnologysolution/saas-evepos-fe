@@ -34,7 +34,7 @@ export default function ChatConversationList({ isLoading, conversations, isOpenS
             key={item?._id}
             isOpenSidebar={isOpenSidebar}
             conversation={item}
-            onSelectConversation={() => handleSelectConversation(item?.member?._id)}
+            onSelectConversation={() => handleSelectConversation(item?.memberRef?._id)}
           />
         ) : (
           <SkeletonConversationItem key={index} />

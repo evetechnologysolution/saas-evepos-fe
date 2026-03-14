@@ -467,7 +467,7 @@ export default function ProductForm({ isEdit, currentData }) {
                 {!ctx.loadVariant &&
                   (ctx.variant?.length > 0 ? (
                     variantList?.map((variant, index) => (
-                      <Stack key={index} flexDirection="row" alignItems="center" justifyContent="center" gap={2}>
+                      <Stack key={index} flexDirection="row" alignItems="center" justifyContent="center" gap={2} mb={3}>
                         <RHFSelect
                           name={`variant${index}`}
                           SelectProps={{ native: false }}
@@ -566,12 +566,12 @@ export default function ProductForm({ isEdit, currentData }) {
                               p: 0,
                               minWidth: 30,
                               height: 30,
-                              mb: 0.5,
-                              bgcolor: '#FFC2B4',
-                              color: 'red',
-                              '&:hover': {
-                                bgcolor: '#FFC2B4',
-                              },
+                              // mb: 0.5,
+                              // bgcolor: '#FFC2B4',
+                              // color: 'red',
+                              // '&:hover': {
+                              //   bgcolor: '#FFC2B4',
+                              // },
                             }}
                             size="large"
                             onClick={() => handleOptionRemove(index)}
