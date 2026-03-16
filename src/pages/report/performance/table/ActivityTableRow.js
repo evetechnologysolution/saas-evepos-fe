@@ -29,19 +29,19 @@ const CustomTableRow = styled(TableRow)(() => ({
 
 export default function ActivityTableRow({ row }) {
   const {
-    createdAt,
+    date,
     name,
     unit,
     qty,
     orderRef: { orderId },
-    log,
+    // log,
   } = row;
   const theme = useTheme();
   const { user } = useAuth();
   const navigate = useNavigate();
   return (
     <CustomTableRow hover>
-      <TableCell align="center">{formatDate2(createdAt)}</TableCell>
+      <TableCell align="center">{formatDate2(date)}</TableCell>
 
       <TableCell>{row?.staffRef?.fullname || '-'}</TableCell>
 
