@@ -314,6 +314,14 @@ export default function Router() {
               ],
             },
             {
+              path: 'print-count',
+              element: (
+                <RoleBasedGuard hasContent roles={evewashAllowed(['owner'])}>
+                  <PrintCount />
+                </RoleBasedGuard>
+              ),
+            },
+            {
               path: 'expense',
               element: (
                 <RoleBasedGuard hasContent roles={['owner', 'admin']}>
@@ -894,6 +902,9 @@ const MemberCreate = Loadable(lazy(() => import('../pages/member/list/MemberCrea
 const MemberEdit = Loadable(lazy(() => import('../pages/member/list/MemberEdit')));
 const MemberView = Loadable(lazy(() => import('../pages/member/list/MemberView')));
 const MemberLogVoucher = Loadable(lazy(() => import('../pages/member/log-voucher/MemberLogVoucher')));
+
+// Print Count
+const PrintCount = Loadable(lazy(() => import('../pages/print-count/PrintCount')));
 
 // Library
 const LibraryProduct = Loadable(lazy(() => import('../pages/library/product/LibraryProduct')));

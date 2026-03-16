@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { useState, useRef, useEffect, useContext } from 'react';
+import { useQueryClient } from 'react-query';
 // react-to-print
 import { useReactToPrint } from 'react-to-print';
 // @mui
@@ -9,6 +10,7 @@ import { LoadingButton } from '@mui/lab';
 import Iconify from '../../../../components/Iconify';
 // hooks
 import useAuth from '../../../../hooks/useAuth';
+import axios from '../../../../utils/axios';
 // context
 import { cashierContext } from '../../../../contexts/CashierContext';
 import PrintLaundry from '../pos/PrintLaundryFromOrders';
@@ -65,6 +67,8 @@ export default function ModalPrintLaundry(props) {
   const ctx = useContext(cashierContext);
   const { user } = useAuth();
 
+  const queryClient = useQueryClient();
+
   const [isLoading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState(false);
   const [qty, setQty] = useState(0);
@@ -99,6 +103,10 @@ export default function ModalPrintLaundry(props) {
     }
     setObjData({ ...data, qtyLabel: qty });
     setAlert(false);
+    if (qty > 0) {
+      await axios.patch(`/order/raw/${data?._id}`, { notes: `Tas Laundry ${qty} pcs` });
+      queryClient.invalidateQueries('listOrders');
+    }
     setTimeout(() => {
       setShouldPrint(true);
     }, 500);
@@ -156,15 +164,15 @@ export default function ModalPrintLaundry(props) {
                 <LoadingButton variant="contained" loading={isLoading} type="submit">
                   Dengan Label
                 </LoadingButton>
-                {/* <LoadingButton
-                                    variant="contained"
-                                    color="warning"
-                                    loading={isLoading}
-                                    type="button"
-                                    onClick={() => handlePrint()}
-                                >
-                                    Tanpa Label
-                                </LoadingButton> */}
+                <LoadingButton
+                  variant="contained"
+                  color="warning"
+                  loading={isLoading}
+                  type="button"
+                  onClick={() => handlePrint()}
+                >
+                  Tanpa Label
+                </LoadingButton>
               </Stack>
             </Stack>
           </form>

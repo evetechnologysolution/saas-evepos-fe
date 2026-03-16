@@ -230,7 +230,7 @@ export default function OrdersTableRow({ row }) {
 
         <TableCell align="center">
           <Label variant="ghost" color={statusColor} sx={{ textTransform: 'capitalize' }}>
-            {status === 'pending' ? 'unpaid' : status}
+            {status}
           </Label>
         </TableCell>
 
