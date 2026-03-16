@@ -82,8 +82,8 @@ export default function ModalSave(props) {
             tableId: ctx.selectedTable?.tableId || "",
             tableName: ctx.selectedTable?.tableName || "",
             orders: ctx.bill,
-            orderType: "Manual",
-            status: "Pending"
+            orderType: "manual",
+            status: "unpaid"
         };
         const asArray = Object.entries(objBill);
         const filtered = asArray.filter(([key, value]) => value !== 0);

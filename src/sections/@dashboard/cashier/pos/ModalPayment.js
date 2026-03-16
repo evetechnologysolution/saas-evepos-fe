@@ -1365,7 +1365,7 @@ export default function ModalPayment(props) {
       )}
 
       <div style={{ overflow: 'hidden', height: 0, width: 0 }}>
-        <PrintReceipt ref={printRef} bill={ctx.bill} status="pending" />
+        <PrintReceipt ref={printRef} bill={ctx.bill} status="unpaid" />
       </div>
     </>
   );
