@@ -34,12 +34,11 @@ const TABLE_HEAD = [
   { id: 'date', label: 'Date', align: 'center' },
   { id: 'staff', label: 'Staff', align: 'left' },
   { id: 'order', label: 'Order ID', align: 'left' },
-  { id: 'service', label: 'Service', align: 'left' },
   { id: 'qty', label: 'Qty (Kg)', align: 'center' },
   { id: 'qty', label: 'Qty (Pcs)', align: 'center' },
   { id: 'qty', label: 'Qty (M2)', align: 'center' },
   { id: 'qty', label: 'Qty (Cup)', align: 'center' },
-  //   { id: 'status', label: 'Activity', align: 'center' },
+  { id: 'status', label: 'Activity', align: 'center' },
 ];
 
 // ----------------------------------------------------------------------
