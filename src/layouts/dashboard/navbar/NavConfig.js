@@ -138,12 +138,12 @@ export const useNavConfig = () => {
         //   roles: ['owner', 'admin', 'cashier'],
         //   total: ctx?.allNotif?.newPostcard || 0,
         // },
-        // {
-        //   title: 'Print Count',
-        //   path: PATH_DASHBOARD.printCout.root,
-        //   icon: ICONS.printCount,
-        //   roles: ['owner'],
-        // },
+        {
+          title: 'Print Count',
+          path: PATH_DASHBOARD.printCout.root,
+          icon: ICONS.printCount,
+          roles: evewashAllowed(['owner']),
+        },
         {
           title: 'Cash Cashier',
           path: PATH_DASHBOARD.cashCashier.root,

@@ -326,6 +326,15 @@ const PrintReceipt = React.forwardRef(({ bill, status = 'paid' }, ref) => {
             )} */}
 
       <Divider />
+
+      {ctx.primaryNotes && (
+        <>
+          <p style={{ textAlign: 'left' }}>Notes :</p>
+          <p style={{ textAlign: 'left' }}>{ctx.primaryNotes}</p>
+          <Divider />
+        </>
+      )}
+
       {ctm.receiptHeader?.notes && (
         <table style={{ width: '100%', fontSize: '8px', marginBottom: '10px' }}>
           <tbody>

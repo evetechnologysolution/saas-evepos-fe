@@ -115,6 +115,7 @@ export default function OrdersTableRow({ row, local, closeLocal, onDeleteRow }) 
     orders,
     orderType,
     status,
+    notes,
     dp,
     serviceCharge,
     serviceChargePercentage,
@@ -219,9 +220,8 @@ export default function OrdersTableRow({ row, local, closeLocal, onDeleteRow }) 
         const priceAfterDiscount = order.price - discountPerItem;
         const totalPrice = Math.round(order.qty * priceAfterDiscount);
 
-        return `- ${order.name} x${
-          order.qty
-        } @ Rp${priceAfterDiscount.toLocaleString()} = Rp${totalPrice.toLocaleString()}`;
+        return `- ${order.name} x${order.qty
+          } @ Rp${priceAfterDiscount.toLocaleString()} = Rp${totalPrice.toLocaleString()}`;
       })
       .join('\n');
 
@@ -260,6 +260,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
     ctx.setBill(orders);
     ctx.setProgress(progressRef?.log?.length > 0 ? progressRef?.log : []);
     ctx.setOrderDate(createdAt);
+    ctx.setPrimaryNotes(notes || '');
     if (customer.name) {
       ctx.setCustomerData(customer);
       ctx.setCustomerName(customer.name);
@@ -480,8 +481,8 @@ Terima kasih telah menggunakan layanan kami 🙏`;
 
         <TableCell align="center">
           {status?.toLowerCase() === 'paid' ||
-          status?.toLowerCase() === 'refund' ||
-          status?.toLowerCase() === 'cancel' ? (
+            status?.toLowerCase() === 'refund' ||
+            status?.toLowerCase() === 'cancel' ? (
             <div>
               {/* {user?.role === "Super Admin" ? (
                 <Link component="button" variant="body2" underline="hover" onClick={() => setOpenPayment(true)}>
@@ -703,7 +704,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                             Rp.{' '}
                             {numberWithCommas(
                               Math.round(item?.qty * item?.price) -
-                                (Math.round(item?.qty * item?.price) * item?.discountAmount) / 100
+                              (Math.round(item?.qty * item?.price) * item?.discountAmount) / 100
                             )}
                           </span>
                           <br />

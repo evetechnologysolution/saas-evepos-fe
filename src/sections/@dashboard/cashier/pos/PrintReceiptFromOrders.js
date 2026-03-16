@@ -139,7 +139,7 @@ const PrintReceiptFromOrders = React.forwardRef(({ data }, ref) => {
                       Rp.{' '}
                       {numberWithCommas(
                         Math.round(item.qty * item.price) -
-                          (Math.round(item.qty * item.price) * item.discountAmount) / 100
+                        (Math.round(item.qty * item.price) * item.discountAmount) / 100
                       )}
                     </td>
                   </tr>
@@ -256,6 +256,15 @@ const PrintReceiptFromOrders = React.forwardRef(({ data }, ref) => {
       </table>
 
       <Divider />
+
+      {data?.notes && (
+        <>
+          <p style={{ textAlign: 'left' }}>Notes :</p>
+          <p style={{ textAlign: 'left' }}>{data?.notes}</p>
+          <Divider />
+        </>
+      )}
+
       {ctm.receiptHeader?.notes && (
         <table style={{ width: '100%', fontSize: '8px', marginBottom: '10px' }}>
           <tbody>

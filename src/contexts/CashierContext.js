@@ -40,6 +40,7 @@ const CashierContextProvider = ({ children }) => {
   const [customerScan, setCustomerScan] = useState(false);
   const [customerPoint, setCustomerPoint] = useState(0);
   const [voucherCode, setVoucherCode] = useState('');
+  const [primaryNotes, setPrimaryNotes] = useState("");
   const [listTable, setListTable] = useState(tableNameData);
   const [qrdata, setQrdata] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -224,19 +225,19 @@ const CashierContextProvider = ({ children }) => {
         current.map((item) =>
           item._id === id
             ? {
-                ...item,
-                customer: data.customer,
-                orders: data.orders,
-                status: data.status ? data.status : item.status,
-                havePaid: data?.havePaid || 0,
-                discount: data?.discount || 0,
-                discountPrice: data?.discountPrice || 0,
-                voucherDiscPrice: data?.voucherDiscPrice || 0,
-                billedAmount: data.billedAmount,
-                payment: data.payment ? data.payment : item.payment,
-                cardNumber: data.cardNumber ? data.cardNumber : item.cardNumber,
-                notes: data.notes ? data.notes : item.notes,
-              }
+              ...item,
+              customer: data.customer,
+              orders: data.orders,
+              status: data.status ? data.status : item.status,
+              havePaid: data?.havePaid || 0,
+              discount: data?.discount || 0,
+              discountPrice: data?.discountPrice || 0,
+              voucherDiscPrice: data?.voucherDiscPrice || 0,
+              billedAmount: data.billedAmount,
+              payment: data.payment ? data.payment : item.payment,
+              cardNumber: data.cardNumber ? data.cardNumber : item.cardNumber,
+              notes: data.notes ? data.notes : item.notes,
+            }
             : item
         )
       );
@@ -415,6 +416,7 @@ const CashierContextProvider = ({ children }) => {
     setCustomerScan(false);
     setCustomerPoint(0);
     setVoucherCode('');
+    setPrimaryNotes('');
   };
 
   const handleResetPos = () => {
@@ -474,6 +476,8 @@ const CashierContextProvider = ({ children }) => {
       setCustomerPoint,
       voucherCode,
       setVoucherCode,
+      primaryNotes,
+      setPrimaryNotes,
       listTable,
       setListTable,
       qrdata,

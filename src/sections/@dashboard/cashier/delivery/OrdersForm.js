@@ -188,7 +188,7 @@ export default function OrdersForm({ currentData }) {
                   </Typography>
                   {data?.status && (
                     <Label variant="ghost" color={statusColor} sx={{ textTransform: 'capitalize' }}>
-                      {data?.status === 'pending' ? 'unpaid' : data?.status}
+                      {data?.status}
                     </Label>
                   )}
                 </Stack>
