@@ -378,7 +378,7 @@ export default function ScanProgress() {
                           )
                         ) : (
                           <tr>
-                            <td colSpan={2}>
+                            <td colSpan={100}>
                               <Skeleton variant="text" />
                             </td>
                           </tr>
@@ -538,7 +538,7 @@ export default function ScanProgress() {
                         )
                       ) : (
                         <tr>
-                          <td colSpan={5}>
+                          <td colSpan={100}>
                             <Skeleton variant="text" />
                           </td>
                         </tr>
