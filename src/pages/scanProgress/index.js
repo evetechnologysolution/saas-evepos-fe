@@ -369,7 +369,7 @@ export default function ScanProgress() {
                             ))
                           ) : (
                             <tr>
-                              <td colSpan={2} style={{ textAlign: 'center' }}>
+                              <td colSpan={100} style={{ textAlign: 'center' }}>
                                 <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
                                   Data kosong
                                 </Typography>
@@ -529,7 +529,7 @@ export default function ScanProgress() {
                             ))
                         ) : (
                           <tr>
-                            <td colSpan={5} style={{ textAlign: 'center' }}>
+                            <td colSpan={100} style={{ textAlign: 'center' }}>
                               <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
                                 Data kosong
                               </Typography>
