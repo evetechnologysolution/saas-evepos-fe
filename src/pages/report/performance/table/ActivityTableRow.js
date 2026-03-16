@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 import { paramCase } from 'change-case';
 import { useNavigate } from 'react-router-dom';
 // @mui
-import { useTheme } from '@mui/material/styles';
 import { styled, Link, TableRow, TableCell, List, ListItem, ListItemText } from '@mui/material';
 import Label from '../../../../components/Label';
 // hooks
@@ -30,13 +29,13 @@ const CustomTableRow = styled(TableRow)(() => ({
 export default function ActivityTableRow({ row }) {
   const {
     date,
+    status,
     name,
     unit,
     qty,
     orderRef: { orderId },
     // log,
   } = row;
-  const theme = useTheme();
   const { user } = useAuth();
   const navigate = useNavigate();
   return (
@@ -59,8 +58,6 @@ export default function ActivityTableRow({ row }) {
           `${orderId}` || '-'
         )}
       </TableCell>
-
-      <TableCell align="left">{name}</TableCell>
 
       <TableCell align="center">
         {unit.toLowerCase() === 'kg' ? (
@@ -102,15 +99,15 @@ export default function ActivityTableRow({ row }) {
         ) : null}
       </TableCell>
 
-      {/* <TableCell align="center" sx={{ textTransform: 'capitalize' }}>
+      <TableCell align="center" sx={{ textTransform: 'capitalize' }}>
         <Label
-          variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
+          variant="ghost"
           color="warning"
           sx={{ textTransform: 'capitalize' }}
         >
-          {row?.status || '-'}
+          {status || '-'}
         </Label>
-      </TableCell> */}
+      </TableCell>
     </CustomTableRow>
   );
 }
