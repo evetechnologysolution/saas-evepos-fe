@@ -15,14 +15,13 @@ export default function GuestGuard({ children }) {
   const { user, isAuthenticated } = useAuth();
 
   if (isAuthenticated) {
-    // if (user?.role === 'Super Admin' || user?.role === 'Admin') return <Navigate to={PATH_DASHBOARD.root} />;
-    if (user?.role === 'Super Admin' || user?.role === 'Admin') return <Navigate to={PATH_DASHBOARD.cashier.pos} />;
-    if (user?.role === 'Cashier') return <Navigate to={PATH_DASHBOARD.cashier.pos} />;
-    if (user?.role === 'Staff') return <Navigate to={PATH_DASHBOARD.progressScan} />;
-    if (user?.role === 'Kitchen' || user?.role === 'Production') return <Navigate to={PATH_DASHBOARD.kitchen.root} />;
-    if (user?.role === 'Bar') return <Navigate to={PATH_DASHBOARD.bar.root} />;
-    if (user?.role === 'Content Writer') return <Navigate to={PATH_DASHBOARD.content.blog} />;
-    if (user?.role === 'Admin Bazaar' || user?.role === 'Staff Bazaar') return <Navigate to={PATH_DASHBOARD.voucherScan} />;
+    // if (user?.role === 'super admin' || user?.role === 'admin') return <Navigate to={PATH_DASHBOARD.root} />;
+    // if (user?.role === 'kitchen' || user?.role === 'production') return <Navigate to={PATH_DASHBOARD.kitchen.root} />;
+    // if (user?.role === 'bar') return <Navigate to={PATH_DASHBOARD.bar.root} />;
+
+    if (['owner', 'admin', 'cashier'].includes(user?.role)) return <Navigate to={PATH_DASHBOARD.cashier.pos} />;
+    if (['staff'].includes(user?.role)) return <Navigate to={PATH_DASHBOARD.progressScan} />;
+    if (['content writer'].includes(user?.role)) return <Navigate to={PATH_DASHBOARD.content.blog} />;
   }
 
   return <>{children}</>;
