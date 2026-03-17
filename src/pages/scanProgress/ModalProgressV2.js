@@ -25,7 +25,16 @@ import Iconify from 'src/components/Iconify';
 import axiosInstance from 'src/utils/axios';
 import { handleMutationFeedback } from 'src/utils/mutationfeedback';
 
-export default function ModalProgress({ open, onClose, detail, currProgress, refetch, currentStatusId }) {
+const roundQty = (v) => Math.round(v * 10) / 10;
+
+export default function ModalProgress({
+  open,
+  onClose,
+  detail,
+  currProgress,
+  refetch,
+  currentStatusId,
+}) {
   const { enqueueSnackbar } = useSnackbar();
 
   const {
@@ -43,13 +52,9 @@ export default function ModalProgress({ open, onClose, detail, currProgress, ref
 
   const currData = watch();
 
-  const progressMap =
-    detail?.progressDetail?.reduce((acc, p) => {
-      acc[String(p.id)] = p;
-      return acc;
-    }, {}) || {};
+  // progressDetail sudah sesuai index order
+  const progressDetail = detail?.progressDetail || [];
 
-  // Inject orders ke form saat detail berubah
   useEffect(() => {
     if (detail?.orders) {
       reset({
@@ -65,7 +70,7 @@ export default function ModalProgress({ open, onClose, detail, currProgress, ref
         })),
       });
     }
-  }, [currProgress, detail, reset]);
+  }, [currProgress, detail, reset, currentStatusId]);
 
   const handleClose = () => {
     reset();
@@ -73,7 +78,9 @@ export default function ModalProgress({ open, onClose, detail, currProgress, ref
   };
 
   const onSubmit = async (data) => {
-    const filteredProcess = data?.listProcess?.filter((item) => item?.qty > 0 && item?.status !== '');
+    const filteredProcess = data?.listProcess?.filter(
+      (item) => item?.qty > 0 && item?.status !== ''
+    );
 
     if (filteredProcess?.length > 0) {
       const finalPayload = {
@@ -81,6 +88,7 @@ export default function ModalProgress({ open, onClose, detail, currProgress, ref
       };
 
       const mutation = axiosInstance.post(`/progress/${detail?._id}`, finalPayload);
+
       await handleMutationFeedback(mutation, {
         successMsg: 'Notes berhasil disimpan!',
         errorMsg: 'Gagal menyimpan notes!',
@@ -94,16 +102,19 @@ export default function ModalProgress({ open, onClose, detail, currProgress, ref
   };
 
   return (
-    <Dialog open={open} onClose={() => {}} fullWidth maxWidth="md">
+    <Dialog open={open} onClose={() => { }} fullWidth maxWidth="md">
       <DialogTitle sx={{ pr: 5 }}>
         Proses {currProgress}
-        <IconButton onClick={handleClose} sx={{ position: 'absolute', right: 8, top: 8 }}>
+        <IconButton
+          onClick={handleClose}
+          sx={{ position: 'absolute', right: 8, top: 8 }}
+        >
           <Iconify icon="eva:close-fill" />
         </IconButton>
       </DialogTitle>
 
       <DialogContent dividers>
-        <TableContainer component={Paper} sx={{ borderRadius: 1, overflowX: 'auto' }}>
+        <TableContainer component={Paper} sx={{ borderRadius: 1 }}>
           <Table
             size="small"
             sx={{
@@ -111,7 +122,6 @@ export default function ModalProgress({ open, onClose, detail, currProgress, ref
                 fontWeight: 600,
                 fontSize: 13,
                 color: 'text.secondary',
-                whiteSpace: 'nowrap',
               },
               '& td': {
                 fontSize: 13,
@@ -131,10 +141,17 @@ export default function ModalProgress({ open, onClose, detail, currProgress, ref
 
             <TableBody>
               {detail?.orders?.map((item, i) => {
-                const selected = progressMap[String(item.id)];
-                const qtyProcessed = selected?.progressByStatus[currProgress?.toLowerCase()] || 0;
+                const progressItem = progressDetail[i];
 
-                const remaining = Math.max(0, item.qty - qtyProcessed);
+                const qtyProcessed =
+                  progressItem?.progressByStatus?.[
+                  currProgress?.toLowerCase()
+                  ] || 0;
+
+                const remaining = Math.max(
+                  0,
+                  roundQty(item.qty - qtyProcessed)
+                );
 
                 return (
                   <TableRow key={i} hover>
@@ -145,13 +162,23 @@ export default function ModalProgress({ open, onClose, detail, currProgress, ref
                       </Typography>
 
                       {item.variant?.map((variant, v) => (
-                        <Typography key={v} variant="caption" display="block" sx={{ opacity: 0.7 }}>
-                          {variant.name}: {variant.option} {variant.qty > 1 && `(x${variant.qty})`}
+                        <Typography
+                          key={v}
+                          variant="caption"
+                          display="block"
+                          sx={{ opacity: 0.7 }}
+                        >
+                          {variant.name}: {variant.option}{' '}
+                          {variant.qty > 1 && `(x${variant.qty})`}
                         </Typography>
                       ))}
 
                       {item.notes && (
-                        <Typography variant="caption" display="block" sx={{ opacity: 0.7 }}>
+                        <Typography
+                          variant="caption"
+                          display="block"
+                          sx={{ opacity: 0.7 }}
+                        >
                           Notes: {item.notes}
                         </Typography>
                       )}
@@ -164,13 +191,12 @@ export default function ModalProgress({ open, onClose, detail, currProgress, ref
                       </Typography>
                     </TableCell>
 
-                    {/* QTY */}
+                    {/* QTY PROCESS */}
                     <TableCell align="center" sx={{ width: 100 }}>
                       <Controller
                         name={`listProcess.${i}.qty`}
                         control={control}
                         rules={{
-                          //   required: 'Wajib diisi',
                           min: {
                             value: 0,
                             message: 'Tidak boleh minus',
@@ -188,9 +214,11 @@ export default function ModalProgress({ open, onClose, detail, currProgress, ref
                             type="number"
                             size="small"
                             fullWidth
+                            disabled={
+                              currData?.listProcess?.[i]?.isChecked || !remaining
+                            }
                             error={Boolean(errors?.listProcess?.[i]?.qty)}
                             helperText={errors?.listProcess?.[i]?.qty?.message}
-                            disabled={currData?.listProcess?.[i]?.isChecked || !remaining}
                             inputProps={{
                               min: 0,
                               max: remaining,
@@ -206,8 +234,8 @@ export default function ModalProgress({ open, onClose, detail, currProgress, ref
                       />
                     </TableCell>
 
-                    {/* CHECKBOX PROCESS ALL */}
-                    <TableCell align="center" sx={{ width: 10 }}>
+                    {/* PROCESS ALL */}
+                    <TableCell align="center">
                       <Checkbox
                         onChange={(e) => {
                           if (e.target.checked) {
@@ -235,11 +263,6 @@ export default function ModalProgress({ open, onClose, detail, currProgress, ref
                             size="small"
                             fullWidth
                             placeholder="Type here..."
-                            sx={{
-                              '& .MuiInputBase-input': {
-                                typography: 'body2',
-                              },
-                            }}
                             disabled={!remaining}
                           />
                         )}
@@ -262,7 +285,12 @@ export default function ModalProgress({ open, onClose, detail, currProgress, ref
           </Grid>
 
           <Grid item xs={8}>
-            <LoadingButton fullWidth variant="contained" loading={isSubmitting} onClick={handleSubmit(onSubmit)}>
+            <LoadingButton
+              fullWidth
+              variant="contained"
+              loading={isSubmitting}
+              onClick={handleSubmit(onSubmit)}
+            >
               Save
             </LoadingButton>
           </Grid>
