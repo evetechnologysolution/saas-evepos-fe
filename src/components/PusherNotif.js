@@ -15,8 +15,8 @@ export default function PusherNotif() {
     // const beamsRef = useRef(null);
     // const beamsStartedRef = useRef(false);
 
-    const allowChatRoles = ["Super Admin", "Admin", "Cashier"];
-    const allowOrderRoles = ["Super Admin", "Admin", "Cashier"];
+    const allowChatRoles = ["owner", "admin", "cashier"];
+    const allowOrderRoles = ["owner", "admin", "cashier"];
 
     useEffect(() => {
         if (!user?._id || !user?.role) return;
@@ -44,6 +44,10 @@ export default function PusherNotif() {
                 const allowedRoles = (data?.roles || roles).map((r) =>
                     r.toLowerCase()
                 );
+
+                // console.log(data);
+
+                if (user?.tenantRef?._id !== data?.tenantRef) return;
 
                 if (!allowedRoles.includes(userRole)) return;
 

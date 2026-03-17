@@ -22,7 +22,7 @@ const CustomTableRow = styled(TableRow)(() => ({
 export default function LogVoucherTableRow({ row }) {
   const { user } = useAuth();
 
-  const { usedAt, name, voucherCode, voucherType, member } = row;
+  const { usedAt, name, voucherCode, voucherType, memberRef } = row;
 
   return (
     <CustomTableRow hover>
@@ -34,13 +34,13 @@ export default function LogVoucherTableRow({ row }) {
 
       <TableCell>{voucherType === 1 ? 'Diskon' : voucherType === 2 ? 'Hadiah' : 'Pastcard'}</TableCell>
 
-      <TableCell>{member.memberId}</TableCell>
+      <TableCell>{memberRef?.memberId}</TableCell>
 
-      <TableCell>{member.name}</TableCell>
+      <TableCell>{memberRef?.name}</TableCell>
 
       <TableCell>
-        {!member?.phone?.includes('EM')
-          ? maskedPhone(['owner', 'super admin']?.includes(user?.role), member?.phone)
+        {!memberRef?.phone?.includes('EM')
+          ? maskedPhone(['owner', 'super admin']?.includes(user?.role), memberRef?.phone)
           : '-'}
       </TableCell>
     </CustomTableRow>

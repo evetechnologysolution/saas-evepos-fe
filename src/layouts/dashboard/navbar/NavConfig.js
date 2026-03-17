@@ -131,13 +131,13 @@ export const useNavConfig = () => {
             ...(user?.tenantRef?.isEvewash ? [{ title: 'log voucher', path: PATH_DASHBOARD.member.logVoucher }] : []),
           ],
         },
-        // {
-        //   title: 'Postcard',
-        //   path: PATH_DASHBOARD.postCard.root,
-        //   icon: ICONS.member,
-        //   roles: ['owner', 'admin', 'cashier'],
-        //   total: ctx?.allNotif?.newPostcard || 0,
-        // },
+        {
+          title: 'Postcard',
+          path: PATH_DASHBOARD.postCard.root,
+          icon: ICONS.member,
+          roles: evewashAllowed(['owner', 'admin', 'cashier']),
+          total: ctx?.allNotif?.newPostcard || 0,
+        },
         {
           title: 'Print Count',
           path: PATH_DASHBOARD.printCout.root,
