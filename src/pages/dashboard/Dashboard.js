@@ -278,12 +278,23 @@ export default function Dashboard() {
           </Grid>
           <Grid item xs={12} sm={4} md={2.4}>
             <YearlyWidgetSummary
+              title="Donation"
+              subtitle={getTopCurrentFilterLabel()}
+              total={dashboardRevenue?.totalRounding || 0}
+              type="currency"
+              color="success"
+              icon={'heroicons-solid:currency-dollar'}
+              isLoading={loadingDashboardRevenue}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4} md={2.4}>
+            <YearlyWidgetSummary
               title="Profit"
               subtitle={getTopCurrentFilterLabel()}
               total={
                 dashboardRevenue?.totalRevenue +
-                  dashboardRevenue?.totalRounding -
-                  dashboardRevenue?.expense?.totalExpense || 0
+                dashboardRevenue?.totalRounding -
+                dashboardRevenue?.expense?.totalExpense || 0
               }
               type="currency"
               color="info"
@@ -299,17 +310,6 @@ export default function Dashboard() {
               type="other"
               color="info"
               icon={'heroicons-solid:trending-up'}
-              isLoading={loadingDashboardRevenue}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4} md={2.4}>
-            <YearlyWidgetSummary
-              title="Donation"
-              subtitle={getTopCurrentFilterLabel()}
-              total={dashboardRevenue?.roundingAmount || 0}
-              type="currency"
-              color="success"
-              icon={'heroicons-solid:currency-dollar'}
               isLoading={loadingDashboardRevenue}
             />
           </Grid>
