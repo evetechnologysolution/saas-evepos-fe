@@ -396,7 +396,7 @@ export default function ScanProgress() {
                       </Box>
                     ) : (
                       <Stack flexDirection="row" gap={1.5} flexWrap="wrap" justifyContent="space-between">
-                        <Stack flexDirection="row" gap={1.5}>
+                        <Stack flexDirection="row" gap={1.5} flexWrap="wrap">
                           {!isEdit &&
                             listStatus
                               ?.filter((r) => !r.archived)
