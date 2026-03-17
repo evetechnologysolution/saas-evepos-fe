@@ -55,13 +55,13 @@ export const useNavConfig = () => {
           title: 'POS',
           path: PATH_DASHBOARD.cashier.pos,
           icon: ICONS.pos,
-          roles: ['owner', 'admin', 'cashier', 'staff'],
+          roles: ['owner', 'admin', 'cashier'],
         },
         {
           title: 'Orders',
           path: PATH_DASHBOARD.cashier.orders,
           icon: ICONS.order,
-          roles: ['owner', 'admin', 'cashier', 'staff'],
+          roles: ['owner', 'admin', 'cashier'],
         },
         {
           title: 'Delivery',
@@ -74,7 +74,7 @@ export const useNavConfig = () => {
           title: 'PickUp',
           path: PATH_DASHBOARD.pickup.root,
           icon: ICONS.pickup,
-          roles: ['owner', 'admin', 'cashier', 'staff'],
+          roles: ['owner', 'admin', 'cashier'],
         },
         {
           title: 'Scan Orders',
@@ -105,13 +105,13 @@ export const useNavConfig = () => {
           title: 'Track History',
           path: PATH_DASHBOARD.history.root,
           icon: ICONS.history,
-          roles: evewashAllowed(['owner', 'admin', 'cashier', 'staff']),
+          roles: evewashAllowed(['owner', 'admin', 'cashier']),
         },
         {
           title: 'Track Order',
           path: PATH_DASHBOARD.history.order,
           icon: ICONS.history,
-          roles: ['owner', 'admin', 'cashier', 'staff'],
+          roles: ['owner', 'admin', 'cashier'],
         },
         // {
         //   title: 'Customer',
@@ -124,7 +124,7 @@ export const useNavConfig = () => {
           title: 'Member',
           path: PATH_DASHBOARD.member.root,
           icon: ICONS.member,
-          roles: ['owner', 'admin', 'cashier', 'staff'],
+          roles: ['owner', 'admin', 'cashier'],
           children: [
             { title: 'list member', path: PATH_DASHBOARD.member.list },
             // { title: 'member card', path: PATH_DASHBOARD.member.memberCard },
@@ -249,7 +249,7 @@ export const useNavConfig = () => {
           title: 'ticket',
           path: '/dashboard/ticket',
           icon: ICONS.report,
-          roles: ['owner', 'staff'],
+          roles: ['owner'],
         },
       ],
     },
