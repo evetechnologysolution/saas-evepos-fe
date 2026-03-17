@@ -52,10 +52,16 @@ export default function LoginForm() {
     try {
       // await login(data.username, data.password);
       const response = await login({ username: data.username, password: data.password });
-      if (response?.tenantRef?.status === 'pending') {
-        navigate('/auth/informasi-usaha');
+      if (response?.tenantRef?.status !== 'pending') {
+        if (['admin', 'cashier'].includes(response?.role)) {
+          navigate('/dashboard/cashier/pos');
+        } else if (['staff'].includes(response?.role)) {
+          navigate('/dashboard/scan-progress');
+        } else {
+          navigate('/dashboard/app');
+        }
       } else {
-        navigate('/dashboard/app');
+        navigate('/auth/informasi-usaha');
       }
     } catch (error) {
       // console.error(error);
