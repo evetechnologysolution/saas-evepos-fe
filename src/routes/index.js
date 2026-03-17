@@ -116,38 +116,6 @@ export default function Router() {
               ),
             },
             {
-              path: 'scan-progress',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'admin', 'cashier', 'staff']}>
-                  <ProgressScan />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'track-history',
-              element: (
-                <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin', 'cashier', 'staff'])}>
-                  <TrackHistory />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'track-order',
-              element: (
-                <RoleBasedGuard hasContent roles={['owner', 'admin', 'cashier', 'staff']}>
-                  <TrackOrderHistory />
-                </RoleBasedGuard>
-              ),
-            },
-            {
-              path: 'scan-voucher',
-              element: (
-                <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin', 'staff', 'cashier'])}>
-                  <VoucherScan />
-                </RoleBasedGuard>
-              ),
-            },
-            {
               path: 'cashier',
               children: [
                 { element: <Navigate to="/dashboard/cashier/pos" replace />, index: true },
@@ -312,6 +280,46 @@ export default function Router() {
                   ),
                 },
               ],
+            },
+            {
+              path: 'scan-progress',
+              element: (
+                <RoleBasedGuard hasContent roles={['owner', 'admin', 'cashier', 'staff']}>
+                  <ProgressScan />
+                </RoleBasedGuard>
+              ),
+            },
+            {
+              path: 'track-history',
+              element: (
+                <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin', 'cashier', 'staff'])}>
+                  <TrackHistory />
+                </RoleBasedGuard>
+              ),
+            },
+            {
+              path: 'track-order',
+              element: (
+                <RoleBasedGuard hasContent roles={['owner', 'admin', 'cashier', 'staff']}>
+                  <TrackOrderHistory />
+                </RoleBasedGuard>
+              ),
+            },
+            {
+              path: 'scan-voucher',
+              element: (
+                <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin', 'staff', 'cashier'])}>
+                  <VoucherScan />
+                </RoleBasedGuard>
+              ),
+            },
+            {
+              path: 'postcard',
+              element: (
+                <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin', 'cashier'])}>
+                  <MemberPostcard />
+                </RoleBasedGuard>
+              ),
             },
             {
               path: 'print-count',
@@ -902,6 +910,7 @@ const MemberCreate = Loadable(lazy(() => import('../pages/member/list/MemberCrea
 const MemberEdit = Loadable(lazy(() => import('../pages/member/list/MemberEdit')));
 const MemberView = Loadable(lazy(() => import('../pages/member/list/MemberView')));
 const MemberLogVoucher = Loadable(lazy(() => import('../pages/member/log-voucher/MemberLogVoucher')));
+const MemberPostcard = Loadable(lazy(() => import('../pages/member/postcard/MemberPostcard')));
 
 // Print Count
 const PrintCount = Loadable(lazy(() => import('../pages/print-count/PrintCount')));

@@ -199,10 +199,10 @@ export default function ModalScanCustomer(props) {
         const res = await axios.get(`/member/track?search=${memberId}`);
         if (res?.data) {
           setNotFound(false);
-          // setNotVerified(!res?.data?.isVerified);
-          setName(res?.data?.name);
-          setPhone(res?.data?.phone);
-          setPoint(res?.data?.point);
+          setNotVerified(!res?.data?.isVerified);
+          setName(res?.data?.isVerified ? res?.data?.name : "");
+          setPhone(res?.data?.isVerified ? res?.data?.phone : "");
+          setPoint(res?.data?.isVerified ? res?.data?.point : 0);
         }
       } catch (error) {
         console.error('Error fetching members:', error);

@@ -58,7 +58,7 @@ VoucherForm.propTypes = {
 const voucherTypeOpt = [
   { label: 'Diskon', value: 1 },
   { label: 'Hadiah', value: 2 },
-  // { label: "Postcard", value: 3 },
+  { label: "Postcard", value: 3 },
 ];
 
 const optionsPostcard = [

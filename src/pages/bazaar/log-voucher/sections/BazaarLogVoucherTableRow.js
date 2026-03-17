@@ -22,7 +22,7 @@ const CustomTableRow = styled(TableRow)(() => ({
 export default function BazaarLogVoucherTableRow({ row }) {
   const { user } = useAuth();
 
-  const { usedAt, name, voucherCode, voucherType, member } = row;
+  const { usedAt, name, voucherCode, voucherType, memberRef } = row;
   const allowedRoles = ['owner', 'super admin', 'admin bazaar', 'staff bazaar'];
 
   return (
@@ -35,12 +35,12 @@ export default function BazaarLogVoucherTableRow({ row }) {
 
       <TableCell>{voucherType === 1 ? 'Diskon' : voucherType === 2 ? 'Hadiah' : 'Pastcard'}</TableCell>
 
-      <TableCell>{member.memberId}</TableCell>
+      <TableCell>{memberRef.memberId}</TableCell>
 
-      <TableCell>{member.name}</TableCell>
+      <TableCell>{memberRef?.name}</TableCell>
 
       <TableCell>
-        {!member?.phone?.includes('EM') ? maskedPhone(allowedRoles.includes(user.role), member?.phone) : '-'}
+        {!memberRef?.phone?.includes('EM') ? maskedPhone(allowedRoles.includes(user.role), memberRef?.phone) : '-'}
       </TableCell>
     </CustomTableRow>
   );
