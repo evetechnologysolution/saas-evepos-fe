@@ -15,10 +15,12 @@ import {
   Link,
   IconButton,
   Button,
+  ButtonBase,
   Dialog,
   DialogTitle,
   DialogContent,
   MenuItem,
+  Typography
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import axios from '../../../../utils/axios';
@@ -366,21 +368,40 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                 </Label>
               )} */}
             </Stack>
-            {user?.role?.toLowerCase() === 'admin' || user?.role?.toLowerCase() === 'owner' ? (
-              <Link
-                component="button"
-                variant="subtitle2"
-                underline="hover"
-                // onClick={() => navigate(PATH_DASHBOARD.cashier.ordersEdit(paramCase(_id)))}
-                onClick={() => navigate(`/dashboard/cashier/order/${_id}/edit`)}
-              >
-                {!orderId ? _id : orderId}
-              </Link>
-            ) : !orderId ? (
-              _id
-            ) : (
-              orderId
-            )}
+            <Stack flexDirection="row" gap={0.5}>
+              {user?.role?.toLowerCase() === 'admin' || user?.role?.toLowerCase() === 'owner' && (
+                <ButtonBase
+                  type="button"
+                  title="Copy ID"
+                  onClick={() => {
+                    try {
+                      navigator.clipboard.writeText(orderId);
+                      enqueueSnackbar('Sukses menyalin orderId !');
+                    } catch (error) {
+                      enqueueSnackbar('Terjadi kesalahan saat menyalin orderId !', { variant: 'error' });
+                    }
+                  }}
+                >
+                  <Iconify icon="mage:copy" width={20} height={20} />
+                </ButtonBase>
+              )}
+
+              {user?.role?.toLowerCase() === 'admin' || user?.role?.toLowerCase() === 'owner' ? (
+                <Link
+                  component="button"
+                  variant="subtitle2"
+                  underline="hover"
+                  // onClick={() => navigate(PATH_DASHBOARD.cashier.ordersEdit(paramCase(_id)))}
+                  onClick={() => navigate(`/dashboard/cashier/order/${_id}/edit`)}
+                >
+                  {!orderId ? _id : orderId}
+                </Link>
+              ) : !orderId ? (
+                _id
+              ) : (
+                orderId
+              )}
+            </Stack>
           </TableCell>
         )}
 
