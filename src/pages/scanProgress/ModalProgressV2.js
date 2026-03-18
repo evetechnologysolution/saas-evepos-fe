@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
 import {
@@ -19,6 +19,7 @@ import {
   TableRow,
   Paper,
   Typography,
+  Alert,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Iconify from 'src/components/Iconify';
@@ -36,6 +37,8 @@ export default function ModalProgress({
   currentStatusId,
 }) {
   const { enqueueSnackbar } = useSnackbar();
+
+  const [showAlert, setShowAlert] = useState(false);
 
   const {
     control,
@@ -75,6 +78,9 @@ export default function ModalProgress({
   const handleClose = () => {
     reset();
     onClose();
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 500);
   };
 
   const onSubmit = async (data) => {
@@ -83,6 +89,7 @@ export default function ModalProgress({
     );
 
     if (filteredProcess?.length > 0) {
+      setShowAlert(false);
       const finalPayload = {
         log: filteredProcess,
       };
@@ -98,6 +105,8 @@ export default function ModalProgress({
         },
         enqueueSnackbar,
       });
+    } else {
+      setShowAlert(true);
     }
   };
 
@@ -114,6 +123,9 @@ export default function ModalProgress({
       </DialogTitle>
 
       <DialogContent dividers>
+        {showAlert && (
+          <Alert severity="error" sx={{ mb: 1 }}>Qty proses belum diinput. Jika tidak tampil, geser tabel ke kanan.</Alert>
+        )}
         <TableContainer component={Paper} sx={{ borderRadius: 1 }}>
           <Table
             size="small"
@@ -192,7 +204,7 @@ export default function ModalProgress({
                     </TableCell>
 
                     {/* QTY PROCESS */}
-                    <TableCell align="center" sx={{ width: 100 }}>
+                    <TableCell align="center" sx={{ minWidth: 120 }}>
                       <Controller
                         name={`listProcess.${i}.qty`}
                         control={control}

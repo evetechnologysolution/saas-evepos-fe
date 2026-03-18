@@ -343,7 +343,7 @@ export default function OrdersTableRow({ row }) {
                             Rp.{' '}
                             {numberWithCommas(
                               Math.round(item.qty * item.price) -
-                                (Math.round(item.qty * item.price) * item.discountAmount) / 100
+                              (Math.round(item.qty * item.price) * item.discountAmount) / 100
                             )}
                           </span>
                           <br />
@@ -406,14 +406,14 @@ export default function OrdersTableRow({ row }) {
                           </td>
                           <td style={{ padding: '0.5rem' }} align="left" valign="top">
                             <p>{item?.name || '-'}</p>
-                            <Stack flexDirection="row" gap={1}>
-                              <p>
-                                <em>{item?.qty ? `${item?.qty} ${item?.unit}` : '-'}</em>
-                              </p>
+                            <p>
+                              <em>{item?.qty ? `${item?.qty} ${item?.unit}` : '-'}</em>
+                            </p>
+                            <div>
                               <Label variant="ghost" color="warning" sx={{ textTransform: 'capitalize' }}>
                                 {item?.status || '-'}
                               </Label>
-                            </Stack>
+                            </div>
                             <br />
                           </td>
                           <td style={{ padding: '0.5rem' }} align="center" valign="top">

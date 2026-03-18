@@ -21,6 +21,7 @@ import useAuth from 'src/hooks/useAuth';
 import useSettings from 'src/hooks/useSettings';
 import { PATH_DASHBOARD } from 'src/routes/paths';
 import ScanProgresTableToolbar from 'src/sections/@dashboard/scan-progress/ScanProgressToolbar';
+import Scrollbar from 'src/components/Scrollbar';
 import Label from 'src/components/Label';
 import axiosInstance from 'src/utils/axios';
 import { formatDate2 } from 'src/utils/getData';
@@ -243,9 +244,9 @@ export default function ScanProgress() {
                 item
                 xs={12}
                 sm={12}
-                // sx={{
-                //   order: { xs: 1, sm: 2 },
-                // }}
+              // sx={{
+              //   order: { xs: 1, sm: 2 },
+              // }}
               >
                 <Stack spacing={2}>
                   <Stack>
@@ -261,130 +262,134 @@ export default function ScanProgress() {
                     </div>
                   </Stack>
                   <Stack>
-                    <table className="styled-table">
-                      <thead>
-                        <tr>
-                          <th>
-                            <Typography variant="subtitle2">Order ID</Typography>
-                          </th>
-                          <th>
-                            <Typography variant="subtitle2">Customer Name</Typography>
-                          </th>
-                          <th>
-                            <Typography variant="subtitle2">Phone</Typography>
-                          </th>
-                          <th>
-                            <Typography variant="subtitle2">Notes</Typography>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>
-                            {isLoading ? (
-                              <Skeleton variant="text" />
-                            ) : (
-                              <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                                {detail?.orderId || '-'}
-                              </Typography>
-                            )}
-                          </td>
-                          <td>
-                            {isLoading ? (
-                              <Skeleton variant="text" />
-                            ) : (
-                              <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                                {detail?.customer?.name || '-'}
-                              </Typography>
-                            )}
-                          </td>
-                          <td>
-                            {isLoading ? (
-                              <Skeleton variant="text" />
-                            ) : (
-                              <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                                {detail?.customer?.phone && !detail?.customer?.phone?.includes('EM')
-                                  ? maskedPhone(['owner', 'super admin']?.includes(user?.role), detail?.customer?.phone)
-                                  : '-'}
-                              </Typography>
-                            )}
-                          </td>
-                          <td>
-                            {isLoading ? (
-                              <Skeleton variant="text" />
-                            ) : (
-                              <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                                {detail?.notes || '-'}
-                              </Typography>
-                            )}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    <Scrollbar>
+                      <table style={{ width: '100%' }} className="styled-table">
+                        <thead>
+                          <tr>
+                            <th>
+                              <Typography variant="subtitle2">Order ID</Typography>
+                            </th>
+                            <th>
+                              <Typography variant="subtitle2">Customer Name</Typography>
+                            </th>
+                            <th>
+                              <Typography variant="subtitle2">Phone</Typography>
+                            </th>
+                            <th>
+                              <Typography variant="subtitle2">Notes</Typography>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>
+                              {isLoading ? (
+                                <Skeleton variant="text" />
+                              ) : (
+                                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                  {detail?.orderId || '-'}
+                                </Typography>
+                              )}
+                            </td>
+                            <td>
+                              {isLoading ? (
+                                <Skeleton variant="text" />
+                              ) : (
+                                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                  {detail?.customer?.name || '-'}
+                                </Typography>
+                              )}
+                            </td>
+                            <td>
+                              {isLoading ? (
+                                <Skeleton variant="text" />
+                              ) : (
+                                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                  {detail?.customer?.phone && !detail?.customer?.phone?.includes('EM')
+                                    ? maskedPhone(['owner', 'super admin']?.includes(user?.role), detail?.customer?.phone)
+                                    : '-'}
+                                </Typography>
+                              )}
+                            </td>
+                            <td>
+                              {isLoading ? (
+                                <Skeleton variant="text" />
+                              ) : (
+                                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                  {detail?.notes || '-'}
+                                </Typography>
+                              )}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </Scrollbar>
                   </Stack>
                   <Stack>
-                    <table className="styled-table">
-                      <thead>
-                        <tr>
-                          <th>
-                            <Typography variant="subtitle2">Items</Typography>
-                          </th>
-                          <th style={{ textAlign: 'center' }}>
-                            <Typography variant="subtitle2">Qty</Typography>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {!isLoading ? (
-                          detail?.orders?.length > 0 ? (
-                            detail.orders.map((item, i) => (
-                              <tr key={i}>
-                                <td>
-                                  <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                                    {item.name}
-                                  </Typography>
-                                  {item.variant.length > 0 &&
-                                    item.variant.map((field, v) => (
-                                      <Typography variant="body2" sx={{ fontStyle: 'italic' }} key={v}>
-                                        <em>{`${field.name} : ${field.option}`}</em>
+                    <Scrollbar>
+                      <table style={{ width: '100%' }} className="styled-table">
+                        <thead>
+                          <tr>
+                            <th>
+                              <Typography variant="subtitle2">Items</Typography>
+                            </th>
+                            <th style={{ textAlign: 'center' }}>
+                              <Typography variant="subtitle2">Qty</Typography>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {!isLoading ? (
+                            detail?.orders?.length > 0 ? (
+                              detail.orders.map((item, i) => (
+                                <tr key={i}>
+                                  <td>
+                                    <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                      {item.name}
+                                    </Typography>
+                                    {item.variant.length > 0 &&
+                                      item.variant.map((field, v) => (
+                                        <Typography variant="body2" sx={{ fontStyle: 'italic' }} key={v}>
+                                          <em>{`${field.name} : ${field.option}`}</em>
+                                        </Typography>
+                                      ))}
+                                    {item.isLaundryBag && (
+                                      <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                        Laundry Bag Day
                                       </Typography>
-                                    ))}
-                                  {item.isLaundryBag && (
-                                    <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                                      Laundry Bag Day
+                                    )}
+                                    {item.notes && (
+                                      <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                        Notes: {item.notes}
+                                      </Typography>
+                                    )}
+                                  </td>
+                                  <td style={{ textAlign: 'center' }}>
+                                    <Typography variant="body2">
+                                      {`x ${item.qty}${item?.category?.toLowerCase() === 'kiloan' ? 'kg' : ''}`}
                                     </Typography>
-                                  )}
-                                  {item.notes && (
-                                    <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                                      Notes: {item.notes}
-                                    </Typography>
-                                  )}
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                  <Typography variant="body2">
-                                    {`x ${item.qty}${item?.category?.toLowerCase() === 'kiloan' ? 'kg' : ''}`}
+                                  </td>
+                                </tr>
+                              ))
+                            ) : (
+                              <tr>
+                                <td colSpan={100} style={{ textAlign: 'center' }}>
+                                  <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                    Data kosong
                                   </Typography>
                                 </td>
                               </tr>
-                            ))
+                            )
                           ) : (
                             <tr>
-                              <td colSpan={100} style={{ textAlign: 'center' }}>
-                                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                                  Data kosong
-                                </Typography>
+                              <td colSpan={100}>
+                                <Skeleton variant="text" />
                               </td>
                             </tr>
-                          )
-                        ) : (
-                          <tr>
-                            <td colSpan={100}>
-                              <Skeleton variant="text" />
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
+                          )}
+                        </tbody>
+                      </table>
+                    </Scrollbar>
                   </Stack>
                   <Stack>
                     <Typography variant="subtitle2" sx={{ mb: 1.5 }}>
@@ -457,94 +462,96 @@ export default function ScanProgress() {
                       </Stack>
                     )}
                   </Stack>
-                  <table className="styled-table">
-                    <thead>
-                      <tr>
-                        <th width={150}>
-                          <Typography variant="subtitle2" align="center">
-                            Date
-                          </Typography>
-                        </th>
-                        <th>
-                          <Typography variant="subtitle2" align="center">
-                            Item
-                          </Typography>
-                        </th>
-                        <th>
-                          <Typography variant="subtitle2" align="center">
-                            Qty
-                          </Typography>
-                        </th>
-                        <th>
-                          <Typography variant="subtitle2" align="center">
-                            Staff
-                          </Typography>
-                        </th>
-                        <th>
-                          <Typography variant="subtitle2" align="center">
-                            Proses
-                          </Typography>
-                        </th>
-                        <th>
-                          <Typography variant="subtitle2" align="center">
-                            Notes
-                          </Typography>
-                        </th>
-                        {/* <th width={100}><Typography variant="subtitle2" align="center">Qty</Typography></th> */}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {!isLoading ? (
-                        detail?.progressRef && detail?.progressRef?.log?.length > 0 ? (
-                          detail.progressRef.log
-                            .slice()
-                            .reverse()
-                            .map((item, i) => (
-                              <tr key={i}>
-                                <td style={{ textAlign: 'center' }}>
-                                  <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                                    {item?.date ? formatDate2(item?.date) : '-'}
-                                  </Typography>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                  <Typography variant="body2">{item?.name || '-'}</Typography>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                  <Typography variant="body2">
-                                    {item?.qty ? `${item?.qty} ${item?.unit}` : '-'}
-                                  </Typography>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                  <Typography variant="body2">{item?.staffRef?.fullname || '-'}</Typography>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                  <Label variant="ghost" color="warning" sx={{ textTransform: 'capitalize' }}>
-                                    {item?.status || '-'}
-                                  </Label>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                  <Typography variant="body2">{item?.notes || '-'}</Typography>
-                                </td>
-                              </tr>
-                            ))
+                  <Scrollbar>
+                    <table style={{ width: '100%' }} className="styled-table">
+                      <thead>
+                        <tr>
+                          <th width={150}>
+                            <Typography variant="subtitle2" align="center">
+                              Date
+                            </Typography>
+                          </th>
+                          <th>
+                            <Typography variant="subtitle2" align="center">
+                              Item
+                            </Typography>
+                          </th>
+                          <th>
+                            <Typography variant="subtitle2" align="center">
+                              Qty
+                            </Typography>
+                          </th>
+                          <th>
+                            <Typography variant="subtitle2" align="center">
+                              Staff
+                            </Typography>
+                          </th>
+                          <th>
+                            <Typography variant="subtitle2" align="center">
+                              Proses
+                            </Typography>
+                          </th>
+                          <th>
+                            <Typography variant="subtitle2" align="center">
+                              Notes
+                            </Typography>
+                          </th>
+                          {/* <th width={100}><Typography variant="subtitle2" align="center">Qty</Typography></th> */}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {!isLoading ? (
+                          detail?.progressRef && detail?.progressRef?.log?.length > 0 ? (
+                            detail.progressRef.log
+                              .slice()
+                              .reverse()
+                              .map((item, i) => (
+                                <tr key={i}>
+                                  <td style={{ textAlign: 'center' }}>
+                                    <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                      {item?.date ? formatDate2(item?.date) : '-'}
+                                    </Typography>
+                                  </td>
+                                  <td style={{ textAlign: 'center' }}>
+                                    <Typography variant="body2">{item?.name || '-'}</Typography>
+                                  </td>
+                                  <td style={{ textAlign: 'center' }}>
+                                    <Typography variant="body2">
+                                      {item?.qty ? `${item?.qty} ${item?.unit}` : '-'}
+                                    </Typography>
+                                  </td>
+                                  <td style={{ textAlign: 'center' }}>
+                                    <Typography variant="body2">{item?.staffRef?.fullname || '-'}</Typography>
+                                  </td>
+                                  <td style={{ textAlign: 'center' }}>
+                                    <Label variant="ghost" color="warning" sx={{ textTransform: 'capitalize' }}>
+                                      {item?.status || '-'}
+                                    </Label>
+                                  </td>
+                                  <td style={{ textAlign: 'center' }}>
+                                    <Typography variant="body2">{item?.notes || '-'}</Typography>
+                                  </td>
+                                </tr>
+                              ))
+                          ) : (
+                            <tr>
+                              <td colSpan={100} style={{ textAlign: 'center' }}>
+                                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                  Data kosong
+                                </Typography>
+                              </td>
+                            </tr>
+                          )
                         ) : (
                           <tr>
-                            <td colSpan={100} style={{ textAlign: 'center' }}>
-                              <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                                Data kosong
-                              </Typography>
+                            <td colSpan={100}>
+                              <Skeleton variant="text" />
                             </td>
                           </tr>
-                        )
-                      ) : (
-                        <tr>
-                          <td colSpan={100}>
-                            <Skeleton variant="text" />
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+                        )}
+                      </tbody>
+                    </table>
+                  </Scrollbar>
                 </Stack>
               </Grid>
             </Grid>

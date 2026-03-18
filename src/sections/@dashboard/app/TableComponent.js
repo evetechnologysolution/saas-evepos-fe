@@ -110,7 +110,7 @@ export default function TableComponent() {
         // end: controller.end || "",
         paidStart: controller.start || '',
         paidEnd: controller.end || '',
-        sortBy: 'paymentDate',
+        sort: 'paymentDate',
         sortType: 'desc',
       },
     ],
