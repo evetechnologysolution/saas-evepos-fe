@@ -994,7 +994,7 @@ const CashFlow = Loadable(lazy(() => import('../pages/report/CashFlow')));
 const Sales = Loadable(lazy(() => import('../pages/report/Sales')));
 const PopularProduct = Loadable(lazy(() => import('../pages/report/PopularProduct')));
 const PaymentOverview = Loadable(lazy(() => import('../pages/report/PaymentOverview')));
-const StaffPerformance = Loadable(lazy(() => import('../pages/report/performance/StaffPerformance')));
+const StaffPerformance = Loadable(lazy(() => import('../pages/report/performance/StaffPerformanceV2')));
 
 // PROGRESS SCAN
 const ProgressScan = Loadable(lazy(() => import('../pages/scanProgress')));
