@@ -131,17 +131,10 @@ export default function StaffPerformance() {
     getData
   );
 
-  const totalByStatus = summaryData?.detail
-    ?.flatMap((d) => d.progress)
-    ?.reduce((acc, curr) => {
-      const key = curr.status?.toLowerCase();
-      if (!acc[key]) {
-        acc[key] = { qtyKg: 0, qtyPcs: 0 };
-      }
-      acc[key].qtyKg += curr.qtyKg || 0;
-      acc[key].qtyPcs += curr.qtyPcs || 0;
-      return acc;
-    }, {});
+  const grandTotalPerformance = summaryData?.topPerformance?.reduce(
+    (acc, item) => acc + (item.qtyKg || 0) + (item.qtyPcs || 0),
+    0
+  );
 
   return (
     <Page title="Dashboard">
@@ -369,16 +362,9 @@ export default function StaffPerformance() {
                       <Stack gap={2}>
                         <Grid container spacing={2}>
                           {summaryData?.topPerformance?.map((item, i) => {
-                            const key = item?.status?.toLowerCase();
-
-                            const totalKg = totalByStatus?.[key]?.qtyKg || 0;
-                            const totalPcs = totalByStatus?.[key]?.qtyPcs || 0;
-
                             const qtyKg = item?.qtyKg || 0;
                             const qtyPcs = item?.qtyPcs || 0;
-
-                            const total = totalKg + totalPcs;
-
+                            const totalItem = qtyKg + qtyPcs;
                             return (
                               <Grid item xs={12} md={6} xl={4} key={i}>
                                 <WidgetPerformance
@@ -387,7 +373,7 @@ export default function StaffPerformance() {
                                   qtyKg={qtyKg}
                                   qtyPcs={qtyPcs}
                                   total={qtyKg + qtyPcs}
-                                  percent={total ? ((qtyKg + qtyPcs) / total) * 100 : 0}
+                                  percent={grandTotalPerformance ? (totalItem / grandTotalPerformance) * 100 : 0}
                                   color="warning"
                                   icon="material-symbols:star-rounded"
                                 />
