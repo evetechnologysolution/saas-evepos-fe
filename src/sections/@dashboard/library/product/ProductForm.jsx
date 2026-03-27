@@ -5,7 +5,7 @@ import { useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
 // form
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { LoadingButton } from '@mui/lab';
@@ -23,6 +23,9 @@ import {
   Switch,
   CircularProgress,
   Box,
+  TextField,
+  Autocomplete,
+  Chip,
 } from '@mui/material';
 import { NumericFormat } from 'react-number-format';
 // routes
@@ -76,13 +79,18 @@ const CustomSwitch = styled(Switch)(({ theme }) => ({
 
 export default function ProductForm({ isEdit, currentData }) {
   const navigate = useNavigate();
-  const { create, update, list } = useProduct();
+  const { create, update, list, listStatus } = useProduct();
 
   const ctx = useContext(mainContext);
 
   const { enqueueSnackbar } = useSnackbar();
 
   const { data: selectedList, isLoading } = list({
+    page: 1,
+    perPage: 100,
+  });
+
+  const { data: statusList, isLoading: loadingStatus } = listStatus({
     page: 1,
     perPage: 100,
   });
@@ -105,6 +113,7 @@ export default function ProductForm({ isEdit, currentData }) {
       isAvailable: currentData?.isAvailable ?? true,
       minimumOrderQty: currentData?.minimumOrderQty || 0,
       isHaveMinimumQty: currentData?.minimumOrderQty > 0,
+      masterStatus: currentData?.masterStatus || [],
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentData]
@@ -116,6 +125,7 @@ export default function ProductForm({ isEdit, currentData }) {
   });
 
   const {
+    control,
     reset,
     watch,
     getValues,
@@ -213,6 +223,8 @@ export default function ProductForm({ isEdit, currentData }) {
 
       // variant => stringify, karena form-data tidak bisa array object langsung
       formData.append('variantString', JSON.stringify(variantList || []));
+
+      formData.append('masterStatus', JSON.stringify(data.masterStatus || []));
 
       // image (string URL / File / null)
       if (data.image instanceof File) {
@@ -365,6 +377,34 @@ export default function ProductForm({ isEdit, currentData }) {
               />
               {/* <RHFTextField name="productionNotes" label="Production Notes" autoComplete="off" multiline rows={5} /> */}
 
+              <Controller
+                name="masterStatus"
+                control={control}
+                defaultValue={[]}
+                render={({ field, fieldState: { error } }) => (
+                  <Autocomplete
+                    multiple
+                    filterSelectedOptions
+                    disableCloseOnSelect
+                    options={statusList?.docs || []}
+                    value={(field.value || []).map((id) =>
+                      (statusList?.docs || []).find((option) => option._id === id)
+                    ).filter(Boolean)}
+                    getOptionLabel={(option) => option?.name || ''}
+                    isOptionEqualToValue={(option, value) => option._id === value._id}
+                    onChange={(event, newValue) => field.onChange(newValue.map((item) => item._id))}
+                    renderTags={(value, getTagProps) =>
+                      value.map((option, index) => (
+                        <Chip {...getTagProps({ index })} key={option._id} size="small" label={option.name} />
+                      ))
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Master Progress" error={!!error} helperText={error?.message} />
+                    )}
+                  />
+                )}
+              />
+
               <RHFSelect name="unit" label="Unit" placeholder="Unit" SelectProps={{ native: false }}>
                 <MenuItem
                   value=""
@@ -449,7 +489,7 @@ export default function ProductForm({ isEdit, currentData }) {
                         onClick={() => setValue('listNumber', n + 1)}
                         disabled={
                           selectedList?.docs?.some((item) => item?.listNumber === n + 1) &&
-                          currentData?.listNumber !== n + 1
+                            currentData?.listNumber !== n + 1
                             ? Boolean(true)
                             : Boolean(false)
                         }

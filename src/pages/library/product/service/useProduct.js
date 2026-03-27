@@ -7,6 +7,7 @@ export default function useProduct() {
   const queryClient = useQueryClient();
   const queryKey = ['products'];
   const queryKeyAll = ['allProduct'];
+  const queryKeyStatus = ['progress-status'];
 
   const list = (params) =>
     useQuery({
@@ -14,6 +15,17 @@ export default function useProduct() {
       queryFn: async () => {
         const qs = new URLSearchParams(params).toString();
         const { data } = await axios.get(`/product?${qs}`);
+        return data;
+      },
+      keepPreviousData: false,
+    });
+
+  const listStatus = (params) =>
+    useQuery({
+      queryKey: [...queryKeyStatus, params],
+      queryFn: async () => {
+        const qs = new URLSearchParams(params).toString();
+        const { data } = await axios.get(`/progress-label`);
         return data;
       },
       keepPreviousData: false,
@@ -64,6 +76,7 @@ export default function useProduct() {
 
   return {
     list,
+    listStatus,
     getById,
     create,
     update,

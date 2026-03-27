@@ -44,6 +44,15 @@ const ProductSchema = Yup.object({
       })
     )
     .default([]),
+
+  masterStatus: Yup.array().of(Yup.string()).default([]),
+  // masterStatus: Yup.array()
+  //   .of(
+  //     Yup.object().shape({
+  //       statusRef: Yup.string().nullable()
+  //     })
+  //   )
+  //   .default([])
 });
 
 export default ProductSchema;

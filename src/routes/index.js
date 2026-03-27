@@ -997,7 +997,7 @@ const PaymentOverview = Loadable(lazy(() => import('../pages/report/PaymentOverv
 const StaffPerformance = Loadable(lazy(() => import('../pages/report/performance/StaffPerformanceV2')));
 
 // PROGRESS SCAN
-const ProgressScan = Loadable(lazy(() => import('../pages/scanProgress')));
+const ProgressScan = Loadable(lazy(() => import('../pages/scanProgress/v2')));
 // VOUCHER SCAN
 const VoucherScan = Loadable(lazy(() => import('../pages/scanVoucher')));
 
