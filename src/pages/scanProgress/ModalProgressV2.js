@@ -152,137 +152,146 @@ export default function ModalProgress({
             </TableHead>
 
             <TableBody>
-              {detail?.orders?.map((item, i) => {
-                const progressItem = progressDetail[i];
+              {detail?.orders
+                ?.filter((item) =>
+                  item?.masterProgressRef?.masterStatus?.some(
+                    (s) => String(s._id) === String(currentStatusId)
+                  )
+                )
+                ?.map((item, i) => {
+                  // const progressItem = progressDetail[i];
+                  const progressItem = progressDetail.find(
+                    (p) => String(p.id) === String(item.id)
+                  );
 
-                const qtyProcessed =
-                  progressItem?.progressByStatus?.[
-                  currProgress?.toLowerCase()
-                  ] || 0;
+                  const qtyProcessed =
+                    progressItem?.progressByStatus?.[
+                    currProgress?.toLowerCase()
+                    ] || 0;
 
-                const remaining = Math.max(
-                  0,
-                  roundQty(item.qty - qtyProcessed)
-                );
+                  const remaining = Math.max(
+                    0,
+                    roundQty(item.qty - qtyProcessed)
+                  );
 
-                return (
-                  <TableRow key={i} hover>
-                    {/* ITEM */}
-                    <TableCell sx={{ minWidth: 200 }}>
-                      <Typography variant="body2" mt={1}>
-                        {item.qty} {item.unit || 'pcs'} x {item.name}
-                      </Typography>
-
-                      {item.variant?.map((variant, v) => (
-                        <Typography
-                          key={v}
-                          variant="caption"
-                          display="block"
-                          sx={{ opacity: 0.7 }}
-                        >
-                          {variant.name}: {variant.option}{' '}
-                          {variant.qty > 1 && `(x${variant.qty})`}
+                  return (
+                    <TableRow key={i} hover>
+                      {/* ITEM */}
+                      <TableCell sx={{ minWidth: 200 }}>
+                        <Typography variant="body2" mt={1}>
+                          {item.qty} {item.unit || 'pcs'} x {item.name}
                         </Typography>
-                      ))}
 
-                      {item.notes && (
-                        <Typography
-                          variant="caption"
-                          display="block"
-                          sx={{ opacity: 0.7 }}
-                        >
-                          Notes: {item.notes}
+                        {item.variant?.map((variant, v) => (
+                          <Typography
+                            key={v}
+                            variant="caption"
+                            display="block"
+                            sx={{ opacity: 0.7 }}
+                          >
+                            {variant.name}: {variant.option}{' '}
+                            {variant.qty > 1 && `(x${variant.qty})`}
+                          </Typography>
+                        ))}
+
+                        {item.notes && (
+                          <Typography
+                            variant="caption"
+                            display="block"
+                            sx={{ opacity: 0.7 }}
+                          >
+                            Notes: {item.notes}
+                          </Typography>
+                        )}
+                      </TableCell>
+
+                      {/* REMAINING */}
+                      <TableCell align="center">
+                        <Typography variant="body2" mt={1}>
+                          {remaining} {item.unit || 'pcs'}
                         </Typography>
-                      )}
-                    </TableCell>
+                      </TableCell>
 
-                    {/* REMAINING */}
-                    <TableCell align="center">
-                      <Typography variant="body2" mt={1}>
-                        {remaining} {item.unit || 'pcs'}
-                      </Typography>
-                    </TableCell>
+                      {/* QTY PROCESS */}
+                      <TableCell align="center" sx={{ minWidth: 120 }}>
+                        <Controller
+                          name={`listProcess.${i}.qty`}
+                          control={control}
+                          rules={{
+                            min: {
+                              value: 0,
+                              message: 'Tidak boleh minus',
+                            },
+                            validate: (value) => {
+                              if (Number(value) > remaining) {
+                                return `Maks. ${remaining}`;
+                              }
+                              return true;
+                            },
+                          }}
+                          render={({ field }) => (
+                            <TextField
+                              {...field}
+                              type="number"
+                              size="small"
+                              fullWidth
+                              disabled={
+                                currData?.listProcess?.[i]?.isChecked || !remaining
+                              }
+                              error={Boolean(errors?.listProcess?.[i]?.qty)}
+                              helperText={errors?.listProcess?.[i]?.qty?.message}
+                              inputProps={{
+                                min: 0,
+                                max: remaining,
+                              }}
+                              sx={{
+                                '& .MuiInputBase-input': {
+                                  typography: 'body2',
+                                  textAlign: 'center',
+                                },
+                              }}
+                            />
+                          )}
+                        />
+                      </TableCell>
 
-                    {/* QTY PROCESS */}
-                    <TableCell align="center" sx={{ minWidth: 120 }}>
-                      <Controller
-                        name={`listProcess.${i}.qty`}
-                        control={control}
-                        rules={{
-                          min: {
-                            value: 0,
-                            message: 'Tidak boleh minus',
-                          },
-                          validate: (value) => {
-                            if (Number(value) > remaining) {
-                              return `Maks. ${remaining}`;
+                      {/* PROCESS ALL */}
+                      <TableCell align="center">
+                        <Checkbox
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setValue(`listProcess.${i}.qty`, remaining);
+                              setValue(`listProcess.${i}.isChecked`, true);
+                            } else {
+                              setValue(`listProcess.${i}.qty`, '');
+                              setValue(`listProcess.${i}.isChecked`, false);
                             }
-                            return true;
-                          },
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            {...field}
-                            type="number"
-                            size="small"
-                            fullWidth
-                            disabled={
-                              currData?.listProcess?.[i]?.isChecked || !remaining
-                            }
-                            error={Boolean(errors?.listProcess?.[i]?.qty)}
-                            helperText={errors?.listProcess?.[i]?.qty?.message}
-                            inputProps={{
-                              min: 0,
-                              max: remaining,
-                            }}
-                            sx={{
-                              '& .MuiInputBase-input': {
-                                typography: 'body2',
-                                textAlign: 'center',
-                              },
-                            }}
-                          />
-                        )}
-                      />
-                    </TableCell>
+                          }}
+                          disabled={!remaining}
+                        />
+                      </TableCell>
 
-                    {/* PROCESS ALL */}
-                    <TableCell align="center">
-                      <Checkbox
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setValue(`listProcess.${i}.qty`, remaining);
-                            setValue(`listProcess.${i}.isChecked`, true);
-                          } else {
-                            setValue(`listProcess.${i}.qty`, '');
-                            setValue(`listProcess.${i}.isChecked`, false);
-                          }
-                        }}
-                        disabled={!remaining}
-                      />
-                    </TableCell>
-
-                    {/* NOTES */}
-                    <TableCell sx={{ minWidth: 300 }}>
-                      <Controller
-                        name={`listProcess.${i}.notes`}
-                        control={control}
-                        render={({ field }) => (
-                          <TextField
-                            {...field}
-                            multiline
-                            minRows={2}
-                            size="small"
-                            fullWidth
-                            placeholder="Type here..."
-                            disabled={!remaining}
-                          />
-                        )}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+                      {/* NOTES */}
+                      <TableCell sx={{ minWidth: 300 }}>
+                        <Controller
+                          name={`listProcess.${i}.notes`}
+                          control={control}
+                          render={({ field }) => (
+                            <TextField
+                              {...field}
+                              multiline
+                              minRows={2}
+                              size="small"
+                              fullWidth
+                              placeholder="Type here..."
+                              disabled={!remaining}
+                            />
+                          )}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
             </TableBody>
           </Table>
         </TableContainer>
