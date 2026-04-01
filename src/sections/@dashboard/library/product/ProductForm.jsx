@@ -107,7 +107,7 @@ export default function ProductForm({ isEdit, currentData }) {
       category: currentData?.category || '',
       subcategory: currentData?.subcategory || '',
       unit: currentData?.unit || 'pcs',
-      listNumber: currentData?.listNumber || '',
+      listNumber: currentData?.listNumber || 0,
       extraNotes: currentData?.extraNotes ?? false,
       isRecommended: currentData?.isRecommended ?? false,
       isAvailable: currentData?.isAvailable ?? true,
