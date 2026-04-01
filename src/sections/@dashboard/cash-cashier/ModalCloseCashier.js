@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { useReactToPrint } from 'react-to-print';
+import { useQueryClient } from 'react-query';
 import {
   Alert,
   styled,
@@ -85,6 +86,7 @@ BootstrapDialogTitle.propTypes = {
 };
 
 export default function ModalCloseCashier({ open, handleClose, handleCloseCashier }) {
+  const queryClient = useQueryClient();
   const ctx = useContext(mainContext);
 
   const navigate = useNavigate();
@@ -92,6 +94,10 @@ export default function ModalCloseCashier({ open, handleClose, handleCloseCashie
   const { enqueueSnackbar } = useSnackbar();
 
   const { closeCashier } = useCash();
+
+  useEffect(() => {
+    queryClient.invalidateQueries('existCash');
+  }, [open]);
 
   let nonCash = 0;
   if (ctx.existCash?.detail) {
@@ -119,7 +125,7 @@ export default function ModalCloseCashier({ open, handleClose, handleCloseCashie
   const [amount, setAmount] = useState(0);
   const [amountDisplay, setAmountDisplay] = useState('');
   const [notes, setNotes] = useState('');
-  const [cashData, setCashData] = useState(ctx.existCash);
+  const [cashData, setCashData] = useState({});
   const [loading, setLoading] = useState(false);
   const [checked, setChecked] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
@@ -136,6 +142,7 @@ export default function ModalCloseCashier({ open, handleClose, handleCloseCashie
   useEffect(() => {
     setEstimasiSaldo(ctx.existCash?.total || 0);
     setDifference(ctx.existCash?.total > 0 ? -ctx.existCash?.total : 0);
+    setCashData(ctx.existCash);
   }, [ctx.existCash]);
 
   useEffect(() => {
@@ -188,14 +195,14 @@ export default function ModalCloseCashier({ open, handleClose, handleCloseCashie
         setOrders(getOrder.data.docs);
       }
 
-      // Periksa pesanan yang belum selesai
-      const checkUnfinishedResponse = await axios.get('/order/unfinished');
-      if (checkUnfinishedResponse.data !== null) {
-        setShowAlert(true);
-        setLoading(false);
-        setOpenConfirm(false);
-        return; // Keluar dari fungsi jika ada pesanan yang belum selesai
-      }
+      // // Periksa pesanan yang belum selesai
+      // const checkUnfinishedResponse = await axios.get('/order/unfinished');
+      // if (checkUnfinishedResponse?.exists) {
+      //   setShowAlert(true);
+      //   setLoading(false);
+      //   setOpenConfirm(false);
+      //   return; // Keluar dari fungsi jika ada pesanan yang belum selesai
+      // }
 
       // Jika tidak ada pesanan yang belum selesai, lanjutkan dengan menutup kasir
       let objData = {};

@@ -170,6 +170,14 @@ export default function Router() {
               ),
             },
             {
+              path: 'cash-log',
+              element: (
+                <RoleBasedGuard hasContent roles={['owner', 'admin', 'cashier']}>
+                  <CashLog />
+                </RoleBasedGuard>
+              ),
+            },
+            {
               path: 'chat',
               children: [
                 {
@@ -977,6 +985,7 @@ const PaymentSuccess = Loadable(lazy(() => import('../pages/subscription/Success
 const PaymentFailed = Loadable(lazy(() => import('../pages/subscription/Failed')));
 
 // CASH
+const CashLog = Loadable(lazy(() => import('../pages/cash-log/CashLog')));
 const CashCashier = Loadable(lazy(() => import('../pages/cash-cashier/CashCashier')));
 
 // SETTINGS

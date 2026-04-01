@@ -31,7 +31,7 @@ import { formatDate, formatDate2, formatOnlyTime, numberWithCommas } from '../..
 
 // ----------------------------------------------------------------------
 
-OrdersTableRow.propTypes = {
+CashCashierTableRow.propTypes = {
   row: PropTypes.object,
   onDeleteRow: PropTypes.func,
 };
@@ -81,7 +81,7 @@ BootstrapDialogTitle.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default function OrdersTableRow({ row, onDeleteRow }) {
+export default function CashCashierTableRow({ row, onDeleteRow }) {
   const {
     startDate,
     endDate,
@@ -98,12 +98,12 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
     notes,
   } = row;
 
-  const eWallet = detail.dana + detail.ovo + detail.shopeePay + detail.qris;
-  const card = detail.bri + detail.bni + detail.bca + detail.mandiri;
+  const eWallet = detail?.dana + detail?.ovo + detail?.shopeePay;
+  const bankTransfer = detail?.bri + detail?.bni + detail?.bca + detail?.mandiri;
 
-  const closeCashier = history.find((item) => item.title === 'Tutup Kas' && item.isCashOut === true);
-  const fixCashOut = closeCashier ? cashOut - closeCashier.amount : cashOut;
-  const expected = detail.cash + cashIn + eWallet + card - fixCashOut;
+  const closeCashier = history?.find((item) => item?.title === 'Tutup Kas' && item?.isCashOut === true);
+  const fixCashOut = closeCashier ? cashOut - closeCashier?.amount : cashOut;
+  const expected = cashIn - fixCashOut;
 
   const { user } = useAuth();
 
@@ -152,10 +152,9 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
         <TableCell align="center">
           {formatDate(startDate)}, {formatOnlyTime(startDate)}
         </TableCell>
-        <TableCell align="center">{`Rp. ${numberWithCommas(cashIn)}`}</TableCell>
-        <TableCell align="center">{`Rp. ${numberWithCommas(sales)}`}</TableCell>
-        <TableCell align="center">{`Rp. ${numberWithCommas(cashOut)}`}</TableCell>
-        <TableCell align="center">{`Rp. ${numberWithCommas(total)}`}</TableCell>
+        <TableCell align="center">{`Rp. ${numberWithCommas(cashIn || 0)}`}</TableCell>
+        <TableCell align="center">{`Rp. ${numberWithCommas(cashOut || 0)}`}</TableCell>
+        <TableCell align="center">{`Rp. ${numberWithCommas(total || 0)}`}</TableCell>
         <TableCell align="center">
           {endDate ? (
             <>
@@ -190,7 +189,7 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
                   <Iconify icon="solar:printer-outline" sx={{ width: 24, height: 24 }} />
                   {printLoading ? 'Loading...' : 'Print'}
                 </MenuItem>
-                {user.role === 'Super Admin' && (
+                {user.role === 'owner' && (
                   <MenuItem
                     sx={{ color: 'red' }}
                     onClick={() => {
@@ -244,16 +243,14 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
               <Grid container>
                 <Grid item xs={6}>
                   <Stack>
-                    <Typography variant="body1">Sales</Typography>
                     <Typography variant="body1">Cash In</Typography>
                     <Typography variant="body1">Cash Out</Typography>
                   </Stack>
                 </Grid>
                 <Grid item xs={6}>
                   <Stack>
-                    <Typography variant="body1">: {`Rp. ${numberWithCommas(sales)}`}</Typography>
-                    <Typography variant="body1">: {`Rp. ${numberWithCommas(cashIn)}`}</Typography>
-                    <Typography variant="body1">: {`Rp. ${numberWithCommas(fixCashOut)}`}</Typography>
+                    <Typography variant="body1">: {`Rp. ${numberWithCommas(cashIn || 0)}`}</Typography>
+                    <Typography variant="body1">: {`Rp. ${numberWithCommas(fixCashOut || 0)}`}</Typography>
                   </Stack>
                 </Grid>
               </Grid>
@@ -263,14 +260,16 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
                   <Stack>
                     <Typography variant="subtitle1">Cash</Typography>
                     <Typography variant="subtitle1">E-Wallet</Typography>
-                    <Typography variant="subtitle1">Card</Typography>
+                    <Typography variant="subtitle1">Bank Transfer</Typography>
+                    <Typography variant="subtitle1">QRIS</Typography>
                   </Stack>
                 </Grid>
                 <Grid item xs={6}>
                   <Stack>
-                    <Typography variant="body1">: {`Rp. ${numberWithCommas(detail.cash)}`}</Typography>
-                    <Typography variant="body1">: {`Rp. ${numberWithCommas(eWallet)}`}</Typography>
-                    <Typography variant="body1">: {`Rp. ${numberWithCommas(card)}`}</Typography>
+                    <Typography variant="body1">: {`Rp. ${numberWithCommas(detail?.cash || 0)}`}</Typography>
+                    <Typography variant="body1">: {`Rp. ${numberWithCommas(eWallet || 0)}`}</Typography>
+                    <Typography variant="body1">: {`Rp. ${numberWithCommas(bankTransfer || 0)}`}</Typography>
+                    <Typography variant="body1">: {`Rp. ${numberWithCommas(detail?.qris || 0)}`}</Typography>
                   </Stack>
                 </Grid>
               </Grid>
@@ -289,9 +288,9 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
                 </Grid>
                 <Grid item xs={6}>
                   <Stack>
-                    <Typography variant="body1">: {`Rp. ${numberWithCommas(tax)}`}</Typography>
-                    <Typography variant="body1">: {`Rp. ${numberWithCommas(serviceCharge)}`}</Typography>
-                    <Typography variant="body1">: {`Rp. ${numberWithCommas(refund)}`}</Typography>
+                    <Typography variant="body1">: {`Rp. ${numberWithCommas(tax || 0)}`}</Typography>
+                    <Typography variant="body1">: {`Rp. ${numberWithCommas(serviceCharge || 0)}`}</Typography>
+                    <Typography variant="body1">: {`Rp. ${numberWithCommas(refund || 0)}`}</Typography>
                   </Stack>
                 </Grid>
               </Grid>
@@ -316,10 +315,10 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
                 </Grid>
                 <Grid item xs={6}>
                   <Stack>
-                    <Typography variant="body1">: {`Rp. ${numberWithCommas(expected)}`}</Typography>
+                    <Typography variant="body1">: {`Rp. ${numberWithCommas(expected || 0)}`}</Typography>
                     <Typography variant="body1">: {`Rp. ${numberWithCommas(closeCashier?.amount || 0)}`}</Typography>
                     <Typography variant="body1">
-                      : {`Rp. ${numberWithCommas((closeCashier?.amount || 0) - expected)}`}
+                      : {`Rp. ${numberWithCommas((closeCashier?.amount || 0) - (expected || 0))}`}
                     </Typography>
                     {notes && (
                       <Typography variant="body1">
@@ -363,51 +362,34 @@ export default function OrdersTableRow({ row, onDeleteRow }) {
           <table style={{ width: '100%' }}>
             <thead style={{ color: '#6c757d!important', fontSize: '0.9rem' }}>
               <tr>
-                <th align="center">DATE</th>
-                <th align="left">TRANSACTION NAME</th>
-                <th align="center">AMOUNT</th>
-                <th align="center">TYPE</th>
+                <th align="center">Date</th>
+                <th align="left">Transaction Name</th>
+                <th align="center">Amount</th>
+                <th align="center">Type</th>
               </tr>
             </thead>
             <tbody style={{ fontSize: '0.85rem' }}>
-              {history.length > 0 ? (
-                <>
-                  <tr>
+              {history?.length > 0 ? (
+                history?.map((item, i) => (
+                  <tr key={i}>
                     <td align="center" style={{ padding: '0.5rem 0' }}>
-                      {/* {endDate ? formatDate2(endDate) : formatDate2(startDate)} */}
-                      {formatDate2(startDate)}
+                      {item?.createdAt ? formatDate2(item?.createdAt) : "-"}
                     </td>
                     <td align="left" style={{ textTransform: 'capitalize' }}>
-                      Sales
+                      {item.title} {item?.orderRef?.orderId ? item?.orderRef?.orderId : ""}
                     </td>
-                    <td align="center">Rp. {numberWithCommas(sales)}</td>
+                    <td align="center">Rp. {numberWithCommas(item?.amount || 0)}</td>
                     <td align="center">
-                      <Label variant="ghost" color="warning" sx={{ textTransform: 'capitalize' }}>
-                        Sales
+                      <Label
+                        variant="ghost"
+                        color={item?.isCashOut ? 'error' : 'success'}
+                        sx={{ textTransform: 'capitalize' }}
+                      >
+                        {item?.isCashOut ? 'Cash Out' : 'Cash In'}
                       </Label>
                     </td>
                   </tr>
-                  {history.map((item, i) => (
-                    <tr key={i}>
-                      <td align="center" style={{ padding: '0.5rem 0' }}>
-                        {formatDate2(item.date)}
-                      </td>
-                      <td align="left" style={{ textTransform: 'capitalize' }}>
-                        {item.title}
-                      </td>
-                      <td align="center">Rp. {numberWithCommas(item.amount)}</td>
-                      <td align="center">
-                        <Label
-                          variant="ghost"
-                          color={item.isCashOut ? 'error' : 'success'}
-                          sx={{ textTransform: 'capitalize' }}
-                        >
-                          {item.isCashOut ? 'Cash Out' : 'Cash In'}
-                        </Label>
-                      </td>
-                    </tr>
-                  ))}
-                </>
+                ))
               ) : (
                 <tr>
                   <td align="center" colSpan={4} style={{ padding: '0.5rem 0' }}>

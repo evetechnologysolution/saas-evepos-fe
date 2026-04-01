@@ -34,7 +34,6 @@ export default function CashFlow() {
     const [endDate, setEndDate] = useState(null);
     const [filterLoading, setFilterLoading] = useState(false);
     const [data, setData] = useState({});
-    const [expense, setExpense] = useState(0);
     const [totalSales, setTotalSales] = useState(0);
     const [totalCashIn, setTotalCashIn] = useState(0);
     const [totalCashOut, setTotalCashOut] = useState(0);
@@ -44,12 +43,12 @@ export default function CashFlow() {
 
     useEffect(() => {
         const tCashIn = data?.cashIn || 0;
-        const tCashOut = (data?.cashOt || 0) + (data?.refund || 0) + (data?.totalExpense || 0);
+        const tCashOut = (data?.refund || 0) + (data?.totalExpense || 0);
         const tSales = data?.sales || 0;
         const tCashFlow = tSales - tCashOut;
-        const tAmount = tCashIn + tCashFlow;
+        const tAmount = (tCashIn - tSales) + tCashFlow;
 
-        setTotalCashIn(tCashIn);
+        setTotalCashIn(tCashIn - tSales);
         setTotalSales(tSales);
         setTotalCashOut(tCashOut);
         setTotalCashFlow(tCashFlow);

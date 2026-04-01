@@ -41,8 +41,8 @@ const styles = StyleSheet.create({
 });
 
 export default function MyPDF({ period, data }) {
-    const tCashIn = data?.cashIn || 0;
-    const tCashOut = (data?.cashOt || 0) + (data?.refund || 0) + (data?.totalExpense || 0);
+    const tCashIn = (data?.cashIn || 0) - (data?.sales || 0);
+    const tCashOut = (data?.refund || 0) + (data?.totalExpense || 0);
     const tSales = data?.sales || 0;
     const tCashFlow = tSales - tCashOut;
     const tAmount = tCashIn + tCashFlow;

@@ -6,6 +6,7 @@ import axios from 'src/utils/axios';
 export default function useCash() {
   const queryClient = useQueryClient();
   const queryKey = ['listCashCashier'];
+  const queryKeyLog = ['listCashLog'];
   const queryKeyExist = ['existCash'];
 
   const list = (params) =>
@@ -21,7 +22,7 @@ export default function useCash() {
 
   const create = useMutation({
     mutationFn: async (data) => {
-      const response = await axios.post('/cash-balance', data);
+      const response = await axios.post('/cash-balance-history', data);
 
       if (data?.cashOut) {
         await axios.post('/expense/', {
@@ -36,6 +37,7 @@ export default function useCash() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(queryKeyLog);
       queryClient.invalidateQueries(queryKeyExist);
     },
   });
@@ -47,6 +49,7 @@ export default function useCash() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(queryKeyLog);
       queryClient.invalidateQueries(queryKeyExist);
     },
   });
@@ -58,6 +61,7 @@ export default function useCash() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(queryKeyLog);
       queryClient.invalidateQueries(queryKeyExist);
     },
   });
@@ -79,6 +83,8 @@ export default function useCash() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(queryKeyLog);
+      queryClient.invalidateQueries(queryKeyExist);
     },
   });
 

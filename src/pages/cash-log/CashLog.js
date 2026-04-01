@@ -29,29 +29,28 @@ import { TableHeadCustom, TableLoading, TableNoData } from '../../components/tab
 import ConfirmDelete from '../../components/ConfirmDelete';
 // sections
 import {
-  CashCashierTableToolbar,
-  CashCashierTableRow,
+  CashLogTableToolbar,
+  CashLogTableRow,
   ModalCloseCashier,
 } from '../../sections/@dashboard/cash-cashier';
 // context
 import { mainContext } from '../../contexts/MainContext';
 // service
-import useCash from './service/useCash';
+import useCashLog from './service/useCashLog';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'startDate', label: 'Start Date', align: 'center', width: 80 },
-  { id: 'cashIn', label: 'Cash In', align: 'center', width: 80 },
-  { id: 'cashOut', label: 'Cash Out', align: 'center', width: 80 },
-  { id: 'total', label: 'Total', align: 'center', width: 80 },
-  { id: 'endDate', label: 'End Date', align: 'center', width: 80 },
-  { id: '', label: 'Action', align: 'center', width: 10 },
+  { id: 'createdAt', label: 'Created At', align: 'center', width: 80 },
+  { id: '', label: 'Transaction Name', align: 'left', width: 80 },
+  { id: 'amount', label: 'Total', align: 'center', width: 80 },
+  { id: '', label: 'Type', align: 'center', width: 200 },
+  // { id: '', label: 'Action', align: 'center', width: 10 },
 ];
 
 // ----------------------------------------------------------------------
 
-export default function CashCashier() {
+export default function CashLog() {
   const { dense, onChangeDense } = useTable();
 
   const { themeStretch } = useSettings();
@@ -64,7 +63,7 @@ export default function CashCashier() {
   const [endDate, setEndDate] = useState(null);
   const [openCashier, setOpenCashier] = useState(false);
 
-  const { list, remove } = useCash();
+  const { list, remove } = useCashLog();
 
   const [controller, setController] = useState({
     page: 0,
@@ -78,6 +77,7 @@ export default function CashCashier() {
     search: controller.search,
     start: controller.start || '',
     end: controller.end || '',
+    balanceRef: ctx.existCash?._id
   });
 
   const handleCLoseModal = () => {
@@ -173,7 +173,7 @@ export default function CashCashier() {
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <Card>
           <Typography variant="h6" mx={1}>
-            Cashier History
+            Cash Cashier Log
           </Typography>
 
           <Stack
@@ -185,7 +185,7 @@ export default function CashCashier() {
             mb={{ xs: 2, sm: 0 }}
           >
             <div style={{ minWidth: '40%' }}>
-              <CashCashierTableToolbar
+              <CashLogTableToolbar
                 filterStartDate={startDate}
                 onFilterStartDate={handleStartDate}
                 filterEndDate={endDate}
@@ -234,10 +234,10 @@ export default function CashCashier() {
                   {!isLoading ? (
                     <>
                       {tableData?.docs?.map((row) => (
-                        <CashCashierTableRow key={row._id} row={row} onDeleteRow={() => handleDialogDelete(row._id)} />
+                        <CashLogTableRow key={row._id} row={row} onDeleteRow={() => handleDialogDelete(row._id)} />
                       ))}
 
-                      <TableNoData isNotFound={tableData?.docs?.length === 0} />
+                      <TableNoData isNotFound={!tableData?.docs?.length} />
                     </>
                   ) : (
                     <TableLoading />

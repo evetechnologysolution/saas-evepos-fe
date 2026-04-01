@@ -145,12 +145,12 @@ export default function ProductCard({
           currentBill.map((item) =>
             item.id === id
               ? {
-                  ...item,
-                  qty: item.qty + 1,
-                  promotionType: promoType,
-                  promotionQtyMin: promoQtyMin,
-                  discountAmount: promoAmount,
-                }
+                ...item,
+                qty: item.qty + 1,
+                promotionType: promoType,
+                promotionQtyMin: promoQtyMin,
+                discountAmount: promoAmount,
+              }
               : item
           )
         );
@@ -178,9 +178,9 @@ export default function ProductCard({
             currentBill.map((item) =>
               item.id === id
                 ? {
-                    ...item,
-                    qty: item.qty + 1,
-                  }
+                  ...item,
+                  qty: item.qty + 1,
+                }
                 : item
             )
           );
@@ -299,12 +299,10 @@ export default function ProductCard({
           >
             {isOverflow ? (
               <Marquee>
-                <span style={{ marginRight: 10 }}>{`${name} ${
-                  minimumOrderQty > 0 ? `(min ${minimumOrderQty}${unit})` : ''
-                }`}</span>
+                <span style={{ marginRight: 10 }}>{name}</span>
               </Marquee>
             ) : (
-              <span>{`${name} ${minimumOrderQty > 0 ? `(min ${minimumOrderQty}${unit})` : ''}`}</span>
+              <span>{name}</span>
             )}
           </Typography>
         </Tooltip>
