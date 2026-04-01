@@ -76,37 +76,11 @@ export default function CashierPos() {
   const [alertCashier, setAlertCashier] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (ctm.generalSettings?.cashBalance && !ctm.existCash?.isOpen) {
-        setOpenCashier(true);
-      }
+    const isCashEnabled = ctm.generalSettings?.cashBalance;
+    const isOpen = ctm.existCash?.isOpen;
 
-      const today = new Date().setHours(0, 0, 0, 0);
-      const openDate = new Date(ctm.existCash?.startDate).setHours(0, 0, 0, 0);
-
-      if (
-        ctm.generalSettings?.cashBalance &&
-        ctm.existCash?.isOpen &&
-        new Date(today).getTime() > new Date(openDate).getTime()
-      ) {
-        setAlertCashier(true);
-      }
-
-      // if (!ctm.generalSettings?.dineIn?.table && !ctm.generalSettings?.dineIn?.customer && !ctx.currentOrderID) {
-      //     ctx.setCustomerName(randomCustomer());
-      // }
-
-      // if (ctm.generalSettings?.dineIn?.table && !ctx.currentOrderID) {
-      //     ctx.setCustomerName("");
-      // }
-
-      // if (!ctm.generalSettings?.dineIn?.table && ctm.generalSettings?.dineIn?.customer && !ctx.currentOrderID) {
-      //     ctx.setCustomerName("");
-      // }
-    };
-
-    fetchData(); // Call the fetchData function
-  }, []);
+    setAlertCashier(isCashEnabled && !isOpen);
+  }, [ctm.generalSettings?.cashBalance, ctm.existCash?.isOpen]);
 
   // for select order type
   const handleSelectType = (value) => {

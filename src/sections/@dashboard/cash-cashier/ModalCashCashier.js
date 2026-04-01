@@ -108,6 +108,8 @@ export default function ModalCashCashier(props) {
   useEffect(() => {
     if (!ctx.existCash?.isOpen) {
       setValue('title', 'Kas Awal');
+    } else {
+      setValue('title', '');
     }
   }, [ctx.existCash?.isOpen]);
 
@@ -123,6 +125,7 @@ export default function ModalCashCashier(props) {
     let objData = {
       title: values.title,
       amount: values.amount,
+      isCashOut
     };
 
     if (isCashOut) {
