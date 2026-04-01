@@ -196,9 +196,12 @@ export default function OrdersTableRow({ row }) {
             </p>
           )}
           {orders.length > 1 && (
-            <Link component="button" variant="inherit" underline="hover" onClick={handleOpen}>
-              {`+${orders.length - 1} produk lainnya`}
-            </Link>
+            <>
+              <br />
+              <Link component="button" variant="inherit" underline="hover" onClick={handleOpen}>
+                {`+${orders.length - 1} produk lainnya`}
+              </Link>
+            </>
           )}
         </TableCell>
 
@@ -324,7 +327,7 @@ export default function OrdersTableRow({ row }) {
                             Rp.{' '}
                             {numberWithCommas(
                               Math.round(item.qty * item.price) -
-                                (Math.round(item.qty * item.price) * item.discountAmount) / 100
+                              (Math.round(item.qty * item.price) * item.discountAmount) / 100
                             )}
                           </span>
                           <br />

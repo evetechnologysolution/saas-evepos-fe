@@ -448,9 +448,12 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                     </p>
                   )}
                   {orders.length > 1 && (
-                    <Link component="button" variant="inherit" underline="hover" onClick={handleOpen}>
-                      {`+${orders.length - 1} produk lainnya`}
-                    </Link>
+                    <>
+                      <br />
+                      <Link component="button" variant="inherit" underline="hover" onClick={handleOpen}>
+                        {`+${orders.length - 1} produk lainnya`}
+                      </Link>
+                    </>
                   )}
                 </>
               ) : (
