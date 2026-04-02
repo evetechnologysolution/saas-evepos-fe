@@ -71,6 +71,7 @@ export default function PickupOrders() {
     perPage: controller.rowsPerPage,
     search: controller.search,
     pickup: controller.pickup,
+    sort: controller.pickup !== "pending" ? "pickupData.date" : "",
   });
 
   const handlePageChange = (event, newPage) => {
