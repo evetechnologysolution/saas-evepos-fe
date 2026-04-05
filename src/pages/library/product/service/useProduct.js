@@ -42,6 +42,17 @@ export default function useProduct() {
     },
   });
 
+  const updateSorting = useMutation({
+    mutationFn: async (payload) => {
+      const { data } = await axios.post('/product/reorder', payload);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(queryKeyAll);
+    },
+  });
+
   const update = useMutation({
     mutationFn: async ({ id, payload }) => {
       const { data } = await axios.patch(`/product/${id}`, payload);
@@ -79,6 +90,7 @@ export default function useProduct() {
     listStatus,
     getById,
     create,
+    updateSorting,
     update,
     remove,
     queryKey,

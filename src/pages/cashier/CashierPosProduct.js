@@ -19,7 +19,7 @@ import { mainContext } from '../../contexts/MainContext';
 export default function CashierPosProduct() {
   const ctm = useContext(mainContext);
 
-  const rowsPerPage = 50;
+  const rowsPerPage = 52;
   const [page, setPage] = useState(0);
 
   // select category

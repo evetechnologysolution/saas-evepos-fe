@@ -70,6 +70,7 @@ export const PATH_DASHBOARD = {
   library: {
     root: path(ROOTS_DASHBOARD, '/library'),
     product: path(ROOTS_DASHBOARD, '/library/product'),
+    productSorting: path(ROOTS_DASHBOARD, '/library/product/sorting'),
     productCreate: path(ROOTS_DASHBOARD, '/library/product/new'),
     productEdit: (id) => path(ROOTS_DASHBOARD, `/library/product/${id}/edit`),
     category: path(ROOTS_DASHBOARD, '/library/category'),

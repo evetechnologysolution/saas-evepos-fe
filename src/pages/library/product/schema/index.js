@@ -14,7 +14,7 @@ const ProductSchema = Yup.object({
 
   isAvailable: Yup.boolean().required().default(true),
   extraNotes: Yup.boolean().required().default(false),
-  listNumber: Yup.number().default(0),
+  // listNumber: Yup.number().default(0),
   isRecommended: Yup.boolean().required().default(false),
 
   // file image (opsional)
