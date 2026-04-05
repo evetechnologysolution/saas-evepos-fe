@@ -219,7 +219,13 @@ export default function ProductForm({ isEdit, currentData }) {
       formData.append('isRecommended', data.isRecommended);
 
       // number
-      formData.append('listNumber', Number(data.listNumber));
+      if (!isEdit) {
+        const latestNumber = Array.isArray(ctx.product)
+          ? ctx.product.length
+          : 0;
+
+        formData.append('listNumber', latestNumber + 1);
+      }
 
       // variant => stringify, karena form-data tidak bisa array object langsung
       formData.append('variantString', JSON.stringify(variantList || []));
@@ -471,7 +477,7 @@ export default function ProductForm({ isEdit, currentData }) {
                 />
               )}
 
-              <div>
+              {/* <div>
                 <Typography variant="subtitle2" sx={{ mb: 1 }}>
                   List Number
                 </Typography>
@@ -499,7 +505,7 @@ export default function ProductForm({ isEdit, currentData }) {
                     ))}
                   </Stack>
                 )}
-              </div>
+              </div> */}
 
               <div>
                 <Typography variant="subtitle1">List of Variant</Typography>

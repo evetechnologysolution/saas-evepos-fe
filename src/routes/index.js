@@ -358,6 +358,14 @@ export default function Router() {
                   ),
                 },
                 {
+                  path: 'product/sorting',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'admin']}>
+                      <LibraryProductSorting />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
                   path: 'product/new',
                   element: (
                     <RoleBasedGuard hasContent roles={['owner', 'admin']}>
@@ -925,6 +933,7 @@ const PrintCount = Loadable(lazy(() => import('../pages/print-count/PrintCount')
 
 // Library
 const LibraryProduct = Loadable(lazy(() => import('../pages/library/product/LibraryProduct')));
+const LibraryProductSorting = Loadable(lazy(() => import('../pages/library/product/LibraryProductSorting')));
 const LibraryProductCreate = Loadable(lazy(() => import('../pages/library/product/LibraryProductCreate')));
 const LibraryProductEdit = Loadable(lazy(() => import('../pages/library/product/LibraryProductEdit')));
 const LibraryCategory = Loadable(lazy(() => import('../pages/library/category/LibraryCategory')));

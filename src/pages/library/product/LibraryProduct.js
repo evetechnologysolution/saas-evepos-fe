@@ -148,14 +148,28 @@ export default function LibraryProduct() {
               <div style={{ minWidth: '40%' }}>
                 <ProductTableToolbar filterName={search} onFilterName={handleSearch} onEnter={handleOnKeyPress} />
               </div>
-              <Button
-                variant="contained"
-                startIcon={<Iconify icon="eva:plus-fill" />}
-                component={RouterLink}
-                to={PATH_DASHBOARD.library.productCreate}
+              <Stack
+                flexDirection="row"
+                alignItems={{ sm: 'center' }}
+                gap={1}
               >
-                New Product
-              </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<Iconify icon="hugeicons:sorting-05" />}
+                  component={RouterLink}
+                  to={PATH_DASHBOARD.library.productSorting}
+                >
+                  Sorting Product
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<Iconify icon="eva:plus-fill" />}
+                  component={RouterLink}
+                  to={PATH_DASHBOARD.library.productCreate}
+                >
+                  New Product
+                </Button>
+              </Stack>
             </Stack>
 
             <Scrollbar>
