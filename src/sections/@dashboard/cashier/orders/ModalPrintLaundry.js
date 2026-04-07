@@ -75,10 +75,12 @@ export default function ModalPrintLaundry(props) {
   const [objData, setObjData] = useState(null);
   const [shouldPrint, setShouldPrint] = useState(false);
 
+  const fixId = data?._id || data?.tempId || data?.orderId;
+
   // Print Laundry
   const printLaundryRef = useRef();
   const handleAfterPrintLaundry = () => {
-    ctx.updatePrintLaundry(data?._id, { staff: user?.fullname });
+    ctx.updatePrintLaundry(fixId, { staff: user?.fullname });
   };
   const handlePrintLaundry = useReactToPrint({
     content: () => printLaundryRef.current,
@@ -104,7 +106,7 @@ export default function ModalPrintLaundry(props) {
     setObjData({ ...data, qtyLabel: qty });
     setAlert(false);
     if (qty > 0) {
-      await axios.patch(`/order/raw/${data?._id}`, { notes: `Tas Laundry ${qty} pcs` });
+      await axios.patch(`/order/raw/${fixId}`, { notes: `Tas Laundry ${qty} pcs` });
       queryClient.invalidateQueries('listOrders');
     }
     setTimeout(() => {
