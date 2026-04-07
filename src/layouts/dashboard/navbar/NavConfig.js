@@ -171,19 +171,7 @@ export const useNavConfig = () => {
     {
       subheader: 'management',
       items: [
-        // // CONTENT MANAGER
-        // {
-        //   title: 'Content Manager',
-        //   path: PATH_DASHBOARD.content.root,
-        //   icon: ICONS.content,
-        //   roles: ['owner', 'content writer'],
-        //   children: [
-        //     { title: 'blog', path: PATH_DASHBOARD.content.blog },
-        //     { title: 'gallery', path: PATH_DASHBOARD.content.gallery },
-        //     { title: 'blog category', path: PATH_DASHBOARD.content.category },
-        //   ],
-        // },
-        // // REPORT
+        // REPORT
         {
           title: 'report',
           path: PATH_DASHBOARD.report.root,
@@ -198,6 +186,18 @@ export const useNavConfig = () => {
             { title: 'sales report', path: PATH_DASHBOARD.report.sales },
             { title: 'popular product', path: PATH_DASHBOARD.report.popular },
             { title: 'payment overview', path: PATH_DASHBOARD.report.paymentOverview },
+          ],
+        },
+        // CONTENT MANAGER
+        {
+          title: 'Content Manager',
+          path: PATH_DASHBOARD.content.root,
+          icon: ICONS.content,
+          roles: evewashAllowed(['owner', 'content writer']),
+          children: [
+            { title: 'blog', path: PATH_DASHBOARD.content.blog },
+            { title: 'gallery', path: PATH_DASHBOARD.content.gallery },
+            { title: 'blog category', path: PATH_DASHBOARD.content.category },
           ],
         },
         // LIBRARY
