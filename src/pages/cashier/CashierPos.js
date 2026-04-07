@@ -37,6 +37,7 @@ import { generateRandomOrderId } from '../../utils/generateRandom';
 import { numberWithCommas, formatDay } from '../../utils/getData';
 import CashierPosProduct from './CashierPosProduct';
 import PrintReceipt from '../../sections/@dashboard/cashier/pos/PrintReceipt';
+import ModalPrintLaundry from '../../sections/@dashboard/cashier/orders/ModalPrintLaundry';
 
 // ----------------------------------------------------------------------
 
@@ -56,6 +57,9 @@ export default function CashierPos() {
   const [openScanCustomer, setOpenScanCustomer] = useState(false);
 
   const [openInputVoucher, setOpenInputVoucher] = useState(false);
+
+  const [openPrintLaundry, setOpenPrintLaundry] = useState(false);
+  const [selectedObj, setSelectedObj] = useState(null);
 
   const [isPrint, setIsPrint] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -133,6 +137,7 @@ export default function CashierPos() {
     if (currUid) {
       ctx.updatePrintCount(currUid, { staff: user?.fullname });
       setIsPrint(false);
+      setOpenPrintLaundry(true);
       ctx.handleResetPos();
     }
   };
@@ -220,6 +225,7 @@ export default function CashierPos() {
             },
           });
         }
+        setSelectedObj({ ...objData, _id: ctx.currentOrderID });
         await ctx.updateOrders(ctx.currentOrderID, objData);
         enqueueSnackbar('Update success!');
       } else {
@@ -262,6 +268,7 @@ export default function CashierPos() {
             },
           });
         }
+        setSelectedObj(objData);
         await ctx.createOrders(objData);
         enqueueSnackbar('New order has been saved!');
         setIsPrint(true);
@@ -285,6 +292,7 @@ export default function CashierPos() {
 
   const handleResetBill = () => {
     ctx.handleResetPos();
+    setSelectedObj(null);
   };
 
   return (
@@ -636,6 +644,8 @@ export default function CashierPos() {
       <ModalCashCashier open={openCashier} onClose={() => setOpenCashier(false)} required />
 
       <ModalAlertCashCashier open={alertCashier} />
+
+      <ModalPrintLaundry open={openPrintLaundry} onClose={() => setOpenPrintLaundry(false)} data={selectedObj} />
     </Page>
   );
 }
