@@ -346,6 +346,68 @@ export default function Router() {
               ),
             },
             {
+              path: 'content',
+              children: [
+                { element: <Navigate to="/dashboard/content/blog" replace />, index: true },
+                {
+                  path: 'blog',
+                  element: (
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'content writer'])}>
+                      <ListBlog />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'blog/new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'content writer'])}>
+                      <BlogCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'blog/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'content writer'])}>
+                      <BlogEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'gallery',
+                  element: (
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'content writer'])}>
+                      <ListGallery />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'gallery/new',
+                  element: (
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'content writer'])}>
+                      <GalleryCreate />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'gallery/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'content writer'])}>
+                      <GalleryEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'category',
+                  element: (
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'content writer'])}>
+                      <BlogCategory />
+                    </RoleBasedGuard>
+                  ),
+                },
+              ],
+            },
+            {
               path: 'library',
               children: [
                 { element: <Navigate to="/dashboard/library/product" replace />, index: true },
@@ -930,6 +992,17 @@ const MemberPostcard = Loadable(lazy(() => import('../pages/member/postcard/Memb
 
 // Print Count
 const PrintCount = Loadable(lazy(() => import('../pages/print-count/PrintCount')));
+
+// Blog
+const ListBlog = Loadable(lazy(() => import('../pages/blog/TableBlog')));
+const BlogCreate = Loadable(lazy(() => import('../pages/blog/Blog')));
+const BlogEdit = Loadable(lazy(() => import('../pages/blog/BlogEdit')));
+const BlogCategory = Loadable(lazy(() => import('../pages/category/TableCategory')));
+
+// Gallery
+const GalleryCreate = Loadable(lazy(() => import('../pages/gallery/Gallery')));
+const ListGallery = Loadable(lazy(() => import('../pages/gallery/TableGallery')));
+const GalleryEdit = Loadable(lazy(() => import('../pages/gallery/GalleryEdit')));
 
 // Library
 const LibraryProduct = Loadable(lazy(() => import('../pages/library/product/LibraryProduct')));

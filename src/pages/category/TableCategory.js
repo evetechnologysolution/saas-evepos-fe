@@ -13,6 +13,7 @@ import {
   TextField,
   Button,
 } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import axiosInstance from 'src/utils/axios';
 // routes
 // hooks
@@ -171,9 +172,9 @@ export default function TableCategory() {
                   paddingTop: category.length !== 0 ? 10 : 2,
                 }}
               >
-                <Button variant="contained" type="submit" loading={loading}>
+                <LoadingButton variant="contained" type="submit" loading={loading}>
                   Simpan Kategori
-                </Button>
+                </LoadingButton>
               </Box>
             </form>
             <Box sx={{ pb: 2, opacity: 0 }}>
