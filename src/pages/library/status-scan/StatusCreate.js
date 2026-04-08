@@ -1,12 +1,10 @@
-// @mui
-import { Box, CircularProgress, Container } from '@mui/material';
-// routes
+import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useSnackbar } from 'notistack';
+// @mui
+import { Container } from '@mui/material';
 import { handleMutationFeedback } from 'src/utils/mutationfeedback';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router';
 import { PATH_DASHBOARD } from '../../../routes/paths';
 // hooks
 import useSettings from '../../../hooks/useSettings';
@@ -22,18 +20,9 @@ import useStatus from './service/useService';
 
 export default function LibraryCategoryCreate() {
   const { themeStretch } = useSettings();
-  const { create, list } = useStatus();
+  const { create } = useStatus();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
-
-  const {
-    data: tableData,
-    isSuccess,
-    loadingData,
-  } = list({
-    page: 1,
-    perPage: 50,
-  });
 
   const methods = useForm({
     resolver: yupResolver(schema),
@@ -43,19 +32,12 @@ export default function LibraryCategoryCreate() {
   const {
     handleSubmit,
     setValue,
+    getValues,
     formState: { isSubmitting },
     watch,
   } = methods;
 
   const liveFormState = watch();
-
-  useEffect(() => {
-    if (!tableData) return;
-
-    const ids = tableData?.docs?.map((item) => item.listNumber);
-    setValue('selectedList', ids);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tableData]);
 
   const onSubmit = async (data) => {
     await handleMutationFeedback(create.mutateAsync(data), {
@@ -79,20 +61,15 @@ export default function LibraryCategoryCreate() {
           ]}
         />
 
-        {loadingData ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <StatusForm
-            type="create"
-            methods={methods}
-            isSubmitting={isSubmitting}
-            onSubmit={handleSubmit(onSubmit, (e) => console.log(e))}
-            setValue={setValue}
-            formState={liveFormState}
-          />
-        )}
+        <StatusForm
+          type="create"
+          methods={methods}
+          setValue={setValue}
+          getValues={getValues}
+          formState={liveFormState}
+          isSubmitting={isSubmitting}
+          onSubmit={handleSubmit(onSubmit, (e) => console.log(e))}
+        />
       </Container>
     </Page>
   );

@@ -38,8 +38,8 @@ import useStatus from './service/useService';
 const TABLE_HEAD = [
   { id: 'date', label: 'Date', align: 'center' },
   { id: 'name', label: 'Status Name', align: 'left' },
-  { id: 'name', label: 'Previous Status Name', align: 'left' },
-  { id: 'listNumber', label: 'List Number', align: 'center' },
+  // { id: 'name', label: 'Previous Status Name', align: 'left' },
+  { id: 'basePoint', label: 'Progress Point', align: 'center' },
   { id: 'archived', label: 'Archived', align: 'center' },
   { id: '', label: 'Action', align: 'center' },
 ];
@@ -101,8 +101,11 @@ export default function LibraryCategory() {
     }
   };
 
-  const handleEditRow = (id, current) => {
-    // navigate(`/dashboard/library/status-scan/${id}/edit`);
+  const handleEditRow = (id) => {
+    navigate(`/dashboard/library/status-scan/${id}/edit`);
+  };
+
+  const handleArchiveRow = (id, current) => {
     const prev = Boolean(current);
     setSelectedId(id);
     setCurrentArchive(!prev);
@@ -182,7 +185,8 @@ export default function LibraryCategory() {
                           <StatusTableRow
                             key={row._id}
                             row={row}
-                            onEditRow={() => handleEditRow(row._id, row.archived)}
+                            onEditRow={() => handleEditRow(row._id)}
+                            onArchiveRow={() => handleArchiveRow(row._id, row.archived)}
                             onDeleteRow={() => handleDialog(row._id)}
                           />
                         ))}
@@ -222,7 +226,7 @@ export default function LibraryCategory() {
         title="Archive"
         text="Are you sure want to archive this status ?"
         open={openArchive}
-        onClose={handleEditRow}
+        onClose={handleArchiveRow}
         onClick={handleArchive}
       />
       <ConfirmDelete open={open} onClose={handleDialog} onDelete={handleDelete} isLoading={remove.isLoading} />

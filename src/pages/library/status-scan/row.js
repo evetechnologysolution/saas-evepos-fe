@@ -2,14 +2,14 @@ import PropTypes from 'prop-types';
 // @mui
 import { styled, Stack, TableRow, TableCell, Button } from '@mui/material';
 import Iconify from 'src/components/Iconify';
-
-import { formatDate2 } from 'src/utils/getData';
+import { formatDate2, numberWithCommas } from 'src/utils/getData';
 
 // ----------------------------------------------------------------------
 
 StatusTableRow.propTypes = {
   row: PropTypes.object,
   onEditRow: PropTypes.func,
+  onArchiveRow: PropTypes.func,
   onDeleteRow: PropTypes.func,
 };
 
@@ -20,27 +20,37 @@ const CustomTableRow = styled(TableRow)(() => ({
   },
 }));
 
-export default function StatusTableRow({ row, onEditRow, onDeleteRow }) {
-  const { createdAt, name, previousName, listNumber, archived } = row;
+export default function StatusTableRow({ row, onEditRow, onArchiveRow, onDeleteRow }) {
+  const { createdAt, name, basePoint, archived } = row;
 
   return (
     <CustomTableRow hover>
       <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
       <TableCell>{name}</TableCell>
-      <TableCell>{previousName || '-'}</TableCell>
+      {/* <TableCell>{previousName || '-'}</TableCell> */}
 
-      <TableCell align="center">{listNumber}</TableCell>
+      <TableCell align="center">{numberWithCommas(basePoint || 0)}</TableCell>
       <TableCell align="center">{archived ? 'Yes' : 'No'}</TableCell>
 
       <TableCell align="center">
         <Stack direction="row" justifyContent="center" gap={1}>
           <Button
-            title="Archive"
+            title="Edit"
             variant="contained"
             sx={{ p: 0, minWidth: 35, height: 35 }}
             onClick={() => {
               onEditRow();
+            }}
+          >
+            <Iconify icon="eva:edit-outline" sx={{ width: 24, height: 24 }} />
+          </Button>
+          <Button
+            title="Archive"
+            variant="contained"
+            sx={{ p: 0, minWidth: 35, height: 35 }}
+            onClick={() => {
+              onArchiveRow();
             }}
           >
             <Iconify icon="eva:archive-outline" sx={{ width: 24, height: 24 }} />

@@ -79,16 +79,19 @@ const CustomSwitch = styled(Switch)(({ theme }) => ({
 
 export default function ProductForm({ isEdit, currentData }) {
   const navigate = useNavigate();
-  const { create, update, list, listStatus } = useProduct();
+  const {
+    create, update, listStatus
+    // list, 
+  } = useProduct();
 
   const ctx = useContext(mainContext);
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const { data: selectedList, isLoading } = list({
-    page: 1,
-    perPage: 100,
-  });
+  // const { data: selectedList, isLoading } = list({
+  //   page: 1,
+  //   perPage: 100,
+  // });
 
   const { data: statusList, isLoading: loadingStatus } = listStatus({
     page: 1,
@@ -114,6 +117,10 @@ export default function ProductForm({ isEdit, currentData }) {
       minimumOrderQty: currentData?.minimumOrderQty || 0,
       isHaveMinimumQty: currentData?.minimumOrderQty > 0,
       masterStatus: currentData?.masterStatus || [],
+      progressPoint: {
+        baseQty: currentData?.progressPoint?.baseQty || null,
+        basePoint: currentData?.progressPoint?.basePoint || null,
+      }
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentData]
@@ -231,6 +238,8 @@ export default function ProductForm({ isEdit, currentData }) {
       formData.append('variantString', JSON.stringify(variantList || []));
 
       formData.append('masterStatus', JSON.stringify(data.masterStatus || []));
+      formData.append('progressPoint.baseQty', Number(data?.progressPoint?.baseQty || 0));
+      // formData.append('progressPoint.basePoint', Number(data?.progressPoint?.basePoint || 0));
 
       // image (string URL / File / null)
       if (data.image instanceof File) {
@@ -261,23 +270,43 @@ export default function ProductForm({ isEdit, currentData }) {
             <Stack spacing={3}>
               {isEdit && <RHFTextField name="id" label="Product ID" disabled />}
               <RHFTextField name="name" label="Product Name" autoComplete="off" />
-              <NumericFormat
-                customInput={RHFTextField}
-                name="price"
-                label="Price"
-                autoComplete="off"
-                decimalScale={2}
-                decimalSeparator="."
-                thousandSeparator=","
-                allowNegative={false}
-                InputProps={{
-                  startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
-                }}
-                value={getValues('price') === 0 ? '' : getValues('price')}
-                onValueChange={(values) => {
-                  setValue('price', Number(values.value));
-                }}
-              />
+              <Stack flexDirection={{ xs: "column", md: "row" }} gap={3}>
+                <NumericFormat
+                  customInput={RHFTextField}
+                  name="price"
+                  label="Price"
+                  autoComplete="off"
+                  decimalScale={2}
+                  decimalSeparator="."
+                  thousandSeparator=","
+                  allowNegative={false}
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
+                  }}
+                  value={getValues('price') === 0 ? '' : getValues('price')}
+                  onValueChange={(values) => {
+                    setValue('price', Number(values.value));
+                  }}
+                />
+                <NumericFormat
+                  customInput={RHFTextField}
+                  name="productionPrice"
+                  label="Production Cost"
+                  autoComplete="off"
+                  decimalScale={2}
+                  decimalSeparator="."
+                  thousandSeparator=","
+                  allowNegative={false}
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
+                  }}
+                  value={getValues('productionPrice') === 0 ? '' : getValues('productionPrice')}
+                  onValueChange={(values) => {
+                    setValue('productionPrice', Number(values.value));
+                  }}
+                />
+                {/* <RHFTextField name="productionNotes" label="Production Notes" autoComplete="off" multiline rows={5} /> */}
+              </Stack>
               {/* <div>
                 <Typography sx={{ mb: 1 }}>Description</Typography>
                 <RHFEditor simple name="description" />
@@ -291,125 +320,80 @@ export default function ProductForm({ isEdit, currentData }) {
           </Grid>
           <Grid item xs={12} md={6}>
             <Stack spacing={3}>
-              <RHFSelect
-                name="category"
-                label="Category"
-                placeholder="Category"
-                // InputLabelProps={{ shrink: true }}
-                SelectProps={{ native: false }}
-              >
-                <MenuItem
-                  value=""
-                  sx={{
-                    mx: 1,
-                    borderRadius: 0.75,
-                    typography: 'body2',
-                    fontStyle: 'italic',
-                    color: 'text.secondary',
-                  }}
-                  disabled
+              <Stack flexDirection={{ xs: "column", md: "row" }} gap={3}>
+                <RHFSelect
+                  name="category"
+                  label="Category"
+                  placeholder="Category"
+                  // InputLabelProps={{ shrink: true }}
+                  SelectProps={{ native: false }}
                 >
-                  Select One
-                </MenuItem>
-                <Divider />
-                {ctx?.category?.map((item, n) => (
                   <MenuItem
-                    key={n}
-                    value={item?._id}
+                    value=""
                     sx={{
                       mx: 1,
-                      my: 0.5,
                       borderRadius: 0.75,
                       typography: 'body2',
+                      fontStyle: 'italic',
+                      color: 'text.secondary',
                     }}
+                    disabled
                   >
-                    {item?.name}
+                    Select One
                   </MenuItem>
-                ))}
-              </RHFSelect>
+                  <Divider />
+                  {ctx?.category?.map((item, n) => (
+                    <MenuItem
+                      key={n}
+                      value={item?._id}
+                      sx={{
+                        mx: 1,
+                        my: 0.5,
+                        borderRadius: 0.75,
+                        typography: 'body2',
+                      }}
+                    >
+                      {item?.name}
+                    </MenuItem>
+                  ))}
+                </RHFSelect>
 
-              <RHFSelect
-                name="subcategory"
-                label="Subcategory"
-                placeholder="Subcategory"
-                SelectProps={{ native: false }}
-              >
-                <MenuItem
-                  value=""
-                  sx={{
-                    mx: 1,
-                    borderRadius: 0.75,
-                    typography: 'body2',
-                    fontStyle: 'italic',
-                    color: 'text.secondary',
-                  }}
-                  disabled
+                <RHFSelect
+                  name="subcategory"
+                  label="Subcategory"
+                  placeholder="Subcategory"
+                  SelectProps={{ native: false }}
                 >
-                  Select One
-                </MenuItem>
-                <Divider />
-                {ctx?.subcategory?.map((item, n) => (
                   <MenuItem
-                    key={n}
-                    value={item?._id}
+                    value=""
                     sx={{
                       mx: 1,
-                      my: 0.5,
                       borderRadius: 0.75,
                       typography: 'body2',
+                      fontStyle: 'italic',
+                      color: 'text.secondary',
                     }}
+                    disabled
                   >
-                    {item?.name}
+                    Select One
                   </MenuItem>
-                ))}
-              </RHFSelect>
-
-              <NumericFormat
-                customInput={RHFTextField}
-                name="productionPrice"
-                label="Production Cost"
-                autoComplete="off"
-                decimalScale={2}
-                decimalSeparator="."
-                thousandSeparator=","
-                allowNegative={false}
-                InputProps={{
-                  startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
-                }}
-                value={getValues('productionPrice') === 0 ? '' : getValues('productionPrice')}
-                onValueChange={(values) => {
-                  setValue('productionPrice', Number(values.value));
-                }}
-              />
-              {/* <RHFTextField name="productionNotes" label="Production Notes" autoComplete="off" multiline rows={5} /> */}
-
-              <Controller
-                name="masterStatus"
-                control={control}
-                defaultValue={[]}
-                render={({ field, fieldState: { error } }) => (
-                  <Autocomplete
-                    multiple
-                    filterSelectedOptions
-                    disableCloseOnSelect
-                    options={statusList?.docs || []}
-                    value={(field.value || []).map((id) =>
-                      (statusList?.docs || []).find((option) => option._id === id)
-                    ).filter(Boolean)}
-                    getOptionLabel={(option) => option?.name || ''}
-                    isOptionEqualToValue={(option, value) => option._id === value._id}
-                    onChange={(event, newValue) => field.onChange(newValue.map((item) => item._id))}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Chip {...getTagProps({ index })} key={option._id} size="small" label={option.name} />
-                      ))
-                    }
-                    renderInput={(params) => (
-                      <TextField {...params} label="Master Progress" error={!!error} helperText={error?.message} />
-                    )}
-                  />
-                )}
-              />
+                  <Divider />
+                  {ctx?.subcategory?.map((item, n) => (
+                    <MenuItem
+                      key={n}
+                      value={item?._id}
+                      sx={{
+                        mx: 1,
+                        my: 0.5,
+                        borderRadius: 0.75,
+                        typography: 'body2',
+                      }}
+                    >
+                      {item?.name}
+                    </MenuItem>
+                  ))}
+                </RHFSelect>
+              </Stack>
 
               <RHFSelect name="unit" label="Unit" placeholder="Unit" SelectProps={{ native: false }}>
                 <MenuItem
@@ -477,6 +461,69 @@ export default function ProductForm({ isEdit, currentData }) {
                 />
               )}
 
+              <Stack gap={3}>
+                <Typography variant="subtitle2">
+                  Progress Settings
+                </Typography>
+                <Controller
+                  name="masterStatus"
+                  control={control}
+                  defaultValue={[]}
+                  render={({ field, fieldState: { error } }) => (
+                    <Autocomplete
+                      multiple
+                      filterSelectedOptions
+                      disableCloseOnSelect
+                      options={statusList?.docs || []}
+                      value={(field.value || []).map((id) =>
+                        (statusList?.docs || []).find((option) => option._id === id)
+                      ).filter(Boolean)}
+                      getOptionLabel={(option) => option?.name || ''}
+                      isOptionEqualToValue={(option, value) => option._id === value._id}
+                      onChange={(event, newValue) => field.onChange(newValue.map((item) => item._id))}
+                      renderTags={(value, getTagProps) =>
+                        value.map((option, index) => (
+                          <Chip {...getTagProps({ index })} key={option._id} size="small" label={option.name} />
+                        ))
+                      }
+                      renderInput={(params) => (
+                        <TextField {...params} label="Master Progress" error={!!error} helperText={error?.message} />
+                      )}
+                    />
+                  )}
+                />
+                <Stack flexDirection={{ xs: "column", md: "row" }} gap={3}>
+                  <NumericFormat
+                    customInput={RHFTextField}
+                    name="progressPoint.baseQty"
+                    label="Progress Base Qty"
+                    autoComplete="off"
+                    decimalScale={2}
+                    decimalSeparator="."
+                    thousandSeparator=","
+                    allowNegative={false}
+                    value={getValues('progressPoint.baseQty') === 0 ? '' : getValues('progressPoint.baseQty')}
+                    onValueChange={(values) => {
+                      setValue('progressPoint.baseQty', values.value ? Number(values.value) : null);
+                    }}
+                  />
+                  {/* <NumericFormat
+                    customInput={RHFTextField}
+                    name="progressPoint.basePoint"
+                    label="Progress Base Point"
+                    autoComplete="off"
+                    decimalScale={2}
+                    decimalSeparator="."
+                    thousandSeparator=","
+                    allowNegative={false}
+                    value={getValues('progressPoint.basePoint') === 0 ? '' : getValues('progressPoint.basePoint')}
+                    onValueChange={(values) => {
+                      setValue('progressPoint.basePoint', Number(values.value));
+                    }}
+                  /> */}
+                </Stack>
+              </Stack>
+
               {/* <div>
                 <Typography variant="subtitle2" sx={{ mb: 1 }}>
                   List Number
@@ -507,132 +554,134 @@ export default function ProductForm({ isEdit, currentData }) {
                 )}
               </div> */}
 
-              <div>
-                <Typography variant="subtitle1">List of Variant</Typography>
-                {ctx.loadVariant && <CircularProgress />}
-                {!ctx.loadVariant &&
-                  (ctx.variant?.length > 0 ? (
-                    variantList?.map((variant, index) => (
-                      <Stack key={index} flexDirection="row" alignItems="center" justifyContent="center" gap={2} mb={3}>
-                        <RHFSelect
-                          name={`variant${index}`}
-                          SelectProps={{ native: false }}
-                          onChange={(e) => handleVariantChange(e, index)}
-                          value={variant?.variantRef || ''}
-                          required
-                        >
-                          <MenuItem
-                            value=""
-                            sx={{
-                              mx: 1,
-                              borderRadius: 0.75,
-                              typography: 'body2',
-                              fontStyle: 'italic',
-                              color: 'text.secondary',
-                            }}
-                            disabled
+              <Stack gap={3}>
+                <Typography variant="subtitle2">List of Variant</Typography>
+                <Stack gap={3}>
+                  {ctx.loadVariant && <CircularProgress />}
+                  {!ctx.loadVariant &&
+                    (ctx.variant?.length > 0 ? (
+                      variantList?.map((variant, index) => (
+                        <Stack key={index} flexDirection="row" alignItems="center" justifyContent="center" gap={2}>
+                          <RHFSelect
+                            name={`variant${index}`}
+                            SelectProps={{ native: false }}
+                            onChange={(e) => handleVariantChange(e, index)}
+                            value={variant?.variantRef || ''}
+                            required
                           >
-                            Select One
-                          </MenuItem>
-                          <Divider />
-                          {ctx.variant.map((item, n) => (
                             <MenuItem
-                              key={n}
-                              value={item._id}
+                              value=""
                               sx={{
                                 mx: 1,
-                                my: 0.5,
                                 borderRadius: 0.75,
                                 typography: 'body2',
+                                fontStyle: 'italic',
+                                color: 'text.secondary',
                               }}
-                              disabled={variantList.some((v) => v.variantRef === item._id)}
+                              disabled
                             >
-                              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <Typography variant="body2">{item.name}</Typography>
-                                <Typography variant="body2" color="primary">
-                                  {item.options.map((field, i) => (
-                                    <span key={i}>
-                                      {field.name}
-                                      {item.options.length > 1 && i !== item.options.length - 1 && ', '}
-                                    </span>
-                                  ))}
-                                </Typography>
-                              </div>
+                              Select One
                             </MenuItem>
-                          ))}
-                        </RHFSelect>
-                        <FormControlLabel
-                          name={`isRequired[${index}]`}
-                          labelPlacement="start"
-                          sx={{ mx: 0, width: 0.5, justifyContent: 'space-between' }}
-                          control={
-                            <CustomSwitch
-                              checked={Boolean(variant.isMandatory)}
-                              onChange={(e) => handleVariantMandatory(e.target.checked, index)}
-                            />
-                          }
-                          label={
-                            <>
-                              <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                                Mandatory
-                              </Typography>
-                              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                Enable for mandatory
-                              </Typography>
-                            </>
-                          }
-                        />
-                        <FormControlLabel
-                          name={`isMultiple[${index}]`}
-                          labelPlacement="start"
-                          sx={{ mx: 0, width: 0.5, justifyContent: 'space-between' }}
-                          control={
-                            <CustomSwitch
-                              checked={Boolean(variant.isMultiple)}
-                              onChange={(e) => handleVariantMultiple(e.target.checked, index)}
-                            />
-                          }
-                          label={
-                            <>
-                              <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                                Multiple Select
-                              </Typography>
-                              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                Enable for multiple
-                              </Typography>
-                            </>
-                          }
-                        />
-                        <Stack alignItems="flex-end">
-                          <Button
-                            color="error"
-                            variant="contained"
-                            sx={{
-                              boxShadow: '0',
-                              p: 0,
-                              minWidth: 30,
-                              height: 30,
-                              // mb: 0.5,
-                              // bgcolor: '#FFC2B4',
-                              // color: 'red',
-                              // '&:hover': {
-                              //   bgcolor: '#FFC2B4',
-                              // },
-                            }}
-                            size="large"
-                            onClick={() => handleOptionRemove(index)}
-                          >
-                            <Iconify icon="eva:trash-2-outline" width={20} height={20} />
-                          </Button>
+                            <Divider />
+                            {ctx.variant.map((item, n) => (
+                              <MenuItem
+                                key={n}
+                                value={item._id}
+                                sx={{
+                                  mx: 1,
+                                  my: 0.5,
+                                  borderRadius: 0.75,
+                                  typography: 'body2',
+                                }}
+                                disabled={variantList.some((v) => v.variantRef === item._id)}
+                              >
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <Typography variant="body2">{item.name}</Typography>
+                                  <Typography variant="body2" color="primary">
+                                    {item.options.map((field, i) => (
+                                      <span key={i}>
+                                        {field.name}
+                                        {item.options.length > 1 && i !== item.options.length - 1 && ', '}
+                                      </span>
+                                    ))}
+                                  </Typography>
+                                </div>
+                              </MenuItem>
+                            ))}
+                          </RHFSelect>
+                          <FormControlLabel
+                            name={`isRequired[${index}]`}
+                            labelPlacement="start"
+                            sx={{ mx: 0, width: 0.5, justifyContent: 'space-between' }}
+                            control={
+                              <CustomSwitch
+                                checked={Boolean(variant.isMandatory)}
+                                onChange={(e) => handleVariantMandatory(e.target.checked, index)}
+                              />
+                            }
+                            label={
+                              <>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                                  Mandatory
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                  Enable for mandatory
+                                </Typography>
+                              </>
+                            }
+                          />
+                          <FormControlLabel
+                            name={`isMultiple[${index}]`}
+                            labelPlacement="start"
+                            sx={{ mx: 0, width: 0.5, justifyContent: 'space-between' }}
+                            control={
+                              <CustomSwitch
+                                checked={Boolean(variant.isMultiple)}
+                                onChange={(e) => handleVariantMultiple(e.target.checked, index)}
+                              />
+                            }
+                            label={
+                              <>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                                  Multiple Select
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                  Enable for multiple
+                                </Typography>
+                              </>
+                            }
+                          />
+                          <Stack alignItems="flex-end">
+                            <Button
+                              color="error"
+                              variant="contained"
+                              sx={{
+                                boxShadow: '0',
+                                p: 0,
+                                minWidth: 30,
+                                height: 30,
+                                // mb: 0.5,
+                                // bgcolor: '#FFC2B4',
+                                // color: 'red',
+                                // '&:hover': {
+                                //   bgcolor: '#FFC2B4',
+                                // },
+                              }}
+                              size="large"
+                              onClick={() => handleOptionRemove(index)}
+                            >
+                              <Iconify icon="eva:trash-2-outline" width={20} height={20} />
+                            </Button>
+                          </Stack>
                         </Stack>
-                      </Stack>
-                    ))
-                  ) : (
-                    <Typography variant="body2" fontStyle="italic" color="text.secondary">
-                      Variant is empty
-                    </Typography>
-                  ))}
-              </div>
+                      ))
+                    ) : (
+                      <Typography variant="body2" fontStyle="italic" color="text.secondary">
+                        Variant is empty
+                      </Typography>
+                    ))}
+                </Stack>
+              </Stack>
 
               <Stack alignItems="flex-end">
                 <Button variant="text" onClick={handleVariantAdd} disabled={ctx.variant?.length === 0}>

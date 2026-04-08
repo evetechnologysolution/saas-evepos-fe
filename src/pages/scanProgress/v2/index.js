@@ -42,7 +42,6 @@ export default function ScanProgress() {
   const codeReaderRef = useRef(null);
   const inputRef = useRef(null);
   const [currentDataProgress, setCurrentDataProgress] = useState(null);
-  const [currentStatusId, setCurrentStatusId] = useState(null);
 
   const fetchOrderDetail = async (search) => {
     if (!search) throw new Error('No search term');
@@ -176,12 +175,10 @@ export default function ScanProgress() {
     };
   }, [isCameraOpen]);
 
-  const handleSubmit = async (val, id) => {
+  const handleSubmit = async (val) => {
     if (!val) {
       return;
     }
-
-    setCurrentStatusId(id);
     setCurrentDataProgress(val);
     setTimeout(() => {
       setOpenModal(true);
@@ -406,7 +403,9 @@ export default function ScanProgress() {
 
                                   return relatedOrders.every((order) => {
                                     const row = progressDetail.find(
-                                      (p) => String(p.id) === String(order.id)
+                                      (p) => p.itemRef ?
+                                        String(p.id) === String(order.id) && String(p.itemRef) === String(order._id) :
+                                        String(p.id) === String(order.id) && p.orderedQty === order.qty
                                     );
 
                                     const totalProgress =
@@ -422,7 +421,7 @@ export default function ScanProgress() {
                                 <LoadingButton
                                   key={n}
                                   variant="outlined"
-                                  onClick={() => handleSubmit(opt.name, opt._id)}
+                                  onClick={() => handleSubmit(opt)}
                                   sx={{ textTransform: 'capitalize' }}
                                   disabled={isDisabled}
                                   type="button"
@@ -540,8 +539,7 @@ export default function ScanProgress() {
       <ModalProgress
         open={openModal}
         onClose={() => setOpenModal(false)}
-        currProgress={currentDataProgress}
-        currentStatusId={currentStatusId}
+        currDataProgress={currentDataProgress}
         detail={detail}
         refetch={refetch}
       />

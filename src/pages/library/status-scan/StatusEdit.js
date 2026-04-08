@@ -1,12 +1,11 @@
-// @mui
-import { Box, CircularProgress, Container } from '@mui/material';
-// routes
+import { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useSnackbar } from 'notistack';
+// @mui
+import { Box, CircularProgress, Container } from '@mui/material';
 import { handleMutationFeedback } from 'src/utils/mutationfeedback';
-import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router';
 import { PATH_DASHBOARD } from '../../../routes/paths';
 // hooks
 import useSettings from '../../../hooks/useSettings';
@@ -24,21 +23,15 @@ export default function LibraryCategoryCreate() {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const { id } = useParams();
-  const { data: tableData, isLoading: loadingData } = list({
-    page: 1,
-    perPage: 50,
-  });
   const { data: categoryById, isSuccess: isSuccessById, isLoading: loadingCategoryById } = getById(id);
   const methods = useForm({
     resolver: yupResolver(schema),
-    defaultValues: {
-      ...schema.getDefault(),
-      selectedList: [],
-    },
+    defaultValues: schema.getDefault(),
   });
   const {
     handleSubmit,
     setValue,
+    getValues,
     formState: { isSubmitting },
     watch,
     reset,
@@ -46,23 +39,12 @@ export default function LibraryCategoryCreate() {
   const liveFormState = watch();
 
   useEffect(() => {
-    if (!isSuccessById || !tableData) return;
-
-    const ids = tableData?.docs?.map((item) => item.listNumber);
-
-    reset({
-      ...categoryById,
-      selectedList: ids,
-    });
-  }, [isSuccessById, categoryById, tableData, reset]);
+    if (!isSuccessById) return;
+    reset(categoryById);
+  }, [isSuccessById, categoryById, reset]);
 
   const onSubmit = async (data) => {
-    const sanitizedData = {
-      ...data,
-      selectedList: data.selectedList || [],
-    };
-
-    await handleMutationFeedback(update.mutateAsync({ id, payload: sanitizedData }), {
+    await handleMutationFeedback(update.mutateAsync({ id, payload: data }), {
       successMsg: 'Status berhasil disimpan!',
       errorMsg: 'Gagal menyimpan status!',
       onSuccess: () => navigate('/dashboard/library/status-scan'),
@@ -84,7 +66,7 @@ export default function LibraryCategoryCreate() {
             { name: 'New' },
           ]}
         />
-        {loadingCategoryById || loadingData ? (
+        {loadingCategoryById ? (
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <CircularProgress />
           </Box>
@@ -92,10 +74,11 @@ export default function LibraryCategoryCreate() {
           <StatusForm
             type="edit"
             methods={methods}
+            setValue={setValue}
+            getValues={getValues}
+            formState={liveFormState}
             isSubmitting={isSubmitting}
             onSubmit={handleSubmit(onSubmit, (e) => console.log(e))}
-            setValue={setValue}
-            formState={liveFormState}
           />
         )}
       </Container>
