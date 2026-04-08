@@ -32,9 +32,8 @@ export default function ModalProgress({
   open,
   onClose,
   detail,
-  currProgress,
+  currDataProgress,
   refetch,
-  currentStatusId,
 }) {
   const { enqueueSnackbar } = useSnackbar();
 
@@ -55,25 +54,30 @@ export default function ModalProgress({
 
   const currData = watch();
 
-  // progressDetail sudah sesuai index order
   const progressDetail = detail?.progressDetail || [];
 
   useEffect(() => {
     if (detail?.orders) {
       reset({
         listProcess: detail.orders.map((item) => ({
-          status: currProgress || '',
+          status: currDataProgress?.name || '',
+          itemRef: item?._id,
           id: item?.id,
           name: item?.name,
           unit: item?.unit,
+          orderedQty: item?.qty || 0,
           qty: '',
           notes: '',
           isChecked: false,
-          statusRef: currentStatusId,
+          statusRef: currDataProgress?._id,
+          progressPoint: {
+            baseQty: item?.masterProgressRef?.progressPoint?.baseQty || 0,
+            basePoint: currDataProgress?.basePoint || 0,
+          },
         })),
       });
     }
-  }, [currProgress, detail, reset, currentStatusId]);
+  }, [currDataProgress, detail, reset]);
 
   const handleClose = () => {
     reset();
@@ -88,6 +92,8 @@ export default function ModalProgress({
       (item) => item?.qty > 0 && item?.status !== ''
     );
 
+    // console.log(filteredProcess);
+
     if (filteredProcess?.length > 0) {
       setShowAlert(false);
       const finalPayload = {
@@ -97,8 +103,8 @@ export default function ModalProgress({
       const mutation = axiosInstance.post(`/progress/${detail?._id}`, finalPayload);
 
       await handleMutationFeedback(mutation, {
-        successMsg: 'Notes berhasil disimpan!',
-        errorMsg: 'Gagal menyimpan notes!',
+        successMsg: 'Progress berhasil disimpan!',
+        errorMsg: 'Gagal menyimpan progress!',
         onSuccess: () => {
           refetch();
           handleClose();
@@ -113,7 +119,7 @@ export default function ModalProgress({
   return (
     <Dialog open={open} onClose={() => { }} fullWidth maxWidth="md">
       <DialogTitle sx={{ pr: 5 }}>
-        Proses {currProgress}
+        Proses {currDataProgress?.name}
         <IconButton
           onClick={handleClose}
           sx={{ position: 'absolute', right: 8, top: 8 }}
@@ -155,24 +161,29 @@ export default function ModalProgress({
               {detail?.orders
                 ?.filter((item) =>
                   item?.masterProgressRef?.masterStatus?.some(
-                    (s) => String(s._id) === String(currentStatusId)
+                    (s) => String(s._id) === String(currDataProgress?._id)
                   )
                 )
                 ?.map((item, i) => {
-                  // const progressItem = progressDetail[i];
                   const progressItem = progressDetail.find(
-                    (p) => String(p.id) === String(item.id)
+                    (p) => p.itemRef ?
+                      String(p.id) === String(item.id) && String(p.itemRef) === String(item._id) :
+                      String(p.id) === String(item.id) && p.orderedQty === item.qty
                   );
 
                   const qtyProcessed =
                     progressItem?.progressByStatus?.[
-                    currProgress?.toLowerCase()
+                    currDataProgress?.name?.toLowerCase()
                     ] || 0;
 
                   const remaining = Math.max(
                     0,
                     roundQty(item.qty - qtyProcessed)
                   );
+
+                  const originIndex = detail?.orders.findIndex((field) => progressItem?.itemRef ?
+                    String(field.id) === String(progressItem.id) && field._id === progressItem?.itemRef :
+                    String(field.id) === String(progressItem.id) && field.qty === progressItem?.orderedQty);
 
                   return (
                     <TableRow key={i} hover>
@@ -215,7 +226,7 @@ export default function ModalProgress({
                       {/* QTY PROCESS */}
                       <TableCell align="center" sx={{ minWidth: 120 }}>
                         <Controller
-                          name={`listProcess.${i}.qty`}
+                          name={`listProcess.${originIndex}.qty`}
                           control={control}
                           rules={{
                             min: {
@@ -236,10 +247,10 @@ export default function ModalProgress({
                               size="small"
                               fullWidth
                               disabled={
-                                currData?.listProcess?.[i]?.isChecked || !remaining
+                                currData?.listProcess?.[originIndex]?.isChecked || !remaining
                               }
-                              error={Boolean(errors?.listProcess?.[i]?.qty)}
-                              helperText={errors?.listProcess?.[i]?.qty?.message}
+                              error={Boolean(errors?.listProcess?.[originIndex]?.qty)}
+                              helperText={errors?.listProcess?.[originIndex]?.qty?.message}
                               inputProps={{
                                 min: 0,
                                 max: remaining,
@@ -260,11 +271,11 @@ export default function ModalProgress({
                         <Checkbox
                           onChange={(e) => {
                             if (e.target.checked) {
-                              setValue(`listProcess.${i}.qty`, remaining);
-                              setValue(`listProcess.${i}.isChecked`, true);
+                              setValue(`listProcess.${originIndex}.qty`, remaining);
+                              setValue(`listProcess.${originIndex}.isChecked`, true);
                             } else {
-                              setValue(`listProcess.${i}.qty`, '');
-                              setValue(`listProcess.${i}.isChecked`, false);
+                              setValue(`listProcess.${originIndex}.qty`, '');
+                              setValue(`listProcess.${originIndex}.isChecked`, false);
                             }
                           }}
                           disabled={!remaining}
@@ -274,7 +285,7 @@ export default function ModalProgress({
                       {/* NOTES */}
                       <TableCell sx={{ minWidth: 300 }}>
                         <Controller
-                          name={`listProcess.${i}.notes`}
+                          name={`listProcess.${originIndex}.notes`}
                           control={control}
                           render={({ field }) => (
                             <TextField

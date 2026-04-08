@@ -52,7 +52,11 @@ const ProductSchema = Yup.object({
   //       statusRef: Yup.string().nullable()
   //     })
   //   )
-  //   .default([])
+  //   .default([]),
+  progressPoint: Yup.object({
+    baseQty: Yup.number().required('Base qty wajib diisi').min(0, 'Base qty wajib diisi').default(null).nullable(),
+    basePoint: Yup.number().default(null).nullable(),
+  })
 });
 
 export default ProductSchema;
