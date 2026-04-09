@@ -277,8 +277,8 @@ export default function StaffPerformance() {
                     <BestActivity
                       title={item?.staffRef?.fullname || "Activity"}
                       subheader={options.find((opt) => opt.value === controller?.periodBy)?.label || ''}
-                      point={item?.staffRef?.point}
-                      bonus={item?.staffRef?.bonus}
+                      point={item?.staffRef?.point || 0}
+                      bonus={item?.staffRef?.bonus || 0}
                       data={item?.progress?.map((item) => {
                         const totalKg = summaryData?.totalKg || 0;
                         const totalPcs = summaryData?.totalPcs || 0;
