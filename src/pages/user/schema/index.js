@@ -13,6 +13,7 @@ const userSchema = Yup.object({
   email: Yup.string().email('Format email tidak valid').nullable().optional(),
   password: Yup.string().required('Password wajib diisi').min(6, 'Password minimal 6 karakter'),
   role: Yup.string().required('Role wajib diisi').oneOf(['Admin', 'Staff', 'Cashier'], 'Role tidak valid'),
+  info: Yup.string().default(''),
 });
 
 export default userSchema;

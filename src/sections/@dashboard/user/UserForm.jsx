@@ -50,6 +50,7 @@ export default function UserNewEditForm({ isEdit, currentData }) {
       password: '',
       phone: currentData?.phone || '',
       email: currentData?.email || '',
+      info: currentData?.info || '',
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentData]
@@ -156,6 +157,8 @@ export default function UserNewEditForm({ isEdit, currentData }) {
                     </MenuItem>
                   ))}
                 </RHFSelect>
+
+                <RHFTextField name="info" label="Information" type="text" autoComplete="off" multiline rows={3} />
               </>
             </Stack>
 
