@@ -13,7 +13,6 @@ import {
   Typography,
   InputAdornment,
   MenuItem,
-  Box,
   CircularProgress,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -39,23 +38,18 @@ export default function StaffPerformance() {
   const theme = useTheme();
   const { themeStretch } = useSettings();
 
-  const initialData = Array(6).fill({
-    label: '',
-    total: 0,
-    percent: 0,
-  });
   const options = [
     { value: 'all', label: 'All' },
     { value: 'today', label: 'Today' },
     { value: 'this-week', label: 'This Week' },
     { value: 'this-month', label: 'This Month' },
     { value: 'this-year', label: 'This Year' },
-    // { value: "by-date", label: "By Date" }
+    { value: "date", label: "Custom Date" }
   ];
   const defaultPeriod = 'this-month';
-  const [showFilterDate, setShowFilterDate] = useState(false);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [selectedPeriod, setSelectedPeriod] = useState(defaultPeriod);
+  const [tempDate, setTempDate] = useState({ start: null, end: null });
+  const [selectedDate, setSelectedDate] = useState({ start: null, end: null });
   const [ctrStaff, setCtrStaff] = useState({
     page: 1,
     perPage: 50,
@@ -68,18 +62,6 @@ export default function StaffPerformance() {
     start: '',
     end: '',
   });
-
-  // const handleReset = () => {
-  //   setStartDate(null);
-  //   setEndDate(null);
-  //   setController({
-  //     search: "",
-  //     staff: "all",
-  //     periodBy: defaultPeriod,
-  //     start: "",
-  //     end: ""
-  //   });
-  // };
 
   const getStaff = async ({ queryKey }) => {
     const [, params] = queryKey; // Extract query params
@@ -183,10 +165,18 @@ export default function StaffPerformance() {
               sx={{ minWidth: 200 }}
               value={controller?.periodBy || defaultPeriod}
               onChange={(e) => {
-                setController({
-                  ...controller,
-                  periodBy: e.target.value,
-                });
+                const val = e.target.value;
+                setSelectedPeriod(val);
+                if (val !== "date") {
+                  setController((prev) => ({
+                    ...prev,
+                    periodBy: val,
+                    start: "",
+                    end: ""
+                  }))
+                  setTempDate({ start: null, end: null });
+                  setSelectedDate({ start: null, end: null });
+                }
               }}
             >
               {options.map((item, i) => (
@@ -195,16 +185,27 @@ export default function StaffPerformance() {
                 </MenuItem>
               ))}
             </TextField>
-            {showFilterDate && (
+            {selectedPeriod === "date" && (
               <>
                 <div>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <MobileDatePicker
                       label="Start Date"
                       inputFormat="dd/MM/yyyy"
-                      value={startDate}
+                      value={tempDate?.start}
                       onChange={(newValue) => {
-                        setStartDate(newValue);
+                        setTempDate((prev) => ({ ...prev, start: newValue }));
+                      }}
+                      onAccept={(newValue) => {
+                        setSelectedDate((prev) => ({ ...prev, start: newValue }));
+                        if (newValue && selectedDate?.end) {
+                          setController((prev) => ({
+                            ...prev,
+                            periodBy: '',
+                            start: newValue,
+                            end: selectedDate?.end,
+                          }));
+                        }
                       }}
                       renderInput={(params) => (
                         <TextField
@@ -227,9 +228,20 @@ export default function StaffPerformance() {
                     <MobileDatePicker
                       label="End Date"
                       inputFormat="dd/MM/yyyy"
-                      value={endDate}
+                      value={tempDate?.end}
                       onChange={(newValue) => {
-                        setEndDate(newValue);
+                        setTempDate((prev) => ({ ...prev, end: newValue }));
+                      }}
+                      onAccept={(newValue) => {
+                        setSelectedDate((prev) => ({ ...prev, end: newValue }));
+                        if (newValue && selectedDate?.start) {
+                          setController((prev) => ({
+                            ...prev,
+                            periodBy: '',
+                            start: selectedDate?.start,
+                            end: newValue,
+                          }));
+                        }
                       }}
                       renderInput={(params) => (
                         <TextField
@@ -265,6 +277,8 @@ export default function StaffPerformance() {
                     <BestActivity
                       title={item?.staffRef?.fullname || "Activity"}
                       subheader={options.find((opt) => opt.value === controller?.periodBy)?.label || ''}
+                      point={item?.staffRef?.point}
+                      bonus={item?.staffRef?.bonus}
                       data={item?.progress?.map((item) => {
                         const totalKg = summaryData?.totalKg || 0;
                         const totalPcs = summaryData?.totalPcs || 0;

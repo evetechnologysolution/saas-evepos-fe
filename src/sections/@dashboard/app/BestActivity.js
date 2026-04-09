@@ -1,29 +1,45 @@
 // @mui
 import PropTypes from 'prop-types';
 import { Card, CardHeader, Typography, Stack, LinearProgress } from '@mui/material';
+import Label from '../../../components/Label';
+import Iconify from '../../../components/Iconify';
 // utils
-import { fPercent, fNumber } from '../../../utils/formatNumber';
+import { fPercent, fNumber, fCurrency } from '../../../utils/formatNumber';
 
 // ----------------------------------------------------------------------
 
 BestActivity.propTypes = {
   title: PropTypes.string,
   subheader: PropTypes.string,
-  filter: PropTypes.node,
+  point: PropTypes.number,
+  bonus: PropTypes.number,
   data: PropTypes.array.isRequired,
 };
 
-export default function BestActivity({ title, subheader, filter, data, ...other }) {
+export default function BestActivity({ title, subheader, point, bonus, data, ...other }) {
   return (
     <Card {...other}>
-      <Stack direction="row" justifyContent="space-between">
-        <CardHeader title={title} subheader={subheader} />
-        {filter && (
-          <div style={{ padding: "24px 24px 0px" }}>{filter}</div>
-        )}
+      <CardHeader title={title} subheader={subheader} />
+      <Stack direction="row" justifyContent="space-between" sx={{ px: 3, pt: 1 }}>
+        <Label variant="ghost" color="warning" sx={{ minWidth: 60 }}>
+          <Stack flexDirection="row" justifyContent="space-between" width="100%">
+            <Iconify icon="material-symbols:star-rounded" sx={{ width: 20, height: 20 }} />{' '}
+            <Typography variant="subtitle2" sx={{ fontStyle: 'italic' }}>
+              {fNumber(point)}
+            </Typography>
+          </Stack>
+        </Label>
+        <Label variant="ghost" color="success" sx={{ minWidth: 80 }}>
+          <Stack flexDirection="row" justifyContent="space-between" width="100%">
+            <Iconify icon="tabler:coin-filled" sx={{ width: 20, height: 20 }} />{' '}
+            <Typography variant="subtitle2" sx={{ fontStyle: 'italic' }}>
+              {fCurrency(bonus)}
+            </Typography>
+          </Stack>
+        </Label>
       </Stack>
 
-      <Stack spacing={2} sx={{ p: 3 }}>
+      <Stack spacing={2} sx={{ px: 3, py: 1 }}>
         {data.map((progress, index) => (
           <ProgressItem key={index} progress={progress} />
         ))}

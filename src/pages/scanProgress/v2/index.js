@@ -54,11 +54,12 @@ export default function ScanProgress() {
 
   const { getDetailPoint } = useStatus();
 
-  const [selectedPeriod, setSelectedPeriod] = useState('this-month');
+  const defaultPeriod = 'this-month';
+  const [selectedPeriod, setSelectedPeriod] = useState(defaultPeriod);
   const [tempDate, setTempDate] = useState({ start: null, end: null });
   const [selectedDate, setSelectedDate] = useState({ start: null, end: null });
   const [controller, setController] = useState({
-    periodBy: 'this-month',
+    periodBy: defaultPeriod,
     start: '',
     end: '',
   });
@@ -235,7 +236,7 @@ export default function ScanProgress() {
                   if (val !== "date") {
                     setController((prev) => ({
                       ...prev,
-                      periodBy: e.target.value,
+                      periodBy: val,
                       start: "",
                       end: ""
                     }))
@@ -267,6 +268,7 @@ export default function ScanProgress() {
                           if (newValue && selectedDate?.end) {
                             setController((prev) => ({
                               ...prev,
+                              periodBy: '',
                               start: newValue,
                               end: selectedDate?.end,
                             }));
@@ -302,6 +304,7 @@ export default function ScanProgress() {
                           if (newValue && selectedDate?.start) {
                             setController((prev) => ({
                               ...prev,
+                              periodBy: '',
                               start: selectedDate?.start,
                               end: newValue,
                             }));
@@ -340,7 +343,7 @@ export default function ScanProgress() {
                   <div>
                     <Label variant="ghost" color="warning" sx={{ minWidth: 60 }}>
                       <Stack flexDirection="row" justifyContent="space-between" width="100%">
-                        <Iconify icon="material-symbols:star" sx={{ width: 20, height: 20 }} />{' '}
+                        <Iconify icon="material-symbols:star-rounded" sx={{ width: 20, height: 20 }} />{' '}
                         <Typography variant="subtitle2" sx={{ fontStyle: 'italic' }}>
                           {numberWithCommas(dataPoint?.detail?.[0]?.point || 0)}
                         </Typography>
