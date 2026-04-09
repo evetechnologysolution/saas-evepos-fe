@@ -1,10 +1,8 @@
 import { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 import { useQuery } from 'react-query';
 // @mui
 import {
   Box,
-  Button,
   Card,
   Table,
   Switch,
@@ -16,12 +14,8 @@ import {
   Typography,
 } from '@mui/material';
 import axios from '../../../utils/axios';
-// routes
-import { PATH_DASHBOARD } from '../../../routes/paths';
 // hooks
 import useTable from '../../../hooks/useTable';
-// components
-import Iconify from '../../../components/Iconify';
 import Scrollbar from '../../../components/Scrollbar';
 import { TableHeadCustom, TableLoading, TableNoData } from '../../../components/table';
 // sections
@@ -49,11 +43,17 @@ export default function ListActivity() {
   const [countData, setCountData] = useState(0);
   const [search, setSearch] = useState('');
 
+  const [periodActivity, setPeriodActivity] = useState('all');
+  const [tempDate, setTempDate] = useState({ start: null, end: null });
+  const [selectedDate, setSelectedDate] = useState({ start: null, end: null });
+
   const [controller, setController] = useState({
     page: 0,
     rowsPerPage: 10,
     search: '',
     periodBy: 'all',
+    start: '',
+    end: ''
   });
 
   const getData = async ({ queryKey }) => {
@@ -77,6 +77,8 @@ export default function ListActivity() {
         perPage: controller.rowsPerPage,
         search: controller.search || '',
         periodBy: controller.periodBy || '',
+        start: controller.start || '',
+        end: controller.end || '',
       },
     ],
     getData
@@ -98,10 +100,19 @@ export default function ListActivity() {
   };
 
   const handlePeriod = (event) => {
-    setController({
-      ...controller,
-      periodBy: event.target.value,
-    });
+    const val = event.target.value;
+    setPeriodActivity(val)
+    if (val !== "date") {
+      setController({
+        ...controller,
+        page: 0,
+        periodBy: val,
+        start: "",
+        end: ""
+      });
+      setTempDate({ start: null, end: null });
+      setSelectedDate({ start: null, end: null });
+    }
   };
 
   const handleSearch = (value) => {
@@ -138,19 +149,16 @@ export default function ListActivity() {
             <ActivityTableToolbar
               filterName={search}
               onFilterName={handleSearch}
-              filterPeriod={controller.periodBy}
+              filterPeriod={periodActivity}
               onFilterPeriod={handlePeriod}
               onEnter={handleOnKeyPress}
+              tempDate={tempDate}
+              setTempDate={setTempDate}
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+              setController={setController}
             />
           </div>
-          {/* <Button
-                                variant="contained"
-                                startIcon={<Iconify icon="eva:plus-fill" />}
-                                component={RouterLink}
-                                to={PATH_DASHBOARD.user.create}
-                            >
-                                New User
-                            </Button> */}
         </Stack>
 
         <Scrollbar>

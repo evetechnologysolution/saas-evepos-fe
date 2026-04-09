@@ -119,7 +119,7 @@ export default function Dashboard() {
     thisWeek: 'This Week',
     today: 'Today',
     thisYear: 'This Year',
-    date: 'Custom Date Range',
+    date: 'Custom Date',
   };
 
   // Handler untuk preset filter ATAS
@@ -193,11 +193,11 @@ export default function Dashboard() {
             <MenuItem value="thisWeek">This Week</MenuItem>
             <MenuItem value="thisMonth">This Month</MenuItem>
             <MenuItem value="thisYear">This Year</MenuItem>
-            <MenuItem value="date">Custom Date Range</MenuItem>
+            <MenuItem value="date">Custom Date</MenuItem>
           </Select>
         </Box>
 
-        {/* Custom Date Range Picker ATAS */}
+        {/* Custom Date Picker ATAS */}
         {isTopCustomDateActive && (
           <Grid container spacing={2} alignItems="center" justifyContent="flex-end" sx={{ mb: 2 }}>
             <Grid item xs={12} sm="auto">
@@ -337,11 +337,11 @@ export default function Dashboard() {
               <MenuItem value="thisWeek">This Week</MenuItem>
               <MenuItem value="thisMonth">This Month</MenuItem>
               <MenuItem value="thisYear">This Year</MenuItem>
-              <MenuItem value="date">Custom Date Range</MenuItem>
+              <MenuItem value="date">Custom Date</MenuItem>
             </Select>
           </Grid>
 
-          {/* Custom Date Range Picker untuk section BAWAH */}
+          {/* Custom Date Picker untuk section BAWAH */}
           {isBottomCustomDateActive && (
             <Grid item xs={12}>
               <Grid container spacing={2} alignItems="center" justifyContent="flex-end">

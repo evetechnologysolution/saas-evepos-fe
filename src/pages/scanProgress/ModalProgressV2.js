@@ -34,6 +34,7 @@ export default function ModalProgress({
   detail,
   currDataProgress,
   refetch,
+  refetchPoint,
 }) {
   const { enqueueSnackbar } = useSnackbar();
 
@@ -107,6 +108,7 @@ export default function ModalProgress({
         errorMsg: 'Gagal menyimpan progress!',
         onSuccess: () => {
           refetch();
+          refetchPoint();
           handleClose();
         },
         enqueueSnackbar,

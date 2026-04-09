@@ -1,8 +1,10 @@
-import PropTypes from "prop-types";
-import { useState } from "react";
-import { Stack, InputAdornment, TextField, MenuItem } from "@mui/material";
+import PropTypes from 'prop-types';
+import { Stack, InputAdornment, TextField, MenuItem, Box } from '@mui/material';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 // components
-import Iconify from "../../../../components/Iconify";
+import Iconify from '../../../../components/Iconify';
 
 // ----------------------------------------------------------------------
 
@@ -12,20 +14,24 @@ ActivityTableToolbar.propTypes = {
   onFilterName: PropTypes.func,
   onFilterRole: PropTypes.func,
   onFilterPeriod: PropTypes.func,
-  onEnter: PropTypes.func
+  onEnter: PropTypes.func,
+  tempDate: PropTypes.object,
+  setTempDate: PropTypes.func,
+  selectedDate: PropTypes.object,
+  setSelectedDate: PropTypes.func,
+  setController: PropTypes.func,
 };
 
-export default function ActivityTableToolbar({ filterName, filterPeriod, onFilterName, onFilterPeriod, onEnter }) {
+export default function ActivityTableToolbar({ filterName, filterPeriod, onFilterName, onFilterPeriod, onEnter, tempDate, setTempDate, selectedDate, setSelectedDate, setController }) {
   const options = [
     { value: "all", label: "All" },
     { value: "today", label: "Today" },
     { value: "this-week", label: "This Week" },
     { value: "this-month", label: "This Month" },
     { value: "this-year", label: "This Year" },
-    // { value: "by-date", label: "By Date" }
+    { value: "date", label: "Custom Date" }
   ];
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+
   return (
     <Stack spacing={2} direction={{ xs: "column", sm: "row" }} sx={{ py: 2.5, px: 1 }}>
       <TextField
@@ -60,6 +66,83 @@ export default function ActivityTableToolbar({ filterName, filterPeriod, onFilte
           </MenuItem>
         ))}
       </TextField>
+
+      {filterPeriod === "date" && (
+        <>
+          <Box minWidth={160}>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <MobileDatePicker
+                label="Start Date"
+                inputFormat="dd/MM/yyyy"
+                value={tempDate?.start}
+                onChange={(newValue) => {
+                  setTempDate((prev) => ({ ...prev, start: newValue }));
+                }}
+                onAccept={(newValue) => {
+                  setSelectedDate((prev) => ({ ...prev, start: newValue }));
+                  if (newValue && selectedDate?.end) {
+                    setController((prev) => ({
+                      ...prev,
+                      page: 0,
+                      start: newValue,
+                      end: selectedDate?.end,
+                    }));
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    fullWidth
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <img src="/assets/calender-icon.svg" alt="icon" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
+          </Box>
+          <Box minWidth={160}>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <MobileDatePicker
+                label="End Date"
+                inputFormat="dd/MM/yyyy"
+                value={tempDate?.end}
+                onChange={(newValue) => {
+                  setTempDate((prev) => ({ ...prev, end: newValue }));
+                }}
+                onAccept={(newValue) => {
+                  setSelectedDate((prev) => ({ ...prev, end: newValue }));
+                  if (newValue && selectedDate?.start) {
+                    setController((prev) => ({
+                      ...prev,
+                      page: 0,
+                      start: selectedDate?.start,
+                      end: newValue,
+                    }));
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    fullWidth
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <img src="/assets/calender-icon.svg" alt="icon" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
+          </Box>
+        </>
+      )}
 
       <TextField
         fullWidth

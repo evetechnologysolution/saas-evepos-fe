@@ -6,6 +6,7 @@ import axios from 'src/utils/axios';
 export default function useStatus() {
   const queryClient = useQueryClient();
   const queryKey = ['progress-label'];
+  const queryKeyPoint = ['detail-point'];
 
   const list = (params) =>
     useQuery({
@@ -15,6 +16,18 @@ export default function useStatus() {
         const { data } = await axios.get(`/progress-label/all`);
         return data;
       },
+      keepPreviousData: false,
+    });
+
+  const getDetailPoint = (params) =>
+    useQuery({
+      queryKey: [...queryKeyPoint, params],
+      queryFn: async () => {
+        const qs = new URLSearchParams(params).toString();
+        const { data } = await axios.get(`/progress/total-point?${qs}`);
+        return data;
+      },
+      enabled: !!params?.staff && params.staff !== "all",
       keepPreviousData: false,
     });
 
@@ -60,6 +73,7 @@ export default function useStatus() {
 
   return {
     list,
+    getDetailPoint,
     getById,
     create,
     update,

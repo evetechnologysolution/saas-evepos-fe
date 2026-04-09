@@ -12,8 +12,16 @@ import {
   Skeleton,
   IconButton,
   Box,
+  Select,
+  MenuItem,
+  TextField,
+  InputAdornment,
+  Divider
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import HeaderBreadcrumbs from 'src/components/HeaderBreadcrumbs';
 import Page from 'src/components/Page';
 import useAuth from 'src/hooks/useAuth';
@@ -23,9 +31,10 @@ import ScanProgresTableToolbar from 'src/sections/@dashboard/scan-progress/ScanP
 import Scrollbar from 'src/components/Scrollbar';
 import Label from 'src/components/Label';
 import axiosInstance from 'src/utils/axios';
-import { formatDate2 } from 'src/utils/getData';
+import { formatDate2, numberWithCommas } from 'src/utils/getData';
 import { maskedPhone } from 'src/utils/masked';
 import Iconify from 'src/components/Iconify';
+import useStatus from '../service/useStatus';
 import ModalProgress from '../ModalProgressV2';
 import '../scanProgress.scss';
 
@@ -42,6 +51,25 @@ export default function ScanProgress() {
   const codeReaderRef = useRef(null);
   const inputRef = useRef(null);
   const [currentDataProgress, setCurrentDataProgress] = useState(null);
+
+  const { getDetailPoint } = useStatus();
+
+  const defaultPeriod = 'this-month';
+  const [selectedPeriod, setSelectedPeriod] = useState(defaultPeriod);
+  const [tempDate, setTempDate] = useState({ start: null, end: null });
+  const [selectedDate, setSelectedDate] = useState({ start: null, end: null });
+  const [controller, setController] = useState({
+    periodBy: defaultPeriod,
+    start: '',
+    end: '',
+  });
+
+  const { data: dataPoint, isLoading: loadingPoint, refetch: refetchPoint } = getDetailPoint({
+    staff: user?._id,
+    periodBy: controller.periodBy,
+    start: controller.start,
+    end: controller.end,
+  });
 
   const fetchOrderDetail = async (search) => {
     if (!search) throw new Error('No search term');
@@ -197,6 +225,155 @@ export default function ScanProgress() {
         />
 
         <Card sx={{ p: 3 }}>
+          <Stack spacing={2} sx={{ px: { md: 1.5 } }}>
+            <Stack gap={{ xs: 2, md: 3 }} flexDirection={{ xs: "column", md: "row" }}>
+              <Typography variant="subtitle2">My Performance</Typography>
+              <Select
+                value={selectedPeriod}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSelectedPeriod(val);
+                  if (val !== "date") {
+                    setController((prev) => ({
+                      ...prev,
+                      periodBy: val,
+                      start: "",
+                      end: ""
+                    }))
+                    setTempDate({ start: null, end: null });
+                    setSelectedDate({ start: null, end: null });
+                  }
+                }}
+              >
+                <MenuItem value="today">Today</MenuItem>
+                <MenuItem value="this-week">This Week</MenuItem>
+                <MenuItem value="this-month">This Month</MenuItem>
+                <MenuItem value="this-year">This Year</MenuItem>
+                <MenuItem value="date">Custom Date</MenuItem>
+              </Select>
+
+              {selectedPeriod === "date" && (
+                <>
+                  <div>
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <MobileDatePicker
+                        label="Start Date"
+                        inputFormat="dd/MM/yyyy"
+                        value={tempDate?.start}
+                        onChange={(newValue) => {
+                          setTempDate((prev) => ({ ...prev, start: newValue }));
+                        }}
+                        onAccept={(newValue) => {
+                          setSelectedDate((prev) => ({ ...prev, start: newValue }));
+                          if (newValue && selectedDate?.end) {
+                            setController((prev) => ({
+                              ...prev,
+                              periodBy: '',
+                              start: newValue,
+                              end: selectedDate?.end,
+                            }));
+                          }
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            fullWidth
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <img src="/assets/calender-icon.svg" alt="icon" />
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                        )}
+                      />
+                    </LocalizationProvider>
+                  </div>
+                  <div>
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <MobileDatePicker
+                        label="End Date"
+                        inputFormat="dd/MM/yyyy"
+                        value={tempDate?.end}
+                        onChange={(newValue) => {
+                          setTempDate((prev) => ({ ...prev, end: newValue }));
+                        }}
+                        onAccept={(newValue) => {
+                          setSelectedDate((prev) => ({ ...prev, end: newValue }));
+                          if (newValue && selectedDate?.start) {
+                            setController((prev) => ({
+                              ...prev,
+                              periodBy: '',
+                              start: selectedDate?.start,
+                              end: newValue,
+                            }));
+                          }
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            fullWidth
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <img src="/assets/calender-icon.svg" alt="icon" />
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                        )}
+                      />
+                    </LocalizationProvider>
+                  </div>
+                </>
+              )}
+            </Stack>
+
+            <Stack gap={{ xs: 1, md: 3 }} flexDirection={{ xs: "column", md: "row" }}>
+              <Stack>
+                <Typography variant="body2">Full Name</Typography>
+                <Typography variant="subtitle2">{user?.fullname || '-'}</Typography>
+              </Stack>
+              <Stack>
+                <Typography variant="body2">Performance Point</Typography>
+                {loadingPoint ? (
+                  <Skeleton variant="text" width="100px" />
+                ) : (
+                  <div>
+                    <Label variant="ghost" color="warning" sx={{ minWidth: 60 }}>
+                      <Stack flexDirection="row" justifyContent="space-between" width="100%">
+                        <Iconify icon="material-symbols:star-rounded" sx={{ width: 20, height: 20 }} />{' '}
+                        <Typography variant="subtitle2" sx={{ fontStyle: 'italic' }}>
+                          {numberWithCommas(dataPoint?.detail?.[0]?.point || 0)}
+                        </Typography>
+                      </Stack>
+                    </Label>
+                  </div>
+                )}
+              </Stack>
+              <Stack>
+                <Typography variant="body2">Performance Bonus</Typography>
+                {loadingPoint ? (
+                  <Skeleton variant="text" width="100px" />
+                ) : (
+                  <div>
+                    <Label variant="ghost" color="success" sx={{ minWidth: 80 }}>
+                      <Stack flexDirection="row" justifyContent="space-between" width="100%">
+                        <Iconify icon="tabler:coin-filled" sx={{ width: 20, height: 20 }} />{' '}
+                        <Typography variant="subtitle2" sx={{ fontStyle: 'italic' }}>
+                          Rp. {numberWithCommas(dataPoint?.detail?.[0]?.bonus || 0)}
+                        </Typography>
+                      </Stack>
+                    </Label>
+                  </div>
+                )}
+              </Stack>
+            </Stack>
+          </Stack>
+
+          <Divider sx={{ mx: { md: 1.5 }, mt: 1.5 }} />
+
           <ScanProgresTableToolbar
             ref={inputRef}
             handleOpenCamera={handleOpenCamera}
@@ -222,7 +399,7 @@ export default function ScanProgress() {
               </Alert>
             )}
 
-            <Grid container spacing={2} sx={{ p: 1.5 }}>
+            <Grid container spacing={2} sx={{ p: { md: 1.5 } }}>
               <Grid
                 item
                 xs={12}
@@ -542,123 +719,126 @@ export default function ScanProgress() {
         currDataProgress={currentDataProgress}
         detail={detail}
         refetch={refetch}
+        refetchPoint={refetchPoint}
       />
 
-      {isCameraOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            zIndex: 9999,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          {/* Kamera pakai react-webcam */}
-          <Webcam
-            ref={webcamRef}
-            audio={false}
-            screenshotFormat="image/jpeg"
-            videoConstraints={{ facingMode: 'environment' }}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-          <IconButton
-            onClick={() => handleCloseCamera()}
+      {
+        isCameraOpen && (
+          <div
             style={{
-              position: 'absolute',
-              top: 20,
-              right: 20,
-              color: 'white',
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              zIndex: 10000,
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              zIndex: 9999,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
             }}
           >
-            <Iconify icon="eva:close-fill" width={30} height={30} />
-          </IconButton>
-          <Stack
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
-            gap={4}
-            p={1}
-            sx={{ position: 'absolute', inset: 0 }}
-          >
-            <div style={{ position: 'relative', width: '50vw', height: '50vh' }}>
-              {['top left', 'top right', 'bottom left', 'bottom right'].map((pos, i) => {
-                let bgColor = '#FFFFFF transparent transparent #FFFFFF';
-                if (i === 1) bgColor = '#FFFFFF #FFFFFF transparent transparent';
-                if (i === 2) bgColor = 'transparent transparent #FFFFFF #FFFFFF';
-                if (i === 3) bgColor = 'transparent #FFFFFF #FFFFFF transparent';
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      position: 'absolute',
-                      [pos.split(' ')[0]]: 0,
-                      [pos.split(' ')[1]]: 0,
-                      width: '2rem',
-                      height: '2rem',
-                      border: '4px solid transparent',
-                      borderColor: bgColor,
-                    }}
-                  />
-                );
-              })}
+            {/* Kamera pakai react-webcam */}
+            <Webcam
+              ref={webcamRef}
+              audio={false}
+              screenshotFormat="image/jpeg"
+              videoConstraints={{ facingMode: 'environment' }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+            <IconButton
+              onClick={() => handleCloseCamera()}
+              style={{
+                position: 'absolute',
+                top: 20,
+                right: 20,
+                color: 'white',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                zIndex: 10000,
+              }}
+            >
+              <Iconify icon="eva:close-fill" width={30} height={30} />
+            </IconButton>
+            <Stack
+              flexDirection="column"
+              justifyContent="center"
+              alignItems="center"
+              gap={4}
+              p={1}
+              sx={{ position: 'absolute', inset: 0 }}
+            >
+              <div style={{ position: 'relative', width: '50vw', height: '50vh' }}>
+                {['top left', 'top right', 'bottom left', 'bottom right'].map((pos, i) => {
+                  let bgColor = '#FFFFFF transparent transparent #FFFFFF';
+                  if (i === 1) bgColor = '#FFFFFF #FFFFFF transparent transparent';
+                  if (i === 2) bgColor = 'transparent transparent #FFFFFF #FFFFFF';
+                  if (i === 3) bgColor = 'transparent #FFFFFF #FFFFFF transparent';
+                  return (
+                    <div
+                      key={i}
+                      style={{
+                        position: 'absolute',
+                        [pos.split(' ')[0]]: 0,
+                        [pos.split(' ')[1]]: 0,
+                        width: '2rem',
+                        height: '2rem',
+                        border: '4px solid transparent',
+                        borderColor: bgColor,
+                      }}
+                    />
+                  );
+                })}
 
-              {/* Animasi scan */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                }}
-              >
+                {/* Animasi scan */}
                 <div
                   style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
                     width: '100%',
                     height: '100%',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    position: 'absolute',
+                    display: 'flex',
+                    justifyContent: 'center',
                   }}
-                />
-                <div
-                  style={{
-                    width: '100%',
-                    height: '4px',
-                    background: 'rgba(255, 255, 255, 0.8)',
-                    position: 'absolute',
-                    animation: 'scanMove 2s linear infinite',
-                    boxShadow: '0px 0px 10px #FFFFFF',
-                  }}
-                />
-              </div>
+                >
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      position: 'absolute',
+                    }}
+                  />
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '4px',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      position: 'absolute',
+                      animation: 'scanMove 2s linear infinite',
+                      boxShadow: '0px 0px 10px #FFFFFF',
+                    }}
+                  />
+                </div>
 
-              {/* CSS Animasi */}
-              <style>
-                {`
+                {/* CSS Animasi */}
+                <style>
+                  {`
                     @keyframes scanMove {
                         0% { top: 0; opacity: 0.1; }
                         50% { opacity: 1; }
                         100% { top: 100%; opacity: 0.1; }
                     }
                 `}
-              </style>
-            </div>
-            <Typography variant="body" color="#FFFFFF" textAlign="center">
-              Sejajarkan kode QR di dalam kotak untuk pemindai otomatis
-            </Typography>
-          </Stack>
-        </div>
-      )}
-    </Page>
+                </style>
+              </div>
+              <Typography variant="body" color="#FFFFFF" textAlign="center">
+                Sejajarkan kode QR di dalam kotak untuk pemindai otomatis
+              </Typography>
+            </Stack>
+          </div>
+        )
+      }
+    </Page >
   );
 }
