@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { BrowserMultiFormatReader } from '@zxing/library';
 import Webcam from 'react-webcam';
 import {
@@ -39,6 +39,7 @@ import ModalProgress from '../ModalProgressV2';
 import '../scanProgress.scss';
 
 export default function ScanProgress() {
+  const queryClient = useQueryClient();
   const { user } = useAuth();
   const { themeStretch } = useSettings();
   const [isLoading, setIsLoading] = useState(false);
@@ -100,6 +101,7 @@ export default function ScanProgress() {
     onSuccess: (res) => {
       setDetail(res ?? null); // kosongkan jika null
       setIsLoading(false);
+      queryClient.invalidateQueries(['authUser']);
     },
     onError: () => {
       setDetail(null); // reset data ke null jika error
@@ -330,44 +332,50 @@ export default function ScanProgress() {
               )}
             </Stack>
 
-            <Stack gap={{ xs: 1, md: 3 }} flexDirection={{ xs: "column", md: "row" }}>
-              <Stack>
-                <Typography variant="body2">Full Name</Typography>
-                <Typography variant="subtitle2">{user?.fullname || '-'}</Typography>
+            <Stack gap={{ xs: 1, md: 3 }} flexDirection="column">
+              <Stack gap={{ xs: 1, md: 3 }} flexDirection={{ xs: "column", md: "row" }}>
+                <Stack>
+                  <Typography variant="body2">Full Name</Typography>
+                  <Typography variant="subtitle2">{user?.fullname || '-'}</Typography>
+                </Stack>
+                <Stack>
+                  <Typography variant="body2">Performance Point</Typography>
+                  {loadingPoint ? (
+                    <Skeleton variant="text" width="100px" />
+                  ) : (
+                    <div>
+                      <Label variant="ghost" color="warning" sx={{ minWidth: 60 }}>
+                        <Stack flexDirection="row" justifyContent="space-between" width="100%">
+                          <Iconify icon="material-symbols:star-rounded" sx={{ width: 20, height: 20 }} />{' '}
+                          <Typography variant="subtitle2" sx={{ fontStyle: 'italic' }}>
+                            {numberWithCommas(dataPoint?.detail?.[0]?.point || 0)}
+                          </Typography>
+                        </Stack>
+                      </Label>
+                    </div>
+                  )}
+                </Stack>
+                <Stack>
+                  <Typography variant="body2">Performance Bonus</Typography>
+                  {loadingPoint ? (
+                    <Skeleton variant="text" width="100px" />
+                  ) : (
+                    <div>
+                      <Label variant="ghost" color="success" sx={{ minWidth: 80 }}>
+                        <Stack flexDirection="row" justifyContent="space-between" width="100%">
+                          <Iconify icon="tabler:coin-filled" sx={{ width: 20, height: 20 }} />{' '}
+                          <Typography variant="subtitle2" sx={{ fontStyle: 'italic' }}>
+                            Rp. {numberWithCommas(dataPoint?.detail?.[0]?.bonus || 0)}
+                          </Typography>
+                        </Stack>
+                      </Label>
+                    </div>
+                  )}
+                </Stack>
               </Stack>
               <Stack>
-                <Typography variant="body2">Performance Point</Typography>
-                {loadingPoint ? (
-                  <Skeleton variant="text" width="100px" />
-                ) : (
-                  <div>
-                    <Label variant="ghost" color="warning" sx={{ minWidth: 60 }}>
-                      <Stack flexDirection="row" justifyContent="space-between" width="100%">
-                        <Iconify icon="material-symbols:star-rounded" sx={{ width: 20, height: 20 }} />{' '}
-                        <Typography variant="subtitle2" sx={{ fontStyle: 'italic' }}>
-                          {numberWithCommas(dataPoint?.detail?.[0]?.point || 0)}
-                        </Typography>
-                      </Stack>
-                    </Label>
-                  </div>
-                )}
-              </Stack>
-              <Stack>
-                <Typography variant="body2">Performance Bonus</Typography>
-                {loadingPoint ? (
-                  <Skeleton variant="text" width="100px" />
-                ) : (
-                  <div>
-                    <Label variant="ghost" color="success" sx={{ minWidth: 80 }}>
-                      <Stack flexDirection="row" justifyContent="space-between" width="100%">
-                        <Iconify icon="tabler:coin-filled" sx={{ width: 20, height: 20 }} />{' '}
-                        <Typography variant="subtitle2" sx={{ fontStyle: 'italic' }}>
-                          Rp. {numberWithCommas(dataPoint?.detail?.[0]?.bonus || 0)}
-                        </Typography>
-                      </Stack>
-                    </Label>
-                  </div>
-                )}
+                <Typography variant="body2">Info</Typography>
+                <Typography variant="subtitle2">{user?.info || '-'}</Typography>
               </Stack>
             </Stack>
           </Stack>

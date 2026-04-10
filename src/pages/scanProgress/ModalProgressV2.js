@@ -23,6 +23,7 @@ import {
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Iconify from 'src/components/Iconify';
+import useAuth from 'src/hooks/useAuth';
 import axiosInstance from 'src/utils/axios';
 import { handleMutationFeedback } from 'src/utils/mutationfeedback';
 
@@ -36,6 +37,7 @@ export default function ModalProgress({
   refetch,
   refetchPoint,
 }) {
+  const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
 
   const [showAlert, setShowAlert] = useState(false);
@@ -59,6 +61,15 @@ export default function ModalProgress({
 
   useEffect(() => {
     if (detail?.orders) {
+
+      const customPoint = user?.customPoint?.find(
+        (cp) =>
+          String(cp?.progressLabelRef?._id || cp?.progressLabelRef) ===
+          String(currDataProgress?._id)
+      );
+
+      const finalPoint = customPoint?.point ?? currDataProgress?.basePoint ?? 0;
+
       reset({
         listProcess: detail.orders.map((item) => ({
           status: currDataProgress?.name || '',
@@ -73,12 +84,12 @@ export default function ModalProgress({
           statusRef: currDataProgress?._id,
           progressPoint: {
             baseQty: item?.masterProgressRef?.progressPoint?.baseQty || 0,
-            basePoint: currDataProgress?.basePoint || 0,
+            basePoint: finalPoint,
           },
         })),
       });
     }
-  }, [currDataProgress, detail, reset]);
+  }, [currDataProgress, detail, user, reset]);
 
   const handleClose = () => {
     reset();

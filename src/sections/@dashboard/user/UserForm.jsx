@@ -22,7 +22,7 @@ import useUser from '../../../pages/user/service/useUser';
 
 // ----------------------------------------------------------------------
 
-UserNewEditForm.propTypes = {
+UserForm.propTypes = {
   isEdit: PropTypes.bool,
   currentData: PropTypes.object,
 };
@@ -34,7 +34,7 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export default function UserNewEditForm({ isEdit, currentData }) {
+export default function UserForm({ isEdit, currentData }) {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { create, update } = useUser();
@@ -50,7 +50,6 @@ export default function UserNewEditForm({ isEdit, currentData }) {
       password: '',
       phone: currentData?.phone || '',
       email: currentData?.email || '',
-      info: currentData?.info || '',
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentData]
@@ -65,7 +64,6 @@ export default function UserNewEditForm({ isEdit, currentData }) {
 
   const {
     reset,
-    setValue,
     handleSubmit,
     formState: { isSubmitting },
   } = methods;
@@ -157,8 +155,6 @@ export default function UserNewEditForm({ isEdit, currentData }) {
                     </MenuItem>
                   ))}
                 </RHFSelect>
-
-                <RHFTextField name="info" label="Information" type="text" autoComplete="off" multiline rows={3} />
               </>
             </Stack>
 

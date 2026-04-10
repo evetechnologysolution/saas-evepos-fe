@@ -6,6 +6,7 @@ import axios from 'src/utils/axios';
 export default function useUser() {
   const queryClient = useQueryClient();
   const queryKey = ['users'];
+  const queryKeyProgress = ['allProgress'];
 
   const list = (params) =>
     useQuery({
@@ -13,6 +14,17 @@ export default function useUser() {
       queryFn: async () => {
         const qs = new URLSearchParams(params).toString();
         const { data } = await axios.get(`/user?${qs}`);
+        return data;
+      },
+      keepPreviousData: false,
+    });
+
+  const listProgress = (params) =>
+    useQuery({
+      queryKey: [...queryKeyProgress, params],
+      queryFn: async () => {
+        const qs = new URLSearchParams(params).toString();
+        const { data } = await axios.get(`/progress-label?${qs}`);
         return data;
       },
       keepPreviousData: false,
@@ -60,6 +72,7 @@ export default function useUser() {
 
   return {
     list,
+    listProgress,
     getById,
     create,
     update,

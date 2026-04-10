@@ -1,7 +1,6 @@
 import { paramCase } from 'change-case';
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { useQuery, useQueryClient } from 'react-query';
 import { useSnackbar } from 'notistack';
 // @mui
 import {
@@ -18,8 +17,6 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import axios from '../../utils/axios';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
 // hooks
@@ -33,14 +30,10 @@ import { TableHeadCustom, TableLoading, TableNoData } from '../../components/tab
 import ConfirmDelete from '../../components/ConfirmDelete';
 // sections
 import { UserTableToolbar, UserTableRow } from '../../sections/@dashboard/user/list';
-// context
-import { mainContext } from '../../contexts/MainContext';
 import { roleOptions } from '../../_mock/roleOptions';
 import useUser from './service/useUser';
 
 // ----------------------------------------------------------------------
-
-const STATUS_OPTIONS = ['All', 'Active', 'Inactive'];
 
 const ROLE_OPTIONS = ['All', ...roleOptions];
 
@@ -136,6 +129,10 @@ export default function UserList() {
   //     });
   //   };
 
+  const handlePointRow = (id) => {
+    navigate(PATH_DASHBOARD.user.customPoint(paramCase(id)));
+  };
+
   const handleEditRow = (id) => {
     navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
   };
@@ -208,6 +205,7 @@ export default function UserList() {
                           <UserTableRow
                             key={row._id}
                             row={row}
+                            onPointRow={() => handlePointRow(row._id)}
                             onEditRow={() => handleEditRow(row._id)}
                             onDeleteRow={() => handleDialog(row._id)}
                           />
