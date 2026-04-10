@@ -146,6 +146,7 @@ export const PATH_DASHBOARD = {
     create: path(ROOTS_DASHBOARD, '/user/new'),
     account: path(ROOTS_DASHBOARD, '/user/account'),
     edit: (id) => path(ROOTS_DASHBOARD, `/user/${id}/edit`),
+    customPoint: (id) => path(ROOTS_DASHBOARD, `/user/${id}/custom-point`),
     profile: path(ROOTS_DASHBOARD, '/profile/account'),
     userAccount: path(ROOTS_DASHBOARD, '/account'),
   },

@@ -203,7 +203,7 @@ export default function LibraryCategory() {
 
             <Box sx={{ position: 'relative' }}>
               <TablePagination
-                rowsPerPageOptions={[1, 5, 10, 25]}
+                rowsPerPageOptions={[5, 10, 25]}
                 component="div"
                 count={Number(tableData?.totalDocs || 0)}
                 rowsPerPage={controller.rowsPerPage}

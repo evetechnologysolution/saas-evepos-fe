@@ -8,9 +8,10 @@ import EmptyContent from '../EmptyContent';
 
 TableNoData.propTypes = {
   isNotFound: PropTypes.bool,
+  height: PropTypes.number,
 };
 
-export default function TableNoData({ isNotFound }) {
+export default function TableNoData({ isNotFound, height = 160 }) {
   return (
     <TableRow>
       {isNotFound ? (
@@ -18,7 +19,7 @@ export default function TableNoData({ isNotFound }) {
           <EmptyContent
             title="No Data"
             sx={{
-              '& span.MuiBox-root': { height: 160 },
+              '& span.MuiBox-root': { height },
             }}
           />
         </TableCell>

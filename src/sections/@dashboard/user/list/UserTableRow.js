@@ -16,6 +16,7 @@ import defaultAvatar from '../../../../assets/avatar_default.jpg';
 
 UserTableRow.propTypes = {
   row: PropTypes.object,
+  onPointRow: PropTypes.func,
   onEditRow: PropTypes.func,
   onDeleteRow: PropTypes.func,
 };
@@ -27,7 +28,7 @@ const CustomTableRow = styled(TableRow)(() => ({
   },
 }));
 
-export default function UserTableRow({ row, onEditRow, onDeleteRow }) {
+export default function UserTableRow({ row, onPointRow, onEditRow, onDeleteRow }) {
   const theme = useTheme();
 
   const { user } = useAuth();
@@ -65,6 +66,17 @@ export default function UserTableRow({ row, onEditRow, onDeleteRow }) {
 
       <TableCell align="center">
         <Stack direction="row" justifyContent="center" gap={1}>
+          <Button
+            title="Custom Point"
+            variant="contained"
+            color="warning"
+            sx={{ p: 0, minWidth: 35, height: 35 }}
+            onClick={() => {
+              onPointRow();
+            }}
+          >
+            <Iconify icon="material-symbols:star-rounded" sx={{ width: 24, height: 24 }} />
+          </Button>
           <Button
             title="Edit"
             variant="contained"

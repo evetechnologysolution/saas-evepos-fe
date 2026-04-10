@@ -680,6 +680,14 @@ export default function Router() {
                     </RoleBasedGuard>
                   ),
                 },
+                {
+                  path: ':id/custom-point',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner']}>
+                      <UserCustomPoint />
+                    </RoleBasedGuard>
+                  ),
+                },
               ],
             },
             {
@@ -1044,6 +1052,7 @@ const LibraryStatusScanEdit = Loadable(lazy(() => import('../pages/library/statu
 const UserList = Loadable(lazy(() => import('../pages/user/UserList')));
 const UserCreate = Loadable(lazy(() => import('../pages/user/UserCreate')));
 const UserEdit = Loadable(lazy(() => import('../pages/user/UserEdit')));
+const UserCustomPoint = Loadable(lazy(() => import('../pages/user/UserCustomPoint')));
 const UserAccount = Loadable(lazy(() => import('../pages/UserAccount')));
 const UserProfile = Loadable(lazy(() => import('../pages/UserProfile')));
 

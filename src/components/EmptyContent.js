@@ -36,7 +36,7 @@ export default function EmptyContent({ title, description, img, ...other }) {
         sx={{ height: 240, mb: 3 }}
       />
 
-      <Typography variant="h5" gutterBottom>
+      <Typography variant="h6" gutterBottom>
         {title}
       </Typography>
 
