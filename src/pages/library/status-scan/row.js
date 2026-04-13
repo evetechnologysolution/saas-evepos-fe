@@ -28,10 +28,12 @@ export default function StatusTableRow({ row, onEditRow, onArchiveRow, onDeleteR
       <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
       <TableCell>{name}</TableCell>
+
       {/* <TableCell>{previousName || '-'}</TableCell> */}
 
       <TableCell align="center">{numberWithCommas(basePoint || 0)}</TableCell>
-      <TableCell align="center">{archived ? 'Yes' : 'No'}</TableCell>
+
+      {/* <TableCell align="center">{archived ? 'Yes' : 'No'}</TableCell> */}
 
       <TableCell align="center">
         <Stack direction="row" justifyContent="center" gap={1}>
@@ -45,7 +47,7 @@ export default function StatusTableRow({ row, onEditRow, onArchiveRow, onDeleteR
           >
             <Iconify icon="eva:edit-outline" sx={{ width: 24, height: 24 }} />
           </Button>
-          <Button
+          {/* <Button
             title="Archive"
             variant="contained"
             sx={{ p: 0, minWidth: 35, height: 35 }}
@@ -54,8 +56,8 @@ export default function StatusTableRow({ row, onEditRow, onArchiveRow, onDeleteR
             }}
           >
             <Iconify icon="eva:archive-outline" sx={{ width: 24, height: 24 }} />
-          </Button>
-          {/* <Button
+          </Button> */}
+          <Button
             title="Delete"
             variant="contained"
             color="error"
@@ -65,7 +67,7 @@ export default function StatusTableRow({ row, onEditRow, onArchiveRow, onDeleteR
             }}
           >
             <Iconify icon="eva:trash-2-outline" sx={{ width: 24, height: 24 }} />
-          </Button> */}
+          </Button>
         </Stack>
       </TableCell>
     </CustomTableRow>

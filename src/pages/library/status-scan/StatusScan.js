@@ -40,7 +40,7 @@ const TABLE_HEAD = [
   { id: 'name', label: 'Status Name', align: 'left' },
   // { id: 'name', label: 'Previous Status Name', align: 'left' },
   { id: 'basePoint', label: 'Progress Point', align: 'center' },
-  { id: 'archived', label: 'Archived', align: 'center' },
+  // { id: 'archived', label: 'Archived', align: 'center' },
   { id: '', label: 'Action', align: 'center' },
 ];
 
