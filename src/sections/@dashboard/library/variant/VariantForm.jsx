@@ -163,14 +163,14 @@ export default function VariantForm({ isEdit, currentData }) {
                   <Stack direction={{ xs: 'column', sm: 'row' }} gap={3}>
                     <RHFTextField
                       name={`options.${index}.name`}
-                      placeholder="Option Name"
+                      label="Option Name"
                       fullWidth
                       autoComplete="off"
                     />
 
                     <RHFTextField
                       name={`options.${index}.notes`}
-                      placeholder="Option Notes"
+                      label="Option Notes"
                       fullWidth
                       autoComplete="off"
                     />
