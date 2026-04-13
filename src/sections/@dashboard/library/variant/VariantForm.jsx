@@ -160,7 +160,7 @@ export default function VariantForm({ isEdit, currentData }) {
 
               {fields.map((field, index) => (
                 <Stack key={field.id} gap={3}>
-                  <Stack direction={{ xs: 'column', sm: 'row' }} gap={3}>
+                  <Stack direction={{ xs: 'column', sm: 'row' }} gap={3} width="100%">
                     <RHFTextField
                       name={`options.${index}.name`}
                       label="Option Name"
@@ -177,7 +177,7 @@ export default function VariantForm({ isEdit, currentData }) {
 
                   </Stack>
 
-                  <Stack direction={{ xs: 'column', sm: 'row' }} gap={3}>
+                  <Stack direction={{ xs: 'column', sm: 'row' }} gap={3} width="100%">
                     <Stack direction={{ xs: 'column', sm: 'row' }} gap={3}>
                       <RHFNumericFormat
                         name={`options.${index}.price`}
