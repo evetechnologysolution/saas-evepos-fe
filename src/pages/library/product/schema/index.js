@@ -7,7 +7,7 @@ const ProductSchema = Yup.object({
   productionNotes: Yup.string().nullable().default(''),
   description: Yup.string().nullable().default(''),
 
-  category: Yup.string().nullable().default(''),
+  category: Yup.string().required('Category wajib diisi').default(''),
   subcategory: Yup.string().nullable().default(''),
 
   unit: Yup.string().required('Unit wajib diisi').default(''),
