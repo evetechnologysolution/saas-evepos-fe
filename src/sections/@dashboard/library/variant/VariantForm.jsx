@@ -79,7 +79,7 @@ export default function VariantForm({ isEdit, currentData }) {
       caption: currentData?.caption || '',
       showOnWeb: currentData?.showOnWeb ?? false,
       options: currentData?.options || [
-        { name: '', price: 0, productionPrice: 0, productionNotes: '', isMulti: false },
+        { name: '', price: 0, productionPrice: 0, notes: '', productionNotes: '', isMulti: false },
       ],
     },
   });
@@ -163,40 +163,49 @@ export default function VariantForm({ isEdit, currentData }) {
                   <Stack direction={{ xs: 'column', sm: 'row' }} gap={3}>
                     <RHFTextField
                       name={`options.${index}.name`}
-                      placeholder="Option Name"
+                      label="Option Name"
                       fullWidth
                       autoComplete="off"
                     />
 
-                    <RHFNumericFormat
-                      name={`options.${index}.price`}
-                      label="Price"
-                      thousandSeparator=","
-                      decimalScale={2}
-                      allowNegative={false}
-                      InputProps={{
-                        startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
-                      }}
+                    <RHFTextField
+                      name={`options.${index}.notes`}
+                      label="Option Notes"
+                      fullWidth
+                      autoComplete="off"
                     />
+
                   </Stack>
 
                   <Stack direction={{ xs: 'column', sm: 'row' }} gap={3}>
-                    <RHFNumericFormat
-                      name={`options.${index}.productionPrice`}
-                      label="Production Cost"
-                      thousandSeparator=","
-                      decimalScale={2}
-                      allowNegative={false}
-                      InputProps={{
-                        startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
-                      }}
-                    />
+                    <Stack direction={{ xs: 'column', sm: 'row' }} width="100%" gap={3}>
+                      <RHFNumericFormat
+                        name={`options.${index}.price`}
+                        label="Price"
+                        thousandSeparator=","
+                        decimalScale={2}
+                        allowNegative={false}
+                        InputProps={{
+                          startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
+                        }}
+                      />
+                      <RHFNumericFormat
+                        name={`options.${index}.productionPrice`}
+                        label="Production Cost"
+                        thousandSeparator=","
+                        decimalScale={2}
+                        allowNegative={false}
+                        InputProps={{
+                          startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
+                        }}
+                      />
+                    </Stack>
                     <Stack
                       flexDirection="row"
                       justifyContent="space-between"
                       alignItems="center"
+                      width="100%"
                       gap={1}
-                      sx={{ width: '100%' }}
                     >
                       <Controller
                         name={`options.${index}.isMultiple`}
@@ -248,6 +257,7 @@ export default function VariantForm({ isEdit, currentData }) {
                       name: '',
                       price: 0,
                       productionPrice: 0,
+                      notes: '',
                       productionNotes: '',
                       isMulti: false,
                     })

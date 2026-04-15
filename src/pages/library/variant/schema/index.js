@@ -31,6 +31,7 @@ const VariantSchema = Yup.object({
           .min(0, 'Production price tidak boleh negatif')
           .required('Production price wajib diisi')
           .default(0),
+        notes: Yup.string().nullable().default(''),
         productionNotes: Yup.string().nullable().default(''),
         isMultiple: Yup.boolean().default(false),
       })
