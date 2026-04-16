@@ -8,10 +8,10 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { LoadingButton } from '@mui/lab';
-import { Card, Grid, Stack, Button, CircularProgress } from '@mui/material';
+import { Card, Grid, Stack, Button, CircularProgress, Typography } from '@mui/material';
 // routes
 import { PATH_DASHBOARD } from '../../../routes/paths';
-import { FormProvider, RHFTextField } from '../../../components/hook-form';
+import { FormProvider, RHFTextField, RHFSwitch } from '../../../components/hook-form';
 // utils
 import axiosApi from '../../../utils/axios';
 import splitName from '../../../utils/splitName';
@@ -40,14 +40,15 @@ export default function MemberForm({ isEdit, currentData, isLoading }) {
     email: Yup.string().email(),
     password: isEdit
       ? Yup.string()
-          .test('is-password-present', 'Must be at least 6 characters', (value) => {
-            if (value && value.length > 0) {
-              return value.length >= 6;
-            }
-            return true; // If password is empty, don't enforce the 6 char rule
-          })
-          .notRequired() // password not required if empty
+        .test('is-password-present', 'Must be at least 6 characters', (value) => {
+          if (value && value.length > 0) {
+            return value.length >= 6;
+          }
+          return true; // If password is empty, don't enforce the 6 char rule
+        })
+        .notRequired() // password not required if empty
       : Yup.string().required('Password is required').min(6, 'Must be at least 6 characters'),
+    isActive: Yup.boolean().required().default(true),
   });
 
   const defaultValues = useMemo(
@@ -59,6 +60,7 @@ export default function MemberForm({ isEdit, currentData, isLoading }) {
       phone: currentData?.phone || '',
       email: currentData?.email || '',
       password: isEdit ? '' : '123456',
+      isActive: currentData?.isActive ?? true,
     }),
     [currentData, isEdit]
   );
@@ -132,6 +134,23 @@ export default function MemberForm({ isEdit, currentData, isLoading }) {
                   type="password"
                   autoComplete="new-password"
                 />
+                {isEdit && (
+                  <RHFSwitch
+                    name="isActive"
+                    labelPlacement="start"
+                    label={
+                      <>
+                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                          Active
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                          Disable this for inactive members
+                        </Typography>
+                      </>
+                    }
+                    sx={{ mx: 0, width: 1, justifyContent: 'space-between' }}
+                  />
+                )}
               </Stack>
             </Grid>
           </Grid>

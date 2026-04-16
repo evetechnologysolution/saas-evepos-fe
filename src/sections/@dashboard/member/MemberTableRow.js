@@ -28,7 +28,7 @@ const CustomTableRow = styled(TableRow)(() => ({
 export default function MemberTableRow({ row, onDetailRow, onEditRow, onDeleteRow }) {
   const { user } = useAuth();
 
-  const { createdAt, memberId, name, phone, email, addresses, point } = row;
+  const { createdAt, memberId, name, phone, email, addresses, point, isActive } = row;
 
   const mainAddress = Array.isArray(addresses) ? addresses?.find((item) => item?.isDefault) : null;
 
@@ -36,10 +36,21 @@ export default function MemberTableRow({ row, onDetailRow, onEditRow, onDeleteRo
     <CustomTableRow hover>
       <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
-      <TableCell align="center">
-        <Link component="button" variant="inherit" underline="hover" onClick={onDetailRow}>
-          {memberId}
-        </Link>
+      <TableCell>
+        <Stack>
+          <div>
+            <Link component="button" variant="subtitle2" underline="hover" onClick={onDetailRow}>
+              {memberId}
+            </Link>
+          </div>
+          <div>
+            <Label variant="ghost" color={isActive ? "success" : "warning"}>
+              <Typography variant="subtitle2">
+                {isActive ? "Active" : "Inactive"}
+              </Typography>
+            </Label>
+          </div>
+        </Stack>
       </TableCell>
 
       <TableCell>{name}</TableCell>

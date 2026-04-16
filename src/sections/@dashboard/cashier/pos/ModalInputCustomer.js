@@ -92,7 +92,7 @@ export default function ModalInputCustomer(props) {
     if (query) {
       setLoading(true);
       try {
-        const res = await axios.get(`/member?search=${query}`);
+        const res = await axios.get(`/member?search=${query}&status=active`);
         setMembers(res?.data?.docs || []);
       } catch (error) {
         console.error('Error fetching members:', error);
@@ -124,7 +124,7 @@ export default function ModalInputCustomer(props) {
     const fetchDefaultMembers = async () => {
       try {
         setLoading(true);
-        const res = await axios.get('/member?perPage=30');
+        const res = await axios.get('/member?perPage=30&status=active');
         setMembers(res?.data?.docs || []);
       } catch (error) {
         console.error('Error fetching default members:', error);

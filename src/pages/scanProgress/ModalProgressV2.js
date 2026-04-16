@@ -119,7 +119,7 @@ export default function ModalProgress({
         errorMsg: 'Gagal menyimpan progress!',
         onSuccess: () => {
           refetch();
-          refetchPoint();
+          refetchPoint?.();
           handleClose();
         },
         enqueueSnackbar,

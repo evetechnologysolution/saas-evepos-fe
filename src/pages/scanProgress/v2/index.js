@@ -53,24 +53,24 @@ export default function ScanProgress() {
   const inputRef = useRef(null);
   const [currentDataProgress, setCurrentDataProgress] = useState(null);
 
-  const { getDetailPoint } = useStatus();
+  // const { getDetailPoint } = useStatus();
 
-  const defaultPeriod = 'this-month';
-  const [selectedPeriod, setSelectedPeriod] = useState(defaultPeriod);
-  const [tempDate, setTempDate] = useState({ start: null, end: null });
-  const [selectedDate, setSelectedDate] = useState({ start: null, end: null });
-  const [controller, setController] = useState({
-    periodBy: defaultPeriod,
-    start: '',
-    end: '',
-  });
+  // const defaultPeriod = 'this-month';
+  // const [selectedPeriod, setSelectedPeriod] = useState(defaultPeriod);
+  // const [tempDate, setTempDate] = useState({ start: null, end: null });
+  // const [selectedDate, setSelectedDate] = useState({ start: null, end: null });
+  // const [controller, setController] = useState({
+  //   periodBy: defaultPeriod,
+  //   start: '',
+  //   end: '',
+  // });
 
-  const { data: dataPoint, isLoading: loadingPoint, refetch: refetchPoint } = getDetailPoint({
-    staff: user?._id,
-    periodBy: controller.periodBy,
-    start: controller.start,
-    end: controller.end,
-  });
+  // const { data: dataPoint, isLoading: loadingPoint, refetch: refetchPoint } = getDetailPoint({
+  //   staff: user?._id,
+  //   periodBy: controller.periodBy,
+  //   start: controller.start,
+  //   end: controller.end,
+  // });
 
   const fetchOrderDetail = async (search) => {
     if (!search) throw new Error('No search term');
@@ -227,7 +227,7 @@ export default function ScanProgress() {
         />
 
         <Card sx={{ p: 3 }}>
-          <Stack spacing={2} sx={{ px: { md: 1.5 } }}>
+          {/* <Stack spacing={2} sx={{ px: { md: 1.5 } }}>
             <Stack gap={{ xs: 2, md: 3 }} flexDirection={{ xs: "column", md: "row" }}>
               <Typography variant="subtitle2">My Performance</Typography>
               <Select
@@ -378,9 +378,9 @@ export default function ScanProgress() {
                 <Typography variant="subtitle2">{user?.info || '-'}</Typography>
               </Stack>
             </Stack>
-          </Stack>
+          </Stack> */}
 
-          <Divider sx={{ mx: { md: 1.5 }, mt: 1.5 }} />
+          {/* <Divider sx={{ mx: { md: 1.5 }, mt: 1.5 }} /> */}
 
           <ScanProgresTableToolbar
             ref={inputRef}
@@ -727,7 +727,7 @@ export default function ScanProgress() {
         currDataProgress={currentDataProgress}
         detail={detail}
         refetch={refetch}
-        refetchPoint={refetchPoint}
+        // refetchPoint={refetchPoint}
       />
 
       {

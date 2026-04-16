@@ -37,7 +37,7 @@ import { MemberTableToolbar, MemberTableRow } from '../../../sections/@dashboard
 
 const TABLE_HEAD = [
   { id: 'date', label: 'Date', align: 'center' },
-  { id: 'memberId', label: 'Member ID', align: 'center' },
+  { id: 'memberId', label: 'Member ID', align: 'left' },
   { id: 'name', label: 'Name', align: 'left' },
   { id: 'phone', label: 'Phone', align: 'left' },
   { id: 'email', label: 'Email', align: 'left' },
