@@ -98,6 +98,6 @@ export default function MemberTableRow({ row, onDetailRow, onEditRow, onDeleteRo
           )}
         </Stack>
       </TableCell>
-    </CustomTableRow >
+    </CustomTableRow>
   );
 }
