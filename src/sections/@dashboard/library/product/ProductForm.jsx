@@ -40,6 +40,8 @@ import {
   RHFUploadSingleFile,
   RHFSwitch,
 } from '../../../../components/hook-form';
+// hook
+import useAuth from '../../../../hooks/useAuth';
 // context
 import { mainContext } from '../../../../contexts/MainContext';
 import schema from '../../../../pages/library/product/schema';
@@ -78,6 +80,7 @@ const CustomSwitch = styled(Switch)(({ theme }) => ({
 }));
 
 export default function ProductForm({ isEdit, currentData }) {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const {
     create, update, listStatus
@@ -111,16 +114,17 @@ export default function ProductForm({ isEdit, currentData }) {
       subcategory: currentData?.subcategory || '',
       unit: currentData?.unit || 'pcs',
       listNumber: currentData?.listNumber || 0,
-      extraNotes: currentData?.extraNotes ?? false,
-      isRecommended: currentData?.isRecommended ?? false,
-      isAvailable: currentData?.isAvailable ?? true,
       minimumOrderQty: currentData?.minimumOrderQty || 0,
       isHaveMinimumQty: currentData?.minimumOrderQty > 0,
       masterStatus: currentData?.masterStatus || [],
       progressPoint: {
         baseQty: currentData?.progressPoint?.baseQty || null,
         basePoint: currentData?.progressPoint?.basePoint || null,
-      }
+      },
+      extraNotes: currentData?.extraNotes ?? false,
+      isRecommended: currentData?.isRecommended ?? false,
+      showOnWeb: currentData?.showOnWeb ?? false,
+      isAvailable: currentData?.isAvailable ?? true,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentData]
@@ -134,14 +138,14 @@ export default function ProductForm({ isEdit, currentData }) {
   const {
     control,
     reset,
-    watch,
+    // watch,
     getValues,
     setValue,
     handleSubmit,
     formState: { isSubmitting },
   } = methods;
 
-  const values = watch();
+  // const values = watch();
 
   const defaultVariant = { variantRef: '', isMandatory: true, isMultiple: false };
 
@@ -221,9 +225,10 @@ export default function ProductForm({ isEdit, currentData }) {
       formData.append('subcategory', data.subcategory || '');
 
       // boolean
-      formData.append('isAvailable', data.isAvailable);
       formData.append('extraNotes', data.extraNotes);
       formData.append('isRecommended', data.isRecommended);
+      formData.append('showOnWeb', data.showOnWeb);
+      formData.append('isAvailable', data.isAvailable);
 
       // number
       if (!isEdit) {
@@ -720,6 +725,24 @@ export default function ProductForm({ isEdit, currentData }) {
                 }
                 sx={{ mx: 0, width: 1, justifyContent: 'space-between' }}
               />
+
+              {user?.tenantRef?.isEvewash && (
+                <RHFSwitch
+                  name="showOnWeb"
+                  labelPlacement="start"
+                  label={
+                    <>
+                      <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                        Show on Website
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                        Enable to display on the website order page
+                      </Typography>
+                    </>
+                  }
+                  sx={{ mx: 0, width: 1, justifyContent: 'space-between' }}
+                />
+              )}
 
               {isEdit && (
                 <RHFSwitch

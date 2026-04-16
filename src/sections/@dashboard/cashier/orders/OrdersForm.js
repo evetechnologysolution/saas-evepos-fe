@@ -32,7 +32,8 @@ import useAuth from '../../../../hooks/useAuth';
 import Label from '../../../../components/Label';
 // import Image from "../../../../components/Image";
 import ConfirmDialog from '../../../../components/ConfirmDialog';
-import { numberWithCommas, cardNumberFormat, resetCardNumberFormat } from '../../../../utils/getData';
+import Scrollbar from '../../../../components/Scrollbar';
+import { formatDate2, numberWithCommas, cardNumberFormat, resetCardNumberFormat } from '../../../../utils/getData';
 import { maskedPhone } from '../../../../utils/masked';
 // routes
 import { PATH_DASHBOARD } from '../../../../routes/paths';
@@ -294,6 +295,11 @@ export default function OrdersForm({ currentData }) {
                             Quantity
                           </Typography>
                         </th>
+                        <th>
+                          <Typography variant="subtitle2" align="center">
+                            Picked Up By
+                          </Typography>
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -339,7 +345,7 @@ export default function OrdersForm({ currentData }) {
                                       Rp.{' '}
                                       {numberWithCommas(
                                         Math.round(item.qty * item.price) -
-                                          (Math.round(item.qty * item.price) * item.discountAmount) / 100
+                                        (Math.round(item.qty * item.price) * item.discountAmount) / 100
                                       )}
                                     </Typography>
                                   </>
@@ -360,9 +366,17 @@ export default function OrdersForm({ currentData }) {
                               </Stack>
                             </td>
                             <td>
-                              <Typography variant="body2" align="center">{`x ${item.qty}${
-                                item?.category?.toLowerCase() === 'kiloan' ? 'kg' : ''
-                              }`}</Typography>
+                              <Typography variant="body2" align="center">{`x ${item.qty} ${item?.unit || 'pcs'}`}</Typography>
+                            </td>
+                            <td>
+                              {item?.isPickedUp ? (
+                                <>
+                                  <Typography variant="body2">{item?.pickupData?.by || data?.customer?.name}</Typography>
+                                  <Typography variant="body2">{formatDate2(item?.pickupData?.date || data?.paymentDate)}</Typography>
+                                </>
+                              ) : (
+                                '-'
+                              )}
                             </td>
                           </tr>
                         );
@@ -478,7 +492,7 @@ export default function OrdersForm({ currentData }) {
                               }}
                             />
                           )}
-                          // disabled={Boolean(isChecked)}
+                        // disabled={Boolean(isChecked)}
                         />
                       </LocalizationProvider>
 
@@ -569,6 +583,92 @@ export default function OrdersForm({ currentData }) {
                       </FormGroup>
                     </>
                   )}
+                </Stack>
+
+                <Stack>
+                  <Typography variant="subtitle2">Progress</Typography>
+                  <Scrollbar>
+                    <table style={{ width: '100%' }} className="styled-table">
+                      <thead>
+                        <tr>
+                          <th width={150}>
+                            <Typography variant="subtitle2" align="center">
+                              Date
+                            </Typography>
+                          </th>
+                          <th>
+                            <Typography variant="subtitle2" align="center">
+                              Item
+                            </Typography>
+                          </th>
+                          <th>
+                            <Typography variant="subtitle2" align="center">
+                              Qty
+                            </Typography>
+                          </th>
+                          <th>
+                            <Typography variant="subtitle2" align="center">
+                              Staff
+                            </Typography>
+                          </th>
+                          <th>
+                            <Typography variant="subtitle2" align="center">
+                              Proses
+                            </Typography>
+                          </th>
+                          <th>
+                            <Typography variant="subtitle2" align="center">
+                              Notes
+                            </Typography>
+                          </th>
+                          {/* <th width={100}><Typography variant="subtitle2" align="center">Qty</Typography></th> */}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data?.progressRef && data?.progressRef?.log?.length > 0 ? (
+                          data.progressRef.log
+                            .slice()
+                            .reverse()
+                            .map((item, i) => (
+                              <tr key={i}>
+                                <td style={{ textAlign: 'center' }}>
+                                  <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                    {item?.date ? formatDate2(item?.date) : '-'}
+                                  </Typography>
+                                </td>
+                                <td style={{ textAlign: 'center' }}>
+                                  <Typography variant="body2">{item?.name || '-'}</Typography>
+                                </td>
+                                <td style={{ textAlign: 'center' }}>
+                                  <Typography variant="body2">
+                                    {item?.qty ? `${item?.qty} ${item?.unit}` : '-'}
+                                  </Typography>
+                                </td>
+                                <td style={{ textAlign: 'center' }}>
+                                  <Typography variant="body2">{item?.staffRef?.fullname || '-'}</Typography>
+                                </td>
+                                <td style={{ textAlign: 'center' }}>
+                                  <Label variant="ghost" color="warning" sx={{ textTransform: 'capitalize' }}>
+                                    {item?.status || '-'}
+                                  </Label>
+                                </td>
+                                <td style={{ textAlign: 'center' }}>
+                                  <Typography variant="body2">{item?.notes || '-'}</Typography>
+                                </td>
+                              </tr>
+                            ))
+                        ) : (
+                          <tr>
+                            <td colSpan={100} style={{ textAlign: 'center' }}>
+                              <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                Belum ada data
+                              </Typography>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </Scrollbar>
                 </Stack>
               </Stack>
             </Grid>
