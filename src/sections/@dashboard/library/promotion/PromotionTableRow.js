@@ -90,7 +90,13 @@ export default function PromotionTableRow({ row, onEditRow, onDeleteRow }) {
       return `Package Rp. ${numberWithCommas(amount)}`;
     }
     if (type === 3) {
-      return `Bundling ${qtyMin} get ${qtyFree}`;
+      return (
+        <>
+          <span>Bundling</span>
+          <br />
+          <span>Min. Qty {qtyMin}, Get {qtyFree} Free</span>
+        </>
+      )
     }
     return null;
   };
@@ -119,7 +125,7 @@ export default function PromotionTableRow({ row, onEditRow, onDeleteRow }) {
           )}
         </TableCell>
 
-        <TableCell align="left">{`${handlePromoType()}`}</TableCell>
+        <TableCell align="left">{handlePromoType()}</TableCell>
 
         <TableCell align="center">
           {endDate
@@ -202,7 +208,7 @@ export default function PromotionTableRow({ row, onEditRow, onDeleteRow }) {
               ))}
               <tr>
                 <td style={{ padding: '0.2rem 0', fontWeight: 600, marginTop: '10px' }}>NOTES</td>
-                <td style={{ marginTop: '10px' }} align="center">
+                <td style={{ marginTop: '10px' }} colSpan={2} align="right">
                   {handlePromoType()}
                 </td>
               </tr>
