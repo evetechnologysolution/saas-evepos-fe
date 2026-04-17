@@ -185,7 +185,7 @@ export default function PromotionTableRow({ row, onEditRow, onDeleteRow }) {
                 <th align="left">ITEMS</th>
                 <th>QUANTITY</th>
                 <th align="right">PRICE</th>
-                <th></th>
+                <th>{""}</th>
               </tr>
             </thead>
             <tbody style={{ fontSize: '0.85rem' }}>
