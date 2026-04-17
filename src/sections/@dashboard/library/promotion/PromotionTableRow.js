@@ -73,10 +73,14 @@ BootstrapDialogTitle.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
+const dayOptions = [
+  "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"
+];
+
 export default function PromotionTableRow({ row, onEditRow, onDeleteRow }) {
   const theme = useTheme();
 
-  const { createdAt, name, products, type, startDate, endDate, isAvailable, amount, qtyMin, qtyFree } = row;
+  const { createdAt, name, products, type, startDate, endDate, isAvailable, amount, qtyMin, qtyFree, selectedDay } = row;
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -126,6 +130,14 @@ export default function PromotionTableRow({ row, onEditRow, onDeleteRow }) {
         </TableCell>
 
         <TableCell align="left">{handlePromoType()}</TableCell>
+
+        <TableCell align="center">
+          {Array.isArray(selectedDay) && selectedDay.length > 0
+            ? selectedDay
+              .map((d) => dayOptions[d] || "-")
+              .join(", ")
+            : "Setiap Hari"}
+        </TableCell>
 
         <TableCell align="center">
           {endDate

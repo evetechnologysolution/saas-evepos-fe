@@ -49,6 +49,7 @@ const TABLE_HEAD = [
   { id: 'promotionName', label: 'Promotion Name', align: 'left' },
   { id: 'products', label: 'Products', align: 'left' },
   { id: 'promotionType', label: 'Promotion Type', align: 'left' },
+  { id: '', label: 'Selected Day', align: 'center' },
   { id: 'validUntil', label: 'Valid Until', align: 'center' },
   { id: 'isAvailable', label: 'Status', align: 'center' },
   { id: '', label: 'Action', align: 'center' },
