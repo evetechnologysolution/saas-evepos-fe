@@ -1,29 +1,35 @@
 import React, { useState, useContext, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import debounce from 'lodash.debounce';
-// @mui
+
+// MUI
 import {
   Alert,
-  Autocomplete,
   Button,
   styled,
   Stack,
   Dialog,
   DialogTitle,
   DialogContent,
-  // DialogActions,
   IconButton,
   TextField,
   InputAdornment,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { MobileDateTimePicker } from '@mui/x-date-pickers/MobileDateTimePicker';
+
+// react-select
+import AsyncSelect from 'react-select/async';
+
 import axios from '../../../../utils/axios';
 import useAuth from '../../../../hooks/useAuth';
 import Iconify from '../../../../components/Iconify';
 import CustomSwitch from '../../../../components/CustomSwitch';
 import { maskedPhone } from '../../../../utils/masked';
+
 // context
 import { cashierContext } from '../../../../contexts/CashierContext';
 
@@ -38,20 +44,14 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
     padding: theme.spacing(2),
   },
-  '& .MuiDialogActions-root': {
-    padding: theme.spacing(1),
-  },
 }));
 
-const BootstrapDialogTitle = (props) => {
-  const { children, onClose, ...other } = props;
-
+const BootstrapDialogTitle = ({ children, onClose, ...other }) => {
   return (
     <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
       {children}
-      {onClose ? (
+      {onClose && (
         <IconButton
-          aria-label="close"
           onClick={onClose}
           sx={{
             position: 'absolute',
@@ -62,90 +62,93 @@ const BootstrapDialogTitle = (props) => {
         >
           <Iconify icon="eva:close-fill" width={24} height={24} />
         </IconButton>
-      ) : null}
+      )}
     </DialogTitle>
   );
-};
-
-BootstrapDialogTitle.propTypes = {
-  children: PropTypes.node,
-  onClose: PropTypes.func.isRequired,
 };
 
 export default function ModalInputCustomer(props) {
   const { user } = useAuth();
   const ctx = useContext(cashierContext);
+  const theme = useTheme();
 
   const [date, setDate] = useState(null);
   const [isNew, setIsNew] = useState(false);
   const [alert, setAlert] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+
+  const [defaultMembers, setDefaultMembers] = useState([]);
   const [fullName, setFullName] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
   const [point, setPoint] = useState(0);
 
-  const [members, setMembers] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const handleSearch = async (query) => {
-    if (query) {
-      setLoading(true);
-      try {
-        const res = await axios.get(`/member?search=${query}&status=active`);
-        setMembers(res?.data?.docs || []);
-      } catch (error) {
-        console.error('Error fetching members:', error);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      const res = await axios.get('/member');
-      setMembers(res?.data?.docs || []);
-    }
-  };
-
-  const debouncedSearch = useCallback(debounce(handleSearch, 500), []);
-
-  const onInputSearch = (e) => {
-    debouncedSearch(e.target.value);
-  };
-
-  const handleChange = (_, val) => {
-    setFullName(val ? val.name : '');
-    setPhone(val ? val.phone : '');
-    setPoint(val ? val.point : 0);
-    if (!val) {
-      debouncedSearch('');
-    }
-  };
-
   useEffect(() => {
-    const fetchDefaultMembers = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get('/member?perPage=30&status=active');
-        setMembers(res?.data?.docs || []);
-      } catch (error) {
-        console.error('Error fetching default members:', error);
-      } finally {
-        setLoading(false);
-      }
+    const fetchDefault = async () => {
+      const res = await axios.get('/member?perPage=30&status=active');
+
+      setDefaultMembers(
+        res.data.docs.map((item) => ({
+          value: item._id,
+          label: item.name,
+          phone: item.phone,
+          point: item.point,
+        }))
+      );
     };
 
+    fetchDefault();
+  }, []);
+
+  // =========================
+  // LOAD OPTIONS (API)
+  // =========================
+  const loadOptions = async (inputValue) => {
+    try {
+      const res = await axios.get('/member', {
+        params: {
+          search: inputValue || '',
+          status: 'active',
+          perPage: 30,
+        },
+      });
+
+      return (res?.data?.docs || []).map((item) => ({
+        value: item._id,
+        label: item.name,
+        phone: item.phone,
+        point: item.point,
+      }));
+    } catch (error) {
+      console.error('Error fetching members:', error);
+      return [];
+    }
+  };
+
+  // debounce biar gak spam API
+  const debouncedLoadOptions = useCallback(
+    debounce((inputValue, callback) => {
+      loadOptions(inputValue).then(callback);
+    }, 500),
+    []
+  );
+
+  // =========================
+  // EFFECT OPEN MODAL
+  // =========================
+  useEffect(() => {
     if (props.open) {
-      if (ctx.customerName) {
-        setDate(ctx.orderDate);
-      } else {
-        setDate(new Date());
-      }
-      setFullName(ctx.customerName);
-      setPhone(ctx.customerPhone);
-      setPoint(ctx.customerPoint);
-      fetchDefaultMembers();
+      setDate(ctx.customerName ? ctx.orderDate : new Date());
+      setFullName(ctx.customerName || '');
+      setPhone(ctx.customerPhone || '');
+      setPoint(ctx.customerPoint || 0);
     }
   }, [props.open]);
 
+  // =========================
+  // HANDLERS
+  // =========================
   const handleReset = () => {
     props.onClose();
     setTimeout(() => {
@@ -157,7 +160,7 @@ export default function ModalInputCustomer(props) {
       setPoint(0);
       setAlert(false);
       setIsNew(false);
-    }, 500);
+    }, 300);
   };
 
   const handleCancel = () => {
@@ -182,98 +185,178 @@ export default function ModalInputCustomer(props) {
       setAlert(true);
       return;
     }
+
     ctx.setOrderDate(date);
     ctx.setCustomerName(isNew ? `${firstName} ${lastName}` : fullName);
     ctx.setCustomerPhone(phone);
     ctx.setCustomerPoint(point);
     ctx.setCustomerNew(isNew);
+
     setAlert(false);
     setIsNew(false);
     handleReset();
   };
 
+  // =========================
+  // RENDER
+  // =========================
   return (
-    <BootstrapDialog aria-labelledby="customized-dialog-title" fullWidth maxWidth="sm" open={props.open}>
-      <BootstrapDialogTitle
-        id="customized-dialog-title"
-        sx={{ m: 0, p: 2, borderBottom: '1px solid #ccc' }}
-        onClose={handleCancel}
-      >
+    <BootstrapDialog fullWidth maxWidth="sm" open={props.open}>
+      <BootstrapDialogTitle onClose={handleCancel}>
         Input Customer
       </BootstrapDialogTitle>
+
       <DialogContent dividers>
-        <Stack flexDirection="column" gap={2}>
+        <Stack gap={2}>
+
           {isNew && (
             <Alert severity="warning">
               Jika <b>No. WA</b> belum ada, bisa diisi <b>62</b>
             </Alert>
           )}
-          <Stack flexDirection="row" gap={2} alignItems="center">
+
+          <Stack direction="row" gap={2} alignItems="center">
             {isNew ? (
               <>
                 <TextField
-                  name="firstName"
                   label="First Name"
                   fullWidth
-                  autoComplete="off"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  error={!firstName && alert ? Boolean(true) : Boolean(false)}
-                  helperText={!firstName && alert ? 'First Name is required' : ''}
+                  error={!firstName && alert}
+                  helperText={!firstName && alert && 'First Name is required'}
                 />
                 <TextField
-                  name="lastName"
                   label="Last Name"
                   fullWidth
-                  autoComplete="off"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  error={!lastName && alert ? Boolean(true) : Boolean(false)}
-                  helperText={!lastName && alert ? 'Last Name is required' : ''}
+                  error={!lastName && alert}
+                  helperText={!lastName && alert && 'Last Name is required'}
                 />
               </>
             ) : (
-              <Autocomplete
-                options={members?.map((option) => ({
-                  memberId: option?._id,
-                  name: option?.name,
-                  phone: option?.phone,
-                  point: option?.point,
-                }))}
-                getOptionLabel={(option) => option?.name || option}
-                isOptionEqualToValue={(option, value) => option?.phone === value}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Customer Name"
-                    variant="outlined"
-                    onChange={onInputSearch}
-                    error={!fullName && alert ? Boolean(true) : Boolean(false)}
-                    helperText={!fullName && alert ? 'Customer Name is required' : ''}
-                  />
+              <div style={{ width: '100%', position: 'relative' }}>
+                {/* 🔥 Floating Label */}
+                <span
+                  id="customer-name-select"
+                  style={{
+                    position: 'absolute',
+                    left: 10,
+                    top: isFocused || fullName ? -8 : 18,
+                    fontSize: isFocused || fullName ? 12 : 16,
+                    color: isFocused
+                      ? theme.palette.primary.main
+                      : theme.palette.text.secondary,
+                    backgroundColor: theme.palette.background.paper,
+                    padding: isFocused || fullName ? '0 4px' : '0',
+                    transition: 'all 0.15s ease',
+                    pointerEvents: 'none',
+                    zIndex: 1,
+                  }}
+                >
+                  Customer Name
+                </span>
+
+                <AsyncSelect
+                  aria-labelledby="customer-name-select"
+                  cacheOptions
+                  defaultOptions={defaultMembers}
+                  loadOptions={debouncedLoadOptions}
+                  value={
+                    fullName
+                      ? {
+                        label: fullName,
+                        value: fullName,
+                        phone,
+                        point,
+                      }
+                      : null
+                  }
+                  onChange={(val) => {
+                    setFullName(val ? val.label : '');
+                    setPhone(val ? val.phone : '');
+                    setPoint(val ? val.point : 0);
+                  }}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  placeholder="" // kosongkan biar ga tabrakan label
+                  isClearable
+                  menuPortalTarget={document.body}
+                  menuPosition="fixed"
+                  components={{
+                    IndicatorSeparator: () => null,
+                  }}
+                  styles={{
+                    control: (base, state) => {
+                      const isError = !fullName && alert;
+                      const isActive = state.isFocused;
+
+                      return {
+                        ...base,
+                        minHeight: 56,
+                        borderRadius: 8,
+                        border: `1px solid ${isError
+                          ? theme.palette.error.main
+                          : isActive
+                            ? theme.palette.primary.main
+                            : theme.palette.grey[400]
+                          }`,
+                        boxShadow: isActive
+                          ? `0 0 0 1px ${theme.palette.primary.main}`
+                          : 'none',
+                        '&:hover': {
+                          borderColor: isError
+                            ? theme.palette.error.main
+                            : theme.palette.primary.main,
+                        },
+                        backgroundColor: theme.palette.background.paper,
+                      };
+                    },
+
+                    menu: (base) => ({
+                      ...base,
+                      backgroundColor: theme.palette.background.paper,
+                      zIndex: 9999,
+                    }),
+
+                    menuPortal: (base) => ({
+                      ...base,
+                      zIndex: 9999,
+                    }),
+
+                    option: (base, state) => ({
+                      ...base,
+                      backgroundColor: state.isFocused
+                        ? theme.palette.action.hover
+                        : theme.palette.background.paper,
+                    }),
+                  }}
+                />
+
+                {!fullName && alert && (
+                  <span style={{ color: 'red', fontSize: 12 }}>
+                    Customer Name is required
+                  </span>
                 )}
-                fullWidth
-                autoComplete
-                loading={loading}
-                onChange={handleChange}
-                value={fullName || null}
-                // freeSolo
-              />
+              </div>
             )}
-            <div>
-              <CustomSwitch name="newMember" label="New" checked={isNew} onChange={() => handleSwitch()} />
-            </div>
+
+            <CustomSwitch
+              label="New"
+              checked={isNew}
+              onChange={handleSwitch}
+            />
           </Stack>
-          <Stack flexDirection="row" gap={2}>
+
+          <Stack direction="row" gap={2}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <MobileDateTimePicker
                 label="Order Date"
                 inputFormat="dd/MM/yyyy HH:mm"
                 ampm={false}
                 value={date}
-                onChange={(newValue) => {
-                  setDate(newValue);
-                }}
+                onChange={setDate}
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -285,36 +368,38 @@ export default function ModalInputCustomer(props) {
                         </InputAdornment>
                       ),
                     }}
-                    sx={{ width: 400 }}
                   />
                 )}
               />
             </LocalizationProvider>
+
             <TextField
-              name="customerPhone"
               label="WA Number"
               fullWidth
-              autoComplete="off"
-              // value={phone}
-              value={!isNew ? (!phone?.includes('EM') ? maskedPhone(['owner', 'super admin']?.includes(user?.role), phone) : '-') : phone}
-              onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
-              error={!phone && alert ? Boolean(true) : Boolean(false)}
-              helperText={!phone && alert ? 'Phone is required' : ''}
-              disabled={isNew ? Boolean(false) : Boolean(true)}
+              value={
+                !isNew
+                  ? !phone?.includes('EM')
+                    ? maskedPhone(['owner', 'super admin'].includes(user?.role), phone)
+                    : '-'
+                  : phone
+              }
+              onChange={(e) =>
+                setPhone(e.target.value.replace(/[^0-9]/g, ''))
+              }
+              error={!phone && alert}
+              helperText={!phone && alert && 'Phone is required'}
+              disabled={!isNew}
             />
+
             <Stack justifyContent="center">
-              <Button variant="contained" onClick={() => handleSubmit()}>
+              <Button variant="contained" onClick={handleSubmit}>
                 Save
               </Button>
             </Stack>
           </Stack>
+
         </Stack>
       </DialogContent>
-      {/* <DialogActions sx={{ justifyContent: "center" }}>
-                <Button variant="outlined" onClick={() => handleCancel()}>
-                    Cancel
-                </Button>
-            </DialogActions> */}
     </BootstrapDialog>
   );
 }
