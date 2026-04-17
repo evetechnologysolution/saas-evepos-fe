@@ -7,6 +7,7 @@ import axios from 'axios';
 const axiosInstance = axios.create({
   // baseURL: HOST_API,
   // baseURL: 'http://localhost:7777/api',
+  // baseURL: 'https://saasevepos-be.vercel.app/api',
   baseURL: process.env.REACT_APP_BACKEND_URL,
 });
 
