@@ -184,36 +184,28 @@ export default function PromotionTableRow({ row, onEditRow, onDeleteRow }) {
               <tr>
                 <th align="left">ITEMS</th>
                 <th>QUANTITY</th>
-                {type === 1 && <th align="right">PRICE</th>}
-
-                <th> </th>
+                <th align="right">PRICE</th>
+                <th></th>
               </tr>
             </thead>
             <tbody style={{ fontSize: '0.85rem' }}>
-              {type === 1 ? (
-                products?.map((item, i) => (
-                  <tr key={i}>
-                    <td style={{ padding: '0.2rem 0' }}>{item.name}</td>
-                    <td align="center">x 1</td>
-                    <td align="right">Rp. {numberWithCommas(item.price - item.price * (amount / 100))}</td>
-                  </tr>
-                ))
-              ) : (
-                <>
-                  {products?.map((item, i) => (
-                    <tr key={i}>
-                      <td style={{ padding: '0.2rem 0' }}>{item.name}</td>
-                      <td align="center">x 1</td>
-                    </tr>
-                  ))}
-                  <tr>
-                    <td style={{ padding: '0.2rem 0', fontWeight: 600, marginTop: '10px' }}>TOTAL</td>
-                    <td style={{ marginTop: '10px' }} align="center">
-                      Rp. {numberWithCommas(amount)}
-                    </td>
-                  </tr>
-                </>
-              )}
+              {products?.map((item, i) => (
+                <tr key={i}>
+                  <td style={{ padding: '0.2rem 0' }}>{item.name}</td>
+                  <td align="center">x 1</td>
+                  <td align="right">
+                    {type === 1
+                      ? `Rp. ${numberWithCommas(item.price - item.price * (amount / 100))}`
+                      : '-'}
+                  </td>
+                </tr>
+              ))}
+              <tr>
+                <td style={{ padding: '0.2rem 0', fontWeight: 600, marginTop: '10px' }}>NOTES</td>
+                <td style={{ marginTop: '10px' }} align="center">
+                  {handlePromoType()}
+                </td>
+              </tr>
             </tbody>
           </table>
         </DialogContent>
