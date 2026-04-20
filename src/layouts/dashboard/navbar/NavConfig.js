@@ -213,7 +213,7 @@ export const useNavConfig = () => {
             { title: 'sub category', path: PATH_DASHBOARD.library.subcategory },
             { title: 'product', path: PATH_DASHBOARD.library.product },
             { title: 'variant', path: PATH_DASHBOARD.library.variant },
-            ...(user?.tenantRef?.isEvewash ? [{ title: 'perfume', path: PATH_DASHBOARD.library.perfume }] : []),
+            // ...(user?.tenantRef?.isEvewash ? [{ title: 'perfume', path: PATH_DASHBOARD.library.perfume }] : []),
             { title: 'promotion', path: PATH_DASHBOARD.library.promotion },
             // { title: 'special promotion', path: PATH_DASHBOARD.library.specialPromotion },
             ...(user?.tenantRef?.isEvewash ? [{ title: 'voucher', path: PATH_DASHBOARD.library.voucher }] : []),

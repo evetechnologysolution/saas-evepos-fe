@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
 // form
@@ -7,7 +7,7 @@ import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { LoadingButton } from '@mui/lab';
-import { styled, Typography, Card, Grid, Stack, Button, InputAdornment, FormControlLabel, Switch } from '@mui/material';
+import { styled, Typography, Card, Grid, Stack, Button, InputAdornment, FormControlLabel, Switch, Divider } from '@mui/material';
 // routes
 import { handleMutationFeedback } from 'src/utils/mutationfeedback';
 import { PATH_DASHBOARD } from '../../../../routes/paths';
@@ -79,7 +79,7 @@ export default function VariantForm({ isEdit, currentData }) {
       caption: currentData?.caption || '',
       showOnWeb: currentData?.showOnWeb ?? false,
       options: currentData?.options || [
-        { name: '', price: 0, productionPrice: 0, notes: '', productionNotes: '', isMulti: false },
+        { name: '', price: 0, productionPrice: 0, notes: '', productionNotes: '', isMulti: false, isDefault: false },
       ],
     },
   });
@@ -88,6 +88,8 @@ export default function VariantForm({ isEdit, currentData }) {
     reset,
     handleSubmit,
     control,
+    setValue,
+    getValues,
     formState: { isSubmitting },
   } = methods;
 
@@ -122,7 +124,7 @@ export default function VariantForm({ isEdit, currentData }) {
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={12}>
           <Card sx={{ p: 3 }}>
             <Stack spacing={3}>
               {user?.tenantRef?.isEvewash && (
@@ -160,6 +162,30 @@ export default function VariantForm({ isEdit, currentData }) {
 
               {fields.map((field, index) => (
                 <Stack key={field.id} gap={3}>
+                  <Stack
+                    flexDirection="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    width="100%"
+                    gap={1}
+                  >
+                    <Typography variant="subtitle2">No. {index + 1}</Typography>
+                    {fields.length > 1 && (
+                      <Button
+                        sx={{
+                          boxShadow: '0',
+                          p: 0,
+                          minWidth: 30,
+                          height: 30,
+                        }}
+                        size="large"
+                        color="error"
+                        onClick={() => remove(index)}
+                      >
+                        <Iconify icon="eva:trash-2-outline" width={20} height={20} />
+                      </Button>
+                    )}
+                  </Stack>
                   <Stack direction={{ xs: 'column', sm: 'row' }} gap={3}>
                     <RHFTextField
                       name={`options.${index}.name`}
@@ -201,9 +227,9 @@ export default function VariantForm({ isEdit, currentData }) {
                       />
                     </Stack>
                     <Stack
-                      flexDirection="row"
-                      justifyContent="space-between"
-                      alignItems="center"
+                      flexDirection={{ xs: "column", md: "row" }}
+                      justifyContent={{ md: "space-between" }}
+                      alignItems={{ md: "center" }}
                       width="100%"
                       gap={1}
                     >
@@ -229,23 +255,42 @@ export default function VariantForm({ isEdit, currentData }) {
                         )}
                       />
 
-                      {fields.length > 1 && (
-                        <Button
-                          sx={{
-                            boxShadow: '0',
-                            p: 0,
-                            minWidth: 30,
-                            height: 30,
-                          }}
-                          size="large"
-                          color="error"
-                          onClick={() => remove(index)}
-                        >
-                          <Iconify icon="eva:trash-2-outline" width={20} height={20} />
-                        </Button>
-                      )}
+                      <Controller
+                        name={`options.${index}.isDefault`}
+                        control={control}
+                        render={({ field }) => (
+                          <FormControlLabel
+                            label={
+                              <>
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                                  Default Option
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                  Enable for default option
+                                </Typography>
+                              </>
+                            }
+                            control={
+                              // <CustomSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
+                              <CustomSwitch
+                                checked={field.value}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+
+                                  const list = getValues('options');
+
+                                  list.forEach((_, i) => {
+                                    setValue(`options.${i}.isDefault`, i === index ? checked : false);
+                                  });
+                                }}
+                              />
+                            }
+                          />
+                        )}
+                      />
                     </Stack>
                   </Stack>
+                  <Divider />
                 </Stack>
               ))}
 
@@ -260,6 +305,7 @@ export default function VariantForm({ isEdit, currentData }) {
                       notes: '',
                       productionNotes: '',
                       isMulti: false,
+                      isDefault: false,
                     })
                   }
                 >
