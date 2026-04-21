@@ -80,7 +80,7 @@ const PrintReceipt = React.forwardRef(({ bill, status = 'paid' }, ref) => {
     }
 
     ctx.setActualPrice(
-      sumPrice + serviceAmount + taxAmount - ctx.voucherDiscPrice - ctx.discountPrice + ctx.deliveryPrice
+      sumPrice + serviceAmount + taxAmount - ctx.voucherDiscPrice - ctx.discountPrice + (ctx.deliveryPrice - ctx.deliveryPriceDisc)
     );
   }, [bill]);
 

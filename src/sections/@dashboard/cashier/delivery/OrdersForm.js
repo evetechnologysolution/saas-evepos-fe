@@ -77,7 +77,7 @@ export default function OrdersForm({ currentData }) {
     Number(subtotalPrice || 0) -
     Number(data?.voucherDiscPrice || 0) -
     Number(discountPrice || 0) +
-    Number(data?.deliveryPrice || 0);
+    (Number(data?.deliveryPrice || 0) - Number(data?.deliveryPriceDisc || 0));
 
   useEffect(() => {
     const regionParts = [
@@ -205,8 +205,8 @@ export default function OrdersForm({ currentData }) {
                           ? data?.isDropOff
                             ? 'Customer bawa sendiri ke outlet (Self DropOff)'
                             : data?.pickupDateTime
-                            ? formatDate(data?.pickupDateTime)
-                            : '-'
+                              ? formatDate(data?.pickupDateTime)
+                              : '-'
                           : '-'}
                       </Typography>
                     </td>
@@ -221,8 +221,8 @@ export default function OrdersForm({ currentData }) {
                           ? data?.selfPickup
                             ? 'Customer ambil sendiri di outlet (Self PickUp)'
                             : data?.deliveryDate
-                            ? formatDate(data?.deliveryDate)
-                            : 'Konfirmasi sebelum antar'
+                              ? formatDate(data?.deliveryDate)
+                              : 'Konfirmasi sebelum antar'
                           : '-'}
                       </Typography>
                     </td>
@@ -380,7 +380,7 @@ export default function OrdersForm({ currentData }) {
                                     Rp.{' '}
                                     {numberWithCommas(
                                       Math.round(item.qty * item.price) -
-                                        (Math.round(item.qty * item.price) * item.discountAmount) / 100
+                                      (Math.round(item.qty * item.price) * item.discountAmount) / 100
                                     )}
                                   </Typography>
                                 </>
@@ -454,9 +454,8 @@ export default function OrdersForm({ currentData }) {
                                 />
                               </Stack>
                             ) : (
-                              <Typography variant="body2" align="center">{`x ${item.qty}${
-                                item?.category?.toLowerCase() === 'kiloan' ? 'kg' : ''
-                              }`}</Typography>
+                              <Typography variant="body2" align="center">{`x ${item.qty}${item?.category?.toLowerCase() === 'kiloan' ? 'kg' : ''
+                                }`}</Typography>
                             )}
                           </td>
                         </tr>
@@ -494,9 +493,16 @@ export default function OrdersForm({ currentData }) {
               </Stack>
               <Stack>
                 <Typography variant="subtitle2">Delivery Fee</Typography>
-                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                  Rp. {numberWithCommas(data?.deliveryPrice || 0)}
-                </Typography>
+                {data?.deliveryPriceDisc ? (
+                  <Stack>
+                    <Typography variant="body2" sx={{ fontStyle: "italic", color: "red", textDecoration: "line-through", opacity: 0.7 }}>
+                      Rp. {numberWithCommas(data?.deliveryPrice || 0)}
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontStyle: "italic" }}>Rp. {numberWithCommas((data?.deliveryPrice || 0) - (data?.deliveryPriceDisc || 0))}</Typography>
+                  </Stack>
+                ) : (
+                  <Typography variant="body2" sx={{ fontStyle: "italic" }}>Rp. {numberWithCommas(data?.deliveryPrice || 0)}</Typography>
+                )}
               </Stack>
               <Stack>
                 <Typography variant="subtitle2">Total</Typography>

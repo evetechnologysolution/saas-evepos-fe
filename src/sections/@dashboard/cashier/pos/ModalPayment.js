@@ -162,9 +162,11 @@ export default function ModalPayment(props) {
   const [discountOrigin, setDiscountOrigin] = useState(0);
   const [discountPriceOrigin, setDiscountPriceOrigin] = useState(0);
   const [deliveryPriceOrigin, setDeliveryPriceOrigin] = useState(0);
+  const [deliveryPriceDiscOrigin, setDeliveryPriceDiscOrigin] = useState(0);
   const [discount, setDiscount] = useState(ctx.discount);
   const [discountPrice, setDiscountPrice] = useState(ctx.discountPrice);
   const [deliveryPrice, setDeliveryPrice] = useState(ctx.deliveryPrice);
+  const [deliveryPriceDisc, setDeliveryPriceDisc] = useState(ctx.deliveryPriceDisc);
   const [donation, setDonation] = useState(0);
 
   const [loading, setLoading] = useState(false);
@@ -189,6 +191,7 @@ export default function ModalPayment(props) {
       setDiscountOrigin(ctx.discount);
       setDiscountPriceOrigin(ctx.discountPrice);
       setDeliveryPriceOrigin(ctx.deliveryPrice);
+      setDeliveryPriceDiscOrigin(ctx.deliveryPriceDisc);
       setPayDate(new Date());
       if (ctx.discountLabel === 'FIRST WASH') {
         setIsPercent(false);
@@ -227,6 +230,7 @@ export default function ModalPayment(props) {
         setDiscount(0);
         setDiscountPrice(0);
         setDeliveryPrice(0);
+        setDeliveryPriceDisc(0);
       }
     }, 1000);
   };
@@ -244,10 +248,12 @@ export default function ModalPayment(props) {
     ctx.setDiscount(discountOrigin);
     ctx.setDiscountPrice(discountPriceOrigin);
     ctx.setDeliveryPrice(deliveryPriceOrigin);
+    ctx.setDeliveryPriceDisc(deliveryPriceDiscOrigin);
     ctx.setDonation(0);
     setDiscount(discountOrigin);
     setDiscountPrice(discountPriceOrigin);
     setDeliveryPrice(deliveryPriceOrigin);
+    setDeliveryPriceDisc(deliveryPriceDiscOrigin);
     props.onClose();
   };
 
@@ -579,6 +585,7 @@ export default function ModalPayment(props) {
     ctx.setAmountBill(Number(amount));
     ctx.setAmountPaid(amountPaid);
     ctx.setDeliveryPrice(deliveryPrice);
+    ctx.setDeliveryPriceDisc(deliveryPriceDisc);
     ctx.setDiscount(discount);
     ctx.setDiscountPrice(discountPrice);
     ctx.setDonation(donation);
@@ -595,13 +602,13 @@ export default function ModalPayment(props) {
       ...(isUpdate
         ? {}
         : {
-            // _id: orderUid,
-            tempId: orderUid,
-            createdAt: ctx?.orderDate,
-            orderId,
-            staff: user?.fullname,
-            orderType: ctx?.orderType || 'onsite',
-          }),
+          // _id: orderUid,
+          tempId: orderUid,
+          createdAt: ctx?.orderDate,
+          orderId,
+          staff: user?.fullname,
+          orderType: ctx?.orderType || 'onsite',
+        }),
       orders: props.afterSplit?.length ? props.afterSplit : ctx.bill,
       serviceChargePercentage: ctx.serviceChargePercentage,
       serviceCharge: ctx.serviceCharge,
@@ -612,6 +619,7 @@ export default function ModalPayment(props) {
       discount,
       discountPrice,
       deliveryPrice,
+      deliveryPriceDisc,
       billedAmount: ctx.actualPrice,
       roundingAmount: donation,
       productionAmount: ctx.productionAmount,
@@ -814,7 +822,7 @@ export default function ModalPayment(props) {
                           setDiscountPrice(Number(values.value));
                           ctx.setDiscountPrice(Number(values.value));
                         }}
-                        // disabled={ctx.discountLabel === "FIRST WASH"}
+                      // disabled={ctx.discountLabel === "FIRST WASH"}
                       />
                     )}
                   </Grid>
@@ -843,6 +851,35 @@ export default function ModalPayment(props) {
                         setDeliveryPrice(Number(values.value));
                         ctx.setDeliveryPrice(Number(values.value));
                       }}
+                      disabled={!!ctx.deliveryPriceDisc}
+                    />
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <Typography variant="subtitle1">Delivery Fee Discount</Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <NumericFormat
+                      customInput={TextField}
+                      id="deliveryPriceDisc"
+                      name="deliveryPriceDisc"
+                      placeholder="0"
+                      autoComplete="off"
+                      decimalScale={2}
+                      decimalSeparator="."
+                      thousandSeparator=","
+                      allowNegative={false}
+                      InputProps={{
+                        startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
+                        inputProps: { style: { textAlign: 'right' } },
+                      }}
+                      fullWidth
+                      value={deliveryPriceDisc ? Number(deliveryPriceDisc) : ''}
+                      onValueChange={(values) => {
+                        setDeliveryPriceDisc(Number(values.value));
+                        ctx.setDeliveryPriceDisc(Number(values.value));
+                      }}
+                      disabled
                     />
                   </Grid>
 
@@ -1233,10 +1270,10 @@ export default function ModalPayment(props) {
               loading={isLoading}
               disabled={
                 (paymentType === 'Card' && cardBankName === '') ||
-                (paymentType === 'Card' && cardAccountName === '') ||
-                (paymentType === 'Card' && cardNumber === '') ||
-                paymentMethod === '' ||
-                loading
+                  (paymentType === 'Card' && cardAccountName === '') ||
+                  (paymentType === 'Card' && cardNumber === '') ||
+                  paymentMethod === '' ||
+                  loading
                   ? Boolean(true)
                   : Boolean(false)
               }
