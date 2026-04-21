@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { useSnackbar } from "notistack";
+import { NumericFormat } from 'react-number-format';
 // form
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -23,12 +24,12 @@ import { FormProvider, RHFTextField } from "../../../../components/hook-form";
 // utils
 import { handleMutationFeedback } from '../../../../utils/mutationfeedback';
 // service
-import schema from '../../../../pages/library/discount/schema/discount';
-import useDisc from '../../../../pages/library/discount/service/useGlobalDisc';
+import schema from '../../../../pages/library/discount/schema/deliveryDiscount';
+import useDisc from '../../../../pages/library/discount/service/useDeliveryDisc';
 
 // ----------------------------------------------------------------------
 
-export default function DiscountForm() {
+export default function DeliveryDiscountForm() {
     const { enqueueSnackbar } = useSnackbar();
     const { getAll, update } = useDisc();
 
@@ -48,11 +49,13 @@ export default function DiscountForm() {
         resolver: yupResolver(schema),
         defaultValues,
     });
+
     const {
         control,
         reset,
         watch,
         getValues,
+        setValue,
         handleSubmit,
         formState: { isSubmitting },
     } = methods;
@@ -91,7 +94,7 @@ export default function DiscountForm() {
                 <Grid container spacing={5}>
                     <Grid item xs={12} md={6}>
                         <Alert severity="warning" sx={{ mb: 3 }}>
-                            <Typography variant="subtitle1">This form is used to set global discounts that will be displayed on the order page of the website.</Typography>
+                            <Typography variant="subtitle1">This form is used to set delivery discounts that will be displayed on the order page of the website.</Typography>
                         </Alert>
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -162,16 +165,22 @@ export default function DiscountForm() {
                                     />
                                 </Grid>
                             </Grid>
-                            <RHFTextField
+                            <NumericFormat
+                                customInput={RHFTextField}
                                 name="amount"
-                                label="Percentage"
-                                InputProps={{
-                                    endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                                    inputProps: { min: 1, max: 100 }
-                                }}
-                                type="number"
+                                label="Discount Price"
                                 autoComplete="off"
-                                value={(getValues("amount") === 0 || getValues("amount") === null) ? "" : getValues("amount")}
+                                decimalScale={2}
+                                decimalSeparator="."
+                                thousandSeparator=","
+                                allowNegative={false}
+                                InputProps={{
+                                    startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
+                                }}
+                                value={(getValues('amount') === 0 || getValues('amount') === null) ? '' : getValues('amount')}
+                                onValueChange={(values) => {
+                                    setValue('amount', values.value ? Number(values.value) : null);
+                                }}
                             />
                         </Stack>
                         <Stack direction="row" justifyContent="flex-end" mt={5} gap={1}>

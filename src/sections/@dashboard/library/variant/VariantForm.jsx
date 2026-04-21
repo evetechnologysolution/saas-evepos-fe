@@ -254,40 +254,41 @@ export default function VariantForm({ isEdit, currentData }) {
                           />
                         )}
                       />
+                      {user?.tenantRef?.isEvewash && (
+                        <Controller
+                          name={`options.${index}.isDefault`}
+                          control={control}
+                          render={({ field }) => (
+                            <FormControlLabel
+                              label={
+                                <>
+                                  <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                                    Default Option
+                                  </Typography>
+                                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                    Enable for default option
+                                  </Typography>
+                                </>
+                              }
+                              control={
+                                // <CustomSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
+                                <CustomSwitch
+                                  checked={field.value}
+                                  onChange={(e) => {
+                                    const checked = e.target.checked;
 
-                      <Controller
-                        name={`options.${index}.isDefault`}
-                        control={control}
-                        render={({ field }) => (
-                          <FormControlLabel
-                            label={
-                              <>
-                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                                  Default Option
-                                </Typography>
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                  Enable for default option
-                                </Typography>
-                              </>
-                            }
-                            control={
-                              // <CustomSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
-                              <CustomSwitch
-                                checked={field.value}
-                                onChange={(e) => {
-                                  const checked = e.target.checked;
+                                    const list = getValues('options');
 
-                                  const list = getValues('options');
-
-                                  list.forEach((_, i) => {
-                                    setValue(`options.${i}.isDefault`, i === index ? checked : false);
-                                  });
-                                }}
-                              />
-                            }
-                          />
-                        )}
-                      />
+                                    list.forEach((_, i) => {
+                                      setValue(`options.${i}.isDefault`, i === index ? checked : false);
+                                    });
+                                  }}
+                                />
+                              }
+                            />
+                          )}
+                        />
+                      )}
                     </Stack>
                   </Stack>
                   <Divider />
