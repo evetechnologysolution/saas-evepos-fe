@@ -129,6 +129,7 @@ export default function OrdersTableRow({ row, local, closeLocal, onDeleteRow }) 
     voucherCode,
     voucherDiscPrice,
     deliveryPrice,
+    deliveryPriceDisc,
     havePaid,
     billedAmount,
     payment,
@@ -229,7 +230,7 @@ export default function OrdersTableRow({ row, local, closeLocal, onDeleteRow }) 
 
     const totalDisc =
       discountPrice || voucherDiscPrice ? `💸 *Diskon:* Rp${(discountPrice + voucherDiscPrice).toLocaleString()}` : '';
-    const totalDelivery = deliveryPrice ? `🛵 *Ongkir:* Rp${deliveryPrice.toLocaleString()}` : '';
+    const totalDelivery = deliveryPrice ? `🛵 *Ongkir:* Rp${(deliveryPrice - deliveryPriceDisc)?.toLocaleString()}` : '';
     // Gabungkan hanya jika ada nilainya
     const additionalDetails = [totalDisc, totalDelivery].filter(Boolean).join('\n');
 
@@ -300,6 +301,9 @@ Terima kasih telah menggunakan layanan kami 🙏`;
     }
     if (deliveryPrice) {
       ctx.setDeliveryPrice(deliveryPrice);
+    }
+    if (deliveryPriceDisc) {
+      ctx.setDeliveryPriceDisc(deliveryPriceDisc);
     }
     if (havePaid) {
       ctx.setHavePaid(havePaid);
@@ -472,7 +476,30 @@ Terima kasih telah menggunakan layanan kami 🙏`;
         )}
 
         <TableCell align="center" sx={{ color: status?.toLowerCase() === 'refund' ? 'red' : '#212B36' }}>
-          {deliveryPrice ? `Rp. ${numberWithCommas(deliveryPrice)}` : '-'}
+          {deliveryPrice ? (
+            deliveryPriceDisc ? (
+              <>
+                <span
+                  style={{
+                    textDecoration: "line-through",
+                    color: "red",
+                    opacity: 0.7,
+                    marginRight: 6,
+                  }}
+                >
+                  Rp. {numberWithCommas(deliveryPrice)}
+                </span>
+                <br />
+                <span>
+                  Rp. {numberWithCommas(deliveryPrice - deliveryPriceDisc)}
+                </span>
+              </>
+            ) : (
+              <span>Rp. {numberWithCommas(deliveryPrice)}</span>
+            )
+          ) : (
+            "-"
+          )}
         </TableCell>
 
         <TableCell align="center">

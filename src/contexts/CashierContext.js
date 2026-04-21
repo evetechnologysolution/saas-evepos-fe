@@ -56,6 +56,7 @@ const CashierContextProvider = ({ children }) => {
   const [discountLabel, setDiscountLabel] = useState('');
   const [voucherDiscPrice, setVoucherDiscPrice] = useState(0);
   const [deliveryPrice, setDeliveryPrice] = useState(0);
+  const [deliveryPriceDisc, setDeliveryPriceDisc] = useState(0);
   const [donation, setDonation] = useState(0);
   const [splitServiceCharge, setSplitServiceCharge] = useState(0);
   const [serviceCharge, setServiceCharge] = useState(0);
@@ -141,7 +142,7 @@ const CashierContextProvider = ({ children }) => {
     }
 
     setSubtotalPrice(sumPrice);
-    setActualPrice(sumPrice + serviceAmount + taxAmount - voucherDiscPrice - fixDiscPrice + deliveryPrice);
+    setActualPrice(sumPrice + serviceAmount + taxAmount - voucherDiscPrice - fixDiscPrice + (deliveryPrice - deliveryPriceDisc));
   }, [
     bill,
     orderType,
@@ -150,6 +151,7 @@ const CashierContextProvider = ({ children }) => {
     discountPrice,
     discByPrice,
     deliveryPrice,
+    deliveryPriceDisc,
     discountLabel,
     taxSetting,
   ]);
@@ -385,6 +387,7 @@ const CashierContextProvider = ({ children }) => {
     setOrderType('onsite');
     setDp(0);
     setDeliveryPrice(0);
+    setDeliveryPriceDisc(0);
     setDonation(0);
     setDiscByPrice(false);
     setDiscount(0);
@@ -507,6 +510,8 @@ const CashierContextProvider = ({ children }) => {
       setDp,
       deliveryPrice,
       setDeliveryPrice,
+      deliveryPriceDisc,
+      setDeliveryPriceDisc,
       donation,
       setDonation,
       discByPrice,
@@ -591,6 +596,7 @@ const CashierContextProvider = ({ children }) => {
       notes,
       dp,
       deliveryPrice,
+      deliveryPriceDisc,
       donation,
       discByPrice,
       discount,

@@ -94,6 +94,7 @@ export default function OrdersTableRow({ row }) {
     discountLabel,
     voucherDiscPrice,
     deliveryPrice,
+    deliveryPriceDisc,
     billedAmount,
   } = row;
 
@@ -206,7 +207,30 @@ export default function OrdersTableRow({ row }) {
         </TableCell>
 
         <TableCell align="center" sx={{ color: status?.toLowerCase() === 'refund' ? 'red' : '#212B36' }}>
-          {deliveryPrice ? `Rp. ${numberWithCommas(deliveryPrice)}` : '-'}
+          {deliveryPrice ? (
+            deliveryPriceDisc ? (
+              <>
+                <span
+                  style={{
+                    textDecoration: "line-through",
+                    color: "red",
+                    opacity: 0.7,
+                    marginRight: 6,
+                  }}
+                >
+                  Rp. {numberWithCommas(deliveryPrice)}
+                </span>
+                <br />
+                <span>
+                  Rp. {numberWithCommas(deliveryPrice - deliveryPriceDisc)}
+                </span>
+              </>
+            ) : (
+              <span>Rp. {numberWithCommas(deliveryPrice)}</span>
+            )
+          ) : (
+            "-"
+          )}
         </TableCell>
 
         <TableCell align="center">

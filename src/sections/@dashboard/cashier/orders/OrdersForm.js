@@ -81,7 +81,7 @@ export default function OrdersForm({ currentData }) {
     Number(subtotalPrice || 0) -
     Number(data?.voucherDiscPrice || 0) -
     Number(data?.discountPrice || 0) +
-    Number(data?.deliveryPrice || 0);
+    (Number(data?.deliveryPrice || 0) - Number(data?.deliveryPriceDisc || 0));
 
   useEffect(() => {
     const regionParts = [
@@ -424,7 +424,16 @@ export default function OrdersForm({ currentData }) {
                       <Stack>
                         <Typography variant="subtitle2">Delivery Fee</Typography>
                         <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                          Rp. {numberWithCommas(data?.deliveryPrice || 0)}
+                          {data?.deliveryPriceDisc ? (
+                            <Stack>
+                              <Typography variant="body2" sx={{ fontStyle: "italic", color: "red", textDecoration: "line-through", opacity: 0.7 }}>
+                                Rp. {numberWithCommas(data?.deliveryPrice || 0)}
+                              </Typography>
+                              <Typography variant="body2" sx={{ fontStyle: "italic" }}>Rp. {numberWithCommas((data?.deliveryPrice || 0) - (data?.deliveryPriceDisc || 0))}</Typography>
+                            </Stack>
+                          ) : (
+                            <Typography variant="body2" sx={{ fontStyle: "italic" }}>Rp. {numberWithCommas(data?.deliveryPrice || 0)}</Typography>
+                          )}
                         </Typography>
                       </Stack>
                     </Stack>

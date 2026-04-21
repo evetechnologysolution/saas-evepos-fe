@@ -515,9 +515,16 @@ export default function CashierPos() {
                           <Typography variant="body2" ml={1}>
                             Delivery Fee
                           </Typography>
-                          <Typography variant="body2" mr={1}>
-                            Rp. {numberWithCommas(ctx.deliveryPrice)}
-                          </Typography>
+                          {ctx.deliveryPriceDisc ? (
+                            <Stack>
+                              <Typography variant="body2" mr={1} sx={{ color: "red", textDecoration: "line-through", opacity: 0.7 }}>
+                                Rp. {numberWithCommas(ctx.deliveryPrice || 0)}
+                              </Typography>
+                              <Typography variant="body2" mr={1}>Rp. {numberWithCommas((ctx.deliveryPrice || 0) - (ctx.deliveryPriceDisc || 0))}</Typography>
+                            </Stack>
+                          ) : (
+                            <Typography variant="body2" mr={1}>Rp. {numberWithCommas(ctx.deliveryPrice || 0)}</Typography>
+                          )}
                         </Stack>
                       )}
                       {ctx.havePaid > 0 && (
