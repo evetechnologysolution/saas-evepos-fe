@@ -96,6 +96,7 @@ export const PATH_DASHBOARD = {
     voucherCreate: path(ROOTS_DASHBOARD, '/library/voucher/new'),
     voucherEdit: (id) => path(ROOTS_DASHBOARD, `/library/voucher/${id}/edit`),
     discount: path(ROOTS_DASHBOARD, '/library/discount'),
+    deliveryDiscount: path(ROOTS_DASHBOARD, '/library/delivery-discount'),
   },
   report: {
     root: path(ROOTS_DASHBOARD, '/report'),

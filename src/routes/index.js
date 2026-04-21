@@ -651,6 +651,14 @@ export default function Router() {
                     </RoleBasedGuard>
                   ),
                 },
+                {
+                  path: 'delivery-discount',
+                  element: (
+                    <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin'])}>
+                      <LibraryDeliveryDiscount />
+                    </RoleBasedGuard>
+                  ),
+                },
               ],
             },
             {
@@ -1044,6 +1052,7 @@ const LibraryVoucher = Loadable(lazy(() => import('../pages/library/voucher/Libr
 const LibraryVoucherCreate = Loadable(lazy(() => import('../pages/library/voucher/LibraryVoucherCreate')));
 const LibraryVoucherEdit = Loadable(lazy(() => import('../pages/library/voucher/LibraryVoucherEdit')));
 const LibraryDiscount = Loadable(lazy(() => import('../pages/library/discount/LibraryDiscount')));
+const LibraryDeliveryDiscount = Loadable(lazy(() => import('../pages/library/discount/LibraryDeliveryDiscount')));
 const LibraryStatusScan = Loadable(lazy(() => import('../pages/library/status-scan/StatusScan')));
 const LibraryStatusScanCreate = Loadable(lazy(() => import('../pages/library/status-scan/StatusCreate')));
 const LibraryStatusScanEdit = Loadable(lazy(() => import('../pages/library/status-scan/StatusEdit')));

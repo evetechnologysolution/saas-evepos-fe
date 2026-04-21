@@ -218,6 +218,7 @@ export const useNavConfig = () => {
             // { title: 'special promotion', path: PATH_DASHBOARD.library.specialPromotion },
             ...(user?.tenantRef?.isEvewash ? [{ title: 'voucher', path: PATH_DASHBOARD.library.voucher }] : []),
             // ...(user?.tenantRef?.isEvewash ? [{ title: 'discount', path: PATH_DASHBOARD.library.discount }] : []),
+            ...(user?.tenantRef?.isEvewash ? [{ title: 'delivery discount', path: PATH_DASHBOARD.library.deliveryDiscount }] : []),
           ],
         },
         // SETTINGS
