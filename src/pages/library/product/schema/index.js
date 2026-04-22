@@ -56,7 +56,8 @@ const ProductSchema = Yup.object({
   progressPoint: Yup.object({
     baseQty: Yup.number().required('Base qty wajib diisi').min(0, 'Base qty wajib diisi').default(null).nullable(),
     basePoint: Yup.number().default(null).nullable(),
-  })
+  }),
+  baseTime: Yup.number().default(null).nullable(),
 });
 
 export default ProductSchema;

@@ -155,7 +155,7 @@ export default function CashierPosProduct() {
         </Stack>
       </Box>
       <Scrollbar>
-        <Box sx={{ height: '71vh', position: 'relative' }}>
+        <Box sx={{ height: '65vh', position: 'relative' }}>
           {ctm.loadingProduct ? (
             <Box display="flex" justifyContent="center" py={6}>
               <CircularProgress />
