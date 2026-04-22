@@ -307,7 +307,7 @@ export default function CashierPos() {
         <Container maxWidth={themeStretch ? false : 'xl'}>
           {!ctx.isFinished && (
             <Grid container spacing={3}>
-              <Grid item xs={12} md={7} sx={{ height: '71vh' }}>
+              <Grid item xs={12} md={7} sx={{ height: '65vh' }}>
                 <CashierPosProduct />
               </Grid>
 

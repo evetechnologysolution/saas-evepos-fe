@@ -121,6 +121,7 @@ export default function ProductForm({ isEdit, currentData }) {
         baseQty: currentData?.progressPoint?.baseQty || null,
         basePoint: currentData?.progressPoint?.basePoint || null,
       },
+      baseTime: currentData?.baseTime || null,
       extraNotes: currentData?.extraNotes ?? false,
       isRecommended: currentData?.isRecommended ?? false,
       showOnWeb: currentData?.showOnWeb ?? false,
@@ -245,6 +246,7 @@ export default function ProductForm({ isEdit, currentData }) {
       formData.append('masterStatus', JSON.stringify(data.masterStatus || []));
       formData.append('progressPoint.baseQty', Number(data?.progressPoint?.baseQty || 0));
       // formData.append('progressPoint.basePoint', Number(data?.progressPoint?.basePoint || 0));
+      formData.append('baseTime', Number(data?.baseTime || 0));
 
       // image (string URL / File / null)
       if (data.image instanceof File) {
@@ -526,6 +528,20 @@ export default function ProductForm({ isEdit, currentData }) {
                       setValue('progressPoint.basePoint', Number(values.value));
                     }}
                   /> */}
+                  <NumericFormat
+                    customInput={RHFTextField}
+                    name="baseTime"
+                    label="Progress Base Time (Day)"
+                    autoComplete="off"
+                    decimalScale={2}
+                    decimalSeparator="."
+                    thousandSeparator=","
+                    allowNegative={false}
+                    value={getValues('baseTime') === 0 ? '' : getValues('baseTime')}
+                    onValueChange={(values) => {
+                      setValue('baseTime', Number(values.value));
+                    }}
+                  />
                 </Stack>
               </Stack>
 
