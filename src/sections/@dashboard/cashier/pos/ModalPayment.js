@@ -855,33 +855,37 @@ export default function ModalPayment(props) {
                     />
                   </Grid>
 
-                  <Grid item xs={6}>
-                    <Typography variant="subtitle1">Delivery Fee Discount</Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <NumericFormat
-                      customInput={TextField}
-                      id="deliveryPriceDisc"
-                      name="deliveryPriceDisc"
-                      placeholder="0"
-                      autoComplete="off"
-                      decimalScale={2}
-                      decimalSeparator="."
-                      thousandSeparator=","
-                      allowNegative={false}
-                      InputProps={{
-                        startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
-                        inputProps: { style: { textAlign: 'right' } },
-                      }}
-                      fullWidth
-                      value={deliveryPriceDisc ? Number(deliveryPriceDisc) : ''}
-                      onValueChange={(values) => {
-                        setDeliveryPriceDisc(Number(values.value));
-                        ctx.setDeliveryPriceDisc(Number(values.value));
-                      }}
-                      disabled
-                    />
-                  </Grid>
+                  {ctx.deliveryPriceDisc ? (
+                    <>
+                      <Grid item xs={6}>
+                        <Typography variant="subtitle1">Delivery Fee Discount</Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <NumericFormat
+                          customInput={TextField}
+                          id="deliveryPriceDisc"
+                          name="deliveryPriceDisc"
+                          placeholder="0"
+                          autoComplete="off"
+                          decimalScale={2}
+                          decimalSeparator="."
+                          thousandSeparator=","
+                          allowNegative={false}
+                          InputProps={{
+                            startAdornment: <InputAdornment position="start">Rp</InputAdornment>,
+                            inputProps: { style: { textAlign: 'right' } },
+                          }}
+                          fullWidth
+                          value={deliveryPriceDisc ? Number(deliveryPriceDisc) : ''}
+                          onValueChange={(values) => {
+                            setDeliveryPriceDisc(Number(values.value));
+                            ctx.setDeliveryPriceDisc(Number(values.value));
+                          }}
+                          disabled
+                        />
+                      </Grid>
+                    </>
+                  ) : null}
 
                   {/* <Grid item xs={6}>
                                     <Typography variant="subtitle1">

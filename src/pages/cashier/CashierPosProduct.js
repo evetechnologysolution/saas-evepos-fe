@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 // @mui
-import { Box, Button, CircularProgress, IconButton, Stack, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, IconButton, Stack, Typography, TextField, InputAdornment } from '@mui/material';
 // horizontal scroll
 import { ScrollMenu } from 'react-horizontal-scrolling-menu';
 import 'react-horizontal-scrolling-menu/dist/styles.css';
@@ -21,6 +21,7 @@ export default function CashierPosProduct() {
 
   const rowsPerPage = 52;
   const [page, setPage] = useState(0);
+  const [search, setSearch] = useState("");
 
   // select category
   const [products, setProducts] = useState([]);
@@ -33,6 +34,7 @@ export default function CashierPosProduct() {
   }, [ctm.product]);
 
   const handleClickCategory = (val) => {
+    setSearch("");
     setSelectedCategory(val);
     if (val === 'All') {
       setProducts(ctm.product);
@@ -49,24 +51,65 @@ export default function CashierPosProduct() {
     return 'outlined';
   };
 
+  const handleSearch = (e) => {
+    const val = e.target.value;
+    setSearch(val);
+
+    let filtered = ctm.product;
+
+    // filter category dulu
+    if (selectedCategory !== 'All') {
+      filtered = filtered.filter(
+        (item) => item?.category?.name === selectedCategory
+      );
+    }
+
+    // lalu filter search (misal berdasarkan name)
+    if (val) {
+      filtered = filtered.filter((item) =>
+        item?.name?.toLowerCase().includes(val.toLowerCase())
+      );
+    }
+
+    setProducts(filtered);
+    setPage(0);
+  };
+
   return (
     <>
       <Box sx={{ alignItems: 'center' }}>
-        <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
-          {[{ _id: 'all', name: 'All' }, ...ctm.category].map((cat, i) => (
-            <Button
-              key={i}
-              color="primary"
-              variant={getButtonVariant(cat.name)}
-              onClick={() => handleClickCategory(cat.name)}
-              sx={{ mr: 1, minHeight: 45, minWidth: 90 }}
-            >
-              <Typography variant="body2" noWrap>
-                {cat.name}
-              </Typography>
-            </Button>
-          ))}
-        </ScrollMenu>
+        <Stack gap={2}>
+          <TextField
+            placeholder="Search"
+            autoComplete="off"
+            fullWidth
+            size="small"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Iconify icon={'eva:search-fill'} sx={{ color: 'text.disabled', width: 20, height: 20 }} />
+                </InputAdornment>
+              ),
+            }}
+            value={search}
+            onChange={handleSearch}
+          />
+          <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
+            {[{ _id: 'all', name: 'All' }, ...ctm.category].map((cat, i) => (
+              <Button
+                key={i}
+                color="primary"
+                variant={getButtonVariant(cat.name)}
+                onClick={() => handleClickCategory(cat.name)}
+                sx={{ mr: 1, minHeight: 45, minWidth: 90 }}
+              >
+                <Typography variant="body2" noWrap>
+                  {cat.name}
+                </Typography>
+              </Button>
+            ))}
+          </ScrollMenu>
+        </Stack>
         <Stack flexDirection="row" justifyContent="center" alignItems="center">
           <IconButton
             color="primary"
@@ -83,9 +126,8 @@ export default function CashierPosProduct() {
           <Typography variant="body2">
             {products.length > 0 &&
               (products.length > rowsPerPage
-                ? `${page * rowsPerPage + 1} - ${currProduct.length - 1 + (page * rowsPerPage + 1)} of ${
-                    products.length
-                  }`
+                ? `${page * rowsPerPage + 1} - ${currProduct.length - 1 + (page * rowsPerPage + 1)} of ${products.length
+                }`
                 : `${page * rowsPerPage + 1} - ${products.length} of ${products.length}`)}
             {products.length === 0 && '0 - 0 of 0'}
           </Typography>
@@ -123,7 +165,8 @@ export default function CashierPosProduct() {
           ) : (
             <Box py={12}>
               <Typography textAlign="center">
-                Kamu belum memiliki produk. Mohon refresh jika Anda sudah punya produk.
+                {/* Kamu belum memiliki produk. Mohon refresh jika Anda sudah punya produk. */}
+                Produk tidak ditemukan.
               </Typography>
             </Box>
           )}
