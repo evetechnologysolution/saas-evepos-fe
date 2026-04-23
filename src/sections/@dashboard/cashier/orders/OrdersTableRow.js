@@ -20,7 +20,6 @@ import {
   DialogTitle,
   DialogContent,
   MenuItem,
-  Typography
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import axios from '../../../../utils/axios';
@@ -484,7 +483,6 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                     textDecoration: "line-through",
                     color: "red",
                     opacity: 0.7,
-                    marginRight: 6,
                   }}
                 >
                   Rp. {numberWithCommas(deliveryPrice)}

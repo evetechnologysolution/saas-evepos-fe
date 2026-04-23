@@ -18,6 +18,16 @@ export default function useOrder() {
       keepPreviousData: false,
     });
 
+  const getById = (id) =>
+    useQuery({
+      queryKey: [...queryKey, id],
+      queryFn: async () => {
+        const { data } = await axios.get(`/order/${id}`);
+        return data;
+      },
+      enabled: !!id,
+    });
+
   const create = useMutation({
     mutationFn: async (payload) => {
       const { data } = await axios.post('/order', payload);
@@ -37,16 +47,6 @@ export default function useOrder() {
       queryClient.invalidateQueries(queryKey);
     },
   });
-
-  const getById = (id) =>
-    useQuery({
-      queryKey: [...queryKey, id],
-      queryFn: async () => {
-        const { data } = await axios.get(`/order/${id}`);
-        return data;
-      },
-      enabled: !!id,
-    });
 
   const remove = useMutation({
     mutationFn: async (id) => {

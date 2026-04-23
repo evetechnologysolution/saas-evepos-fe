@@ -18,14 +18,16 @@ import {
   Grid,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-// hooks
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 // utils
 import axios from '../../../utils/axios';
 import { fCurrency } from '../../../utils/formatNumber';
-import { formatQDate, formatDate, formatDate2, formatOnlyDate } from '../../../utils/getData';
+import {
+  formatQDate, formatDate, formatDate2,
+  // formatOnlyDate 
+} from '../../../utils/getData';
 // components
 import Iconify from '../../../components/Iconify';
 import Scrollbar from '../../../components/Scrollbar';
@@ -68,6 +70,7 @@ export default function TableComponent() {
     'Qty',
     'Discount',
     'Delivery Fee',
+    'Discount Delivery Fee',
     'Total',
     'Payment',
   ];
@@ -191,14 +194,13 @@ export default function TableComponent() {
 
     handleSearch();
 
-    let url = `/order/export`;
+    let url = `/order/export?satus=paid`;
     if (search) {
-      url = `${url}?search=${search}`;
+      url = `${url}&search=${search}`;
     }
     if (startDate && endDate) {
-      const sign = search ? '&' : '?';
-      // url = `${url + sign}start=${startDate}&end=${endDate}`;
-      url = `${url + sign}paidStart=${startDate}&paidEnd=${endDate}&sortBy=paymentDate&sortType=desc`;
+      // url = `${url}&start=${startDate}&end=${endDate}`;
+      url = `${url}&paidStart=${startDate}&paidEnd=${endDate}&sortBy=paymentDate&sortType=desc`;
     }
 
     const result = [];
@@ -215,7 +217,7 @@ export default function TableComponent() {
           payment = 'Refund';
         }
         result.push([
-          // formatOnlyDate(data.date),
+          // formatOnlyDate(data.createdAt),
           formatDate2(data.paymentDate),
           data.orderId || data._id,
           showOrderType(data.orderType),
@@ -224,6 +226,7 @@ export default function TableComponent() {
           data.orders[0].qty,
           data.discountPrice ? data.discountPrice : 0,
           data.deliveryPrice ? data.deliveryPrice : 0,
+          data.deliveryPriceDisc ? data.deliveryPriceDisc : 0,
           data.billedAmount,
           payment,
         ]);
@@ -232,13 +235,14 @@ export default function TableComponent() {
           data.orders.forEach((row, i) => {
             if (i > 0) {
               result.push([
-                // "",
+                // '',
                 '',
                 '',
                 '',
                 row.name,
                 row.price,
                 row.qty,
+                '',
                 '',
                 '',
                 '',
@@ -412,7 +416,31 @@ export default function TableComponent() {
                             </p>
                           ))}
                         </TableCell>
-                        <TableCell>{row.deliveryPrice ? fCurrency(row.deliveryPrice) : '-'}</TableCell>
+                        <TableCell>
+                          {row.deliveryPrice ? (
+                            row.deliveryPriceDisc ? (
+                              <>
+                                <span
+                                  style={{
+                                    textDecoration: "line-through",
+                                    color: "red",
+                                    opacity: 0.7,
+                                  }}
+                                >
+                                  {fCurrency(row.deliveryPrice)}
+                                </span>
+                                <br />
+                                <span>
+                                  {fCurrency(row.deliveryPrice - row.deliveryPriceDisc)}
+                                </span>
+                              </>
+                            ) : (
+                              <span>{fCurrency(row.deliveryPrice)}</span>
+                            )
+                          ) : (
+                            "-"
+                          )}
+                        </TableCell>
                         <TableCell sx={{ color: row.refundType ? 'red' : '#212B36' }}>
                           {fCurrency(row.billedAmount)}
                         </TableCell>

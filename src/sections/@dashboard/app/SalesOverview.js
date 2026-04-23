@@ -11,7 +11,6 @@ import {
   Select,
   MenuItem,
   Grid,
-  Button,
   TextField,
   InputAdornment,
   CircularProgress,
@@ -36,7 +35,8 @@ const queryOptions = {
 };
 
 export default function SalesOverview({ title, ...other }) {
-  const [filterLabel, setFilterLabel] = useState('today');
+  const [filterLabel, setFilterLabel] = useState('thisWeek');
+  const [tempDate, setTempDate] = useState({ start: null, end: null });
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [showFilterDate, setShowFilterDate] = useState(false);
@@ -148,6 +148,7 @@ export default function SalesOverview({ title, ...other }) {
       setShowFilterDate(true);
     } else {
       setShowFilterDate(false);
+      setTempDate({ start: null, end: null });
       setStartDate(null);
       setEndDate(null);
     }
@@ -229,8 +230,11 @@ export default function SalesOverview({ title, ...other }) {
                 <MobileDatePicker
                   label="Start Date"
                   inputFormat="dd/MM/yyyy"
-                  value={startDate}
-                  onChange={(newValue) => setStartDate(newValue)}
+                  value={tempDate?.start}
+                  onChange={(newValue) => {
+                    setTempDate((prev) => ({ ...prev, start: newValue }));
+                  }}
+                  onAccept={(newValue) => setStartDate(newValue)}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -254,8 +258,11 @@ export default function SalesOverview({ title, ...other }) {
                 <MobileDatePicker
                   label="End Date"
                   inputFormat="dd/MM/yyyy"
-                  value={endDate}
-                  onChange={(newValue) => setEndDate(newValue)}
+                  value={tempDate?.end}
+                  onChange={(newValue) => {
+                    setTempDate((prev) => ({ ...prev, end: newValue }));
+                  }}
+                  onAccept={(newValue) => setEndDate(newValue)}
                   minDate={startDate}
                   renderInput={(params) => (
                     <TextField

@@ -215,7 +215,6 @@ export default function OrdersTableRow({ row }) {
                     textDecoration: "line-through",
                     color: "red",
                     opacity: 0.7,
-                    marginRight: 6,
                   }}
                 >
                   Rp. {numberWithCommas(deliveryPrice)}
