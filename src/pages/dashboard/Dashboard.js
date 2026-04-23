@@ -31,13 +31,15 @@ export default function Dashboard() {
   const { themeStretch } = useSettings();
 
   // State untuk filter bagian ATAS (Revenue, Donation, Sales)
-  const [topFilterLabel, setTopFilterLabel] = useState('thisMonth');
+  const [topFilterLabel, setTopFilterLabel] = useState('today');
+  const [tempTopDate, setTempTopDate] = useState({ start: null, end: null });
   const [topStartDate, setTopStartDate] = useState(null);
   const [topEndDate, setTopEndDate] = useState(null);
   const [isTopCustomDateActive, setIsTopCustomDateActive] = useState(false);
 
   // State untuk filter bagian BAWAH (Payment Method, Popular Product)
   const [bottomFilterLabel, setBottomFilterLabel] = useState('thisMonth');
+  const [tempBottomDate, setTempBottomDate] = useState({ start: null, end: null });
   const [bottomStartDate, setBottomStartDate] = useState(null);
   const [bottomEndDate, setBottomEndDate] = useState(null);
   const [isBottomCustomDateActive, setIsBottomCustomDateActive] = useState(false);
@@ -126,6 +128,7 @@ export default function Dashboard() {
   const handleTopPresetFilterChange = (value) => {
     setTopFilterLabel(value);
     setIsTopCustomDateActive(false);
+    setTempTopDate({ start: null, end: null });
     setTopStartDate(null);
     setTopEndDate(null);
   };
@@ -148,6 +151,7 @@ export default function Dashboard() {
   const handleBottomPresetFilterChange = (value) => {
     setBottomFilterLabel(value);
     setIsBottomCustomDateActive(false);
+    setTempBottomDate({ start: null, end: null });
     setBottomStartDate(null);
     setBottomEndDate(null);
   };
@@ -205,8 +209,11 @@ export default function Dashboard() {
                 <MobileDatePicker
                   label="Start Date"
                   inputFormat="dd/MM/yyyy"
-                  value={topStartDate}
+                  value={tempTopDate?.start}
                   onChange={(newValue) => {
+                    setTempTopDate((prev) => ({ ...prev, start: newValue }));
+                  }}
+                  onAccept={(newValue) => {
                     setTopStartDate(newValue);
                   }}
                   renderInput={(params) => (
@@ -231,8 +238,11 @@ export default function Dashboard() {
                 <MobileDatePicker
                   label="End Date"
                   inputFormat="dd/MM/yyyy"
-                  value={topEndDate}
+                  value={tempTopDate?.end}
                   onChange={(newValue) => {
+                    setTempTopDate((prev) => ({ ...prev, end: newValue }));
+                  }}
+                  onAccept={(newValue) => {
                     setTopEndDate(newValue);
                   }}
                   renderInput={(params) => (
@@ -350,8 +360,11 @@ export default function Dashboard() {
                     <MobileDatePicker
                       label="Start Date"
                       inputFormat="dd/MM/yyyy"
-                      value={bottomStartDate}
+                      value={tempBottomDate?.start}
                       onChange={(newValue) => {
+                        setTempBottomDate((prev) => ({ ...prev, start: newValue }));
+                      }}
+                      onAccept={(newValue) => {
                         setBottomStartDate(newValue);
                       }}
                       renderInput={(params) => (
@@ -376,8 +389,11 @@ export default function Dashboard() {
                     <MobileDatePicker
                       label="End Date"
                       inputFormat="dd/MM/yyyy"
-                      value={bottomEndDate}
+                      value={tempBottomDate?.end}
                       onChange={(newValue) => {
+                        setTempBottomDate((prev) => ({ ...prev, end: newValue }));
+                      }}
+                      onAccept={(newValue) => {
                         setBottomEndDate(newValue);
                       }}
                       renderInput={(params) => (

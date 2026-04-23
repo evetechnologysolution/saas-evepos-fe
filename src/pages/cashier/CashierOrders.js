@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useSnackbar } from 'notistack';
+import { CSVLink } from 'react-csv';
 // @mui
 import {
   Box,
@@ -15,15 +16,19 @@ import {
   FormControlLabel,
   Typography,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { LoadingButton } from '@mui/lab';
 // hooks
 import useSettings from '../../hooks/useSettings';
 import useTable from '../../hooks/useTable';
 // components
 import Page from '../../components/Page';
 import Scrollbar from '../../components/Scrollbar';
+import Iconify from '../../components/Iconify';
 import { TableHeadCustom, TableLoading, TableNoData } from '../../components/table';
 import ConfirmDelete from '../../components/ConfirmDelete';
+// utils
+import axios from '../../utils/axios';
+import { formatDate, formatDate2, formatQDate } from '../../utils/getData';
 // sections
 import { OrdersTableToolbar, OrdersTableRow } from '../../sections/@dashboard/cashier/orders';
 import useOrder from './service/useOrder';
@@ -50,22 +55,44 @@ const TABLE_HEAD = [
 
 export default function CashierOrders() {
   const { dense, onChangeDense } = useTable();
-  const theme = useTheme();
   const { themeStretch } = useSettings();
   const { enqueueSnackbar } = useSnackbar();
   const { list, remove } = useOrder();
 
   const [filterStatus, setFilterStatus] = useState('All');
   const [search, setSearch] = useState('');
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   const [selectedId, setSelectedId] = useState('');
   const [open, setOpen] = useState(false);
+
+  const headers = [
+    'Order Date',
+    'Payment Date',
+    'Order ID',
+    'Order Type',
+    'Status',
+    'Item',
+    'Price',
+    'Qty',
+    'Discount',
+    'Delivery Fee',
+    'Discount Delivery Fee',
+    'Total',
+    'Payment',
+  ];
+  const exportCsv = useRef(null);
+  const [exportData, setExportData] = useState([]);
+  const [loadingExport, setLoadingExport] = useState(false);
 
   const [controller, setController] = useState({
     page: 0,
     rowsPerPage: 10,
     status: '',
     search: '',
+    start: '',
+    end: '',
   });
 
   const { data: tableData, isLoading } = list({
@@ -73,7 +100,16 @@ export default function CashierOrders() {
     perPage: controller.rowsPerPage,
     search: controller.search,
     status: controller.status,
+    start: controller.start || '',
+    end: controller.end || '',
   });
+
+  const showOrderType = (orderType) => {
+    if (orderType?.toLowerCase() === 'onsite') {
+      return 'Onsite';
+    }
+    return 'Delivery';
+  };
 
   const handlePageChange = (event, newPage) => {
     setController({
@@ -96,7 +132,7 @@ export default function CashierOrders() {
     setController({
       page: 0,
       rowsPerPage: controller.rowsPerPage,
-      search,
+      search: controller.search || '',
       status: val !== 'All' ? fixStatus : '',
     });
   };
@@ -105,15 +141,149 @@ export default function CashierOrders() {
     setSearch(value);
   };
 
+  const handleSubmit = () => {
+    let params = {
+      page: 0,
+      rowsPerPage: controller.rowsPerPage,
+      search: '',
+      status: '',
+      start: '',
+      end: '',
+    };
+
+    if (search) {
+      params.search = search;
+    }
+
+    if (filterStatus) {
+      params.status = filterStatus !== 'All' ? filterStatus : '';
+    }
+
+    if (startDate && endDate) {
+      params = {
+        ...params,
+        start: formatQDate(startDate),
+        end: formatQDate(endDate),
+      };
+    }
+
+    setController(params);
+  };
+
   const handleOnKeyPress = (e) => {
     if (e.key === 'Enter') {
-      setController({
-        page: 0,
-        rowsPerPage: controller.rowsPerPage,
-        status: controller.status,
-        search,
-      });
+      handleSubmit();
     }
+  };
+
+  const handleReset = () => {
+    setSearch('');
+    setFilterStatus('All');
+    setStartDate(null);
+    setEndDate(null);
+    setController({
+      page: 0,
+      rowsPerPage: controller.rowsPerPage,
+      search: '',
+      status: '',
+      start: '',
+      end: '',
+    });
+  };
+
+  const handleExport = async () => {
+    setLoadingExport(true);
+
+    handleSearch();
+
+    let url = `/order/export`;
+    const params = new URLSearchParams();
+
+    if (controller.status) {
+      params.append("status", controller.status);
+    }
+
+    if (controller.search) {
+      params.append("search", controller.search);
+    }
+
+    if (controller.start && controller.end) {
+      params.append("start", controller.start);
+      params.append("end", controller.end);
+      params.append("sortBy", "createdAt");
+      // params.append("paidStart", controller.start);
+      // params.append("paidEnd", controller.end);
+      // params.append("sortBy", "paymentDate");
+      params.append("sortType", "desc");
+    }
+
+    if ([...params].length > 0) {
+      url += `?${params.toString()}`;
+    }
+
+    const result = [];
+    await axios.get(url).then((response) => {
+      response.data.forEach((data) => {
+        let payment;
+        if (!data.refundType) {
+          if (data.payment === 'Card') {
+            payment = `${data.payment} | ${data.cardBankName} a/n ${data.cardAccountName} ${data.cardNumber}`;
+          } else {
+            payment = data.payment;
+          }
+        } else {
+          payment = 'Refund';
+        }
+        result.push([
+          formatDate2(data.createdAt),
+          data.paymentDate ? formatDate2(data.paymentDate) : '',
+          data.orderId || data._id,
+          showOrderType(data.orderType),
+          data.status,
+          data.orders[0].name,
+          data.orders[0].price,
+          data.orders[0].qty,
+          data.discountPrice ? data.discountPrice : 0,
+          data.deliveryPrice ? data.deliveryPrice : 0,
+          data.deliveryPriceDisc ? data.deliveryPriceDisc : 0,
+          data.billedAmount,
+          payment,
+        ]);
+
+        if (data.orders.length > 1) {
+          data.orders.forEach((row, i) => {
+            if (i > 0) {
+              result.push([
+                '',
+                '',
+                '',
+                '',
+                '',
+                row.name,
+                row.price,
+                row.qty,
+                '',
+                '',
+                '',
+                '',
+                '',
+              ]);
+            }
+          });
+        }
+      });
+    });
+
+    setExportData(result);
+
+    setTimeout(() => {
+      if (result.length > 0) {
+        exportCsv.current.link.click();
+      } else {
+        alert('Export failed because data is empty!');
+      }
+      setLoadingExport(false);
+    }, 1000);
   };
 
   const handleDialog = (id) => {
@@ -144,42 +314,58 @@ export default function CashierOrders() {
             flexWrap="wrap"
             alignItems={{ sm: 'center' }}
             justifyContent={{ sm: 'space-between' }}
+            gap={1}
             mx={1}
           >
             <Typography variant="h6">Orders</Typography>
-            {/* <Stack flexDirection={{ sm: "row" }} alignItems={{ sm: "center" }} minWidth={user?.role === "Super Admin" ? "50%" : "40%"}> */}
-            <Stack flexDirection={{ sm: 'row' }} alignItems={{ sm: 'center' }} minWidth="50%">
-              {/* {user?.role === "Super Admin" && ( */}
-              <Stack
-                flexDirection="row"
-                gap={1}
-                p={0.5}
-                mx={1}
-                borderRadius="8px"
-                border="1px solid #E4E7EA"
-                width="fit-content"
-                height="fit-content"
-              >
-                {STATUS_OPTIONS.map((item, i) => (
+
+            <Stack flexDirection={{ md: "row" }} alignItems={{ md: "center" }} gap={2} py={2.5}>
+              <Box width="100%">
+                <OrdersTableToolbar
+                  options={STATUS_OPTIONS}
+                  filterStatus={filterStatus}
+                  handleFilterStatus={handleFilterStatus}
+                  startDate={startDate}
+                  setStartDate={setStartDate}
+                  endDate={endDate}
+                  setEndDate={setEndDate}
+                  filterName={search}
+                  onFilterName={handleSearch}
+                  onEnter={handleOnKeyPress}
+                />
+              </Box>
+              <Box>
+                <Stack flexDirection="row" gap={2}>
                   <Button
-                    key={i}
-                    sx={{
-                      boxShadow: 0,
-                      color: filterStatus === item ? theme.palette.primary.main : theme.palette.grey[400],
-                      bgcolor: filterStatus === item ? theme.palette.primary.lighter : '',
-                      textTransform: 'capitalize',
-                    }}
-                    size="large"
-                    onClick={() => handleFilterStatus(item)}
+                    title="Reset"
+                    variant="contained"
+                    color="warning"
+                    sx={{ color: 'white' }}
+                    onClick={() => handleReset()}
                   >
-                    {item}
+                    <Iconify icon={'mdi:reload'} sx={{ width: 25, height: 25 }} />
                   </Button>
-                ))}
-              </Stack>
-              {/* )} */}
-              <div style={{ width: '100%' }}>
-                <OrdersTableToolbar filterName={search} onFilterName={handleSearch} onEnter={handleOnKeyPress} />
-              </div>
+                  <Button title="Search" variant="contained" onClick={() => handleSubmit()}>
+                    <Iconify icon={'eva:search-fill'} sx={{ width: 25, height: 25 }} />
+                  </Button>
+                  <LoadingButton
+                    title="Export"
+                    variant="contained"
+                    color="info"
+                    loading={loadingExport}
+                    onClick={() => handleExport()}
+                  >
+                    <Iconify icon={'material-symbols:download-rounded'} sx={{ width: 25, height: 25 }} />
+                  </LoadingButton>
+                </Stack>
+                <CSVLink
+                  filename={`Export-Orders-${formatDate(new Date())}`}
+                  separator=";"
+                  data={exportData}
+                  headers={headers}
+                  ref={exportCsv}
+                />
+              </Box>
             </Stack>
           </Stack>
 
