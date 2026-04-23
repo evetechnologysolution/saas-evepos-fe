@@ -20,6 +20,7 @@ import { LoadingButton } from '@mui/lab';
 // hooks
 import useSettings from '../../hooks/useSettings';
 import useTable from '../../hooks/useTable';
+import useAuth from '../../hooks/useAuth';
 // components
 import Page from '../../components/Page';
 import Scrollbar from '../../components/Scrollbar';
@@ -57,6 +58,7 @@ export default function CashierOrders() {
   const { dense, onChangeDense } = useTable();
   const { themeStretch } = useSettings();
   const { enqueueSnackbar } = useSnackbar();
+  const { user } = useAuth();
   const { list, remove } = useOrder();
 
   const [filterStatus, setFilterStatus] = useState('All');
@@ -348,15 +350,17 @@ export default function CashierOrders() {
                   <Button title="Search" variant="contained" onClick={() => handleSubmit()}>
                     <Iconify icon={'eva:search-fill'} sx={{ width: 25, height: 25 }} />
                   </Button>
-                  <LoadingButton
-                    title="Export"
-                    variant="contained"
-                    color="info"
-                    loading={loadingExport}
-                    onClick={() => handleExport()}
-                  >
-                    <Iconify icon={'material-symbols:download-rounded'} sx={{ width: 25, height: 25 }} />
-                  </LoadingButton>
+                  {['owner', 'admin'].includes(user?.role?.toLowerCase()) && (
+                    <LoadingButton
+                      title="Export"
+                      variant="contained"
+                      color="info"
+                      loading={loadingExport}
+                      onClick={() => handleExport()}
+                    >
+                      <Iconify icon={'material-symbols:download-rounded'} sx={{ width: 25, height: 25 }} />
+                    </LoadingButton>
+                  )}
                 </Stack>
                 <CSVLink
                   filename={`Export-Orders-${formatDate(new Date())}`}
