@@ -20,6 +20,17 @@ export default function VoucherTableRow({ row }) {
 
   const { createdAt, expiry, voucherCode, name, isUsed } = row;
 
+  function isExpiredTime(expiry) {
+    const expiryDate = new Date(expiry);
+
+    // Cek date valid
+    if (Number.isNaN(expiryDate.getTime())) {
+      return true; // anggap expired jika invalid
+    }
+
+    return Date.now() > expiryDate.getTime();
+  }
+
   return (
     <CustomTableRow hover>
       <TableCell align="center">{formatDate2(createdAt)}</TableCell>
@@ -31,9 +42,9 @@ export default function VoucherTableRow({ row }) {
       <TableCell align="center">
         <Label
           variant="ghost"
-          color={isUsed ? "success" : "warning"}
+          color={isUsed ? "success" : isExpiredTime(expiry) ? "error" : "warning"}
         >
-          {isUsed ? "Used" : "Open"}
+          {isUsed ? "Used" : isExpiredTime(expiry) ? "Expired" : "Open"}
         </Label>
       </TableCell>
 
