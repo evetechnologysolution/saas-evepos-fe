@@ -514,7 +514,7 @@ export default function ModalPayment(props) {
           const canUseVoucher = ctx.bill.some((item) => {
             const matchedProduct = res?.data?.product?.find((row) => row?._id === item?.id);
             const hasMatchingQty = item?.qty >= res?.data?.qtyProduct;
-            if (res?.data?.member?.phone === ctx.customerPhone) {
+            if (res?.data?.memberRef?.phone === ctx.customerPhone) {
               vPrice = matchedProduct?.price || 0;
               return matchedProduct && hasMatchingQty;
             }
