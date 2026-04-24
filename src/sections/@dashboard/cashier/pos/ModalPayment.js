@@ -192,6 +192,7 @@ export default function ModalPayment(props) {
       setDiscountPriceOrigin(ctx.discountPrice);
       setDeliveryPriceOrigin(ctx.deliveryPrice);
       setDeliveryPriceDiscOrigin(ctx.deliveryPriceDisc);
+      setVoucherCode(ctx.voucherCode);
       setPayDate(new Date());
       if (ctx.discountLabel === 'FIRST WASH') {
         setIsPercent(false);
