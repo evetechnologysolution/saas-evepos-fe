@@ -2,7 +2,7 @@
 import { useQuery } from 'react-query';
 import axios from '../../utils/axios';
 
-export const useAllNotif = () => {
+export const useAllNotif = (options = {}) => {
   return useQuery(
     ['allNotif'],
     async () => {
@@ -11,6 +11,7 @@ export const useAllNotif = () => {
     },
     {
       refetchOnWindowFocus: false,
+      ...options,
     }
   );
 };

@@ -27,7 +27,9 @@ const MainContextProvider = ({ children }) => {
   const [selectedSubs, setSelectedSubs] = useState({});
 
   // queries
-  const { data: allNotif = null } = useAllNotif();
+  const { data: allNotif = null } = useAllNotif({
+    enabled: isUserReady,
+  });
   const { data: product = [], isLoading: loadingProduct } = useProduct({
     enabled: isUserReady,
   });
