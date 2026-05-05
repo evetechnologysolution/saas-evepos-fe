@@ -23,6 +23,7 @@ const CashierContextProvider = ({ children }) => {
   const [qrKey, setQrKey] = useState('');
   const [savedOrders, setSavedOrders] = useLocalStorage('savedOrders', []);
   const [progress, setProgress] = useState([]);
+  const [spk, setSpk] = useState([]);
   const [bill, setBill] = useState([]);
   const [splitBill, setSplitBill] = useState([]);
   const [savedBillID, setSavedBillID] = useState('');
@@ -380,6 +381,7 @@ const CashierContextProvider = ({ children }) => {
     setPax(1);
     setQrKey('');
     setProgress([]);
+    setSpk([]);
     setBill([]);
     setSplitBill([]);
     setSavedBillID('');
@@ -445,6 +447,8 @@ const CashierContextProvider = ({ children }) => {
       setSavedOrders,
       progress,
       setProgress,
+      spk,
+      setSpk,
       bill,
       setBill,
       splitBill,

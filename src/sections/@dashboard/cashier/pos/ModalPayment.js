@@ -12,7 +12,7 @@ import { useReactToPrint } from 'react-to-print';
 import {
   Alert,
   Container,
-  Button,
+  // Button,
   Grid,
   IconButton,
   styled,
@@ -626,6 +626,9 @@ export default function ModalPayment(props) {
       productionAmount: ctx.productionAmount,
       notes,
       isScan: ctx?.customerScan || false,
+      ...(ctx.spk.length > 0 && {
+        listSpk: ctx.spk
+      }),
     };
 
     if (type === 'payment') {

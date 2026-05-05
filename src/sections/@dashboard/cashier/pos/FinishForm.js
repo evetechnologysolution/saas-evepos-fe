@@ -12,6 +12,7 @@ import useAuth from '../../../../hooks/useAuth';
 import { cashierContext } from '../../../../contexts/CashierContext';
 // import { mainContext } from "../../../../contexts/MainContext";
 // utils
+import { generateListSpk } from '../../../../utils/generateSpkOrder';
 // import { numberWithCommas, randomCustomer } from "../../../../utils/getData";
 import { numberWithCommas } from '../../../../utils/getData';
 // components
@@ -62,6 +63,9 @@ export default function FinishForm() {
         notes: ctx.customerNotes,
         isNew: ctx?.customerNew || false,
       }
+    }),
+    ...(ctx.bill.length > 0 && {
+      listSpk: generateListSpk(ctx.bill, ctx.displayOrderID)
     }),
   };
 

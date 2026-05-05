@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React, { useState, useContext } from 'react';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 // @mui
 import {
   IconButton,
@@ -22,9 +23,6 @@ import { LoadingButton } from '@mui/lab';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
-import { useSnackbar } from 'notistack';
-import axios from '../../../../utils/axios';
-import { combinedDateTime } from '../../../../utils/getData';
 // components
 import Iconify from '../../../../components/Iconify';
 // import CustomSwitch from "../../../../components/CustomSwitch";
@@ -32,6 +30,9 @@ import Iconify from '../../../../components/Iconify';
 import { PATH_DASHBOARD } from '../../../../routes/paths';
 // context
 import { cashierContext } from '../../../../contexts/CashierContext';
+// utils
+import axios from '../../../../utils/axios';
+import { combinedDateTime, numberWithCommas } from '../../../../utils/getData';
 
 // ----------------------------------------------------------------------
 
@@ -90,6 +91,7 @@ export default function ModalPickup(props) {
     customer,
     customerRef,
     orders,
+    listSpk,
     orderType,
     dp,
     serviceCharge,
@@ -107,6 +109,7 @@ export default function ModalPickup(props) {
   } = props.data;
   const { enqueueSnackbar } = useSnackbar();
 
+  const hasSpk = listSpk?.length > 0;
   const [pickupDate, setPickupDate] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState(false);
@@ -133,10 +136,12 @@ export default function ModalPickup(props) {
   const handleCheckAll = () => {
     if (!checkAll) {
       // CHECK ALL
-      const all = orders
+      const items = hasSpk ? listSpk : orders;
+      const all = items
         .map((item, index) => {
           if (!item.isPickedUp) {
             return {
+              _id: item._id,
               id: item.id,
               name: item.name,
               variant: item.variant,
@@ -159,11 +164,10 @@ export default function ModalPickup(props) {
   const handleChecked = (e, item, index) => {
     if (e.target.checked) {
       setListPickUp((curr) => {
-        const updated = [...curr, { id: item.id, name: item.name, variant: item.variant, index }];
-
+        const updated = [...curr, { _id: item._id, id: item.id, name: item.name, variant: item.variant, index }];
+        const items = hasSpk ? listSpk : orders;
         // Hitung berapa item yang sebenarnya bisa dicheck
-        const totalCheckable = orders.filter((o) => !o.isPickedUp).length;
-
+        const totalCheckable = items.filter((o) => !o.isPickedUp).length;
         // Jika jumlah item yang dicentang == jumlah item yang bisa dicentang ⇒ aktifkan checkAll
         if (updated.length === totalCheckable) {
           setCheckAll(true);
@@ -193,8 +197,9 @@ export default function ModalPickup(props) {
       status: checkAll ? 'completed' : 'outstanding',
     };
 
-    const mergedOrders = orders.map((item, idx) => {
-      const picked = listPickUp.find((p) => p.index === idx);
+    // ================= MERGE SPK =================
+    const mergedSpk = listSpk?.map((item, idx) => {
+      const picked = listPickUp?.find((p) => p.index === idx);
 
       if (picked) {
         return {
@@ -204,14 +209,91 @@ export default function ModalPickup(props) {
         };
       }
 
-      return item; // biarkan apa adanya
+      return item;
     });
+
+    // ================= BUILD MAP (ONLY IF SPK EXISTS) =================
+    let spkMap = null;
+
+    if (mergedSpk?.length > 0) {
+      spkMap = {};
+
+      mergedSpk.forEach((spk) => {
+        const key = spk.id;
+
+        if (!spkMap[key]) {
+          spkMap[key] = {
+            totalQty: 0,
+            pickedQty: 0,
+          };
+        }
+
+        spkMap[key].totalQty += Number(spk.qty || 0);
+
+        if (spk.isPickedUp) {
+          spkMap[key].pickedQty += Number(spk.qty || 0);
+        }
+      });
+    }
+
+    // ================= MERGE ORDERS =================
+    const mergedOrders = orders?.map((item, idx) => {
+      // ===== CASE 1: DATA BARU (pakai SPK) =====
+      if (spkMap) {
+        const data = spkMap[item.id];
+
+        if (!data) return item;
+
+        const isFullyPicked =
+          Math.round(data.totalQty * 10) === Math.round(data.pickedQty * 10);
+
+        if (isFullyPicked) {
+          return {
+            ...item,
+            isPickedUp: true,
+            pickupData: objPickUp,
+          };
+        }
+
+        return item;
+      }
+
+      // ===== CASE 2: DATA LAMA (tanpa SPK) =====
+      const picked = listPickUp?.find((p) => p.index === idx);
+
+      if (picked) {
+        return {
+          ...item,
+          isPickedUp: true,
+          pickupData: objPickUp,
+        };
+      }
+
+      return item;
+    });
+
+    // const mergedOrders = orders?.map((item, idx) => {
+    //   const picked = listPickUp.find((p) => p.index === idx);
+
+    //   if (picked) {
+    //     return {
+    //       ...item,
+    //       isPickedUp: true,
+    //       pickupData: objPickUp,
+    //     };
+    //   }
+
+    //   return item; // biarkan apa adanya
+    // });
 
     if (status !== 'paid') {
       ctx.handleResetPos();
       ctx.setCurrentOrderID(_id);
       ctx.setDisplayOrderID(orderId);
       ctx.setBill(mergedOrders);
+      if (mergedSpk?.length > 0) {
+        ctx.setSpk(mergedSpk);
+      }
       ctx.setOrderDate(date);
       if (customer.name) {
         ctx.setCustomerData(customer);
@@ -261,7 +343,12 @@ export default function ModalPickup(props) {
       setAlert(false);
     } else {
       await axios.patch(`/order/raw/${_id}`, {
-        orders: mergedOrders,
+        ...(mergedOrders?.length > 0 && {
+          orders: mergedOrders
+        }),
+        ...(mergedSpk?.length > 0 && {
+          listSpk: mergedSpk
+        }),
         pickupData: objPickUp,
         pickUpStatus: objPickUp.status || 'completed',
       });
@@ -322,32 +409,59 @@ export default function ModalPickup(props) {
           label={<b>PickUp All</b>}
           control={<Checkbox checked={checkAll} onChange={() => handleCheckAll()} />}
         />
-        <Grid container>
-          {orders.map((item, i) => (
-            <Grid item xs={6} key={i}>
-              <FormControlLabel
-                label={
-                  <div>
-                    <span>{item.name}</span>
-                    {item.variant &&
-                      item.variant.map((variant, v) => (
-                        <p key={v} style={{ fontSize: '0.80rem', opacity: '0.7' }}>{`${variant.name} : ${
-                          variant.option
-                        } ${variant.qty > 1 ? `(x${variant.qty})` : ''}`}</p>
-                      ))}
-                    {item.notes && <p style={{ fontSize: '0.80rem', opacity: '0.7' }}>Notes : {item.notes}</p>}
-                  </div>
-                }
-                control={
-                  <Checkbox
-                    disabled={item.isPickedUp}
-                    checked={item.isPickedUp || listPickUp.some((row) => row.index === i)}
-                    onChange={(e) => handleChecked(e, item, i)}
-                  />
-                }
-              />
-            </Grid>
-          ))}
+        <Grid container rowGap={2}>
+          {hasSpk ? (
+            listSpk?.map((item, i) => (
+              <Grid item xs={6} key={i}>
+                <FormControlLabel
+                  label={
+                    <div>
+                      <p>{item.spkId}</p>
+                      <p>{item.name} {numberWithCommas(item?.qty || 0)}{item?.unit}</p>
+                      {item.variant &&
+                        item.variant.map((variant, v) => (
+                          <p key={v} style={{ fontSize: '0.80rem', opacity: '0.7' }}>{`${variant.name} : ${variant.option
+                            } ${variant.qty > 1 ? `(x${variant.qty})` : ''}`}</p>
+                        ))}
+                      {item.notes && <p style={{ fontSize: '0.80rem', opacity: '0.7' }}>Notes : {item.notes}</p>}
+                    </div>
+                  }
+                  control={
+                    <Checkbox
+                      disabled={item.isPickedUp}
+                      checked={item.isPickedUp || listPickUp.some((row) => row.index === i)}
+                      onChange={(e) => handleChecked(e, item, i)}
+                    />
+                  }
+                />
+              </Grid>
+            ))
+          ) : (
+            orders.map((item, i) => (
+              <Grid item xs={6} key={i}>
+                <FormControlLabel
+                  label={
+                    <div>
+                      <p>{item.name} {numberWithCommas(item?.qty || 0)}{item?.unit}</p>
+                      {item.variant &&
+                        item.variant.map((variant, v) => (
+                          <p key={v} style={{ fontSize: '0.80rem', opacity: '0.7' }}>{`${variant.name} : ${variant.option
+                            } ${variant.qty > 1 ? `(x${variant.qty})` : ''}`}</p>
+                        ))}
+                      {item.notes && <p style={{ fontSize: '0.80rem', opacity: '0.7' }}>Notes : {item.notes}</p>}
+                    </div>
+                  }
+                  control={
+                    <Checkbox
+                      disabled={item.isPickedUp}
+                      checked={item.isPickedUp || listPickUp.some((row) => row.index === i)}
+                      onChange={(e) => handleChecked(e, item, i)}
+                    />
+                  }
+                />
+              </Grid>
+            ))
+          )}
         </Grid>
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center', pt: '10px !important' }}>

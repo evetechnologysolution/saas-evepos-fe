@@ -32,6 +32,7 @@ import { ModalCashCashier, ModalAlertCashCashier } from '../../sections/@dashboa
 import { cashierContext } from '../../contexts/CashierContext';
 import { mainContext } from '../../contexts/MainContext';
 // utils
+import { generateListSpk } from '../../utils/generateSpkOrder';
 // import { numberWithCommas, formatDay, randomCustomer } from "../../utils/getData";
 import { generateRandomOrderId } from '../../utils/generateRandom';
 import { numberWithCommas, formatDay } from '../../utils/getData';
@@ -267,6 +268,9 @@ export default function CashierPos() {
               isNew: ctx?.customerNew || false,
             },
           });
+        }
+        if (objData.orders && Array.isArray(objData.orders)) {
+          objData.listSpk = generateListSpk(objData.orders, orderId);
         }
         setSelectedObj(objData);
         await ctx.createOrders(objData);
