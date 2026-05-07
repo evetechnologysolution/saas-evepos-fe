@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, { useState, useContext } from 'react';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 // @mui
@@ -31,8 +30,9 @@ import { PATH_DASHBOARD } from '../../../../routes/paths';
 // context
 import { cashierContext } from '../../../../contexts/CashierContext';
 // utils
-import axios from '../../../../utils/axios';
+import { handleMutationFeedback } from '../../../../utils/mutationfeedback';
 import { combinedDateTime, numberWithCommas } from '../../../../utils/getData';
+import usePickup from '../../../../pages/pickup/service/usePickup';
 
 // ----------------------------------------------------------------------
 
@@ -81,7 +81,7 @@ BootstrapDialogTitle.propTypes = {
 };
 
 export default function ModalPickup(props) {
-  const client = useQueryClient();
+  const { updateRaw } = usePickup();
   const ctx = useContext(cashierContext);
   const navigate = useNavigate();
   const {
@@ -342,7 +342,7 @@ export default function ModalPickup(props) {
       }, 100);
       setAlert(false);
     } else {
-      await axios.patch(`/order/raw/${_id}`, {
+      const objData = {
         ...(mergedOrders?.length > 0 && {
           orders: mergedOrders
         }),
@@ -351,11 +351,18 @@ export default function ModalPickup(props) {
         }),
         pickupData: objPickUp,
         pickUpStatus: objPickUp.status || 'completed',
+      }
+
+      const mutation = updateRaw.mutateAsync({ id: _id, payload: objData });
+      await handleMutationFeedback(mutation, {
+        successMsg: 'Order picked up!',
+        errorMsg: 'Gagal update data!',
+        onSuccess: () => {
+          setIsLoading(false);
+          handleClose();
+        },
+        enqueueSnackbar,
       });
-      client.invalidateQueries(['pickup']);
-      enqueueSnackbar('Order picked up!', { variant: 'success' });
-      setIsLoading(false);
-      handleClose();
     }
   };
 

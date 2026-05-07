@@ -1,20 +1,15 @@
 import PropTypes from 'prop-types';
 // @mui
-import { useTheme } from '@mui/material/styles';
-import { styled, Stack, TableRow, TableCell, Typography, Button } from '@mui/material';
-// components
-import Label from '../../../../components/Label';
-import Image from '../../../../components/Image';
+import { styled, Stack, TableRow, TableCell, Button } from '@mui/material';
+
 import Iconify from '../../../../components/Iconify';
-// utils
-import { formatDate2, numberWithCommas } from '../../../../utils/getData';
-// default picture
-import defaultMenu from '../../../../assets/default_menu.jpg';
-import defaultBeverage from '../../../../assets/default_beverage.jpg';
+import Label from '../../../../components/Label';
+
+import { formatDate2 } from '../../../../utils/getData';
 
 // ----------------------------------------------------------------------
 
-ProductTableRow.propTypes = {
+SubcategoryTableRow.propTypes = {
   row: PropTypes.object,
   onEditRow: PropTypes.func,
   onDeleteRow: PropTypes.func,
@@ -27,48 +22,15 @@ const CustomTableRow = styled(TableRow)(() => ({
   },
 }));
 
-export default function ProductTableRow({ row, onEditRow, onDeleteRow }) {
-  const theme = useTheme();
+export default function SubcategoryTableRow({ row, onEditRow, onDeleteRow }) {
+  const { createdAt, name, listNumber, outletRef } = row;
 
-  const { createdAt, name, image, price, category, listNumber, isAvailable, isRecommended, outletRef, section } = row;
-
-  const showImage = () => {
-    if (!image && section === 'Kitchen') {
-      return defaultMenu;
-    }
-    if (!image && section === 'Bar') {
-      return defaultBeverage;
-    }
-    return image;
-  };
 
   return (
     <CustomTableRow hover>
       <TableCell align="center">{formatDate2(createdAt)}</TableCell>
 
-      <TableCell>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Image disabledEffect alt={name} src={showImage()} sx={{ borderRadius: 1.5, width: 48, height: 48, mr: 2 }} />
-          <div>
-            {isRecommended && (
-              <Label
-                variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
-                color="warning"
-                sx={{ textTransform: 'capitalize' }}
-              >
-                Recomended
-              </Label>
-            )}
-            <Typography variant="subtitle2" noWrap>
-              {name}
-            </Typography>
-          </div>
-        </div>
-      </TableCell>
-
-      <TableCell align="center">{`Rp. ${numberWithCommas(price)}`}</TableCell>
-
-      <TableCell align="center">{category ? category.name : ''}</TableCell>
+      <TableCell>{name}</TableCell>
 
       <TableCell>
         {Array.isArray(outletRef) && outletRef.length ? (
@@ -100,16 +62,6 @@ export default function ProductTableRow({ row, onEditRow, onDeleteRow }) {
       </TableCell>
 
       <TableCell align="center">{listNumber}</TableCell>
-
-      <TableCell align="center">
-        <Label
-          variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
-          color={isAvailable ? 'success' : 'error'}
-          sx={{ textTransform: 'capitalize' }}
-        >
-          {isAvailable ? 'Available' : 'Not Available'}
-        </Label>
-      </TableCell>
 
       <TableCell align="center">
         <Stack direction="row" justifyContent="center" gap={1}>

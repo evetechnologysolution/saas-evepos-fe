@@ -5,16 +5,16 @@ import axios from 'src/utils/axios';
 // context
 import { mainContext } from '../../../contexts/MainContext';
 
-export default function usePickup() {
+export default function useOrder() {
   const ctm = useContext(mainContext);
   const queryClient = useQueryClient();
-  const queryKey = ['pickup'];
+  const queryKey = ['delivery-orders'];
 
   const list = (params = {}) =>
     useQuery({
       queryKey: [...queryKey, ctm?.selectedOutlet, params],
       queryFn: async () => {
-        const { data } = await axios.get('/order', {
+        const { data } = await axios.get('/order/delivery', {
           params: {
             outletRef: ctm?.selectedOutlet,
             ...params,
@@ -25,6 +25,23 @@ export default function usePickup() {
       },
       enabled: !!ctm?.selectedOutlet,
       keepPreviousData: false,
+    });
+
+  const getById = (id) =>
+    useQuery({
+      queryKey: [...queryKey, ctm?.selectedOutlet, id],
+      queryFn: async () => {
+        const { data } = await axios.get(
+          `/order/${id}`,
+          {
+            params: {
+              outletRef: ctm?.selectedOutlet,
+            },
+          }
+        );
+        return data;
+      },
+      enabled: !!id && !!ctm?.selectedOutlet,
     });
 
   const create = useMutation({
@@ -80,23 +97,6 @@ export default function usePickup() {
       queryClient.invalidateQueries(queryKey);
     },
   });
-
-  const getById = (id) =>
-    useQuery({
-      queryKey: [...queryKey, ctm?.selectedOutlet, id],
-      queryFn: async () => {
-        const { data } = await axios.get(
-          `/order/${id}`,
-          {
-            params: {
-              outletRef: ctm?.selectedOutlet,
-            },
-          }
-        );
-        return data;
-      },
-      enabled: !!id && !!ctm?.selectedOutlet,
-    });
 
   const remove = useMutation({
     mutationFn: async (id) => {

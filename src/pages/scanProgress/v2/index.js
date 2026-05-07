@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import { useQuery, useQueryClient } from 'react-query';
 import { BrowserMultiFormatReader } from '@zxing/library';
 import Webcam from 'react-webcam';
@@ -34,11 +34,13 @@ import axiosInstance from 'src/utils/axios';
 import { formatDate2, numberWithCommas } from 'src/utils/getData';
 import { maskedPhone } from 'src/utils/masked';
 import Iconify from 'src/components/Iconify';
+import { mainContext } from 'src/contexts/MainContext';
 import useStatus from '../service/useStatus';
 import ModalProgress from '../ModalProgressV2';
 import '../scanProgress.scss';
 
 export default function ScanProgress() {
+  const ctm = useContext(mainContext)
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { themeStretch } = useSettings();
@@ -76,7 +78,7 @@ export default function ScanProgress() {
     if (!search) throw new Error('No search term');
 
     try {
-      const res = await axiosInstance.get(`/order/${search}`);
+      const res = await axiosInstance.get(`/order/${search}?outletRef=${ctm?.selectedOutlet}`);
       return res.data;
     } catch (error) {
       // console.error("Error fetching order detail:", error);
@@ -727,7 +729,7 @@ export default function ScanProgress() {
         currDataProgress={currentDataProgress}
         detail={detail}
         refetch={refetch}
-        // refetchPoint={refetchPoint}
+      // refetchPoint={refetchPoint}
       />
 
       {

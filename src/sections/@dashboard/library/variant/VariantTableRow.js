@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { styled, Stack, TableRow, TableCell, Button } from '@mui/material';
 
 import Iconify from '../../../../components/Iconify';
+import Label from '../../../../components/Label';
 
 import { formatDate2 } from '../../../../utils/getData';
 
@@ -22,7 +23,7 @@ const CustomTableRow = styled(TableRow)(() => ({
 }));
 
 export default function VariantTableRow({ row, onEditRow, onDeleteRow }) {
-  const { createdAt, name, options } = row;
+  const { createdAt, name, options, outletRef } = row;
 
   return (
     <CustomTableRow hover>
@@ -37,6 +38,35 @@ export default function VariantTableRow({ row, onEditRow, onDeleteRow }) {
             {options.length > 1 && index !== options.length - 1 && ', '}
           </span>
         ))}
+      </TableCell>
+
+      <TableCell>
+        {Array.isArray(outletRef) && outletRef.length ? (
+          <Stack gap={0.5}>
+            {outletRef.map((item, i) => (
+              <Stack
+                key={i}
+                flexDirection="row"
+                alignItems="center"
+                gap={0.5}
+              >
+                <span>{i + 1}. {item?.name}</span>
+
+                {item?.isPrimary && (
+                  <Label
+                    variant="ghost"
+                    color="success"
+                    sx={{ textTransform: 'capitalize' }}
+                  >
+                    UTAMA
+                  </Label>
+                )}
+              </Stack>
+            ))}
+          </Stack>
+        ) : (
+          <span>-</span>
+        )}
       </TableCell>
 
       <TableCell align="center">

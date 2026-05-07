@@ -1,8 +1,6 @@
-import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 // @mui
-import { Container } from '@mui/material';
-import axios from '../../utils/axios';
+import { Box, Container, CircularProgress } from '@mui/material';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
 // hooks
@@ -12,28 +10,17 @@ import Page from '../../components/Page';
 import HeaderBreadcrumbs from '../../components/HeaderBreadcrumbs';
 // sections
 import OrdersForm from '../../sections/@dashboard/cashier/delivery/OrdersForm';
+import useDelivery from './service/useDelivery';
 
 // ----------------------------------------------------------------------
 
 export default function CashierDeliveryEdit() {
   const { themeStretch } = useSettings();
+  const { getById } = useDelivery();
 
   const { id = '' } = useParams();
 
-  const [currentData, setCurrentData] = useState({});
-
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        await axios.get(`/order/${id}`).then((response) => {
-          setCurrentData(response.data);
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getData();
-  }, [id]);
+  const { data: currentData, isLoading } = getById(id);
 
   return (
     <Page title="Delivery: Edit">
@@ -48,7 +35,13 @@ export default function CashierDeliveryEdit() {
           ]}
         />
 
-        <OrdersForm currentData={currentData} />
+        {isLoading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <OrdersForm currentData={currentData} />
+        )}
       </Container>
     </Page>
   );

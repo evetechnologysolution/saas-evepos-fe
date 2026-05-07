@@ -256,6 +256,9 @@ export default function CashierPos() {
           cardNumber: '',
           notes: '',
           isScan: ctx?.customerScan || false,
+          ...(['owner'].includes(user?.role?.toLowerCase()) && {
+            outletRef: ctm?.selectedOutlet
+          })
         };
         if (ctx.customerName) {
           objData = Object.assign(objData, {

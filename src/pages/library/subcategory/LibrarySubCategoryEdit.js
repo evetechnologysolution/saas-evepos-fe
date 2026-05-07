@@ -16,7 +16,7 @@ import HeaderBreadcrumbs from '../../../components/HeaderBreadcrumbs';
 // sections
 import CategoryForm from './form/SubCategoryForm';
 import schema from './schema';
-import useCategory from './service/useService';
+import useCategory from './service/useSubcategory';
 
 // ----------------------------------------------------------------------
 

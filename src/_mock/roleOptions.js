@@ -2,6 +2,7 @@
 
 export const roleOptions = [
   // "Super Admin",
+  'Owner',
   'Admin',
   'Cashier',
   'Staff',

@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useSnackbar } from "notistack";
 // @mui
 import {
@@ -17,6 +17,7 @@ import {
 import { LoadingButton } from "@mui/lab";
 import Iconify from "src/components/Iconify";
 import axiosInstance from "src/utils/axios";
+import { mainContext } from "src/contexts/MainContext";
 
 // ----------------------------------------------------------------------
 
@@ -67,6 +68,7 @@ BootstrapDialogTitle.propTypes = {
 };
 
 export default function ModalProgress(props) {
+    const ctm = useContext(mainContext);
     const { enqueueSnackbar } = useSnackbar();
     const [loading, setLoading] = useState(false);
     const [showAlert, setShowAlert] = useState(false);
@@ -97,6 +99,7 @@ export default function ModalProgress(props) {
         setLoading(true); // opsional: kalau pakai indikator loading
 
         const data = {
+            outletRef: ctm?.selectedOutlet,
             log: {
                 status: props?.progress,
                 qty,

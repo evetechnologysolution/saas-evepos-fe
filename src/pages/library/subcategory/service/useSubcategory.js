@@ -3,18 +3,18 @@ import { useContext } from 'react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import axios from 'src/utils/axios';
 // context
-import { mainContext } from '../../../contexts/MainContext';
+import { mainContext } from '../../../../contexts/MainContext';
 
-export default function usePickup() {
+export default function useSubcategory() {
   const ctm = useContext(mainContext);
   const queryClient = useQueryClient();
-  const queryKey = ['pickup'];
+  const queryKey = ['subcategory'];
 
   const list = (params = {}) =>
     useQuery({
       queryKey: [...queryKey, ctm?.selectedOutlet, params],
       queryFn: async () => {
-        const { data } = await axios.get('/order', {
+        const { data } = await axios.get('/subcategory', {
           params: {
             outletRef: ctm?.selectedOutlet,
             ...params,
@@ -29,15 +29,7 @@ export default function usePickup() {
 
   const create = useMutation({
     mutationFn: async (payload) => {
-      const { data } = await axios.post(
-        '/order',
-        payload,
-        {
-          params: {
-            outletRef: ctm?.selectedOutlet,
-          },
-        }
-      );
+      const { data } = await axios.post('/subcategory', payload);
       return data;
     },
     onSuccess: () => {
@@ -48,25 +40,7 @@ export default function usePickup() {
   const update = useMutation({
     mutationFn: async ({ id, payload }) => {
       const { data } = await axios.patch(
-        `/order/${id}`,
-        payload,
-        {
-          params: {
-            outletRef: ctm?.selectedOutlet,
-          },
-        }
-      );
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(queryKey);
-    },
-  });
-
-  const updateRaw = useMutation({
-    mutationFn: async ({ id, payload }) => {
-      const { data } = await axios.patch(
-        `/order/raw/${id}`,
+        `/subcategory/${id}`,
         payload,
         {
           params: {
@@ -86,7 +60,7 @@ export default function usePickup() {
       queryKey: [...queryKey, ctm?.selectedOutlet, id],
       queryFn: async () => {
         const { data } = await axios.get(
-          `/order/${id}`,
+          `/subcategory/${id}`,
           {
             params: {
               outletRef: ctm?.selectedOutlet,
@@ -101,7 +75,7 @@ export default function usePickup() {
   const remove = useMutation({
     mutationFn: async (id) => {
       const { data } = await axios.delete(
-        `/order/${id}`,
+        `/subcategory/${id}`,
         {
           params: {
             outletRef: ctm?.selectedOutlet,
@@ -120,7 +94,6 @@ export default function usePickup() {
     getById,
     create,
     update,
-    updateRaw,
     remove,
     queryKey,
   };

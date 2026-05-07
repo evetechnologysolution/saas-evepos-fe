@@ -1,6 +1,16 @@
 import * as Yup from 'yup';
 
 const ProductSchema = Yup.object({
+  outletRef: Yup.array()
+    .transform((value, originalValue) => {
+      if (originalValue === '' || originalValue === null) {
+        return [];
+      }
+      return value;
+    })
+    .of(Yup.string())
+    .min(1, 'Outlet wajib diisi')
+    .default([]),
   name: Yup.string().required('Name wajib diisi').default(''),
   price: Yup.number().min(0, 'Price tidak boleh negatif').required('Price wajib diisi').default(''),
   productionPrice: Yup.number().min(0).default(0),

@@ -3,19 +3,19 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
 // form
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { LoadingButton } from '@mui/lab';
-import { Card, Grid, Stack, MenuItem, Divider, Button, InputAdornment, IconButton } from '@mui/material';
+import { Card, Grid, Stack, MenuItem, Divider, Button, InputAdornment, IconButton, Autocomplete, TextField } from '@mui/material';
 // routes
 import { handleMutationFeedback } from 'src/utils/mutationfeedback';
 import Iconify from 'src/components/Iconify';
 import { PATH_DASHBOARD } from '../../../routes/paths';
 // components
 import { FormProvider, RHFSelect, RHFTextField } from '../../../components/hook-form';
-// hooks
 import { roleOptions } from '../../../_mock/roleOptions';
+import useOutlet from '../../../pages/outlet/service/useOutlet';
 import schema from '../../../pages/user/schema';
 import schemaEdit from '../../../pages/user/schema/edit';
 import useUser from '../../../pages/user/service/useUser';
@@ -35,15 +35,22 @@ function capitalizeFirstLetter(string) {
 }
 
 export default function UserForm({ isEdit, currentData }) {
+  const { list: listOulet } = useOutlet();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { create, update } = useUser();
 
   const [showPassword, setShowPassword] = useState(false);
 
+  const { data: dataOulet, isLoading: loadingOutlet } = listOulet({
+    page: 1,
+    perPage: 10,
+  });
+
   const defaultValues = useMemo(
     () => ({
       id: currentData?._id || '',
+      outletRef: currentData?.outletRef?._id || currentData?.outletRef || null,
       fullname: currentData?.fullname || '',
       username: currentData?.username || '',
       role: capitalizeFirstLetter(currentData?.role) || '',
@@ -63,6 +70,7 @@ export default function UserForm({ isEdit, currentData }) {
   });
 
   const {
+    control,
     reset,
     handleSubmit,
     formState: { isSubmitting },
@@ -91,14 +99,47 @@ export default function UserForm({ isEdit, currentData }) {
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Card sx={{ p: 3 }}>
+      <Card sx={{ p: 3 }}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
             <Stack spacing={3}>
               {isEdit && <RHFTextField name="id" label="User ID" disabled />}
+
+              <Controller
+                name="outletRef"
+                control={control}
+                defaultValue={[]}
+                render={({ field, fieldState: { error } }) => (
+                  <Autocomplete
+                    options={dataOulet?.docs || []}
+                    value={
+                      dataOulet?.docs?.find((option) => option._id === field.value) || null
+                    }
+                    getOptionLabel={(option) => option?.name || ''}
+                    isOptionEqualToValue={(option, value) => option._id === value._id}
+                    onChange={(event, newValue) =>
+                      field.onChange(newValue ? newValue._id : null)
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Pilih Outlet"
+                        error={!!error}
+                        helperText={error?.message}
+                      />
+                    )}
+                  />
+                )}
+              />
+
               <RHFTextField name="fullname" label="Fullname" autoComplete="off" />
 
               <RHFTextField name="username" label="Username" autoComplete="off" />
+            </Stack>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Stack spacing={3}>
 
               <RHFTextField name="email" label="Email" type="email" autoComplete="off" />
 
@@ -146,7 +187,7 @@ export default function UserForm({ isEdit, currentData }) {
                         typography: 'body2',
                       }}
                       disabled={
-                        (isEdit && currentData?.role === 'Super Admin') || item === 'Super Admin'
+                        (isEdit && currentData?.role?.toLowerCase() === 'owner') || item?.toLowerCase() === 'owner'
                           ? Boolean(true)
                           : Boolean(false)
                       }
@@ -162,13 +203,13 @@ export default function UserForm({ isEdit, currentData }) {
               <Button variant="outlined" onClick={() => navigate(PATH_DASHBOARD.user.root)}>
                 Cancel
               </Button>
-              <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+              <LoadingButton type="submit" variant="contained" loading={isSubmitting} disabled={loadingOutlet}>
                 {!isEdit ? 'New User' : 'Save Changes'}
               </LoadingButton>
             </Stack>
-          </Card>
+          </Grid>
         </Grid>
-      </Grid>
+      </Card>
     </FormProvider>
   );
 }

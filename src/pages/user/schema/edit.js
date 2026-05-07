@@ -1,6 +1,19 @@
 import * as Yup from 'yup';
 
 const userSchemaEdit = Yup.object({
+  outletRef: Yup.string()
+    .nullable()
+    .transform((value, originalValue) => {
+      if (originalValue === '' || originalValue === null) {
+        return null;
+      }
+      return value;
+    })
+    .when('role', {
+      is: (role) => role?.toLowerCase() !== 'owner',
+      then: (schema) => schema.required('Outlet wajib diisi'),
+      otherwise: (schema) => schema.notRequired(),
+    }),
   username: Yup.string().required('Username wajib diisi').min(3, 'Username minimal 3 karakter'),
   fullname: Yup.string().required('Nama wajib diisi').min(3, 'Nama minimal 3 karakter'),
   phone: Yup.string()
@@ -15,7 +28,7 @@ const userSchemaEdit = Yup.object({
     .transform((val) => (val === '' ? undefined : val))
     .min(6, 'Password minimal 6 karakter')
     .optional(),
-  role: Yup.string().required('Role wajib diisi').oneOf(['Admin', 'Staff', 'Cashier'], 'Role tidak valid'),
+  role: Yup.string().required('Role wajib diisi').oneOf(['Owner', 'Admin', 'Staff', 'Cashier'], 'Role tidak valid'),
 });
 
 export default userSchemaEdit;

@@ -1,15 +1,15 @@
-// hooks/queries/useCategory.js
 import { useQuery } from 'react-query';
 import axios from '../../utils/axios';
 
-export const useGeneralPerfume = (options = {}) => {
+export const useGeneralPerfume = (selectedOutlet, options = {}) => {
   return useQuery(
-    ['generalPerfume'],
+    ['generalPerfume', selectedOutlet],
     async () => {
-      const res = await axios.get('/variant/all?perfume=yes');
+      const res = await axios.get(`/variant/all?perfume=yes&outletRef=${selectedOutlet}`);
       return res.data?.[0];
     },
     {
+      enabled: !!selectedOutlet,
       refetchOnWindowFocus: false,
       ...options,
     }

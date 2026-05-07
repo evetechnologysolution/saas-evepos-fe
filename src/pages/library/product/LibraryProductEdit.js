@@ -1,8 +1,6 @@
-import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 // @mui
 import { Box, CircularProgress, Container } from '@mui/material';
-import axios from '../../../utils/axios';
 // routes
 import { PATH_DASHBOARD } from '../../../routes/paths';
 // hooks

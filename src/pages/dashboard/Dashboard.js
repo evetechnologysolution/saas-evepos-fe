@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useQuery } from 'react-query';
 // @mui
 import {
@@ -24,10 +24,12 @@ import Page from '../../components/Page';
 // sections
 import { YearlyWidgetSummary, SalesOverview, BestSeller, TableComponent } from '../../sections/@dashboard/app';
 import AlertNewUser from './modalinformation';
+import { mainContext } from '../../contexts/MainContext';
 
 // ----------------------------------------------------------------------
 
 export default function Dashboard() {
+  const ctm = useContext(mainContext);
   const { themeStretch } = useSettings();
 
   // State untuk filter bagian ATAS (Revenue, Donation, Sales)
@@ -86,33 +88,65 @@ export default function Dashboard() {
   const bottomFilterParams = getBottomFilterParams();
 
   const { data: dashboardRevenue, isLoading: loadingDashboardRevenue } = useQuery({
-    queryKey: ['dashboard-revenue', topFilterParams.filter, topFilterParams.start, topFilterParams.end],
-    queryFn: () =>
-      axios
-        .get(`/revenue?filter=${topFilterParams.filter}&start=${topFilterParams.start}&end=${topFilterParams.end}`)
-        .then((res) => res.data),
+    queryKey: [
+      'dashboard-revenue',
+      ctm?.selectedOutlet,
+      topFilterParams,
+    ],
+
+    queryFn: async () => {
+      const { data } = await axios.get('/revenue', {
+        params: {
+          outletRef: ctm?.selectedOutlet,
+          ...topFilterParams,
+        },
+      });
+
+      return data;
+    },
+    enabled: !!ctm?.selectedOutlet,
     ...queryOptions,
   });
 
   const { data: popularProduct, isLoading: loadingPopularProduct } = useQuery({
-    queryKey: ['popular', bottomFilterParams.filter, bottomFilterParams.start, bottomFilterParams.end],
-    queryFn: () =>
-      axios
-        .get(
-          `/popular?filter=${bottomFilterParams.filter}&start=${bottomFilterParams.start}&end=${bottomFilterParams.end}`
-        )
-        .then((res) => res.data),
+    queryKey: [
+      'popular',
+      ctm?.selectedOutlet,
+      bottomFilterParams,
+    ],
+
+    queryFn: async () => {
+      const { data } = await axios.get('/popular', {
+        params: {
+          outletRef: ctm?.selectedOutlet,
+          ...bottomFilterParams,
+        },
+      });
+
+      return data;
+    },
+    enabled: !!ctm?.selectedOutlet,
     ...queryOptions,
   });
 
   const { data: mostPaymentUsed, isLoading: loadingMostPaymentUsed } = useQuery({
-    queryKey: ['paymentmethod', bottomFilterParams.filter, bottomFilterParams.start, bottomFilterParams.end],
-    queryFn: () =>
-      axios
-        .get(
-          `/payment-revenue?filter=${bottomFilterParams.filter}&start=${bottomFilterParams.start}&end=${bottomFilterParams.end}`
-        )
-        .then((res) => res.data[0] || {}),
+    queryKey: [
+      'paymentmethod',
+      ctm?.selectedOutlet,
+      bottomFilterParams,
+    ],
+
+    queryFn: async () => {
+      const { data } = await axios.get('/payment-revenue', {
+        params: {
+          outletRef: ctm?.selectedOutlet,
+          ...bottomFilterParams,
+        },
+      });
+
+      return data[0] || {};
+    },
+    enabled: !!ctm?.selectedOutlet,
     ...queryOptions,
   });
 

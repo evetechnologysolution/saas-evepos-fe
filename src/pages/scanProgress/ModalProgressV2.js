@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
 import {
@@ -26,6 +26,7 @@ import Iconify from 'src/components/Iconify';
 import useAuth from 'src/hooks/useAuth';
 import axiosInstance from 'src/utils/axios';
 import { handleMutationFeedback } from 'src/utils/mutationfeedback';
+import { mainContext } from 'src/contexts/MainContext';
 
 const roundQty = (v) => Math.round(v * 10) / 10;
 
@@ -37,6 +38,7 @@ export default function ModalProgress({
   refetch,
   refetchPoint,
 }) {
+  const ctm = useContext(mainContext);
   const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -109,6 +111,7 @@ export default function ModalProgress({
     if (filteredProcess?.length > 0) {
       setShowAlert(false);
       const finalPayload = {
+        outletRef: ctm?.selectedOutlet,
         log: filteredProcess,
       };
 

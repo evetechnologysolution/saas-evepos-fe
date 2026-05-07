@@ -1,15 +1,15 @@
-// hooks/queries/useProduct.js
 import { useQuery } from 'react-query';
 import axios from '../../utils/axios';
 
-export const useProduct = (options = {}) => {
+export const useProduct = (selectedOutlet, options = {}) => {
   return useQuery(
-    ['allProduct'],
+    ['allProduct', selectedOutlet],
     async () => {
-      const res = await axios.get('/product/all');
+      const res = await axios.get(`/product/all?outletRef=${selectedOutlet}`);
       return res.data;
     },
     {
+      enabled: !!selectedOutlet,
       refetchOnWindowFocus: false,
       ...options,
     }

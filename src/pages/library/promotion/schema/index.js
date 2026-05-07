@@ -1,6 +1,17 @@
 import * as yup from 'yup';
 
 const schema = yup.object().shape({
+  outletRef: yup.array()
+    .transform((value, originalValue) => {
+      if (originalValue === '' || originalValue === null) {
+        return [];
+      }
+      return value;
+    })
+    .of(yup.string())
+    .min(1, 'Outlet wajib diisi')
+    .default([]),
+
   name: yup.string().required('Nama promo wajib diisi'),
 
   type: yup.number().oneOf([1, 2, 3]).required('Type promo wajib dipilih'),
@@ -46,7 +57,12 @@ const schema = yup.object().shape({
     .test(
       'selected-day',
       'Hari harus antara 0 (Minggu) sampai 6 (Sabtu)',
-      (value) => value === '' || (Number.isInteger(value) && value >= 0 && value <= 6)
+      (value) => {
+        if (value === '' || value === 'all' || value === null) return true;
+
+        const num = Number(value);
+        return Number.isInteger(num) && num >= 0 && num <= 6;
+      }
     ),
 
   isAvailable: yup.boolean().required(),

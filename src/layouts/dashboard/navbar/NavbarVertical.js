@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 // @mui
 import { styled, useTheme } from '@mui/material/styles';
-import { Box, Stack, Drawer, List } from '@mui/material';
+import { Box, Stack, Drawer, List, InputLabel, FormControl, Select, MenuItem } from '@mui/material';
 import {
   ListItemStyle as ListItem,
   ListItemTextStyle,
@@ -26,6 +26,9 @@ import Logo from '../../../components/Logo';
 import Scrollbar from '../../../components/Scrollbar';
 import { NavSectionVertical } from '../../../components/nav-section';
 import ConfirmDialog from '../../../components/ConfirmDialog';
+import useOutlet from '../../../pages/outlet/service/useOutlet';
+// context
+import { mainContext } from '../../../contexts/MainContext';
 //
 import { useNavConfig } from './NavConfig';
 // import NavbarDocs from './NavbarDocs';
@@ -52,10 +55,11 @@ NavbarVertical.propTypes = {
 
 export default function NavbarVertical({ isOpenSidebar, onCloseSidebar }) {
   const theme = useTheme();
+  const ctx = useContext(mainContext);
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
 
   const { pathname } = useLocation();
 
@@ -65,8 +69,13 @@ export default function NavbarVertical({ isOpenSidebar, onCloseSidebar }) {
 
   const isDesktop = useResponsive('up', 'lg');
 
-  const { isCollapse, collapseClick, collapseHover, onToggleCollapse, onHoverEnter, onHoverLeave } =
-    useCollapseDrawer();
+  const { isCollapse, collapseClick, collapseHover, onToggleCollapse, onHoverEnter, onHoverLeave } = useCollapseDrawer();
+
+  const { list: listOulet } = useOutlet();
+  const { data: dataOulet } = listOulet({
+    page: 1,
+    perPage: 10,
+  });
 
   useEffect(() => {
     if (isOpenSidebar) {
@@ -111,6 +120,42 @@ export default function NavbarVertical({ isOpenSidebar, onCloseSidebar }) {
         </Stack>
 
         <NavbarAccount isCollapse={isCollapse} />
+
+        <FormControl
+          fullWidth
+          size="small"
+          sx={{ fontSize: "small" }}
+          disabled={!['owner']?.includes(user?.role?.toLowerCase())}
+        >
+          <InputLabel id="outlet-label">Outlet</InputLabel>
+          <Select
+            labelId="outlet-label"
+            name="outlet"
+            label="Outlet"
+            placeholder="Outlet"
+            size="small"
+            sx={{ fontSize: "small" }}
+            disabled={!['owner']?.includes(user?.role?.toLowerCase())}
+            value={ctx.selectedOutlet}
+            onChange={(e) => ctx.setSelectedOutlet(e.target.value)}
+          >
+            {dataOulet?.docs.map((item, i) => (
+              <MenuItem
+                key={i}
+                sx={{
+                  mx: 1,
+                  my: 0.5,
+                  borderRadius: 0.75,
+                  typography: "body2",
+                  fontSize: "small"
+                }}
+                value={item._id}
+              >
+                {item?.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Stack>
 
       <NavSectionVertical navConfig={useNavConfig()} isCollapse={isCollapse} />

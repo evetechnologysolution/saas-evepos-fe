@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useQuery } from 'react-query';
+import moment from 'moment';
 // @mui
 import { Button, Container, Grid, Stack, Typography, TextField, InputAdornment, CircularProgress } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
@@ -7,7 +8,7 @@ import { useTheme } from '@mui/material/styles';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
-import moment from 'moment';
+import { mainContext } from '../../contexts/MainContext';
 import axios from '../../utils/axios';
 // hooks
 import useSettings from '../../hooks/useSettings';
@@ -20,6 +21,7 @@ import { BestSeller } from '../../sections/@dashboard/app';
 // ----------------------------------------------------------------------
 
 export default function PopularProduct() {
+  const ctm = useContext(mainContext);
   const theme = useTheme();
   const { themeStretch } = useSettings();
 
@@ -62,6 +64,7 @@ export default function PopularProduct() {
     [
       'listPopularCategory',
       {
+        outletRef: ctm?.selectedOutlet,
         filter: controller.filter,
         start: controller.start,
         end: controller.end,

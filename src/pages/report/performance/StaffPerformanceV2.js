@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useQuery } from 'react-query';
 // @mui
 import {
@@ -29,12 +29,14 @@ import useSettings from '../../../hooks/useSettings';
 import Page from '../../../components/Page';
 // sections
 import { BestActivity, WidgetPerformance } from '../../../sections/@dashboard/app';
+import { mainContext } from '../../../contexts/MainContext';
 import defaultAvatar from '../../../assets/avatar_default.jpg';
 import ListActivity from './ListActivity';
 
 // ----------------------------------------------------------------------
 
 export default function StaffPerformance() {
+  const ctm = useContext(mainContext);
   const theme = useTheme();
   const { themeStretch } = useSettings();
 
@@ -78,6 +80,7 @@ export default function StaffPerformance() {
     [
       'listStaff',
       {
+        outletRef: ctm?.selectedOutlet,
         page: ctrStaff.page,
         perPage: ctrStaff.perPage,
         search: ctrStaff.search,
@@ -103,6 +106,7 @@ export default function StaffPerformance() {
     [
       'summaryActivity',
       {
+        outletRef: ctm?.selectedOutlet,
         search: controller.search,
         staff: controller.staff,
         periodBy: controller.periodBy,

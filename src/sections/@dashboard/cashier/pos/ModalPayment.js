@@ -41,6 +41,7 @@ import useAuth from '../../../../hooks/useAuth';
 import Iconify from '../../../../components/Iconify';
 import { bankOptions } from '../../../../_mock/paymentOptions';
 // context
+import { mainContext } from '../../../../contexts/MainContext';
 import { cashierContext } from '../../../../contexts/CashierContext';
 // utils
 import axiosInstance from '../../../../utils/axios';
@@ -142,6 +143,7 @@ export default function ModalPayment(props) {
 
   const { enqueueSnackbar } = useSnackbar();
 
+  const ctm = useContext(mainContext);
   const ctx = useContext(cashierContext);
 
   const { user } = useAuth();
@@ -609,6 +611,9 @@ export default function ModalPayment(props) {
           orderId,
           staff: user?.fullname,
           orderType: ctx?.orderType || 'onsite',
+          ...(['owner'].includes(user?.role?.toLowerCase()) && {
+            outletRef: ctm?.selectedOutlet
+          })
         }),
       orders: props.afterSplit?.length ? props.afterSplit : ctx.bill,
       serviceChargePercentage: ctx.serviceChargePercentage,

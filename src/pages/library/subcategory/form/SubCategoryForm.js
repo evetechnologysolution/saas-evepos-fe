@@ -1,12 +1,14 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable camelcase */
 import PropTypes from 'prop-types';
+import { Controller } from 'react-hook-form';
 // @mui
 import { LoadingButton } from '@mui/lab';
-import { Card, Grid, Stack, Button, Typography } from '@mui/material';
+import { Card, Grid, Stack, Button, Typography, Autocomplete, Chip, TextField } from '@mui/material';
 // routes
 import { useNavigate } from 'react-router';
 import { FormProvider, RHFTextField } from '../../../../components/hook-form';
+import useOutlet from '../../../outlet/service/useOutlet';
 
 // ----------------------------------------------------------------------
 
@@ -21,7 +23,13 @@ SubCategoryForm.propTypes = {
 
 export default function SubCategoryForm({ methods, onSubmit, type, isSubmitting, setValue, formState }) {
   const navigate = useNavigate();
+  const { list: listOulet } = useOutlet();
   const button_label = type === 'create' ? 'Simpan data' : 'Simpan perubahan';
+
+  const { data: dataOulet, isLoading: loadingOutlet } = listOulet({
+    page: 1,
+    perPage: 10,
+  });
 
   return (
     <>
@@ -30,6 +38,30 @@ export default function SubCategoryForm({ methods, onSubmit, type, isSubmitting,
           <Grid item xs={12} md={5}>
             <Card sx={{ p: 3 }}>
               <Stack spacing={3}>
+                <Controller
+                  name="outletRef"
+                  control={methods.control}
+                  defaultValue={[]}
+                  render={({ field, fieldState: { error } }) => (
+                    <Autocomplete
+                      multiple
+                      filterSelectedOptions
+                      options={dataOulet?.docs || []}
+                      value={dataOulet?.docs?.filter((option) => field.value?.includes(option._id)) || []}
+                      getOptionLabel={(option) => option.name || ''}
+                      isOptionEqualToValue={(option, value) => option._id === value._id}
+                      onChange={(event, newValue) => field.onChange(newValue.map((item) => item._id))}
+                      renderTags={(value, getTagProps) =>
+                        value.map((option, index) => (
+                          <Chip {...getTagProps({ index })} key={option._id} size="small" label={option.name} />
+                        ))
+                      }
+                      renderInput={(params) => (
+                        <TextField {...params} label="Pilih Outlet" error={!!error} helperText={error?.message} />
+                      )}
+                    />
+                  )}
+                />
                 <RHFTextField name="name" label="Sub Category Name" autoComplete="off" />
                 <div>
                   <Typography sx={{ mb: 1, ml: 2 }}>List Number</Typography>
@@ -57,7 +89,7 @@ export default function SubCategoryForm({ methods, onSubmit, type, isSubmitting,
                 <Button variant="outlined" onClick={() => navigate(-1)}>
                   Cancel
                 </Button>
-                <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+                <LoadingButton type="submit" variant="contained" loading={isSubmitting} disabled={loadingOutlet}>
                   {button_label}
                 </LoadingButton>
               </Stack>
