@@ -86,7 +86,6 @@ export default function TaxSettingForm() {
         control,
         reset,
         watch,
-        getValues,
         handleSubmit,
         formState: { isSubmitting },
     } = methods;
