@@ -1,9 +1,9 @@
-import * as Yup from 'yup';
-import { useEffect, useMemo, useContext } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSnackbar } from 'notistack';
 // form
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+
 // @mui
 import { LoadingButton } from '@mui/lab';
 import {
@@ -14,54 +14,79 @@ import {
     Typography,
     InputAdornment,
     FormControlLabel,
-    Checkbox
+    Checkbox,
+    TextField,
+    Autocomplete,
+    Chip
 } from '@mui/material';
-// context
-import { cashierContext } from '../../../../contexts/CashierContext';
+
 // components
-import { FormProvider, RHFTextField, RHFSwitch } from '../../../../components/hook-form';
+import { FormProvider, RHFSwitch, RHFNumericFormat } from '../../../../components/hook-form';
+
+// schema & service
+import schema from '../../../../pages/setting/tax/schema';
+import useTaxSetting from '../../../../pages/setting/tax/service/useTaxSetting';
+import useOutlet from '../../../../pages/outlet/service/useOutlet';
 
 // ----------------------------------------------------------------------
 
+const orderTypeOptions = [
+    {
+        label: 'Onsite',
+        value: 'onsite',
+    },
+    {
+        label: 'Delivery',
+        value: 'delivery',
+    },
+];
+
 export default function TaxSettingForm() {
-    const ctx = useContext(cashierContext);
 
     const { enqueueSnackbar } = useSnackbar();
 
-    const DataSchema = Yup.object().shape({
-        taxPercentageActive: Yup.boolean(),
-        taxOrderType1: Yup.boolean(),
-        taxOrderType2: Yup.boolean(),
-        servicePercentageActive: Yup.boolean(),
-        serviceOrderType1: Yup.boolean(),
-        serviceOrderType2: Yup.boolean(),
+    const { list: listOulet } = useOutlet();
+
+    const { data: dataOulet, isLoading: loadingOutlet } = listOulet({
+        page: 1,
+        perPage: 10,
+    });
+
+    const { getDataSetting, update } = useTaxSetting();
+
+    const { data: dataSetting } = getDataSetting({
+        byOutlet: 'none',
     });
 
     const defaultValues = useMemo(
         () => ({
-            taxPercentageActive: ctx.taxSetting?.tax?.isActive || false,
-            taxPercentage: ctx.taxSetting?.tax?.percentage || 0,
-            taxOrderType1: ctx.taxSetting?.tax?.orderType?.includes('onsite') || false,
-            taxOrderType2: ctx.taxSetting?.tax?.orderType?.includes('delivery') || false,
-            servicePercentageActive: ctx.taxSetting?.serviceCharge?.isActive || false,
-            servicePercentage: ctx.taxSetting?.serviceCharge?.percentage || 0,
-            serviceOrderType1: ctx.taxSetting?.serviceCharge?.orderType?.includes('onsite') || false,
-            serviceOrderType2: ctx.taxSetting?.serviceCharge?.orderType?.includes('delivery') || false,
+            outletRef: dataSetting?.outletRef || [],
+
+            tax: {
+                isActive: dataSetting?.tax?.isActive ?? false,
+                percentage: dataSetting?.tax?.percentage || 0,
+                orderType: dataSetting?.tax?.orderType || [],
+            },
+
+            serviceCharge: {
+                isActive: dataSetting?.serviceCharge?.isActive ?? false,
+                percentage: dataSetting?.serviceCharge?.percentage || 0,
+                orderType: dataSetting?.serviceCharge?.orderType || [],
+            },
         }),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [ctx.taxSetting]
+        [dataSetting]
     );
 
     const methods = useForm({
-        resolver: yupResolver(DataSchema),
+        resolver: yupResolver(schema),
         defaultValues,
     });
 
     const {
+        control,
         reset,
         watch,
         getValues,
-        setValue,
         handleSubmit,
         formState: { isSubmitting },
     } = methods;
@@ -69,43 +94,32 @@ export default function TaxSettingForm() {
     const values = watch();
 
     useEffect(() => {
-        if (ctx.taxSetting) {
+        if (dataSetting) {
             reset(defaultValues);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [ctx.taxSetting]);
+    }, [dataSetting]);
 
-    const onSubmit = async () => {
+    const onSubmit = async (formData) => {
         try {
-            const taxOrderType = []
-            if (values.taxOrderType1) {
-                taxOrderType.push("onsite");
-            }
-            if (values.taxOrderType2) {
-                taxOrderType.push("delivery");
-            }
-
-            const serviceOrderType = []
-            if (values.serviceOrderType1) {
-                serviceOrderType.push("onsite");
-            }
-            if (values.serviceOrderType2) {
-                serviceOrderType.push("delivery");
-            }
-
             const objData = {
+                outletRef: formData.outletRef,
+
                 tax: {
-                    isActive: values.taxPercentageActive,
-                    percentage: Number(values.taxPercentage),
-                    orderType: taxOrderType
+                    isActive: formData.tax.isActive,
+                    percentage: Number(formData.tax.percentage),
+                    orderType: formData.tax.orderType,
                 },
+
                 serviceCharge: {
-                    isActive: values.servicePercentageActive,
-                    percentage: Number(values.servicePercentage),
-                    orderType: serviceOrderType
-                }
+                    isActive: formData.serviceCharge.isActive,
+                    percentage: Number(formData.serviceCharge.percentage),
+                    orderType: formData.serviceCharge.orderType,
+                },
             };
-            await ctx.updateTaxSetting(objData);
+
+            await update.mutateAsync(objData);
+
             enqueueSnackbar('Update success!');
         } catch (error) {
             console.error(error);
@@ -116,120 +130,246 @@ export default function TaxSettingForm() {
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
             <Card sx={{ p: 3 }}>
                 <Grid container spacing={5}>
+                    <Grid item xs={12}>
+                        <Stack spacing={3}>
+                            <Controller
+                                name="outletRef"
+                                control={control}
+                                defaultValue={[]}
+                                render={({ field, fieldState: { error } }) => (
+                                    <Autocomplete
+                                        multiple
+                                        filterSelectedOptions
+                                        options={dataOulet?.docs || []}
+                                        value={dataOulet?.docs?.filter((option) => field.value?.includes(option._id)) || []}
+                                        getOptionLabel={(option) => option.name || ''}
+                                        isOptionEqualToValue={(option, value) => option._id === value._id}
+                                        onChange={(event, newValue) => field.onChange(newValue.map((item) => item._id))}
+                                        renderTags={(value, getTagProps) =>
+                                            value.map((option, index) => (
+                                                <Chip {...getTagProps({ index })} key={option._id} size="small" label={option.name} />
+                                            ))
+                                        }
+                                        renderInput={(params) => (
+                                            <TextField {...params} label="Pilih Outlet" error={!!error} helperText={error?.message} />
+                                        )}
+                                    />
+                                )}
+                            />
+
+                        </Stack>
+                    </Grid>
+                    {/* TAX */}
                     <Grid item xs={12} md={6}>
                         <Stack spacing={3}>
                             <RHFSwitch
-                                name="taxPercentageActive"
+                                name="tax.isActive"
                                 labelPlacement="start"
                                 label={
                                     <>
                                         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
                                             Tax
                                         </Typography>
-                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+
+                                        <Typography
+                                            variant="body2"
+                                            sx={{ color: 'text.secondary' }}
+                                        >
                                             For activating tax
                                         </Typography>
                                     </>
                                 }
-                                sx={{ mx: 0, width: 1, justifyContent: 'space-between' }}
+                                sx={{
+                                    mx: 0,
+                                    width: 1,
+                                    justifyContent: 'space-between',
+                                }}
                             />
-                            <RHFTextField
-                                name="taxPercentage"
+
+                            <RHFNumericFormat
+                                name="tax.percentage"
                                 label="Percentage"
+                                autoComplete="off"
+                                thousandSeparator=","
+                                decimalScale={2}
+                                allowNegative={false}
                                 InputProps={{
                                     endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                                    inputProps: { min: 1, max: 100 }
                                 }}
-                                type="number"
-                                autoComplete="off"
-                                disabled={values.taxPercentageActive ? Boolean(false) : Boolean(true)}
-                                required={values.taxPercentageActive ? Boolean(true) : Boolean(false)}
-                                value={getValues("taxPercentage") === 0 ? "" : getValues("taxPercentage")}
+                                max={100}
+                                disabled={!values?.tax?.isActive}
+                                required={values?.tax?.isActive}
                             />
-                            <Stack>
-                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                                    Choose Order Type
-                                </Typography>
-                                <Stack flexDirection={{ xs: "column", sm: "row" }} gap={{ xs: 0, sm: 2 }}>
-                                    <FormControlLabel
-                                        control={<Checkbox />}
-                                        label="Onsite"
-                                        onChange={(e) => setValue("taxOrderType1", Boolean(e.target.checked))}
-                                        checked={getValues("taxOrderType1")}
-                                        disabled={values.taxPercentageActive ? Boolean(false) : Boolean(true)}
-                                    />
-                                    <FormControlLabel
-                                        control={<Checkbox />}
-                                        label="Delivery"
-                                        onChange={(e) => setValue("taxOrderType2", Boolean(e.target.checked))}
-                                        checked={getValues("taxOrderType2")}
-                                        disabled={values.taxPercentageActive ? Boolean(false) : Boolean(true)}
-                                    />
-                                </Stack>
-                            </Stack>
+
+                            <Controller
+                                name="tax.orderType"
+                                control={control}
+                                render={({ field }) => (
+                                    <Stack>
+                                        <Typography
+                                            variant="subtitle2"
+                                            sx={{ mb: 0.5 }}
+                                        >
+                                            Choose Order Type
+                                        </Typography>
+
+                                        <Stack
+                                            flexDirection={{
+                                                xs: 'column',
+                                                sm: 'row',
+                                            }}
+                                            gap={{ xs: 0, sm: 2 }}
+                                        >
+                                            {orderTypeOptions.map((item) => (
+                                                <FormControlLabel
+                                                    key={item.value}
+                                                    label={item.label}
+                                                    disabled={!values?.tax?.isActive}
+                                                    control={
+                                                        <Checkbox
+                                                            checked={field.value?.includes(item.value)}
+                                                            onChange={(e) => {
+                                                                if (e.target.checked) {
+                                                                    field.onChange([
+                                                                        ...field.value,
+                                                                        item.value,
+                                                                    ]);
+                                                                } else {
+                                                                    field.onChange(
+                                                                        field.value.filter(
+                                                                            (val) => val !== item.value
+                                                                        )
+                                                                    );
+                                                                }
+                                                            }}
+                                                        />
+                                                    }
+                                                />
+                                            ))}
+                                        </Stack>
+                                    </Stack>
+                                )}
+                            />
                         </Stack>
                     </Grid>
+
+                    {/* SERVICE CHARGE */}
                     <Grid item xs={12} md={6}>
                         <Stack spacing={3}>
                             <RHFSwitch
-                                name="servicePercentageActive"
+                                name="serviceCharge.isActive"
                                 labelPlacement="start"
                                 label={
                                     <>
                                         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
                                             Service Charge
                                         </Typography>
-                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+
+                                        <Typography
+                                            variant="body2"
+                                            sx={{ color: 'text.secondary' }}
+                                        >
                                             For activating service charge
                                         </Typography>
                                     </>
                                 }
-                                sx={{ mx: 0, width: 1, justifyContent: 'space-between' }}
+                                sx={{
+                                    mx: 0,
+                                    width: 1,
+                                    justifyContent: 'space-between',
+                                }}
                             />
-                            <RHFTextField
-                                name="servicePercentage"
+
+                            <RHFNumericFormat
+                                name="serviceCharge.percentage"
                                 label="Percentage"
+                                autoComplete="off"
+                                thousandSeparator=","
+                                decimalScale={2}
+                                allowNegative={false}
                                 InputProps={{
                                     endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                                    inputProps: { min: 1, max: 100 }
                                 }}
-                                type="number"
-                                autoComplete="off"
-                                disabled={values.servicePercentageActive ? Boolean(false) : Boolean(true)}
-                                required={values.servicePercentageActive ? Boolean(true) : Boolean(false)}
-                                value={getValues("servicePercentage") === 0 ? "" : getValues("servicePercentage")}
+                                max={100}
+                                disabled={!values?.serviceCharge?.isActive}
+                                required={values?.serviceCharge?.isActive}
                             />
-                            <Stack>
-                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                                    Choose Order Type
-                                </Typography>
-                                <Stack flexDirection={{ xs: "column", sm: "row" }} gap={{ xs: 0, sm: 2 }}>
-                                    <FormControlLabel
-                                        control={<Checkbox />}
-                                        label="Onsite"
-                                        onChange={(e) => setValue("serviceOrderType1", Boolean(e.target.checked))}
-                                        checked={getValues("serviceOrderType1")}
-                                        disabled={values.servicePercentageActive ? Boolean(false) : Boolean(true)}
-                                    />
-                                    <FormControlLabel
-                                        control={<Checkbox />}
-                                        label="Delivery"
-                                        onChange={(e) => setValue("serviceOrderType2", Boolean(e.target.checked))}
-                                        checked={getValues("serviceOrderType2")}
-                                        disabled={values.servicePercentageActive ? Boolean(false) : Boolean(true)}
-                                    />
-                                </Stack>
-                            </Stack>
+
+                            <Controller
+                                name="serviceCharge.orderType"
+                                control={control}
+                                render={({ field }) => (
+                                    <Stack>
+                                        <Typography
+                                            variant="subtitle2"
+                                            sx={{ mb: 0.5 }}
+                                        >
+                                            Choose Order Type
+                                        </Typography>
+
+                                        <Stack
+                                            flexDirection={{
+                                                xs: 'column',
+                                                sm: 'row',
+                                            }}
+                                            gap={{ xs: 0, sm: 2 }}
+                                        >
+                                            {orderTypeOptions.map((item) => (
+                                                <FormControlLabel
+                                                    key={item.value}
+                                                    label={item.label}
+                                                    disabled={!values?.tax?.isActive}
+                                                    control={
+                                                        <Checkbox
+                                                            checked={field.value?.includes(item.value)}
+                                                            onChange={(e) => {
+                                                                if (e.target.checked) {
+                                                                    field.onChange([
+                                                                        ...field.value,
+                                                                        item.value,
+                                                                    ]);
+                                                                } else {
+                                                                    field.onChange(
+                                                                        field.value.filter(
+                                                                            (val) => val !== item.value
+                                                                        )
+                                                                    );
+                                                                }
+                                                            }}
+                                                        />
+                                                    }
+                                                />
+                                            ))}
+                                        </Stack>
+                                    </Stack>
+                                )}
+                            />
                         </Stack>
-                        <Stack direction="row" justifyContent="flex-end" mt={5} gap={1}>
-                            <Button variant="outlined" onClick={() => reset(defaultValues)}>Cancel</Button>
-                            <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+
+                        <Stack
+                            direction="row"
+                            justifyContent="flex-end"
+                            mt={5}
+                            gap={1}
+                        >
+                            <Button
+                                variant="outlined"
+                                onClick={() => reset(defaultValues)}
+                            >
+                                Cancel
+                            </Button>
+
+                            <LoadingButton
+                                type="submit"
+                                variant="contained"
+                                loading={isSubmitting || loadingOutlet}
+                            >
                                 Update
                             </LoadingButton>
                         </Stack>
                     </Grid>
                 </Grid>
             </Card>
-        </FormProvider >
+        </FormProvider>
     );
 }

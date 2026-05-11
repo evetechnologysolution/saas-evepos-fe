@@ -5,21 +5,21 @@ import axios from 'src/utils/axios';
 
 export default function useGeneralSetting() {
   const queryClient = useQueryClient();
-  const queryKeyAll = ['allGeneralSettings'];
-  const queryKey = ['generalSettings'];
+  const queryKeyAll = ['allTaxSetting'];
+  const queryKey = ['taxSetting'];
 
   const getDataSetting = (params = {}) =>
     useQuery({
       queryKey: [...queryKeyAll, params],
       queryFn: async () => {
-        const { data } = await axios.get('/setting', { params });
+        const { data } = await axios.get('/tax', { params });
         return data;
       },
     });
 
   const update = useMutation({
     mutationFn: async (payload) => {
-      const { data } = await axios.post('/setting', payload);
+      const { data } = await axios.post('/tax', payload);
       return data;
     },
     onSuccess: () => {
