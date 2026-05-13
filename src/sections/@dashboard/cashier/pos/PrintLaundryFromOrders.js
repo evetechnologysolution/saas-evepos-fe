@@ -41,6 +41,12 @@ const HeaderTable = ({ data, user, spkId }) => (
           <td>: {spkId}</td>
         </tr>
       )}
+      {data?.outletRef?.name && (
+        <tr>
+          <td>Outlet</td>
+          <td>: {data?.outletRef?.name}</td>
+        </tr>
+      )}
     </tbody>
   </table>
 );
@@ -97,6 +103,8 @@ const PrintLaundryFromOrders = React.forwardRef(({ data }, ref) => {
 
   return (
     <div ref={ref} className="no-break">
+      <br />
+      <br />
       <Divider />
 
       {/* ================= WITH SPK ================= */}
@@ -107,7 +115,7 @@ const PrintLaundryFromOrders = React.forwardRef(({ data }, ref) => {
 
             <Divider />
 
-            <table style={{ width: '100%' }}>
+            <table style={{ width: '100%', textAlign: 'left' }}>
               <tbody>
                 <ItemRow item={item} />
               </tbody>

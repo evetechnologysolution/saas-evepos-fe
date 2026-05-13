@@ -10,7 +10,7 @@ import axios from '../../../../utils/axios';
 import useAuth from '../../../../hooks/useAuth';
 // context
 import { cashierContext } from '../../../../contexts/CashierContext';
-// import { mainContext } from "../../../../contexts/MainContext";
+import { mainContext } from "../../../../contexts/MainContext";
 // utils
 import { generateListSpk } from '../../../../utils/generateSpkOrder';
 // import { numberWithCommas, randomCustomer } from "../../../../utils/getData";
@@ -24,7 +24,7 @@ import ModalPrintLaundry from '../orders/ModalPrintLaundry';
 
 export default function FinishForm() {
   const ctx = useContext(cashierContext);
-  // const ctm = useContext(mainContext);
+  const ctm = useContext(mainContext);
   const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -203,7 +203,7 @@ export default function FinishForm() {
                 </Button>
               </Box>
               <div style={{ overflow: 'hidden', height: 0, width: 0 }}>
-                <PrintReceipt ref={printRef} bill={ctx.bill} />
+                <PrintReceipt ref={printRef} bill={ctx.bill} outletRef={{ id: ctm?.selectedOutlet || null, name: ctm?.selectedOutletName || "" }} />
               </div>
             </Box>
             {ctx.splitAmount > 0 && ctx.totalPrice > 0 && (
@@ -270,7 +270,14 @@ export default function FinishForm() {
           </Stack>
         </Scrollbar>
       </Box>
-      <ModalPrintLaundry open={openPrintLaundry} onClose={() => setOpenPrintLaundry(false)} data={selectedObj} />
+      <ModalPrintLaundry
+        open={openPrintLaundry}
+        onClose={() => setOpenPrintLaundry(false)}
+        data={{
+          ...selectedObj,
+          outletRef: { id: ctm?.selectedOutlet || null, name: ctm?.selectedOutletName || "" }
+        }}
+      />
     </>
   );
 }

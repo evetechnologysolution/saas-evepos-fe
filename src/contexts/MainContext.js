@@ -27,6 +27,7 @@ const MainContextProvider = ({ children }) => {
   const [selectedSubs, setSelectedSubs] = useState({});
 
   const [selectedOutlet, setSelectedOutlet] = useLocalStorage('selectedOutlet', '');
+  const [selectedOutletName, setSelectedOutletName] = useLocalStorage('selectedOutletName', '');
 
   const isUserReady = !!user?._id;
   const isOutletReady = !!selectedOutlet;
@@ -83,13 +84,15 @@ const MainContextProvider = ({ children }) => {
     // OWNER
     if (user?.role === "owner") {
       // hanya isi default jika belum ada value sama sekali
-      setSelectedOutlet((prev) => prev || user?.outletRef || "");
+      setSelectedOutlet((prev) => prev || user?.outletRef?._id || "");
+      setSelectedOutletName((prev) => prev || user?.outletRef?.name || "");
       return;
     }
 
     // NON OWNER
     // selalu sync ke outlet user
-    setSelectedOutlet(user?.outletRef || "");
+    setSelectedOutlet(user?.outletRef?._id || "");
+    setSelectedOutletName(user?.outletRef?.name || "");
   }, [user?._id, user?.role, user?.outletRef]);
 
   const value = useMemo(
@@ -100,6 +103,8 @@ const MainContextProvider = ({ children }) => {
       setSelectedSubs,
       selectedOutlet,
       setSelectedOutlet,
+      selectedOutletName,
+      setSelectedOutletName,
       currentAccount,
       setCurrentAccount,
       allNotif,
@@ -118,6 +123,7 @@ const MainContextProvider = ({ children }) => {
       socket,
       selectedSubs,
       selectedOutlet,
+      selectedOutletName,
       currentAccount,
       allNotif,
       product,

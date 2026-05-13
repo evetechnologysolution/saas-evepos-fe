@@ -38,6 +38,8 @@ const PrintReceiptFromOrders = React.forwardRef(({ data }, ref) => {
 
   return (
     <div ref={ref} className="no-break">
+      <br />
+      <br />
       <p style={{ textTransform: 'uppercase' }}>{ctm.receiptHeader?.name || headerPrint.name}</p>
 
       {ctm.receiptHeader?.isPrintLogo && ctm.receiptHeader?.image && (
@@ -79,6 +81,12 @@ const PrintReceiptFromOrders = React.forwardRef(({ data }, ref) => {
             <td>Created by</td>
             <td>: {user?.fullname || 'Cashier'}</td>
           </tr>
+          {data?.outletRef?.name && (
+            <tr>
+              <td>Outlet</td>
+              <td>: {data?.outletRef?.name}</td>
+            </tr>
+          )}
         </tbody>
       </table>
 

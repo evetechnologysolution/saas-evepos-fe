@@ -7,12 +7,12 @@ export default function useOulet() {
   const queryClient = useQueryClient();
   const queryKey = ['listTenantOulet'];
 
-  const list = (params) =>
+  const list = (params = {}) =>
     useQuery({
       queryKey: [...queryKey, params],
       queryFn: async () => {
-        const qs = new URLSearchParams(params).toString();
-        const { data } = await axios.get(`/outlet?${qs}`);
+        const { data } = await axios.get('/outlet', { params });
+
         return data;
       },
       keepPreviousData: false,

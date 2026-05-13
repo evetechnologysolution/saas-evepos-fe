@@ -637,7 +637,7 @@ export default function CashierPos() {
         </Container>
 
         <div style={{ overflow: 'hidden', height: 0, width: 0 }}>
-          <PrintReceipt ref={printRef} bill={ctx.bill} status="unpaid" />
+          <PrintReceipt ref={printRef} bill={ctx.bill} status="unpaid" outletRef={{ id: ctm?.selectedOutlet || null, name: ctm?.selectedOutletName || "" }} />
         </div>
       </Card>
 
@@ -659,7 +659,14 @@ export default function CashierPos() {
 
       <ModalAlertCashCashier open={alertCashier} />
 
-      <ModalPrintLaundry open={openPrintLaundry} onClose={() => setOpenPrintLaundry(false)} data={selectedObj} />
+      <ModalPrintLaundry
+        open={openPrintLaundry}
+        onClose={() => setOpenPrintLaundry(false)}
+        data={{
+          ...selectedObj,
+          outletRef: { id: ctm?.selectedOutlet || null, name: ctm?.selectedOutletName || "" }
+        }}
+      />
     </Page>
   );
 }

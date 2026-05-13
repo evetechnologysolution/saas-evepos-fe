@@ -55,7 +55,7 @@ NavbarVertical.propTypes = {
 
 export default function NavbarVertical({ isOpenSidebar, onCloseSidebar }) {
   const theme = useTheme();
-  const ctx = useContext(mainContext);
+  const ctm = useContext(mainContext);
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
@@ -124,7 +124,7 @@ export default function NavbarVertical({ isOpenSidebar, onCloseSidebar }) {
         <FormControl
           fullWidth
           size="small"
-          sx={{ fontSize: "small" }}
+          sx={{ fontSize: "small", display: "none" }}
           disabled={!['owner']?.includes(user?.role?.toLowerCase())}
         >
           <InputLabel id="outlet-label">Outlet</InputLabel>
@@ -136,8 +136,17 @@ export default function NavbarVertical({ isOpenSidebar, onCloseSidebar }) {
             size="small"
             sx={{ fontSize: "small" }}
             disabled={!['owner']?.includes(user?.role?.toLowerCase())}
-            value={ctx.selectedOutlet}
-            onChange={(e) => ctx.setSelectedOutlet(e.target.value)}
+            value={ctm.selectedOutlet}
+            onChange={(e) => {
+              const selectedId = e.target.value;
+
+              const selectedOutlet = dataOulet?.docs?.find(
+                (item) => item._id === selectedId
+              );
+
+              ctm.setSelectedOutlet(selectedId);
+              ctm.setSelectedOutletName(selectedOutlet?.name || "");
+            }}
           >
             {dataOulet?.docs.map((item, i) => (
               <MenuItem
@@ -149,6 +158,7 @@ export default function NavbarVertical({ isOpenSidebar, onCloseSidebar }) {
                   typography: "body2",
                   fontSize: "small"
                 }}
+                // disabled={!item.isActive}
                 value={item._id}
               >
                 {item?.name}
