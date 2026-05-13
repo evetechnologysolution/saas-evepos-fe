@@ -1,0 +1,22 @@
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead, th {
+        background-color: #F4F6F8;
+        // color: #637381;
+    }
+
+    th,
+    td {
+        border: 1px solid #CCCCCC;
+        padding: 0.5rem;
+        text-align: leFt;
+    }
+
+    tr {
+        &:hover {
+            background-color: #F1F1F1;
+        }
+    }
+}

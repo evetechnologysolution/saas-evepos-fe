@@ -31,6 +31,7 @@ import { ModalCashCashier, ModalAlertCashCashier } from '../../sections/@dashboa
 // context
 import { cashierContext } from '../../contexts/CashierContext';
 import { mainContext } from '../../contexts/MainContext';
+import useOrder from './service/useOrder';
 // utils
 import { generateListSpk } from '../../utils/generateSpkOrder';
 // import { numberWithCommas, formatDay, randomCustomer } from "../../utils/getData";
@@ -45,6 +46,8 @@ import ModalPrintLaundry from '../../sections/@dashboard/cashier/orders/ModalPri
 export default function CashierPos() {
   const ctx = useContext(cashierContext);
   const ctm = useContext(mainContext);
+
+  const { updatePrintReceipt } = useOrder();
 
   const theme = useTheme();
 
@@ -136,7 +139,7 @@ export default function CashierPos() {
   const printRef = useRef();
   const handleAfterPrint = () => {
     if (currUid) {
-      ctx.updatePrintCount(currUid, { staff: user?.fullname });
+      updatePrintReceipt.mutate({ id: currUid, payload: { staff: user?.fullname } });
       setIsPrint(false);
       setOpenPrintLaundry(true);
       ctx.handleResetPos();

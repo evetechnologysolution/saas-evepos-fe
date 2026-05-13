@@ -2,7 +2,6 @@
 import { useState, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
-import { useQueryClient } from 'react-query';
 import { useSnackbar } from 'notistack';
 // react-to-print
 import { useReactToPrint } from 'react-to-print';
@@ -22,9 +21,9 @@ import {
   MenuItem,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import axios from '../../../../utils/axios';
 // hooks
 import useAuth from '../../../../hooks/useAuth';
+import useOrder from '../../../../pages/cashier/service/useOrder';
 // components
 import Iconify from '../../../../components/Iconify';
 import Label from '../../../../components/Label';
@@ -33,7 +32,9 @@ import ConfirmDialog from '../../../../components/ConfirmDialog';
 import { TableMoreMenu } from '../../../../components/table';
 import ModalRefund from './ModalRefund';
 import ModalChangePayment from './ModalChangePayment';
+import ModalTransfer from './ModalTransfer';
 // utils
+import { handleMutationFeedback } from '../../../../utils/mutationfeedback';
 import { formatDate, formatDate2, numberWithCommas } from '../../../../utils/getData';
 import { maskedPhone } from '../../../../utils/masked';
 // context
@@ -104,7 +105,7 @@ export default function OrdersTableRow({ row, local, closeLocal, onDeleteRow }) 
   const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  const client = useQueryClient();
+  const { generatePoint, updateRaw, updatePrintReceipt } = useOrder();
 
   const {
     _id,
@@ -137,6 +138,7 @@ export default function OrdersTableRow({ row, local, closeLocal, onDeleteRow }) 
     cardNumber,
     isScan,
     progressRef,
+    transfer
   } = row;
 
   let statusColor;
@@ -162,6 +164,7 @@ export default function OrdersTableRow({ row, local, closeLocal, onDeleteRow }) 
   const [openRefund, setOpenRefund] = useState(false);
   const handleCloseRefund = () => setOpenRefund(false);
   const [openPayment, setOpenPayment] = useState(false);
+  const [openTransfer, setOpenTransfer] = useState(false);
 
   const [loadingShow, setLoadingShow] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -183,22 +186,12 @@ export default function OrdersTableRow({ row, local, closeLocal, onDeleteRow }) 
   // Print
   const printRef = useRef();
   const handleAfterPrint = () => {
-    ctx.updatePrintCount(_id, { staff: user?.fullname });
+    updatePrintReceipt.mutate({ id: _id, payload: { staff: user?.fullname } });
   };
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
     onAfterPrint: handleAfterPrint,
   });
-
-  // Print Laundry
-  // const printLaundryRef = useRef();
-  // const handleAfterPrintLaundry = () => {
-  //   ctx.updatePrintLaundry(_id, { staff: user?.fullname });
-  // };
-  // const handlePrintLaundry = useReactToPrint({
-  //   content: () => printLaundryRef.current,
-  //   onAfterPrint: handleAfterPrintLaundry,
-  // });
 
   const showOrderType = () => {
     if (orderType?.toLowerCase() === 'onsite') {
@@ -318,27 +311,54 @@ Terima kasih telah menggunakan layanan kami 🙏`;
     }, 100);
   };
 
-  const handleCancelOrder = async () => {
-    setIsLoading(true);
-    await axios.patch(`/order/raw/${_id}`, { status: 'cancel' });
-    client.invalidateQueries(['orders']);
-    setOpenCancel(false);
-    setIsLoading(false);
-    enqueueSnackbar(`Cancel Order ${orderId || _id} success!`);
+  const handleGeneratePoint = async () => {
+    try {
+      setIsLoading(true);
+
+      const mutation = generatePoint.mutateAsync({ id: _id });
+      await handleMutationFeedback(mutation, {
+        successMsg: `Generate Point ${orderId || _id} success!`,
+        errorMsg: `Generate Point ${orderId || _id} failed!`,
+        onSuccess: () => {
+          setOpenGenerate(false);
+        },
+        enqueueSnackbar,
+      });
+    } catch (error) {
+      console.log(error);
+      enqueueSnackbar(`Generate Point ${orderId || _id} failed!`, { variant: 'error' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleGeneratePoint = async () => {
-    setIsLoading(true);
-    await axios.patch(`/order/generate-point/${_id}`);
-    client.invalidateQueries(['orders']);
-    setOpenGenerate(false);
-    setIsLoading(false);
-    enqueueSnackbar(`Generate Point ${orderId || _id} success!`);
+  const handleCancelOrder = async () => {
+    const objData = {
+      status: 'cancel',
+    };
+
+    try {
+      setIsLoading(true);
+
+      const mutation = updateRaw.mutateAsync({ id: _id, payload: objData });
+      await handleMutationFeedback(mutation, {
+        successMsg: `Cancel Order ${orderId || _id} success!`,
+        errorMsg: `Cancel Order ${orderId || _id} failed!`,
+        onSuccess: () => {
+          setOpenCancel(false);
+        },
+        enqueueSnackbar,
+      });
+    } catch (error) {
+      console.log(error);
+      enqueueSnackbar(`Cancel Order ${orderId || _id} failed!`, { variant: 'error' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancelPayment = async () => {
-    setIsLoading(true);
-    const updated = {
+    const objData = {
       paymentDate: null,
       havePaid: 0,
       status: 'unpaid',
@@ -347,11 +367,25 @@ Terima kasih telah menggunakan layanan kami 🙏`;
       cardAccountName: '',
       cardNumber: '',
     };
-    await axios.patch(`/order/raw/${_id}`, updated);
-    client.invalidateQueries(['orders']);
-    setOpenCancelPayment(false);
-    setIsLoading(false);
-    enqueueSnackbar(`Cancel payment for Order ${orderId || _id} success!`);
+
+    try {
+      setIsLoading(true);
+
+      const mutation = updateRaw.mutateAsync({ id: _id, payload: objData });
+      await handleMutationFeedback(mutation, {
+        successMsg: `Cancel payment for Order ${orderId || _id} success!`,
+        errorMsg: `Cancel payment for Order ${orderId || _id} failed!`,
+        onSuccess: () => {
+          setOpenCancelPayment(false);
+        },
+        enqueueSnackbar,
+      });
+    } catch (error) {
+      console.log(error);
+      enqueueSnackbar(`Cancel payment for Order ${orderId || _id} failed!`, { variant: 'error' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -581,6 +615,22 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                   {['admin', 'cashier', 'staff', 'owner'].includes(user?.role?.toLowerCase()) && (
                     <MenuItem
                       disabled={
+                        !!transfer?.toOutletRef ||
+                        !!progressRef?.log?.length ||
+                        ['cancel'].includes(status?.toLowerCase())
+                      }
+                      onClick={() => {
+                        setOpenTransfer(true);
+                        handleCloseAction();
+                      }}
+                    >
+                      <Iconify icon="solar:square-transfer-horizontal-linear" sx={{ width: 24, height: 24 }} />
+                      Transfer Order
+                    </MenuItem>
+                  )}
+                  {['admin', 'cashier', 'staff', 'owner'].includes(user?.role?.toLowerCase()) && (
+                    <MenuItem
+                      disabled={
                         status?.toLowerCase() === 'paid' || status?.toLowerCase() === 'unpaid'
                           ? Boolean(false)
                           : Boolean(true)
@@ -781,6 +831,8 @@ Terima kasih telah menggunakan layanan kami 🙏`;
       <ModalRefund open={openRefund} onClose={handleCloseRefund} data={row} />
 
       <ModalChangePayment open={openPayment} onClose={() => setOpenPayment(false)} data={row} />
+
+      <ModalTransfer open={openTransfer} onClose={() => setOpenTransfer(false)} data={row} />
 
       <ModalPrintLaundry open={openPrintLaundry} onClose={() => setOpenPrintLaundry(false)} data={row} />
 

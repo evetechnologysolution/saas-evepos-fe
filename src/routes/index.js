@@ -144,6 +144,22 @@ export default function Router() {
                   ),
                 },
                 {
+                  path: 'transfer',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'admin', 'cashier']}>
+                      <CashierTransfer />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
+                  path: 'transfer/:id/edit',
+                  element: (
+                    <RoleBasedGuard hasContent roles={['owner', 'admin', 'cashier']}>
+                      <CashierTransferEdit />
+                    </RoleBasedGuard>
+                  ),
+                },
+                {
                   path: 'delivery',
                   element: (
                     <RoleBasedGuard hasContent roles={evewashAllowed(['owner', 'admin', 'cashier'])}>
@@ -986,6 +1002,8 @@ const NotFound = Loadable(lazy(() => import('../pages/Page404')));
 const CashierPos = Loadable(lazy(() => import('../pages/cashier/CashierPos')));
 const CashierOrders = Loadable(lazy(() => import('../pages/cashier/CashierOrders')));
 const CashierOrdersEdit = Loadable(lazy(() => import('../pages/cashier/CashierOrdersEdit')));
+const CashierTransfer = Loadable(lazy(() => import('../pages/cashier/CashierTransfer')));
+const CashierTransferEdit = Loadable(lazy(() => import('../pages/cashier/CashierTransferEdit')));
 const CashierDelivery = Loadable(lazy(() => import('../pages/cashier/CashierDelivery')));
 const CashierDeliveryEdit = Loadable(lazy(() => import('../pages/cashier/CashierDeliveryEdit')));
 

@@ -5,9 +5,9 @@ import { NumericFormat } from 'react-number-format';
 import { Box, Button, InputAdornment, TextField, Typography, Stack } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useReactToPrint } from 'react-to-print';
-import axios from '../../../../utils/axios';
 // hooks
 import useAuth from '../../../../hooks/useAuth';
+import useOrder from '../../../../pages/cashier/service/useOrder';
 // context
 import { cashierContext } from '../../../../contexts/CashierContext';
 import { mainContext } from "../../../../contexts/MainContext";
@@ -27,6 +27,8 @@ export default function FinishForm() {
   const ctm = useContext(mainContext);
   const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
+
+  const { updateRaw, updatePrintReceipt } = useOrder();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmit, setIsSubmit] = useState(false);
@@ -97,7 +99,7 @@ export default function FinishForm() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await axios.patch(`/order/raw/${ctx.currentOrderID}`, { roundingAmount: donation });
+      await updateRaw.mutateAsync({ id: ctx.currentOrderID, payload: { roundingAmount: donation } })
       enqueueSnackbar('Submit data success!');
       setIsSubmit(true);
     } catch (error) {
@@ -112,7 +114,7 @@ export default function FinishForm() {
   const printRef = useRef();
   const handleAfterPrint = () => {
     setOpenPrintLaundry(true);
-    ctx.updatePrintCount(ctx.currentOrderID, { staff: user?.fullname });
+    updatePrintReceipt.mutate({ id: ctx.currentOrderID, payload: { staff: user?.fullname } });
   };
   const handlePrint = useReactToPrint({
     content: () => printRef.current,

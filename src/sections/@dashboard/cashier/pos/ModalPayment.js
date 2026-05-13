@@ -37,6 +37,7 @@ import { v4 as uuid } from 'uuid';
 import { NumericFormat } from 'react-number-format';
 // hooks
 import useAuth from '../../../../hooks/useAuth';
+import useOrder from '../../../../pages/cashier/service/useOrder';
 // components
 import Iconify from '../../../../components/Iconify';
 import { bankOptions } from '../../../../_mock/paymentOptions';
@@ -145,6 +146,8 @@ export default function ModalPayment(props) {
 
   const ctm = useContext(mainContext);
   const ctx = useContext(cashierContext);
+
+  const { updatePrintReceipt } = useOrder();
 
   const { user } = useAuth();
 
@@ -565,7 +568,7 @@ export default function ModalPayment(props) {
   const printRef = useRef();
   const handleAfterPrint = () => {
     if (currUid) {
-      ctx.updatePrintCount(currUid, { staff: user?.fullname });
+      updatePrintReceipt.mutate({ id: currUid, payload: { staff: user?.fullname } });
       setCurrUid('');
       setIsPrint(false);
       ctx.handleResetPos();

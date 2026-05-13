@@ -8,7 +8,7 @@ import { mainContext } from '../../../contexts/MainContext';
 export default function useOrder() {
   const ctm = useContext(mainContext);
   const queryClient = useQueryClient();
-  const queryKey = ['orders'];
+  const queryKey = ['transferOrders'];
 
   const list = (params = {}) =>
     useQuery({
@@ -17,6 +17,7 @@ export default function useOrder() {
         const { data } = await axios.get('/order', {
           params: {
             outletRef: ctm?.selectedOutlet,
+            isTransfer: "yes",
             ...params,
           },
         });
@@ -171,8 +172,8 @@ export default function useOrder() {
     list,
     getById,
     create,
-    generatePoint,
     update,
+    generatePoint,
     updateRaw,
     updatePrintReceipt,
     updatePrintLaundry,
