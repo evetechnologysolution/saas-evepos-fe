@@ -83,6 +83,7 @@ export default function ModalTransfer(props) {
   const { enqueueSnackbar } = useSnackbar();
 
   const [outletDesti, setOutletDesti] = useState("");
+  const [staff, setStaff] = useState("");
 
   const handleClose = () => {
     onClose();
@@ -93,13 +94,19 @@ export default function ModalTransfer(props) {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!outletDesti) return;
+    if (!outletDesti || !staff) return;
     try {
+      const today = new Date();
       const objData = {
         transfer: {
           toOutletRef: outletDesti,
-          createdAt: new Date(),
-          status: "open"
+          createdAt: today,
+          updatedAt: today,
+          status: "open",
+          newLog: {
+            notes: "Transfer Order",
+            staff
+          }
         }
       };
       const mutation = updateRaw.mutateAsync({ id: data?._id, payload: objData });
@@ -137,6 +144,7 @@ export default function ModalTransfer(props) {
                 fullWidth
                 value={outletDesti}
                 onChange={(e) => setOutletDesti(e.target.value)}
+                required
               >
                 {dataOulet?.docs
                   ?.filter((row) => row?._id !== ctm?.selectedOutlet)
@@ -156,6 +164,14 @@ export default function ModalTransfer(props) {
                     </MenuItem>
                   ))}
               </TextField>
+              <TextField
+                name="staff"
+                label="Staff"
+                fullWidth
+                value={staff}
+                onChange={(e) => setStaff(e.target.value)}
+                required
+              />
               <Stack alignItems="center">
                 <LoadingButton
                   variant="contained"

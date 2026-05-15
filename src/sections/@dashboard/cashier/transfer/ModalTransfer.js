@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { useSnackbar } from 'notistack';
 // @mui
 import {
@@ -10,17 +10,13 @@ import {
   DialogContent,
   Stack,
   TextField,
-  MenuItem,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // components
 import Iconify from '../../../../components/Iconify';
-import useOutlet from '../../../../pages/outlet/service/useOutlet';
-import useOrder from '../../../../pages/cashier/service/useOrder';
+import useTransfer from '../../../../pages/cashier/service/useTransfer';
 // utils
 import { handleMutationFeedback } from '../../../../utils/mutationfeedback';
-// contexts
-import { mainContext } from '../../../../contexts/MainContext';
 
 // ----------------------------------------------------------------------
 
@@ -28,6 +24,7 @@ ModalTransfer.propTypes = {
   open: PropTypes.bool,
   onClose: PropTypes.func,
   data: PropTypes.object,
+  actionCode: PropTypes.number,
 };
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -69,43 +66,61 @@ BootstrapDialogTitle.propTypes = {
 };
 
 export default function ModalTransfer(props) {
-  const { data, open, onClose } = props;
+  const { data, open, onClose, actionCode } = props;
 
-  const ctm = useContext(mainContext);
-  const { updateRaw } = useOrder();
-
-  const { list: listOulet } = useOutlet();
-  const { data: dataOulet, isLoading: loadingOutlet } = listOulet({
-    page: 1,
-    perPage: 10,
-  });
+  const { updateRaw } = useTransfer();
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const [outletDesti, setOutletDesti] = useState("");
+  const [staff, setStaff] = useState("");
+
+  const transferConfig = {
+    1: {
+      status: "accepted",
+      notes: "Transfer Order Diterima",
+    },
+    2: {
+      status: "return",
+      notes: "Transfer Order Dikembalikan ke Outlet Asal",
+    },
+    3: {
+      status: "closed",
+      notes: "Transfer Order Diterima di Outlet Asal",
+    },
+  };
+
+  const currentTransfer = transferConfig[actionCode] || {
+    status: "open",
+    notes: "Transfer Order",
+  };
+
+  const { status, notes } = currentTransfer;
 
   const handleClose = () => {
     onClose();
     setTimeout(() => {
-      setOutletDesti("");
+      setStaff("");
     }, 500);
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!outletDesti) return;
+    if (!notes || !staff) return;
     try {
       const objData = {
         transfer: {
-          toOutletRef: outletDesti,
-          createdAt: new Date(),
-          status: "open"
+          updatedAt: new Date(),
+          status,
+          newLog: {
+            notes,
+            staff
+          }
         }
       };
       const mutation = updateRaw.mutateAsync({ id: data?._id, payload: objData });
       await handleMutationFeedback(mutation, {
-        successMsg: `Transfer Order ${data?.orderId} success!`,
-        errorMsg: `Transfer Order ${data?.orderId} failed!`,
+        successMsg: `Update Transfer Order ${data?.orderId} success!`,
+        errorMsg: `Update Transfer Order ${data?.orderId} failed!`,
         onSuccess: () => {
           handleClose();
         },
@@ -131,35 +146,25 @@ export default function ModalTransfer(props) {
           <form onSubmit={handleSave}>
             <Stack gap={2}>
               <TextField
-                name="toOutletRef"
-                label="Outlet Tujuan"
-                select
+                name="notes"
+                label="Notes"
                 fullWidth
-                value={outletDesti}
-                onChange={(e) => setOutletDesti(e.target.value)}
-              >
-                {dataOulet?.docs
-                  ?.filter((row) => row?._id !== ctm?.selectedOutlet)
-                  ?.map((option, i) => (
-                    <MenuItem
-                      key={option?._id || i}
-                      value={option?._id}
-                      sx={{
-                        mx: 1,
-                        my: 0.5,
-                        borderRadius: 0.75,
-                        typography: 'body2',
-                        textTransform: 'capitalize',
-                      }}
-                    >
-                      {option?.name}
-                    </MenuItem>
-                  ))}
-              </TextField>
+                value={notes}
+                disabled
+                required
+              />
+              <TextField
+                name="staff"
+                label="Staff"
+                fullWidth
+                value={staff}
+                onChange={(e) => setStaff(e.target.value)}
+                required
+              />
               <Stack alignItems="center">
                 <LoadingButton
                   variant="contained"
-                  loading={updateRaw?.isLoading || loadingOutlet}
+                  loading={updateRaw?.isLoading}
                   type="submit"
                 >
                   Save

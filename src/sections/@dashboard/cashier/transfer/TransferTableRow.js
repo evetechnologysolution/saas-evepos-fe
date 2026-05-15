@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { useState, useRef } from 'react';
+import { useState, useRef, useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
@@ -27,12 +27,15 @@ import Iconify from '../../../../components/Iconify';
 import Label from '../../../../components/Label';
 import { TableMoreMenu } from '../../../../components/table';
 import ModalTransfer from './ModalTransfer';
+import ModalTransferLog from './ModalTransferLog';
 // utils
 import { formatDate2, numberWithCommas } from '../../../../utils/getData';
 import { maskedPhone } from '../../../../utils/masked';
 // print order
 import PrintReceipt from '../pos/PrintReceiptFromOrders';
 import ModalPrintLaundry from '../orders/ModalPrintLaundry';
+// context
+import { mainContext } from '../../../../contexts/MainContext';
 
 // ----------------------------------------------------------------------
 
@@ -90,6 +93,7 @@ export default function TransferTableRow({ row }) {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const { updatePrintLaundry } = useTransfer();
+  const ctm = useContext(mainContext);
 
   const {
     _id,
@@ -99,28 +103,41 @@ export default function TransferTableRow({ row }) {
     orders,
     orderType,
     status,
-    discountPrice,
-    discountLabel,
-    voucherDiscPrice,
-    deliveryPrice,
-    deliveryPriceDisc,
-    billedAmount,
+    // discountPrice,
+    // discountLabel,
+    // voucherDiscPrice,
+    // deliveryPrice,
+    // deliveryPriceDisc,
+    // billedAmount,
+    // progressRef,
     isScan,
-    progressRef,
     transfer
   } = row;
 
-  let statusColor;
-  if (status?.toLowerCase() === 'paid') {
-    statusColor = 'success';
-  } else if (status?.toLowerCase() === 'half paid') {
-    statusColor = 'secondary';
-  } else if (status?.toLowerCase() === 'unpaid') {
-    statusColor = 'warning';
-  } else if (status?.toLowerCase() === 'refund') {
-    statusColor = 'default';
+  // let statusColor;
+  // if (status?.toLowerCase() === 'paid') {
+  //   statusColor = 'success';
+  // } else if (status?.toLowerCase() === 'half paid') {
+  //   statusColor = 'secondary';
+  // } else if (status?.toLowerCase() === 'unpaid') {
+  //   statusColor = 'warning';
+  // } else if (status?.toLowerCase() === 'refund') {
+  //   statusColor = 'default';
+  // } else {
+  //   statusColor = 'error';
+  // }
+
+  let statusTransferColor;
+  if (transfer?.status?.toLowerCase() === 'closed') {
+    statusTransferColor = 'success';
+  } else if (transfer?.status?.toLowerCase() === 'return') {
+    statusTransferColor = 'secondary';
+  } else if (transfer?.status?.toLowerCase() === 'open') {
+    statusTransferColor = 'warning';
+  } else if (transfer?.status?.toLowerCase() === 'accepted') {
+    statusTransferColor = 'default';
   } else {
-    statusColor = 'error';
+    statusTransferColor = 'error';
   }
 
   // const isConditional = orders.find((row) => row.promotionLabel !== '');
@@ -128,6 +145,7 @@ export default function TransferTableRow({ row }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const [openLog, setOpenLog] = useState(false);
 
   const [openTransfer, setOpenTransfer] = useState(false);
 
@@ -159,6 +177,35 @@ export default function TransferTableRow({ row }) {
     }
     return 'Delivery';
   };
+
+  const transferStatusLabel = {
+    open: "Transfer Diterima",
+    accepted: "Transfer Dikembalikan",
+    return: "Transfer Selesai",
+  };
+
+  const labelTransfer = transferStatusLabel[transfer?.status] || "Transfer Order";
+
+  const { actionCode, isDisabled } = useMemo(() => {
+    const transferStatus = transfer?.status;
+    const isTargetOutlet = transfer?.toOutletRef?._id === ctm?.selectedOutlet;
+
+    let actionCode = 0;
+    let isDisabled = true;
+
+    if (transferStatus === "open" && isTargetOutlet) {
+      actionCode = 1;
+      isDisabled = false;
+    } else if (transferStatus === "accepted" && isTargetOutlet) {
+      actionCode = 2;
+      isDisabled = false;
+    } else if (transferStatus === "return" && !isTargetOutlet) {
+      actionCode = 3;
+      isDisabled = false;
+    }
+
+    return { actionCode, isDisabled };
+  }, [transfer?.status, transfer?.toOutletRef, ctm?.selectedOutlet]);
 
   return (
     <>
@@ -263,7 +310,7 @@ export default function TransferTableRow({ row }) {
           )}
         </TableCell>
 
-        <TableCell align="center">
+        {/* <TableCell align="center">
           <Label variant="ghost" color={statusColor} sx={{ textTransform: 'capitalize' }}>
             {status === 'unpaid' ? 'unpaid' : status}
           </Label>
@@ -315,6 +362,30 @@ export default function TransferTableRow({ row }) {
               <span>{`(${discountLabel})`}</span>
             </>
           ) : null}
+        </TableCell> */}
+
+        <TableCell>
+          <Stack flexDirection="column" gap={0.5}>
+            <p>{transfer?.toOutletRef?.name}</p>
+            <div>
+              <p>Transfer Date :</p>
+              <p>{transfer?.createdAt ? formatDate2(transfer?.createdAt) : "-"}</p>
+            </div>
+          </Stack>
+        </TableCell>
+
+        <TableCell align="center">
+          {transfer?.log?.length > 0 ? (
+            <Link component="button" variant="inherit" underline="hover" onClick={() => setOpenLog(true)}>
+              Detail
+            </Link>
+          ) : "-"}
+        </TableCell>
+
+        <TableCell align="center">
+          <Label variant="ghost" color={statusTransferColor} sx={{ textTransform: 'capitalize' }}>
+            {transfer?.status}
+          </Label>
         </TableCell>
 
         <TableCell align="center">
@@ -329,26 +400,22 @@ export default function TransferTableRow({ row }) {
               <>
                 {['admin', 'cashier', 'staff', 'owner'].includes(user?.role?.toLowerCase()) && (
                   <MenuItem
-                    disabled={
-                      !!transfer?.toOutletRef ||
-                      !!progressRef?.log?.length ||
-                      ['cancel'].includes(status?.toLowerCase())
-                    }
+                    disabled={isDisabled}
                     onClick={() => {
                       setOpenTransfer(true);
                       handleCloseAction();
                     }}
                   >
                     <Iconify icon="solar:square-transfer-horizontal-linear" sx={{ width: 24, height: 24 }} />
-                    Transfer Order
+                    {labelTransfer}
                   </MenuItem>
                 )}
 
                 <MenuItem
                   disabled={
-                    status?.toLowerCase() === 'paid' || status?.toLowerCase() === 'unpaid'
-                      ? Boolean(false)
-                      : Boolean(true)
+                    ["cancel"]?.includes(status?.toLowerCase())
+                      ? Boolean(true)
+                      : Boolean(false)
                   }
                   onClick={() => {
                     handlePrint();
@@ -472,7 +539,9 @@ export default function TransferTableRow({ row }) {
       </BootstrapDialog>
 
 
-      <ModalTransfer open={openTransfer} onClose={() => setOpenTransfer(false)} data={row} />
+      <ModalTransfer open={openTransfer} onClose={() => setOpenTransfer(false)} data={row} actionCode={actionCode} />
+
+      <ModalTransferLog open={openLog} onClose={() => setOpenLog(false)} data={row} />
 
       <ModalPrintLaundry open={openPrintLaundry} onClose={() => setOpenPrintLaundry(false)} data={row} />
 

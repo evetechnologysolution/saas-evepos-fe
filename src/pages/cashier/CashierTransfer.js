@@ -34,13 +34,16 @@ import useTransfer from './service/useTransfer';
 const STATUS_OPTIONS = ['All', 'Paid', 'Unpaid'];
 
 const TABLE_HEAD = [
-  { id: 'date', label: 'Date', align: 'center', width: 130 },
+  { id: 'ordercreatedAt', label: 'Order Date', align: 'center', width: 130 },
   { id: '', label: 'Order ID', align: 'left', width: 80 },
   { id: '', label: 'Customer', align: 'left', width: 80 },
   { id: '', label: 'Orders', align: 'left', width: 200 },
-  { id: 'status', label: 'Status', align: 'center', width: 80 },
-  { id: 'deliveryPrice', label: 'Delivery Fee', align: 'center', width: 100 },
-  { id: 'billedAmount', label: 'Total', align: 'center', width: 100 },
+  // { id: 'status', label: 'Status', align: 'center', width: 80 },
+  // { id: 'deliveryPrice', label: 'Delivery Fee', align: 'center', width: 100 },
+  // { id: 'billedAmount', label: 'Total', align: 'center', width: 100 },
+  { id: '', label: 'Destination Outlet', align: 'left', width: 100 },
+  { id: '', label: 'Detail Transfer', align: 'center', width: 100 },
+  { id: '', label: 'Status Transfer', align: 'center', width: 80 },
   { id: '', label: 'Action', align: 'center', width: 10 },
 ];
 
@@ -73,6 +76,7 @@ export default function CashierTransfer() {
     status: controller.status,
     start: controller.start || '',
     end: controller.end || '',
+    sort: "transfer.createdAt"
   });
 
   const handlePageChange = (event, newPage) => {

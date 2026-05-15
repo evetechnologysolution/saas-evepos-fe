@@ -631,9 +631,9 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                   {['admin', 'cashier', 'staff', 'owner'].includes(user?.role?.toLowerCase()) && (
                     <MenuItem
                       disabled={
-                        status?.toLowerCase() === 'paid' || status?.toLowerCase() === 'unpaid'
-                          ? Boolean(false)
-                          : Boolean(true)
+                        ["cancel"]?.includes(status?.toLowerCase())
+                          ? Boolean(true)
+                          : Boolean(false)
                       }
                       onClick={() => {
                         sendInvoice(row);
