@@ -399,6 +399,11 @@ Terima kasih telah menggunakan layanan kami 🙏`;
               <Label variant="ghost" color={showOrderType() === 'Onsite' ? 'default' : 'info'}>
                 {showOrderType()}
               </Label>
+              {transfer?.toOutletRef && (
+                <Label variant="ghost" color="error">
+                  Transfer
+                </Label>
+              )}
               {/* {isConditional?.promotionLabel && (
                 <Label variant="ghost" color="warning">
                   {isConditional?.promotionLabel}
@@ -485,12 +490,9 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                     </p>
                   )}
                   {orders.length > 1 && (
-                    <>
-                      <br />
-                      <Link component="button" variant="inherit" underline="hover" onClick={handleOpen}>
-                        {`+${orders.length - 1} produk lainnya`}
-                      </Link>
-                    </>
+                    <Link component="button" variant="inherit" underline="hover" onClick={handleOpen}>
+                      {`+${orders.length - 1} produk lainnya`}
+                    </Link>
                   )}
                 </>
               ) : (
