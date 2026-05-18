@@ -1,15 +1,18 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useContext } from "react";
 import Pusher from "pusher-js";
 import { Client as BeamsClient } from "@pusher/push-notifications-web";
 import { useSnackbar } from "notistack";
 import { useQueryClient } from "react-query";
 // hooks
 import useAuth from "../hooks/useAuth";
+import { mainContext } from "../contexts/MainContext";
 
 export default function PusherNotif() {
     const queryClient = useQueryClient();
     const { user } = useAuth();
     const { enqueueSnackbar } = useSnackbar();
+
+    const ctm = useContext(mainContext);
 
     const pusherRef = useRef(null);
     // const beamsRef = useRef(null);
@@ -32,6 +35,7 @@ export default function PusherNotif() {
             { channel: "admin-notif", event: "chat-received", roles: allowChatRoles },
             { channel: "admin-notif", event: "order-new", roles: allowOrderRoles },
             { channel: "admin-notif", event: "postcard-new", roles: allowOrderRoles },
+            { channel: "admin-notif", event: "transfer-new", roles: allowOrderRoles },
         ];
 
         const boundChannels = [];
@@ -68,6 +72,23 @@ export default function PusherNotif() {
                     queryClient.invalidateQueries("listPostcard");
                 }
 
+                if (event === "transfer-new") {
+                    if (
+                        data?.toNotifOutlet &&
+                        data?.toNotifOutlet === ctm?.selectedOutlet
+                    ) {
+                        queryClient.invalidateQueries("transferOrders");
+                        enqueueSnackbar(data.message, {
+                            anchorOrigin: {
+                                vertical: "bottom",
+                                horizontal: "right",
+                            },
+                            persist: true,
+                        });
+                    }
+
+                    return;
+                }
                 enqueueSnackbar(data.message, {
                     anchorOrigin: { vertical: "bottom", horizontal: "right" },
                     persist: true,
