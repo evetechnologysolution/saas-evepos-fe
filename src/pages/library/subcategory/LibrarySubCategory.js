@@ -29,15 +29,16 @@ import Scrollbar from '../../../components/Scrollbar';
 import { TableHeadCustom, TableLoading, TableNoData } from '../../../components/table';
 import ConfirmDelete from '../../../components/ConfirmDelete';
 // sections
-import { CategoryTableToolbar, CategoryTableRow } from '../../../sections/@dashboard/library/category';
+import { SubcategoryTableToolbar, SubcategoryTableRow } from '../../../sections/@dashboard/library/subcategory';
 // utils
-import useCategory from './service/useService';
+import useCategory from './service/useSubcategory';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'date', label: 'Date', align: 'center' },
-  { id: 'name', label: 'Category Name', align: 'left' },
+  { id: 'createdAt', label: 'Date', align: 'center' },
+  { id: 'name', label: 'Subcategory Name', align: 'left' },
+  { id: '', label: 'Outlet', align: 'left' },
   { id: 'listNumber', label: 'List Number', align: 'center' },
   { id: '', label: 'Action', align: 'center' },
 ];
@@ -138,7 +139,7 @@ export default function LibrarySubCategory() {
               mb={{ xs: 2, sm: 0 }}
             >
               <div style={{ minWidth: '40%' }}>
-                <CategoryTableToolbar filterName={search} onFilterName={handleSearch} onEnter={handleOnKeyPress} />
+                <SubcategoryTableToolbar filterName={search} onFilterName={handleSearch} onEnter={handleOnKeyPress} />
               </div>
               <Button
                 variant="contained"
@@ -159,7 +160,7 @@ export default function LibrarySubCategory() {
                     {!isLoading ? (
                       <>
                         {tableData?.docs?.map((row) => (
-                          <CategoryTableRow
+                          <SubcategoryTableRow
                             key={row._id}
                             row={row}
                             onEditRow={() => handleEditRow(row._id)}

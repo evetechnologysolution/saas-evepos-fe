@@ -1,7 +1,6 @@
 import { paramCase } from 'change-case';
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { useQuery, useQueryClient } from 'react-query';
 import { useSnackbar } from 'notistack';
 // @mui
 import {
@@ -31,17 +30,17 @@ import { TableHeadCustom, TableLoading, TableNoData } from '../../../components/
 import ConfirmDelete from '../../../components/ConfirmDelete';
 // sections
 import { ProductTableToolbar, ProductTableRow } from '../../../sections/@dashboard/library/product';
-// context
 // utils
 import useProduct from './service/useProduct';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'date', label: 'Date', align: 'center' },
+  { id: 'createdAt', label: 'Date', align: 'center' },
   { id: 'name', label: 'Name', align: 'left' },
   { id: 'price', label: 'Price', align: 'center' },
   { id: 'category', label: 'Category', align: 'center' },
+  { id: '', label: 'Outlet', align: 'left' },
   { id: 'listNumber', label: 'List Number', align: 'center' },
   { id: 'isAvailable', label: 'Status', align: 'center' },
   { id: '', label: 'Action', align: 'center' },

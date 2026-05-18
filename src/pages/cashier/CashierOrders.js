@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useContext } from 'react';
 import { useSnackbar } from 'notistack';
 import { CSVLink } from 'react-csv';
 // @mui
@@ -32,6 +32,7 @@ import axios from '../../utils/axios';
 import { formatDate, formatDate2, formatQDate } from '../../utils/getData';
 // sections
 import { OrdersTableToolbar, OrdersTableRow } from '../../sections/@dashboard/cashier/orders';
+import { mainContext } from '../../contexts/MainContext';
 import useOrder from './service/useOrder';
 
 // ----------------------------------------------------------------------
@@ -55,6 +56,7 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 export default function CashierOrders() {
+  const ctm = useContext(mainContext);
   const { dense, onChangeDense } = useTable();
   const { themeStretch } = useSettings();
   const { enqueueSnackbar } = useSnackbar();
@@ -201,6 +203,10 @@ export default function CashierOrders() {
     let url = `/order/export`;
     const params = new URLSearchParams();
 
+    if (ctm?.selectedOutlet) {
+      params.append("outletRef", ctm?.selectedOutlet);
+    }
+
     if (controller.status) {
       params.append("status", controller.status);
     }
@@ -222,6 +228,7 @@ export default function CashierOrders() {
     if ([...params].length > 0) {
       url += `?${params.toString()}`;
     }
+
 
     const result = [];
     await axios.get(url).then((response) => {

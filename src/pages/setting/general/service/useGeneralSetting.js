@@ -5,13 +5,14 @@ import axios from 'src/utils/axios';
 
 export default function useGeneralSetting() {
   const queryClient = useQueryClient();
+  const queryKeyAll = ['allGeneralSettings'];
   const queryKey = ['generalSettings'];
 
-  const getDataSetting = () =>
+  const getDataSetting = (params = {}) =>
     useQuery({
-      queryKey,
+      queryKey: [...queryKeyAll, params],
       queryFn: async () => {
-        const { data } = await axios.get('/setting');
+        const { data } = await axios.get('/setting', { params });
         return data;
       },
     });
@@ -22,6 +23,7 @@ export default function useGeneralSetting() {
       return data;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries(queryKeyAll);
       queryClient.invalidateQueries(queryKey);
     },
   });

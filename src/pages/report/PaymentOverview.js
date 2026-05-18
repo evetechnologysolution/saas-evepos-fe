@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 // @mui
 import {
   Button,
@@ -27,6 +27,7 @@ import Page from '../../components/Page';
 import Iconify from '../../components/Iconify';
 // sections
 import { WidgetSummary, RevenueOverview } from '../../sections/@dashboard/app';
+import { mainContext } from '../../contexts/MainContext';
 
 // ----------------------------------------------------------------------
 
@@ -36,6 +37,7 @@ const queryOptions = {
 };
 
 export default function PaymentOverview() {
+  const ctm = useContext(mainContext);
   const theme = useTheme();
   const { themeStretch } = useSettings();
 
@@ -58,23 +60,30 @@ export default function PaymentOverview() {
   };
 
   // Fetch revenue data menggunakan React Query
+  const params = {
+    filter: filterLabel,
+    ...(filterLabel === 'date' &&
+      startDate &&
+      endDate && {
+      start: formatDateForAPI(startDate),
+      end: formatDateForAPI(endDate),
+    }),
+    ...(ctm?.selectedOutlet && {
+      outletRef: ctm.selectedOutlet,
+    }),
+  };
+
   const { data: revenueData, isLoading } = useQuery({
-    queryKey:
-      filterLabel === 'date'
-        ? ['revenueOverview', filterLabel, formatDateForAPI(startDate), formatDateForAPI(endDate)]
-        : ['revenueOverview', filterLabel],
-    queryFn: () => {
-      let url = `/payment-revenue?filter=${filterLabel}`;
-
-      // Only add start and end params for date filter
-      if (filterLabel === 'date' && startDate && endDate) {
-        url += `&start=${formatDateForAPI(startDate)}&end=${formatDateForAPI(endDate)}`;
-      }
-
-      return axios.get(url).then((res) => res.data);
+    queryKey: ['revenueOverview', ctm?.selectedOutlet, params,],
+    queryFn: async () => {
+      const { data } = await axios.get('/payment-revenue', { params });
+      return data;
     },
+    enabled:
+      !!ctm?.selectedOutlet &&
+      (filterLabel !== 'date' ||
+        (startDate !== null && endDate !== null)),
     ...queryOptions,
-    enabled: filterLabel !== 'date' || (startDate !== null && endDate !== null),
   });
 
   // Handle array or object response

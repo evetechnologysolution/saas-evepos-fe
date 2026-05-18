@@ -33,7 +33,7 @@ export default function UserTableRow({ row, onPointRow, onEditRow, onDeleteRow }
 
   const { user } = useAuth();
 
-  const { _id, createdAt, username, fullname, role, isActive } = row;
+  const { _id, createdAt, username, fullname, role, outletRef, isActive } = row;
 
   return (
     <CustomTableRow hover>
@@ -49,6 +49,21 @@ export default function UserTableRow({ row, onPointRow, onEditRow, onDeleteRow }
       </TableCell>
 
       <TableCell align="left">{username}</TableCell>
+
+      <TableCell>
+        <Stack flexDirection="row" gap={1}>
+          <span>{outletRef?.name || "-"}</span>
+          {outletRef?.isPrimary && (
+            <Label
+              variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
+              color='success'
+              sx={{ textTransform: 'capitalize' }}
+            >
+              UTAMA
+            </Label>
+          )}
+        </Stack>
+      </TableCell>
 
       <TableCell align="center" sx={{ textTransform: 'capitalize' }}>
         {role}

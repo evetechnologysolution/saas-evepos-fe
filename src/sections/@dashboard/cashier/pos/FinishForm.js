@@ -5,13 +5,14 @@ import { NumericFormat } from 'react-number-format';
 import { Box, Button, InputAdornment, TextField, Typography, Stack } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useReactToPrint } from 'react-to-print';
-import axios from '../../../../utils/axios';
 // hooks
 import useAuth from '../../../../hooks/useAuth';
+import useOrder from '../../../../pages/cashier/service/useOrder';
 // context
 import { cashierContext } from '../../../../contexts/CashierContext';
-// import { mainContext } from "../../../../contexts/MainContext";
+import { mainContext } from "../../../../contexts/MainContext";
 // utils
+import { generateListSpk } from '../../../../utils/generateSpkOrder';
 // import { numberWithCommas, randomCustomer } from "../../../../utils/getData";
 import { numberWithCommas } from '../../../../utils/getData';
 // components
@@ -23,9 +24,11 @@ import ModalPrintLaundry from '../orders/ModalPrintLaundry';
 
 export default function FinishForm() {
   const ctx = useContext(cashierContext);
-  // const ctm = useContext(mainContext);
+  const ctm = useContext(mainContext);
   const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
+
+  const { updateRaw, updatePrintReceipt } = useOrder();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmit, setIsSubmit] = useState(false);
@@ -63,6 +66,9 @@ export default function FinishForm() {
         isNew: ctx?.customerNew || false,
       }
     }),
+    ...(ctx.bill.length > 0 && {
+      listSpk: generateListSpk(ctx.bill, ctx.displayOrderID)
+    }),
   };
 
   const handleNewBill = () => {
@@ -93,7 +99,7 @@ export default function FinishForm() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await axios.patch(`/order/raw/${ctx.currentOrderID}`, { roundingAmount: donation });
+      await updateRaw.mutateAsync({ id: ctx.currentOrderID, payload: { roundingAmount: donation } })
       enqueueSnackbar('Submit data success!');
       setIsSubmit(true);
     } catch (error) {
@@ -108,7 +114,7 @@ export default function FinishForm() {
   const printRef = useRef();
   const handleAfterPrint = () => {
     setOpenPrintLaundry(true);
-    ctx.updatePrintCount(ctx.currentOrderID, { staff: user?.fullname });
+    updatePrintReceipt.mutate({ id: ctx.currentOrderID, payload: { staff: user?.fullname } });
   };
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -199,7 +205,7 @@ export default function FinishForm() {
                 </Button>
               </Box>
               <div style={{ overflow: 'hidden', height: 0, width: 0 }}>
-                <PrintReceipt ref={printRef} bill={ctx.bill} />
+                <PrintReceipt ref={printRef} bill={ctx.bill} outletRef={{ id: ctm?.selectedOutlet || null, name: ctm?.selectedOutletName || "" }} />
               </div>
             </Box>
             {ctx.splitAmount > 0 && ctx.totalPrice > 0 && (
@@ -266,7 +272,14 @@ export default function FinishForm() {
           </Stack>
         </Scrollbar>
       </Box>
-      <ModalPrintLaundry open={openPrintLaundry} onClose={() => setOpenPrintLaundry(false)} data={selectedObj} />
+      <ModalPrintLaundry
+        open={openPrintLaundry}
+        onClose={() => setOpenPrintLaundry(false)}
+        data={{
+          ...selectedObj,
+          outletRef: { id: ctm?.selectedOutlet || null, name: ctm?.selectedOutletName || "" }
+        }}
+      />
     </>
   );
 }

@@ -1,9 +1,7 @@
-import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 // @mui
 import { Box, CircularProgress, Container } from '@mui/material';
 import { OrdersForm } from 'src/sections/@dashboard/cashier/orders';
-import axios from '../../utils/axios';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
 // hooks

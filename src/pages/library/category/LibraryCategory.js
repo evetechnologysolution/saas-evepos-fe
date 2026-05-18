@@ -36,8 +36,9 @@ import useCategory from './service/useCategory';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'date', label: 'Date', align: 'center' },
+  { id: 'createdAt', label: 'Date', align: 'center' },
   { id: 'name', label: 'Category Name', align: 'left' },
+  { id: '', label: 'Outlet', align: 'left' },
   { id: 'listNumber', label: 'List Number', align: 'center' },
   { id: '', label: 'Action', align: 'center' },
 ];

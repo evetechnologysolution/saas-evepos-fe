@@ -18,7 +18,7 @@ const Divider = () => {
   return <div style={{ borderBottom: '1.9px dashed #000000', margin: '10px auto' }} />;
 };
 
-const PrintReceipt = React.forwardRef(({ bill, status = 'paid' }, ref) => {
+const PrintReceipt = React.forwardRef(({ bill, status = 'paid', outletRef = {} }, ref) => {
   const { user } = useAuth();
 
   const ctx = useContext(cashierContext);
@@ -29,17 +29,17 @@ const PrintReceipt = React.forwardRef(({ bill, status = 'paid' }, ref) => {
 
   const [image, setImage] = useState(null);
 
-  const checkPoint = (value) => {
-    // Tidak ada point jika bukan dari scan member atau bukan order online
-    if (ctx.customerScan || ctx.customerData.address) {
-      if (value < 10000) {
-        return 0; // Tidak ada kelipatan jika nilai kurang dari 10.000
-      }
-      const count = Math.floor(value / 10000); // Menghitung jumlah kelipatan
-      return count;
-    }
-    return 0;
-  };
+  // const checkPoint = (value) => {
+  //   // Tidak ada point jika bukan dari scan member atau bukan order online
+  //   if (ctx.customerScan || ctx.customerData.address) {
+  //     if (value < 10000) {
+  //       return 0; // Tidak ada kelipatan jika nilai kurang dari 10.000
+  //     }
+  //     const count = Math.floor(value / 10000); // Menghitung jumlah kelipatan
+  //     return count;
+  //   }
+  //   return 0;
+  // };
 
   useEffect(() => {
     if (ctx.displayOrderID) {
@@ -86,6 +86,8 @@ const PrintReceipt = React.forwardRef(({ bill, status = 'paid' }, ref) => {
 
   return (
     <div ref={ref} className="no-break">
+      <br />
+      <br />
       <p style={{ textTransform: 'uppercase' }}>{ctm.receiptHeader?.name || headerPrint.name}</p>
 
       {ctm.receiptHeader?.isPrintLogo && ctm.receiptHeader?.image && (
@@ -129,6 +131,12 @@ const PrintReceipt = React.forwardRef(({ bill, status = 'paid' }, ref) => {
             <td>Created by</td>
             <td>: {user?.fullname || 'Cashier'}</td>
           </tr>
+          {outletRef?.name && (
+            <tr>
+              <td>Outlet</td>
+              <td>: {outletRef?.name}</td>
+            </tr>
+          )}
         </tbody>
       </table>
 

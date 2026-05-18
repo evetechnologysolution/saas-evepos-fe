@@ -36,9 +36,10 @@ import useVariant from './service/useVariant';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'date', label: 'Date', align: 'center' },
+  { id: 'createdAt', label: 'Date', align: 'center' },
   { id: 'name', label: 'Name', align: 'left' },
   { id: '', label: 'Options', align: 'left' },
+  { id: '', label: 'Outlet', align: 'left' },
   { id: '', label: 'Action', align: 'center' },
 ];
 

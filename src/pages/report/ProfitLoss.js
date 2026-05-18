@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 // @mui
 import { Container, Card, Stack, Typography, Grid, Button, Divider, TextField, InputAdornment } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -16,10 +16,12 @@ import Iconify from '../../components/Iconify';
 // utils
 import { numberWithCommas, formatDate } from '../../utils/getData';
 import { fDecimal } from '../../utils/formatNumber';
+import { mainContext } from '../../contexts/MainContext';
 
 // ----------------------------------------------------------------------
 
 export default function ProfitLoss() {
+  const ctm = useContext(mainContext);
   const theme = useTheme();
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -72,7 +74,7 @@ export default function ProfitLoss() {
     setFilterLoading(true);
 
     await axios
-      .get(`/profit-loss?start=${startDate}&end=${endDate}`)
+      .get(`/profit-loss?start=${startDate}&end=${endDate}&outletRef=${ctm?.selectedOutlet}`)
       .then((res) => {
         setTimeout(() => {
           setFilterLoading(false);

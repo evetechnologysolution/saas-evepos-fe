@@ -33,6 +33,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { handleMutationFeedback } from 'src/utils/mutationfeedback';
 import schema from '../../../../pages/library/promotion/schema';
 import usePromotion from '../../../../pages/library/promotion/service/usePromotion';
+import useOutlet from '../../../../pages/outlet/service/useOutlet';
 
 // components
 import {
@@ -61,6 +62,11 @@ PromotionForm.propTypes = {
 export default function PromotionForm({ currentData, isEdit }) {
   const navigate = useNavigate();
   const { create, update } = usePromotion();
+  const { list: listOulet } = useOutlet();
+  const { data: dataOulet, isLoading: loadingOutlet } = listOulet({
+    page: 1,
+    perPage: 10,
+  });
 
   const defaultValues = useMemo(
     () => ({
@@ -74,7 +80,9 @@ export default function PromotionForm({ currentData, isEdit }) {
       startDate: currentData?.startDate ? new Date(currentData.startDate) : new Date(),
       endDate: currentData?.validUntil && currentData?.endDate ? new Date(currentData.endDate) : '',
       selectedDay:
-        currentData?.selectedDay !== undefined && currentData?.selectedDay !== null ? currentData.selectedDay[0] : '',
+        Array.isArray(currentData?.selectedDay) && currentData.selectedDay.length > 0
+          ? currentData.selectedDay[0]
+          : 'all',
       isAvailable: currentData?.isAvailable ?? true,
       image: currentData?.image ?? '',
       products: currentData?.products ?? [],
@@ -84,6 +92,7 @@ export default function PromotionForm({ currentData, isEdit }) {
         otherNotes: currentData?.conditional?.otherNotes ?? '',
         isActive: currentData?.conditional?.isActive ?? false,
       },
+      outletRef: currentData?.outletRef || [],
     }),
     [currentData]
   );
@@ -200,7 +209,7 @@ export default function PromotionForm({ currentData, isEdit }) {
       formData.append('startDate', data.startDate);
       formData.append('endDate', data.validUntil ? data.endDate : '');
       formData.append('validUntil', data.validUntil);
-      formData.append('selectedDay', data.selectedDay === '' ? '' : Number(data.selectedDay));
+      formData.append('selectedDay', ['all', ''].includes(data.selectedDay) ? '' : Number(data.selectedDay));
 
       formData.append('products', JSON.stringify(data.products || []));
 
@@ -211,15 +220,17 @@ export default function PromotionForm({ currentData, isEdit }) {
       formData.append('conditional.otherNotes', Number(data.type) === 1 ? data.conditional.otherNotes : '');
       formData.append('conditional.isActive', Number(data.type) === 1 ? data.conditional.isActive : false);
 
+      formData.append('outletRef', JSON.stringify(data.outletRef || []));
+
       if (data.image instanceof File) {
         formData.append('image', data.image);
       }
 
       const mutation = isEdit
         ? update.mutateAsync({
-            id: currentData._id,
-            payload: formData,
-          })
+          id: currentData._id,
+          payload: formData,
+        })
         : create.mutateAsync(formData);
 
       await handleMutationFeedback(mutation, {
@@ -241,6 +252,30 @@ export default function PromotionForm({ currentData, isEdit }) {
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
             <Stack sx={{ mb: isMobile && 2 }} spacing={3}>
+              <Controller
+                name="outletRef"
+                control={control}
+                defaultValue={[]}
+                render={({ field, fieldState: { error } }) => (
+                  <Autocomplete
+                    multiple
+                    filterSelectedOptions
+                    options={dataOulet?.docs || []}
+                    value={dataOulet?.docs?.filter((option) => field.value?.includes(option._id)) || []}
+                    getOptionLabel={(option) => option.name || ''}
+                    isOptionEqualToValue={(option, value) => option._id === value._id}
+                    onChange={(event, newValue) => field.onChange(newValue.map((item) => item._id))}
+                    renderTags={(value, getTagProps) =>
+                      value.map((option, index) => (
+                        <Chip {...getTagProps({ index })} key={option._id} size="small" label={option.name} />
+                      ))
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Pilih Outlet" error={!!error} helperText={error?.message} />
+                    )}
+                  />
+                )}
+              />
               <RHFTextField name="name" label="Promotion Name" autoComplete="off" />
               <Box>
                 <RHFSwitch
@@ -327,7 +362,10 @@ export default function PromotionForm({ currentData, isEdit }) {
                   </Grid>
                 </Grid>
               </Box>
-
+            </Stack>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Stack sx={{ mb: isMobile && 2 }} spacing={3}>
               <Box>
                 <Grid container spacing={3}>
                   <Grid item xs={12} md={6}>
@@ -528,10 +566,15 @@ export default function PromotionForm({ currentData, isEdit }) {
                     labelPlacement="start"
                     label={
                       <>
-                        <Typography variant="subtitle2">Promo still available ?</Typography>
+                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                          Available
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                          Promotion still available ?
+                        </Typography>
                       </>
                     }
-                    sx={{ mx: 0 }}
+                    sx={{ mx: 0, width: 1, justifyContent: 'space-between' }}
                   />
                 </Box>
               )}
@@ -544,7 +587,7 @@ export default function PromotionForm({ currentData, isEdit }) {
                   type="submit"
                   variant="contained"
                   loading={isSubmitting}
-                  disabled={values?.products?.length === 0}
+                  disabled={values?.products?.length === 0 || loadingOutlet}
                 >
                   {!isEdit ? 'New Promotion' : 'Save Changes'}
                 </LoadingButton>

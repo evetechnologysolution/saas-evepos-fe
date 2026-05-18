@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useState, useRef, useEffect, useContext } from 'react';
-import { useQueryClient } from 'react-query';
+import React, { useState, useRef, useEffect } from 'react';
 // react-to-print
 import { useReactToPrint } from 'react-to-print';
 // @mui
@@ -10,9 +9,9 @@ import { LoadingButton } from '@mui/lab';
 import Iconify from '../../../../components/Iconify';
 // hooks
 import useAuth from '../../../../hooks/useAuth';
-import axios from '../../../../utils/axios';
-// context
-import { cashierContext } from '../../../../contexts/CashierContext';
+import useOrder from '../../../../pages/cashier/service/useOrder';
+// utils
+import { handleMutationFeedback } from '../../../../utils/mutationfeedback';
 import PrintLaundry from '../pos/PrintLaundryFromOrders';
 
 // ----------------------------------------------------------------------
@@ -64,10 +63,9 @@ BootstrapDialogTitle.propTypes = {
 export default function ModalPrintLaundry(props) {
   const { data, open, onClose } = props;
 
-  const ctx = useContext(cashierContext);
   const { user } = useAuth();
 
-  const queryClient = useQueryClient();
+  const { updateRaw, updatePrintLaundry } = useOrder();
 
   const [isLoading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState(false);
@@ -80,7 +78,7 @@ export default function ModalPrintLaundry(props) {
   // Print Laundry
   const printLaundryRef = useRef();
   const handleAfterPrintLaundry = () => {
-    ctx.updatePrintLaundry(fixId, { staff: user?.fullname });
+    updatePrintLaundry.mutate({ id: fixId, payload: { staff: user?.fullname } });
   };
   const handlePrintLaundry = useReactToPrint({
     content: () => printLaundryRef.current,
@@ -97,22 +95,34 @@ export default function ModalPrintLaundry(props) {
 
   const handlePrintWithLabel = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     if (!qty) {
       setAlert(true);
-      setIsLoading(false);
       return;
     }
-    setObjData({ ...data, qtyLabel: qty });
-    setAlert(false);
-    if (qty > 0) {
-      await axios.patch(`/order/raw/${fixId}`, { notes: `Tas Laundry ${qty} pcs` });
-      queryClient.invalidateQueries('listOrders');
+    const objData = {
+      notes: `Tas Laundry ${qty} pcs`
+    };
+
+    try {
+      setIsLoading(true);
+      setObjData({ ...data, qtyLabel: qty });
+
+      const mutation = updateRaw.mutateAsync({ id: fixId, payload: objData });
+      await handleMutationFeedback(mutation, {
+        successMsg: "",
+        errorMsg: "",
+        onSuccess: () => {
+          setAlert(false);
+          setTimeout(() => {
+            setShouldPrint(true);
+          }, 500);
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
     }
-    setTimeout(() => {
-      setShouldPrint(true);
-    }, 500);
-    setIsLoading(false);
   };
 
   const handlePrint = async () => {

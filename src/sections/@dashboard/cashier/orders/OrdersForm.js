@@ -24,7 +24,6 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 // import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import { MobileDateTimePicker } from '@mui/x-date-pickers/MobileDateTimePicker';
-import axios from '../../../../utils/axios';
 // mock
 import { paymentOptions, bankOptions } from '../../../../_mock/paymentOptions';
 // hooks
@@ -35,9 +34,10 @@ import ConfirmDialog from '../../../../components/ConfirmDialog';
 import Scrollbar from '../../../../components/Scrollbar';
 import { formatDate2, numberWithCommas, cardNumberFormat, resetCardNumberFormat } from '../../../../utils/getData';
 import { maskedPhone } from '../../../../utils/masked';
+import { handleMutationFeedback } from '../../../../utils/mutationfeedback';
 // routes
 import { PATH_DASHBOARD } from '../../../../routes/paths';
-// context
+import useOrder from '../../../../pages/cashier/service/useOrder';
 import './OrdersForm.scss';
 
 // ----------------------------------------------------------------------
@@ -47,6 +47,7 @@ OrdersForm.propTypes = {
 };
 
 export default function OrdersForm({ currentData }) {
+  const { updateRaw } = useOrder();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -165,24 +166,35 @@ export default function OrdersForm({ currentData }) {
   };
 
   const handleUpdate = async () => {
-    setLoading(true);
-    const updatedOrder = {
-      createdAt: orderDate,
-      paymentDate: payDate,
-      payment,
-      cardBankName,
-      cardAccountName,
-      cardNumber,
-    };
-    await axios.patch(`/order/raw/${data?._id}`, updatedOrder);
-    setData((prev) => ({
-      ...prev,
-      ...updatedOrder,
-    }));
-    setOpenConfirm(false);
-    setLoading(false);
-    enqueueSnackbar(`Update Order ${data?.orderId} success!`);
-    // navigate(PATH_DASHBOARD.cashier.delivery);
+    try {
+      setLoading(true);
+      const updatedOrder = {
+        createdAt: orderDate,
+        paymentDate: payDate,
+        payment,
+        cardBankName,
+        cardAccountName,
+        cardNumber,
+      };
+      const mutation = updateRaw.mutateAsync({ id: data?._id, payload: updatedOrder });
+      await handleMutationFeedback(mutation, {
+        successMsg: `Update Order ${data?.orderId} success!`,
+        errorMsg: `Update Order ${data?.orderId} failed!`,
+        onSuccess: () => {
+          setData((prev) => ({
+            ...prev,
+            ...updatedOrder,
+          }));
+          setOpenConfirm(false);
+          // navigate(PATH_DASHBOARD.cashier.delivery);
+        },
+        enqueueSnackbar,
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

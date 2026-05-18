@@ -1,12 +1,15 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-
+import { useContext } from 'react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import axios from 'src/utils/axios';
+// context
+import { mainContext } from '../../../../contexts/MainContext';
 
 const QUERY_KEY = ['categories'];
 const QUERY_KEY_ALL = ['allCategory'];
 
 export default function useCategory() {
+  const ctm = useContext(mainContext);
   const queryClient = useQueryClient();
 
   /* =======================
@@ -14,12 +17,18 @@ export default function useCategory() {
    * ======================= */
   const list = (params = {}) =>
     useQuery({
-      queryKey: [...QUERY_KEY, params],
+      queryKey: [...QUERY_KEY, ctm?.selectedOutlet, params],
       queryFn: async () => {
-        const qs = new URLSearchParams(params).toString();
-        const { data } = await axios.get(`/category?${qs}`);
+        const { data } = await axios.get('/category', {
+          params: {
+            outletRef: ctm?.selectedOutlet,
+            ...params,
+          },
+        });
+
         return data;
       },
+      enabled: !!ctm?.selectedOutlet,
       keepPreviousData: true,
       staleTime: 0, // selalu fresh setelah invalidate
       refetchOnWindowFocus: false,
@@ -44,7 +53,16 @@ export default function useCategory() {
    * ======================= */
   const update = useMutation({
     mutationFn: async ({ id, payload }) => {
-      const { data } = await axios.patch(`/category/${id}`, payload);
+      const { data } = await axios.patch(
+        `/category/${id}`,
+        payload,
+        {
+          params: {
+            outletRef: ctm?.selectedOutlet,
+          },
+        }
+      );
+
       return data;
     },
     onSuccess: () => {
@@ -58,7 +76,14 @@ export default function useCategory() {
    * ======================= */
   const remove = useMutation({
     mutationFn: async (id) => {
-      const { data } = await axios.delete(`/category/${id}`);
+      const { data } = await axios.delete(
+        `/category/${id}`,
+        {
+          params: {
+            outletRef: ctm?.selectedOutlet,
+          },
+        }
+      );
       return data;
     },
     onSuccess: () => {
@@ -72,13 +97,26 @@ export default function useCategory() {
    * ======================= */
   const getById = (id) =>
     useQuery({
-      queryKey: [...QUERY_KEY, 'detail', id],
+      queryKey: [
+        ...QUERY_KEY,
+        ctm?.selectedOutlet,
+        id,
+      ],
+
       queryFn: async () => {
-        const { data } = await axios.get(`/category/${id}`);
+        const { data } = await axios.get(
+          `/category/${id}`,
+          {
+            params: {
+              outletRef: ctm?.selectedOutlet,
+            },
+          }
+        );
+
         return data;
       },
-      enabled: Boolean(id),
-      staleTime: 5 * 60 * 1000,
+
+      enabled: !!id && !!ctm?.selectedOutlet,
     });
 
   return {

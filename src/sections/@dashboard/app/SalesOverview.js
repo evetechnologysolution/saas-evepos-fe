@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import merge from 'lodash/merge';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import moment from 'moment';
 // @mui
@@ -22,6 +22,7 @@ import { useQuery } from 'react-query';
 import axios from '../../../utils/axios';
 // components
 import { BaseOptionChart } from '../../../components/chart';
+import { mainContext } from '../../../contexts/MainContext';
 
 // ----------------------------------------------------------------------
 
@@ -35,6 +36,7 @@ const queryOptions = {
 };
 
 export default function SalesOverview({ title, ...other }) {
+  const ctm = useContext(mainContext);
   const [filterLabel, setFilterLabel] = useState('thisWeek');
   const [tempDate, setTempDate] = useState({ start: null, end: null });
   const [startDate, setStartDate] = useState(null);
@@ -71,23 +73,30 @@ export default function SalesOverview({ title, ...other }) {
     return date ? moment(date).format('YYYY-MM-DD') : null;
   };
 
+  const params = {
+    filter: filterLabel,
+    ...(filterLabel === 'date' &&
+      startDate &&
+      endDate && {
+      start: formatDateForAPI(startDate),
+      end: formatDateForAPI(endDate),
+    }),
+    ...(ctm?.selectedOutlet && {
+      outletRef: ctm.selectedOutlet,
+    }),
+  };
+
   const { data: salesReport, isLoading: loadingSalesReport } = useQuery({
-    queryKey:
-      filterLabel === 'date'
-        ? ['salesReport', filterLabel, formatDateForAPI(startDate), formatDateForAPI(endDate)]
-        : ['salesReport', filterLabel],
-    queryFn: () => {
-      let url = `/sales-overview?filter=${filterLabel}`;
-
-      // Only add start and end params for date filter
-      if (filterLabel === 'date' && startDate && endDate) {
-        url += `&start=${formatDateForAPI(startDate)}&end=${formatDateForAPI(endDate)}`;
-      }
-
-      return axios.get(url).then((res) => res.data);
+    queryKey: ['salesReport', ctm?.selectedOutlet, params,],
+    queryFn: async () => {
+      const { data } = await axios.get('/sales-overview', { params });
+      return data;
     },
+    enabled:
+      !!ctm?.selectedOutlet &&
+      (filterLabel !== 'date' ||
+        (startDate !== null && endDate !== null)),
     ...queryOptions,
-    enabled: filterLabel !== 'date' || (startDate !== null && endDate !== null),
   });
 
   // Update subheader based on filter

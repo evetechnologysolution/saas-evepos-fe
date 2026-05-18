@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { sumBy } from 'lodash';
@@ -16,10 +16,10 @@ import Label from '../../../../components/Label';
 import ConfirmDialog from '../../../../components/ConfirmDialog';
 import { formatDate, formatDate2, numberWithCommas } from '../../../../utils/getData';
 import { maskedPhone } from '../../../../utils/masked';
+import { handleMutationFeedback } from '../../../../utils/mutationfeedback';
 // routes
 import { PATH_DASHBOARD } from '../../../../routes/paths';
-// context
-import { cashierContext } from '../../../../contexts/CashierContext';
+import useDelivery from '../../../../pages/cashier/service/useDelivery';
 import './OrdersForm.scss';
 
 // ----------------------------------------------------------------------
@@ -29,10 +29,10 @@ OrdersForm.propTypes = {
 };
 
 export default function OrdersForm({ currentData }) {
+  const { update } = useDelivery();
   const { user } = useAuth();
   const currTheme = useTheme();
   const navigate = useNavigate();
-  const ctx = useContext(cashierContext);
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -119,15 +119,26 @@ export default function OrdersForm({ currentData }) {
   const handleCloseCancel = () => setOpenCancel(false);
 
   const handleCancelOrder = async () => {
-    setLoading(true);
-    await ctx.updateOrders(data?._id, { status: 'cancel' });
-    setData((prev) => ({
-      ...prev,
-      status: 'cancel',
-    }));
-    setOpenCancel(false);
-    setLoading(false);
-    enqueueSnackbar(`Cancel Order ${data?.orderId} success!`);
+    try {
+      setLoading(true);
+      const mutation = update.mutateAsync({ id: data?._id, payload: { status: 'cancel' } });
+      await handleMutationFeedback(mutation, {
+        successMsg: `Cancel Order ${data?.orderId} success!`,
+        errorMsg: `Cancel Order ${data?.orderId} failed!`,
+        onSuccess: () => {
+          setData((prev) => ({
+            ...prev,
+            status: 'cancel',
+          }));
+          setOpenCancel(false);
+        },
+        enqueueSnackbar,
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const [openPending, setOpenPending] = useState(false);
@@ -146,26 +157,41 @@ export default function OrdersForm({ currentData }) {
       alert('*Jika cuci kiloan < 3kg, mohon bulatkan ke 3kg.');
       return;
     }
-    setLoading(true);
-    const updatedOrder = {
-      date: new Date(),
-      status: 'unpaid',
-      discountPrice,
-      productionAmount: sumProductionPrice,
-      havePaid: 0,
-      billedAmount: sumTotalPrice,
-    };
-    await ctx.updateOrders(data?._id, {
-      ...data,
-      ...updatedOrder,
-    });
-    setData((prev) => ({
-      ...prev,
-      ...updatedOrder,
-    }));
-    setOpenPending(false);
-    setLoading(false);
-    enqueueSnackbar(`Update Order ${data?.orderId} success!`);
+    try {
+      setLoading(true);
+
+      const updatedOrder = {
+        date: new Date(),
+        status: 'unpaid',
+        discountPrice,
+        productionAmount: sumProductionPrice,
+        havePaid: 0,
+        billedAmount: sumTotalPrice,
+      };
+      const mutation = update.mutateAsync({
+        id: data?._id,
+        payload: {
+          ...data,
+          ...updatedOrder,
+        }
+      });
+      await handleMutationFeedback(mutation, {
+        successMsg: `Update Order ${data?.orderId} success!`,
+        errorMsg: `Update Order ${data?.orderId} failed!`,
+        onSuccess: () => {
+          setData((prev) => ({
+            ...prev,
+            ...updatedOrder,
+          }));
+          setOpenPending(false);
+        },
+        enqueueSnackbar,
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

@@ -3,6 +3,7 @@ import React, { createContext, useState, useMemo, useEffect } from 'react';
 import { useQueryClient } from 'react-query';
 // hooks
 import useAuth from '../hooks/useAuth';
+import { useLocalStorage } from '../utils/getData';
 // queries
 import { useAllNotif } from '../hooks/queries/useAllNotif';
 import { useProduct } from '../hooks/queries/useProduct';
@@ -20,46 +21,51 @@ const MainContextProvider = ({ children }) => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [socket, setSocket] = useState(null);
-  const isUserReady = !!user?._id;
 
   const [currentAccount, setCurrentAccount] = useState(process.env.REACT_APP_ACCOUNT_TYPE || 'basic');
 
   const [selectedSubs, setSelectedSubs] = useState({});
 
+  const [selectedOutlet, setSelectedOutlet] = useLocalStorage('selectedOutlet', '');
+  const [selectedOutletName, setSelectedOutletName] = useLocalStorage('selectedOutletName', '');
+
+  const isUserReady = !!user?._id;
+  const isOutletReady = !!selectedOutlet;
+
   // queries
-  const { data: allNotif = null } = useAllNotif({
-    enabled: isUserReady,
+  const { data: allNotif = null } = useAllNotif(selectedOutlet, {
+    enabled: isUserReady && isOutletReady,
   });
-  const { data: product = [], isLoading: loadingProduct } = useProduct({
-    enabled: isUserReady,
-  });
-
-  const { data: category = [] } = useCategory({
-    enabled: isUserReady,
+  const { data: product = [], isLoading: loadingProduct } = useProduct(selectedOutlet, {
+    enabled: isUserReady && isOutletReady,
   });
 
-  const { data: subcategory = [] } = useSubcategory({
-    enabled: isUserReady,
+  const { data: category = [] } = useCategory(selectedOutlet, {
+    enabled: isUserReady && isOutletReady,
   });
 
-  const { data: variant = [], isLoading: loadVariant = false } = useVariant({
-    enabled: isUserReady,
+  const { data: subcategory = [] } = useSubcategory(selectedOutlet, {
+    enabled: isUserReady && isOutletReady,
   });
 
-  const { data: existCash = {} } = useCashBalance({
-    enabled: isUserReady,
+  const { data: variant = [], isLoading: loadVariant = false } = useVariant(selectedOutlet, {
+    enabled: isUserReady && isOutletReady,
   });
 
-  const { data: receiptHeader = {} } = useReceiptSetting({
-    enabled: isUserReady,
+  const { data: existCash = {} } = useCashBalance(selectedOutlet, {
+    enabled: isUserReady && isOutletReady,
   });
 
-  const { data: generalSettings = {} } = useGeneralSetting({
-    enabled: isUserReady,
+  const { data: receiptHeader = {} } = useReceiptSetting(selectedOutlet, {
+    enabled: isUserReady && isOutletReady,
   });
 
-  const { data: generalPerfume = {} } = useGeneralPerfume({
-    enabled: isUserReady,
+  const { data: generalSettings = {} } = useGeneralSetting(selectedOutlet, {
+    enabled: isUserReady && isOutletReady,
+  });
+
+  const { data: generalPerfume = {} } = useGeneralPerfume(selectedOutlet, {
+    enabled: isUserReady && isOutletReady,
   });
 
   useEffect(() => {
@@ -72,12 +78,33 @@ const MainContextProvider = ({ children }) => {
     });
   }, [user?._id, user?.role]);
 
+  useEffect(() => {
+    if (!user?._id) return;
+
+    // OWNER
+    if (user?.role === "owner") {
+      // hanya isi default jika belum ada value sama sekali
+      setSelectedOutlet((prev) => prev || user?.outletRef?._id || "");
+      setSelectedOutletName((prev) => prev || user?.outletRef?.name || "");
+      return;
+    }
+
+    // NON OWNER
+    // selalu sync ke outlet user
+    setSelectedOutlet(user?.outletRef?._id || "");
+    setSelectedOutletName(user?.outletRef?.name || "");
+  }, [user?._id, user?.role, user?.outletRef]);
+
   const value = useMemo(
     () => ({
       socket,
       setSocket,
       selectedSubs,
       setSelectedSubs,
+      selectedOutlet,
+      setSelectedOutlet,
+      selectedOutletName,
+      setSelectedOutletName,
       currentAccount,
       setCurrentAccount,
       allNotif,
@@ -95,6 +122,8 @@ const MainContextProvider = ({ children }) => {
     [
       socket,
       selectedSubs,
+      selectedOutlet,
+      selectedOutletName,
       currentAccount,
       allNotif,
       product,

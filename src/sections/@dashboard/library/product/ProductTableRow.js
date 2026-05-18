@@ -30,7 +30,7 @@ const CustomTableRow = styled(TableRow)(() => ({
 export default function ProductTableRow({ row, onEditRow, onDeleteRow }) {
   const theme = useTheme();
 
-  const { createdAt, name, image, price, category, listNumber, isAvailable, isRecommended, section } = row;
+  const { createdAt, name, image, price, category, listNumber, isAvailable, isRecommended, outletRef, section } = row;
 
   const showImage = () => {
     if (!image && section === 'Kitchen') {
@@ -69,6 +69,35 @@ export default function ProductTableRow({ row, onEditRow, onDeleteRow }) {
       <TableCell align="center">{`Rp. ${numberWithCommas(price)}`}</TableCell>
 
       <TableCell align="center">{category ? category.name : ''}</TableCell>
+
+      <TableCell>
+        {Array.isArray(outletRef) && outletRef.length ? (
+          <Stack gap={0.5}>
+            {outletRef.map((item, i) => (
+              <Stack
+                key={i}
+                flexDirection="row"
+                alignItems="center"
+                gap={0.5}
+              >
+                <span>{i + 1}. {item?.name}</span>
+
+                {item?.isPrimary && (
+                  <Label
+                    variant="ghost"
+                    color="success"
+                    sx={{ textTransform: 'capitalize' }}
+                  >
+                    UTAMA
+                  </Label>
+                )}
+              </Stack>
+            ))}
+          </Stack>
+        ) : (
+          <span>-</span>
+        )}
+      </TableCell>
 
       <TableCell align="center">{listNumber}</TableCell>
 

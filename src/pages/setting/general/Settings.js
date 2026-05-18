@@ -1,21 +1,25 @@
 import PropTypes from 'prop-types';
-import { useEffect, useMemo, useContext } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSnackbar } from 'notistack';
-// @mui
-import { Button, Container, Card, Stack, Typography } from '@mui/material';
-import { LoadingButton } from '@mui/lab';
 // form
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+// @mui
+import {
+  Button, Container, Card, Stack, Typography, TextField, Autocomplete, Chip
+} from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 // routes
 import { PATH_DASHBOARD } from '../../../routes/paths';
 // components
 import Page from '../../../components/Page';
 import HeaderBreadcrumbs from '../../../components/HeaderBreadcrumbs';
 import { FormProvider, RHFSwitch } from '../../../components/hook-form';
-// context
-import { mainContext } from '../../../contexts/MainContext';
+// service
+import useOutlet from '../../outlet/service/useOutlet';
 // service
 import useGeneralSetting from './service/useGeneralSetting';
+import schema from './schema';
 
 // ----------------------------------------------------------------------
 
@@ -45,33 +49,43 @@ SettingItem.propTypes = {
 };
 
 export default function Settings() {
-  const ctx = useContext(mainContext);
+  const { enqueueSnackbar } = useSnackbar();
+
+  const { list: listOulet } = useOutlet();
+  const { data: dataOulet, isLoading: loadingOutlet } = listOulet({
+    page: 1,
+    perPage: 10,
+  });
 
   const {
-    // getDataSetting,
+    getDataSetting,
     update,
   } = useGeneralSetting();
 
-  //   const { data } = getDataSetting();
+  const { data: dataSetting } = getDataSetting({
+    byOutlet: "none"
+  });
 
-  const { enqueueSnackbar } = useSnackbar();
 
   const defaultValues = useMemo(
     () => ({
-      cashBalance: ctx.generalSettings?.cashBalance || false,
-      themeSetting: ctx.generalSettings?.themeSetting || false,
-    //   dineInTable: ctx.generalSettings?.dineIn?.table || false,
-    //   dineInCustomer: ctx.generalSettings?.dineIn?.customer || false,
+      outletRef: dataSetting?.outletRef || [],
+      cashBalance: dataSetting?.cashBalance ?? false,
+      themeSetting: dataSetting?.themeSetting ?? false,
+      //   dineInTable: dataSetting?.dineIn?.table || false,
+      //   dineInCustomer: dataSetting?.dineIn?.customer || false,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [ctx.generalSettings]
+    [dataSetting]
   );
 
   const methods = useForm({
+    resolver: yupResolver(schema),
     defaultValues,
   });
 
   const {
+    control,
     reset,
     watch,
     handleSubmit,
@@ -81,15 +95,16 @@ export default function Settings() {
   const values = watch();
 
   useEffect(() => {
-    if (ctx.generalSettings) {
+    if (dataSetting) {
       reset(defaultValues);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ctx.generalSettings]);
+  }, [dataSetting]);
 
   const onSubmit = async () => {
     try {
       const data = {
+        outletRef: values.outletRef,
         cashBalance: values.cashBalance,
         themeSetting: values.themeSetting,
         // dineIn: {
@@ -126,6 +141,30 @@ export default function Settings() {
             }}
           >
             <Stack gap={2}>
+              <Controller
+                name="outletRef"
+                control={control}
+                defaultValue={[]}
+                render={({ field, fieldState: { error } }) => (
+                  <Autocomplete
+                    multiple
+                    filterSelectedOptions
+                    options={dataOulet?.docs || []}
+                    value={dataOulet?.docs?.filter((option) => field.value?.includes(option._id)) || []}
+                    getOptionLabel={(option) => option.name || ''}
+                    isOptionEqualToValue={(option, value) => option._id === value._id}
+                    onChange={(event, newValue) => field.onChange(newValue.map((item) => item._id))}
+                    renderTags={(value, getTagProps) =>
+                      value.map((option, index) => (
+                        <Chip {...getTagProps({ index })} key={option._id} size="small" label={option.name} />
+                      ))
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Pilih Outlet" error={!!error} helperText={error?.message} />
+                    )}
+                  />
+                )}
+              />
               <SettingItem name="cashBalance" title="Wajibkan kas awal sebelum transaksi" />
               {/* <SettingItem
                                 name="themeSetting"
@@ -147,7 +186,7 @@ export default function Settings() {
               <Button variant="outlined" onClick={() => reset(defaultValues)}>
                 Cancel
               </Button>
-              <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+              <LoadingButton type="submit" variant="contained" loading={isSubmitting || loadingOutlet}>
                 Save Changes
               </LoadingButton>
             </Stack>

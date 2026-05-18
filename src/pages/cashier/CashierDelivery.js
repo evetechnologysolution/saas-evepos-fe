@@ -24,6 +24,7 @@ import Scrollbar from '../../components/Scrollbar';
 import { TableHeadCustom, TableLoading, TableNoData } from '../../components/table';
 // sections
 import { OrdersTableToolbar, OrdersTableRow } from '../../sections/@dashboard/cashier/delivery';
+import useDelivery from './service/useDelivery';
 
 // ----------------------------------------------------------------------
 
@@ -46,8 +47,9 @@ export default function CashierDelivery() {
 
   const { themeStretch } = useSettings();
 
-  const [countData, setCountData] = useState(0);
   const [search, setSearch] = useState('');
+
+  const { list } = useDelivery();
 
   const [controller, setController] = useState({
     page: 0,
@@ -55,31 +57,15 @@ export default function CashierDelivery() {
     search: '',
   });
 
-  const getData = async ({ queryKey }) => {
-    const [, params] = queryKey; // Extract query params
-    const queryString = new URLSearchParams(params).toString(); // Build query string
-    try {
-      const res = await axios.get(`/order/delivery?${queryString}`);
-      setCountData(res?.data?.totalDocs || 0);
-      return res.data;
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      throw new Error(error.response?.data?.message || 'Failed to fetch orders');
-    }
-  };
-
-  const { isLoading, data: tableData } = useQuery(
-    [
-      'listDeliveryOrders',
-      {
-        page: controller.page + 1,
-        perPage: controller.rowsPerPage,
-        search: controller.search || '',
-        sort: 'bookingDate:desc,date:desc',
-      },
-    ],
-    getData
-  );
+  const { data: tableData, isLoading } = list({
+    page: controller.page + 1,
+    perPage: controller.rowsPerPage,
+    search: controller.search,
+    // status: controller.status,
+    // start: controller.start || '',
+    // end: controller.end || '',
+    sort: 'bookingDate:desc,date:desc',
+  });
 
   const handlePageChange = (event, newPage) => {
     setController({
@@ -161,7 +147,7 @@ export default function CashierDelivery() {
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"
-              count={countData}
+              count={Number(tableData?.totalDocs || 0)}
               rowsPerPage={controller.rowsPerPage}
               page={controller.page}
               onPageChange={handlePageChange}

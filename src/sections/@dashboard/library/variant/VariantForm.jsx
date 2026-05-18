@@ -7,7 +7,7 @@ import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { LoadingButton } from '@mui/lab';
-import { styled, Typography, Card, Grid, Stack, Button, InputAdornment, FormControlLabel, Switch, Divider } from '@mui/material';
+import { styled, Typography, Card, Grid, Stack, Button, InputAdornment, FormControlLabel, Switch, Divider, Autocomplete, Chip, TextField } from '@mui/material';
 // routes
 import { handleMutationFeedback } from 'src/utils/mutationfeedback';
 import { PATH_DASHBOARD } from '../../../../routes/paths';
@@ -19,6 +19,7 @@ import useAuth from '../../../../hooks/useAuth';
 //
 import schema from '../../../../pages/library/variant/schema';
 import useVariant from '../../../../pages/library/variant/service/useVariant';
+import useOutlet from '../../../../pages/outlet/service/useOutlet';
 // ----------------------------------------------------------------------
 
 VariantForm.propTypes = {
@@ -59,6 +60,11 @@ export default function VariantForm({ isEdit, currentData }) {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { create, update } = useVariant();
+  const { list: listOulet } = useOutlet();
+  const { data: dataOulet, isLoading: loadingOutlet } = listOulet({
+    page: 1,
+    perPage: 10,
+  });
 
   const defaultValues = useMemo(
     () => ({
@@ -66,6 +72,7 @@ export default function VariantForm({ isEdit, currentData }) {
       name: currentData?.name || '',
       caption: currentData?.caption || '',
       showOnWeb: currentData?.showOnWeb ?? false,
+      outletRef: currentData?.outletRef || [],
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentData]
@@ -152,6 +159,31 @@ export default function VariantForm({ isEdit, currentData }) {
                   />
                 </Stack>
               )}
+
+              <Controller
+                name="outletRef"
+                control={control}
+                defaultValue={[]}
+                render={({ field, fieldState: { error } }) => (
+                  <Autocomplete
+                    multiple
+                    filterSelectedOptions
+                    options={dataOulet?.docs || []}
+                    value={dataOulet?.docs?.filter((option) => field.value?.includes(option._id)) || []}
+                    getOptionLabel={(option) => option.name || ''}
+                    isOptionEqualToValue={(option, value) => option._id === value._id}
+                    onChange={(event, newValue) => field.onChange(newValue.map((item) => item._id))}
+                    renderTags={(value, getTagProps) =>
+                      value.map((option, index) => (
+                        <Chip {...getTagProps({ index })} key={option._id} size="small" label={option.name} />
+                      ))
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Pilih Outlet" error={!!error} helperText={error?.message} />
+                    )}
+                  />
+                )}
+              />
 
               <Stack direction={{ xs: 'column', sm: 'row' }} gap={3}>
                 <RHFTextField name="name" label="Variant Name" autoComplete="off" />
@@ -320,7 +352,7 @@ export default function VariantForm({ isEdit, currentData }) {
               <Button variant="outlined" onClick={() => navigate(PATH_DASHBOARD.library.variant)}>
                 Cancel
               </Button>
-              <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+              <LoadingButton type="submit" variant="contained" loading={isSubmitting} disabled={loadingOutlet}>
                 {!isEdit ? 'New Variant' : 'Save Changes'}
               </LoadingButton>
             </Stack>

@@ -12,7 +12,7 @@ import { useReactToPrint } from 'react-to-print';
 import {
   Alert,
   Container,
-  Button,
+  // Button,
   Grid,
   IconButton,
   styled,
@@ -37,10 +37,12 @@ import { v4 as uuid } from 'uuid';
 import { NumericFormat } from 'react-number-format';
 // hooks
 import useAuth from '../../../../hooks/useAuth';
+import useOrder from '../../../../pages/cashier/service/useOrder';
 // components
 import Iconify from '../../../../components/Iconify';
 import { bankOptions } from '../../../../_mock/paymentOptions';
 // context
+import { mainContext } from '../../../../contexts/MainContext';
 import { cashierContext } from '../../../../contexts/CashierContext';
 // utils
 import axiosInstance from '../../../../utils/axios';
@@ -142,7 +144,10 @@ export default function ModalPayment(props) {
 
   const { enqueueSnackbar } = useSnackbar();
 
+  const ctm = useContext(mainContext);
   const ctx = useContext(cashierContext);
+
+  const { updatePrintReceipt } = useOrder();
 
   const { user } = useAuth();
 
@@ -563,7 +568,7 @@ export default function ModalPayment(props) {
   const printRef = useRef();
   const handleAfterPrint = () => {
     if (currUid) {
-      ctx.updatePrintCount(currUid, { staff: user?.fullname });
+      updatePrintReceipt.mutate({ id: currUid, payload: { staff: user?.fullname } });
       setCurrUid('');
       setIsPrint(false);
       ctx.handleResetPos();
@@ -609,6 +614,9 @@ export default function ModalPayment(props) {
           orderId,
           staff: user?.fullname,
           orderType: ctx?.orderType || 'onsite',
+          ...(['owner'].includes(user?.role?.toLowerCase()) && {
+            outletRef: ctm?.selectedOutlet
+          })
         }),
       orders: props.afterSplit?.length ? props.afterSplit : ctx.bill,
       serviceChargePercentage: ctx.serviceChargePercentage,
@@ -626,6 +634,9 @@ export default function ModalPayment(props) {
       productionAmount: ctx.productionAmount,
       notes,
       isScan: ctx?.customerScan || false,
+      ...(ctx.spk.length > 0 && {
+        listSpk: ctx.spk
+      }),
     };
 
     if (type === 'payment') {

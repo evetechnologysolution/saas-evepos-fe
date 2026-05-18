@@ -13,6 +13,7 @@ const ICONS = {
   dashboard: getIcon('ic_dashboard'),
   pos: getIcon('ic_pos'),
   order: getIcon('ic_order'),
+  transfer: getIcon('ic_transfer'),
   delivery: getIcon('ic_delivery'),
   pickup: getIcon('ic_pickup'),
   scan: getIcon('ic_scan'),
@@ -61,6 +62,12 @@ export const useNavConfig = () => {
           title: 'Orders',
           path: PATH_DASHBOARD.cashier.orders,
           icon: ICONS.order,
+          roles: ['owner', 'admin', 'cashier'],
+        },
+        {
+          title: 'Transfer Orders',
+          path: PATH_DASHBOARD.cashier.transfer,
+          icon: ICONS.transfer,
           roles: ['owner', 'admin', 'cashier'],
         },
         {

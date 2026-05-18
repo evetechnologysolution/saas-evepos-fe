@@ -35,6 +35,7 @@ import {
 } from '../../sections/@dashboard/app';
 // context
 import { dashboardContext } from '../../contexts/DashboardContext';
+import { mainContext } from '../../contexts/MainContext';
 
 // ----------------------------------------------------------------------
 
@@ -42,6 +43,7 @@ export default function PopularProduct() {
   const theme = useTheme();
   const { themeStretch } = useSettings();
   const ctx = useContext(dashboardContext);
+  const ctm = useContext(mainContext);
 
   const [filterLabel, setFilterLabel] = useState('This Month');
   const [popular, setPopular] = useState(null);
@@ -78,10 +80,10 @@ export default function PopularProduct() {
       if (startDate && endDate) {
         const getData = async () => {
           try {
-            await axios.get(`/report/popular/date?filter=food&start=${startDate}&end=${endDate}`).then((response) => {
+            await axios.get(`/report/popular/date?filter=food&start=${startDate}&end=${endDate}&outletRef=${ctm?.selectedOutlet}`).then((response) => {
               setPopular(response.data[0]);
             });
-            await axios.get(`/report/popular/date?filter=drink&start=${startDate}&end=${endDate}`).then((response) => {
+            await axios.get(`/report/popular/date?filter=drink&start=${startDate}&end=${endDate}&outletRef=${ctm?.selectedOutlet}`).then((response) => {
               setPopularDrink(response.data[0]);
             });
           } catch (error) {
@@ -98,8 +100,8 @@ export default function PopularProduct() {
   const handleSearch = async () => {
     try {
       if (startDate && endDate) {
-        const popularFood = await axios.get(`/report/popular/date?filter=food&start=${startDate}&end=${endDate}`);
-        const popularDrink = await axios.get(`/report/popular/date?filter=drink&start=${startDate}&end=${endDate}`);
+        const popularFood = await axios.get(`/report/popular/date?filter=food&start=${startDate}&end=${endDate}&outletRef=${ctm?.selectedOutlet}`);
+        const popularDrink = await axios.get(`/report/popular/date?filter=drink&start=${startDate}&end=${endDate}&outletRef=${ctm?.selectedOutlet}`);
 
         setPeriod(`(${moment(startDate).format('DD MMMM YYYY')} - ${moment(endDate).format('DD MMMM YYYY')})`);
         setPopular(popularFood.data[0]);

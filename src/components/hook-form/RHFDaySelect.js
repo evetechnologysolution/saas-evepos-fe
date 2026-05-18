@@ -5,6 +5,7 @@ import { TextField, MenuItem } from '@mui/material';
 // Day options (0–6)
 // =====================
 const DAY_OPTIONS = [
+  // { label: 'All Days', value: 'all' },
   // { label: 'Sunday', value: 0 },
   // { label: 'Monday', value: 1 },
   // { label: 'Tuesday', value: 2 },
@@ -12,6 +13,7 @@ const DAY_OPTIONS = [
   // { label: 'Thursday', value: 4 },
   // { label: 'Friday', value: 5 },
   // { label: 'Saturday', value: 6 },
+  { label: 'Setiap Hari', value: 'all' },
   { label: 'Minggu', value: 0 },
   { label: 'Senin', value: 1 },
   { label: 'Selasa', value: 2 },
@@ -49,13 +51,8 @@ export default function RHFDaySelect({
           }
           {...other}
         >
-          <MenuItem value="">
-            {/* <em>All Days</em> */}
-            <em>Setiap Hari</em>
-          </MenuItem>
-
           {DAY_OPTIONS.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
+            <MenuItem key={option.value} value={option.value} sx={{ ...(option?.value === "all" && { fontStyle: "italic" }) }}>
               {option.label}
             </MenuItem>
           ))}

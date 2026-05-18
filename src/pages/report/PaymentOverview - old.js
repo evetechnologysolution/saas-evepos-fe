@@ -29,6 +29,7 @@ import {
 } from "../../sections/@dashboard/app";
 // context
 import { dashboardContext } from "../../contexts/DashboardContext";
+import { mainContext } from "../../contexts/MainContext";
 
 // ----------------------------------------------------------------------
 
@@ -36,6 +37,7 @@ export default function PaymentOverview() {
   const theme = useTheme();
   const { themeStretch } = useSettings();
   const ctx = useContext(dashboardContext);
+  const ctm = useContext(mainContext);
 
   const [filterLabel, setFilterLabel] = useState("This Month");
   const [paymentMethod, setPaymentMethod] = useState(null);
@@ -70,7 +72,7 @@ export default function PaymentOverview() {
   const handleSearch = async () => {
     try {
       if (startDate && endDate) {
-        const revenueResponse = await axios.get(`/report/revenue-overview/date?start=${startDate}&end=${endDate}`);
+        const revenueResponse = await axios.get(`/report/revenue-overview/date?start=${startDate}&end=${endDate}&outletRef=${ctm?.selectedOutlet}`);
 
         setPeriod(`(${moment(startDate).format("DD MMMM YYYY")} - ${moment(endDate).format("DD MMMM YYYY")})`);
         setPaymentMethod(revenueResponse.data[0]);

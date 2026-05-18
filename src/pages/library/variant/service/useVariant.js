@@ -1,22 +1,31 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-
+import { useContext } from 'react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import axios from 'src/utils/axios';
+// context
+import { mainContext } from '../../../../contexts/MainContext';
 
 export default function useVariant() {
+  const ctm = useContext(mainContext);
   const queryClient = useQueryClient();
   const queryKey = ['variants'];
   const queryKeyAll = ['allVariant'];
   const queryKeyProduct = ['allProduct'];
 
-  const list = (params) =>
+  const list = (params = {}) =>
     useQuery({
-      queryKey: [...queryKey, params],
+      queryKey: [...queryKey, ctm?.selectedOutlet, params],
       queryFn: async () => {
-        const qs = new URLSearchParams(params).toString();
-        const { data } = await axios.get(`/variant?${qs}`);
+        const { data } = await axios.get('/variant', {
+          params: {
+            outletRef: ctm?.selectedOutlet,
+            ...params,
+          },
+        });
+
         return data;
       },
+      enabled: !!ctm?.selectedOutlet,
       keepPreviousData: false,
     });
 
@@ -34,7 +43,15 @@ export default function useVariant() {
 
   const update = useMutation({
     mutationFn: async ({ id, payload }) => {
-      const { data } = await axios.patch(`/variant/${id}`, payload);
+      const { data } = await axios.patch(
+        `/variant/${id}`,
+        payload,
+        {
+          params: {
+            outletRef: ctm?.selectedOutlet,
+          },
+        }
+      );
       return data;
     },
     onSuccess: () => {
@@ -46,17 +63,31 @@ export default function useVariant() {
 
   const getById = (id) =>
     useQuery({
-      queryKey: [...queryKey, id],
+      queryKey: [...queryKey, ctm?.selectedOutlet, id],
       queryFn: async () => {
-        const { data } = await axios.get(`/variant/${id}`);
+        const { data } = await axios.get(
+          `/variant/${id}`,
+          {
+            params: {
+              outletRef: ctm?.selectedOutlet,
+            },
+          }
+        );
         return data;
       },
-      enabled: !!id,
+      enabled: !!id && !!ctm?.selectedOutlet,
     });
 
   const remove = useMutation({
     mutationFn: async (id) => {
-      const { data } = await axios.delete(`/variant/${id}`);
+      const { data } = await axios.delete(
+        `/variant/${id}`,
+        {
+          params: {
+            outletRef: ctm?.selectedOutlet,
+          },
+        }
+      );
       return data;
     },
     onSuccess: () => {

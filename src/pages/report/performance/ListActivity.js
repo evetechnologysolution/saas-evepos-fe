@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useQuery } from 'react-query';
 // @mui
 import {
@@ -18,6 +18,7 @@ import axios from '../../../utils/axios';
 import useTable from '../../../hooks/useTable';
 import Scrollbar from '../../../components/Scrollbar';
 import { TableHeadCustom, TableLoading, TableNoData } from '../../../components/table';
+import { mainContext } from '../../../contexts/MainContext';
 // sections
 import { ActivityTableToolbar, ActivityTableRow } from './table';
 // context
@@ -38,6 +39,7 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 export default function ListActivity() {
+  const ctm = useContext(mainContext);
   const { dense, onChangeDense } = useTable();
 
   const [countData, setCountData] = useState(0);
@@ -73,6 +75,7 @@ export default function ListActivity() {
     [
       'listActivity',
       {
+        outletRef: ctm?.selectedOutlet,
         page: controller.page + 1,
         perPage: controller.rowsPerPage,
         search: controller.search || '',

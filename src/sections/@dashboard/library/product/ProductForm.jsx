@@ -22,7 +22,7 @@ import {
   FormControlLabel,
   Switch,
   CircularProgress,
-  Box,
+  // Box,
   TextField,
   Autocomplete,
   Chip,
@@ -46,6 +46,7 @@ import useAuth from '../../../../hooks/useAuth';
 import { mainContext } from '../../../../contexts/MainContext';
 import schema from '../../../../pages/library/product/schema';
 import useProduct from '../../../../pages/library/product/service/useProduct';
+import useOutlet from '../../../../pages/outlet/service/useOutlet';
 // ----------------------------------------------------------------------
 
 ProductForm.propTypes = {
@@ -101,6 +102,12 @@ export default function ProductForm({ isEdit, currentData }) {
     perPage: 100,
   });
 
+  const { list: listOulet } = useOutlet();
+  const { data: dataOulet, isLoading: loadingOutlet } = listOulet({
+    page: 1,
+    perPage: 10,
+  });
+
   const defaultValues = useMemo(
     () => ({
       id: currentData?._id || '',
@@ -126,6 +133,7 @@ export default function ProductForm({ isEdit, currentData }) {
       isRecommended: currentData?.isRecommended ?? false,
       showOnWeb: currentData?.showOnWeb ?? false,
       isAvailable: currentData?.isAvailable ?? true,
+      outletRef: currentData?.outletRef || [],
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentData]
@@ -247,6 +255,7 @@ export default function ProductForm({ isEdit, currentData }) {
       formData.append('progressPoint.baseQty', Number(data?.progressPoint?.baseQty || 0));
       // formData.append('progressPoint.basePoint', Number(data?.progressPoint?.basePoint || 0));
       formData.append('baseTime', Number(data?.baseTime || 0));
+      formData.append('outletRef', JSON.stringify(data.outletRef || []));
 
       // image (string URL / File / null)
       if (data.image instanceof File) {
@@ -276,6 +285,30 @@ export default function ProductForm({ isEdit, currentData }) {
           <Grid item xs={12} md={6}>
             <Stack spacing={3}>
               {isEdit && <RHFTextField name="id" label="Product ID" disabled />}
+              <Controller
+                name="outletRef"
+                control={control}
+                defaultValue={[]}
+                render={({ field, fieldState: { error } }) => (
+                  <Autocomplete
+                    multiple
+                    filterSelectedOptions
+                    options={dataOulet?.docs || []}
+                    value={dataOulet?.docs?.filter((option) => field.value?.includes(option._id)) || []}
+                    getOptionLabel={(option) => option.name || ''}
+                    isOptionEqualToValue={(option, value) => option._id === value._id}
+                    onChange={(event, newValue) => field.onChange(newValue.map((item) => item._id))}
+                    renderTags={(value, getTagProps) =>
+                      value.map((option, index) => (
+                        <Chip {...getTagProps({ index })} key={option._id} size="small" label={option.name} />
+                      ))
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Pilih Outlet" error={!!error} helperText={error?.message} />
+                    )}
+                  />
+                )}
+              />
               <RHFTextField name="name" label="Product Name" autoComplete="off" />
               <Stack flexDirection={{ xs: "column", md: "row" }} gap={3}>
                 <NumericFormat
@@ -783,7 +816,7 @@ export default function ProductForm({ isEdit, currentData }) {
               <Button variant="outlined" onClick={() => navigate(PATH_DASHBOARD.library.product)}>
                 Cancel
               </Button>
-              <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+              <LoadingButton type="submit" variant="contained" loading={isSubmitting} disabled={loadingOutlet || loadingStatus}>
                 {!isEdit ? 'New Product' : 'Save Changes'}
               </LoadingButton>
             </Stack>

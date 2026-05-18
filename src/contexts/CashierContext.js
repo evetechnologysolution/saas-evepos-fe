@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useState, useEffect, useMemo, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { isTuesday } from 'date-fns';
 import { useQueryClient } from 'react-query';
@@ -9,10 +9,13 @@ import useAuth from '../hooks/useAuth';
 import { useTax } from '../hooks/queries/useTax';
 // dummyData
 import { tableNameData } from '../dummyData';
+// context
+import { mainContext } from './MainContext';
 
 export const cashierContext = createContext(null);
 
 const CashierContextProvider = ({ children }) => {
+  const ctm = useContext(mainContext);
   // Pos State
   const today = new Date();
   const isLaundryBagDay = isTuesday(today);
@@ -23,6 +26,7 @@ const CashierContextProvider = ({ children }) => {
   const [qrKey, setQrKey] = useState('');
   const [savedOrders, setSavedOrders] = useLocalStorage('savedOrders', []);
   const [progress, setProgress] = useState([]);
+  const [spk, setSpk] = useState([]);
   const [bill, setBill] = useState([]);
   const [splitBill, setSplitBill] = useState([]);
   const [savedBillID, setSavedBillID] = useState('');
@@ -74,19 +78,19 @@ const CashierContextProvider = ({ children }) => {
   const queryClient = useQueryClient();
   const isUserReady = !!user?._id;
 
-  const { data: taxSetting = {} } = useTax({
-    enabled: isUserReady,
+  const { data: taxSetting = {} } = useTax(ctm?.selectedOutlet, {
+    enabled: isUserReady && !!ctm?.selectedOutlet,
   });
 
   useEffect(() => {
-    if (!user?._id || !user?.role) return;
+    if (!user?._id || !user?.role || !ctm?.selectedOutlet) return;
 
     const keys = ['taxSetting'];
 
     keys.forEach((key) => {
       queryClient.invalidateQueries(key);
     });
-  }, [user?._id, user?.role]);
+  }, [user?._id, user?.role, ctm?.selectedOutlet]);
 
   useEffect(() => {
     const sumPrice = bill.reduce((acc, item) => {
@@ -380,6 +384,7 @@ const CashierContextProvider = ({ children }) => {
     setPax(1);
     setQrKey('');
     setProgress([]);
+    setSpk([]);
     setBill([]);
     setSplitBill([]);
     setSavedBillID('');
@@ -445,6 +450,8 @@ const CashierContextProvider = ({ children }) => {
       setSavedOrders,
       progress,
       setProgress,
+      spk,
+      setSpk,
       bill,
       setBill,
       splitBill,

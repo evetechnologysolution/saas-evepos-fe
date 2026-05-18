@@ -31,7 +31,9 @@ import { ModalCashCashier, ModalAlertCashCashier } from '../../sections/@dashboa
 // context
 import { cashierContext } from '../../contexts/CashierContext';
 import { mainContext } from '../../contexts/MainContext';
+import useOrder from './service/useOrder';
 // utils
+import { generateListSpk } from '../../utils/generateSpkOrder';
 // import { numberWithCommas, formatDay, randomCustomer } from "../../utils/getData";
 import { generateRandomOrderId } from '../../utils/generateRandom';
 import { numberWithCommas, formatDay } from '../../utils/getData';
@@ -44,6 +46,8 @@ import ModalPrintLaundry from '../../sections/@dashboard/cashier/orders/ModalPri
 export default function CashierPos() {
   const ctx = useContext(cashierContext);
   const ctm = useContext(mainContext);
+
+  const { updatePrintReceipt } = useOrder();
 
   const theme = useTheme();
 
@@ -135,7 +139,7 @@ export default function CashierPos() {
   const printRef = useRef();
   const handleAfterPrint = () => {
     if (currUid) {
-      ctx.updatePrintCount(currUid, { staff: user?.fullname });
+      updatePrintReceipt.mutate({ id: currUid, payload: { staff: user?.fullname } });
       setIsPrint(false);
       setOpenPrintLaundry(true);
       ctx.handleResetPos();
@@ -255,6 +259,9 @@ export default function CashierPos() {
           cardNumber: '',
           notes: '',
           isScan: ctx?.customerScan || false,
+          ...(['owner'].includes(user?.role?.toLowerCase()) && {
+            outletRef: ctm?.selectedOutlet
+          })
         };
         if (ctx.customerName) {
           objData = Object.assign(objData, {
@@ -267,6 +274,9 @@ export default function CashierPos() {
               isNew: ctx?.customerNew || false,
             },
           });
+        }
+        if (objData.orders && Array.isArray(objData.orders)) {
+          objData.listSpk = generateListSpk(objData.orders, orderId);
         }
         setSelectedObj(objData);
         await ctx.createOrders(objData);
@@ -630,7 +640,7 @@ export default function CashierPos() {
         </Container>
 
         <div style={{ overflow: 'hidden', height: 0, width: 0 }}>
-          <PrintReceipt ref={printRef} bill={ctx.bill} status="unpaid" />
+          <PrintReceipt ref={printRef} bill={ctx.bill} status="unpaid" outletRef={{ id: ctm?.selectedOutlet || null, name: ctm?.selectedOutletName || "" }} />
         </div>
       </Card>
 
@@ -652,7 +662,14 @@ export default function CashierPos() {
 
       <ModalAlertCashCashier open={alertCashier} />
 
-      <ModalPrintLaundry open={openPrintLaundry} onClose={() => setOpenPrintLaundry(false)} data={selectedObj} />
+      <ModalPrintLaundry
+        open={openPrintLaundry}
+        onClose={() => setOpenPrintLaundry(false)}
+        data={{
+          ...selectedObj,
+          outletRef: { id: ctm?.selectedOutlet || null, name: ctm?.selectedOutletName || "" }
+        }}
+      />
     </Page>
   );
 }

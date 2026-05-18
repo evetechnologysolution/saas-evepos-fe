@@ -19,6 +19,7 @@ import { IconButtonAnimate } from '../../../components/animate';
 // import LanguagePopover from './LanguagePopover';
 // import ContactsPopover from './ContactsPopover';
 // import NotificationsPopover from './NotificationsPopover';
+import SelectOutlet from './SelectOutlet';
 
 // ----------------------------------------------------------------------
 
@@ -81,12 +82,13 @@ export default function DashboardHeader({ onOpenSidebar, isCollapse = false, ver
         {/* <Searchbar /> */}
         <Box sx={{ flexGrow: 1 }} />
 
-        {/* <Stack direction="row" alignItems="center" spacing={{ xs: 0.5, sm: 1.5 }}>
-          <LanguagePopover />
+        <Stack direction="row" alignItems="center" spacing={{ xs: 0.5, sm: 1.5 }}>
+          {/* <LanguagePopover />
           <NotificationsPopover />
           <ContactsPopover />
-          <AccountPopover />
-        </Stack> */}
+          <AccountPopover /> */}
+          <SelectOutlet />
+        </Stack>
       </Toolbar>
     </RootStyle>
   );

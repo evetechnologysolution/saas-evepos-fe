@@ -2,6 +2,16 @@
 import * as Yup from 'yup';
 
 const VariantSchema = Yup.object({
+  outletRef: Yup.array()
+    .transform((value, originalValue) => {
+      if (originalValue === '' || originalValue === null) {
+        return [];
+      }
+      return value;
+    })
+    .of(Yup.string())
+    .min(1, 'Outlet wajib diisi')
+    .default([]),
   name: Yup.string().required('Nama wajib diisi').default(''),
   options: Yup.array()
     .of(

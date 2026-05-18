@@ -1,15 +1,15 @@
-// hooks/queries/useCategory.js
 import { useQuery } from 'react-query';
 import axios from '../../utils/axios';
 
-export const useCategory = (options = {}) => {
+export const useCategory = (selectedOutlet, options = {}) => {
   return useQuery(
-    ['allCategory'],
+    ['allCategory', selectedOutlet],
     async () => {
-      const res = await axios.get('/category/all');
+      const res = await axios.get(`/category/all?outletRef=${selectedOutlet}`);
       return res.data;
     },
     {
+      enabled: !!selectedOutlet,
       refetchOnWindowFocus: false,
       ...options,
     }

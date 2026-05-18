@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext } from 'react';
 import { useQuery } from 'react-query';
 import { CSVLink } from 'react-csv';
 // @mui
@@ -34,6 +34,7 @@ import Scrollbar from '../../../components/Scrollbar';
 import HeaderBreadcrumbs from '../../../components/HeaderBreadcrumbs';
 import Label from '../../../components/Label';
 import { TableHeadCustom, TableLoading, TableNoData } from '../../../components/table';
+import { mainContext } from '../../../contexts/MainContext';
 
 // ----------------------------------------------------------------------
 
@@ -57,6 +58,7 @@ const TABLE_HEAD = [
 ];
 
 export default function TableComponent() {
+  const ctm = useContext(mainContext);
   const [countData, setCountData] = useState(0);
   const [pagingCounter, setPagingCounter] = useState(0);
   const [search, setSearch] = useState('');
@@ -106,6 +108,7 @@ export default function TableComponent() {
     [
       'listPaidOrders',
       {
+        outletRef: ctm?.selectedOutlet,
         page: controller.page + 1,
         perPage: controller.rowsPerPage,
         search: controller.search || '',
@@ -195,13 +198,30 @@ export default function TableComponent() {
     handleSearch();
 
     let url = `/order/export?satus=paid`;
+    const params = new URLSearchParams();
+    params.append("status", "paid");
+
+    if (ctm?.selectedOutlet) {
+      params.append("outletRef", ctm?.selectedOutlet);
+    }
+
     if (search) {
-      url = `${url}&search=${search}`;
+      params.append("search", search);
     }
     if (startDate && endDate) {
-      // url = `${url}&start=${startDate}&end=${endDate}`;
-      url = `${url}&paidStart=${startDate}&paidEnd=${endDate}&sortBy=paymentDate&sortType=desc`;
+      // params.append("start", startDate);
+      // params.append("end", endDate);
+      params.append("paidStart", startDate);
+      params.append("paidEnd", endDate);
     }
+
+    params.append("sortBy", "paymentDate");
+    params.append("sortType", "desc");
+
+    if ([...params].length > 0) {
+      url += `?${params.toString()}`;
+    }
+
 
     const result = [];
     await axios.get(url).then((response) => {

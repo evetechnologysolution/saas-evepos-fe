@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { useEffect, useMemo, useContext, useCallback } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 import { useSnackbar } from 'notistack';
 // form
 import { useForm } from 'react-hook-form';
@@ -7,8 +7,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { LoadingButton } from '@mui/lab';
 import { Button, Card, Grid, Stack, Box, Typography } from '@mui/material';
-// context
-import { mainContext } from '../../../../contexts/MainContext';
 // components
 import { FormProvider, RHFTextField, RHFSelect, RHFUploadAvatar, RHFSwitch } from '../../../../components/hook-form';
 // utils
@@ -23,46 +21,46 @@ import useReceiptSetting from './service/useReceiptSetting';
 // ----------------------------------------------------------------------
 
 export default function ReceiptSettingForm() {
-  const ctx = useContext(mainContext);
-
-  const { update } = useReceiptSetting();
+  const { getReceiptHeader, update } = useReceiptSetting();
+  const { data: dataSetting } = getReceiptHeader();
 
   const { enqueueSnackbar } = useSnackbar();
 
   const DataSchema = Yup.object().shape({
-    name: Yup.string().required('Name is required'),
+    name: Yup.string().required('Name is required').default(''),
     phone: Yup.string()
       .matches(/^\d+$/, 'Number only!')
       .min(10, 'Minimum 10 digit numbers')
       .max(15, 'Maximum 15 digit numbers')
-      .required('Phone number is required'),
-    web: Yup.string(),
-    image: Yup.string(),
-    address: Yup.string().required('Address is required'),
-    province: Yup.string().required('Province is required'),
-    city: Yup.string().required('City is required'),
-    region: Yup.string().required('Region is required'),
-    zipCode: Yup.string(),
-    notes: Yup.string(),
-    isPrintLogo: Yup.boolean(),
+      .required('Phone number is required')
+      .default(''),
+    web: Yup.string().default(''),
+    image: Yup.string().default(''),
+    address: Yup.string().required('Address is required').default(''),
+    province: Yup.string().required('Province is required').default(''),
+    city: Yup.string().required('City is required').default(''),
+    region: Yup.string().required('Region is required').default(''),
+    zipCode: Yup.string().default(''),
+    notes: Yup.string().default(''),
+    isPrintLogo: Yup.boolean().default(false),
   });
 
   const defaultValues = useMemo(
     () => ({
-      name: ctx.receiptHeader?.name || '',
-      phone: ctx.receiptHeader?.phone || '',
-      web: ctx.receiptHeader?.web || '',
-      image: ctx.receiptHeader?.image || '',
-      address: ctx.receiptHeader?.address || '',
-      province: ctx.receiptHeader?.province || '',
-      city: ctx.receiptHeader?.city || '',
-      region: ctx.receiptHeader?.region || '',
-      zipCode: ctx.receiptHeader?.zipCode || '',
-      notes: ctx.receiptHeader?.notes || '',
-      isPrintLogo: ctx.receiptHeader?.isPrintLogo || false,
+      name: dataSetting?.name ?? '',
+      phone: dataSetting?.phone ?? '',
+      web: dataSetting?.web ?? '',
+      image: dataSetting?.image ?? '',
+      address: dataSetting?.address ?? '',
+      province: dataSetting?.province ?? '',
+      city: dataSetting?.city ?? '',
+      region: dataSetting?.region ?? '',
+      zipCode: dataSetting?.zipCode ?? '',
+      notes: dataSetting?.notes ?? '',
+      isPrintLogo: dataSetting?.isPrintLogo ?? false,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [ctx.receiptHeader]
+    [dataSetting]
   );
 
   const methods = useForm({
@@ -81,11 +79,11 @@ export default function ReceiptSettingForm() {
   const values = watch();
 
   useEffect(() => {
-    if (ctx.receiptHeader) {
+    if (dataSetting) {
       reset(defaultValues);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ctx.receiptHeader]);
+  }, [dataSetting]);
 
   const handleDrop = useCallback(
     (acceptedFiles) => {
@@ -223,24 +221,24 @@ export default function ReceiptSettingForm() {
               <Stack alignItems="center" justifyContent="center">
                 <Box bgcolor="white" p={5}>
                   <Typography variant="subtitle2" textTransform="uppercase" align="center">
-                    {ctx.receiptHeader?.name || headerPrint.name}
+                    {dataSetting?.name || headerPrint.name}
                   </Typography>
-                  {ctx.receiptHeader?.isPrintLogo && ctx.receiptHeader?.image && (
-                    <img alt="Logo" src={ctx.receiptHeader?.image} style={{ width: '50px', margin: '1px auto' }} />
+                  {dataSetting?.isPrintLogo && dataSetting?.image && (
+                    <img alt="Logo" src={dataSetting?.image} style={{ width: '50px', margin: '1px auto' }} />
                   )}
                   <Typography variant="subtitle2" textTransform="capitalize" align="center">
-                    {ctx.receiptHeader?.address || `${headerPrint.address},`}
+                    {dataSetting?.address || `${headerPrint.address},`}
                     <br />
-                    {ctx.receiptHeader?.region ? `${ctx.receiptHeader?.region}, ` : `${headerPrint.region}, `}
-                    {ctx.receiptHeader?.city ? `${ctx.receiptHeader?.city}, ` : `${headerPrint.city}, `}
-                    {ctx.receiptHeader?.province ? `${ctx.receiptHeader?.province} ` : `${headerPrint.province} `}
-                    {ctx.receiptHeader?.zipCode || headerPrint.zipCode}
+                    {dataSetting?.region ? `${dataSetting?.region}, ` : `${headerPrint.region}, `}
+                    {dataSetting?.city ? `${dataSetting?.city}, ` : `${headerPrint.city}, `}
+                    {dataSetting?.province ? `${dataSetting?.province} ` : `${headerPrint.province} `}
+                    {dataSetting?.zipCode || headerPrint.zipCode}
                   </Typography>
                   <Typography variant="subtitle2" textTransform="lowercase" align="center">
-                    {ctx.receiptHeader?.phone || headerPrint.phone}
+                    {dataSetting?.phone || headerPrint.phone}
                   </Typography>
                   <Typography variant="subtitle2" textTransform="lowercase" align="center">
-                    {ctx.receiptHeader?.web}
+                    {dataSetting?.web}
                   </Typography>
                   <div style={{ borderBottom: '1.7px dashed #000000', margin: '10px auto' }} />
                   <div style={{ textAlign: 'left' }}>
@@ -306,10 +304,10 @@ export default function ReceiptSettingForm() {
                     <Typography variant="body2">Rp. {numberWithCommas(0)}</Typography>
                   </div>
                   <div style={{ borderBottom: '1.7px dashed #000000', margin: '10px auto' }} />
-                  {ctx.receiptHeader?.notes && (
+                  {dataSetting?.notes && (
                     <div style={{ width: 300 }}>
                       <Typography variant="body2" mb={2}>
-                        {newLineText(ctx.receiptHeader?.notes)}
+                        {newLineText(dataSetting?.notes)}
                       </Typography>
                     </div>
                   )}

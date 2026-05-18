@@ -41,6 +41,7 @@ const TABLE_HEAD = [
   { id: 'date', label: 'Date', align: 'center' },
   { id: 'fullname', label: 'Fullname', align: 'left' },
   { id: 'username', label: 'Username', align: 'left' },
+  { id: 'outlet', label: 'Outlet', align: 'left' },
   { id: 'role', label: 'Role', align: 'center' },
   { id: 'status', label: 'Status', align: 'center' },
   { id: '', label: 'Action', align: 'center' },

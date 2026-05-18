@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 // @mui
 import {
     Container,
@@ -25,10 +25,12 @@ import Iconify from '../../components/Iconify';
 // utils
 import { numberWithCommas, formatDate } from "../../utils/getData";
 import { fDecimal } from "../../utils/formatNumber";
+import { mainContext } from '../../contexts/MainContext';
 
 // ----------------------------------------------------------------------
 
 export default function CashFlow() {
+    const ctm = useContext(mainContext);
     const theme = useTheme();
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
@@ -71,8 +73,8 @@ export default function CashFlow() {
 
         try {
             const [cashFlowResponse, expenseTotalResponse] = await Promise.all([
-                axios.get(`/cash-balance/cash-flow?start=${startDate}&end=${endDate}`),
-                axios.get(`/expense/total?start=${startDate}&end=${endDate}`)
+                axios.get(`/cash-balance/cash-flow?start=${startDate}&end=${endDate}&outletRef=${ctm?.selectedOutlet}`),
+                axios.get(`/expense/total?start=${startDate}&end=${endDate}&outletRef=${ctm?.selectedOutlet}`)
             ]);
             setFilterLoading(false);
             setData({
