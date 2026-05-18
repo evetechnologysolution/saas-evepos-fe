@@ -176,9 +176,9 @@ export default function UserFormCustomPoint({ currentData }) {
                   options={dataProgress?.docs?.map((option) => ({
                     _id: option?._id,
                     name: option?.name,
-                    basePoint: option?.basePoint,
+                    basePoint: option?.basePoint || 0,
                   }))}
-                  getOptionLabel={(option) => option?.name ? `${option?.name} - ${option?.basePoint} Point` : option}
+                  getOptionLabel={(option) => option?.name ? `${option?.name} - ${option?.basePoint || 0} Point` : ""}
                   isOptionEqualToValue={(option, value) => option?._id === value?._id}
                   renderInput={(params) => (
                     <TextField

@@ -69,6 +69,7 @@ export const useNavConfig = () => {
           path: PATH_DASHBOARD.cashier.transfer,
           icon: ICONS.transfer,
           roles: ['owner', 'admin', 'cashier'],
+          total: ctx?.allNotif?.newTransfer || 0,
         },
         {
           title: 'Delivery',

@@ -5,10 +5,11 @@ import axios from 'src/utils/axios';
 // context
 import { mainContext } from '../../../contexts/MainContext';
 
-export default function useOrder() {
+export default function useTransfer() {
   const ctm = useContext(mainContext);
   const queryClient = useQueryClient();
   const queryKey = ['transferOrders'];
+  const queryKeyNotif = ['allNotif'];
 
   const list = (params = {}) =>
     useQuery({
@@ -112,6 +113,7 @@ export default function useOrder() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(queryKeyNotif);
     },
   });
 

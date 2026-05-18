@@ -9,6 +9,7 @@ export default function useOrder() {
   const ctm = useContext(mainContext);
   const queryClient = useQueryClient();
   const queryKey = ['orders'];
+  const queryKeyNotif = ['allNotif'];
 
   const list = (params = {}) =>
     useQuery({
@@ -111,6 +112,7 @@ export default function useOrder() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(queryKeyNotif);
     },
   });
 
