@@ -197,12 +197,9 @@ export default function OrdersTableRow({ row }) {
             </p>
           )}
           {orders.length > 1 && (
-            <>
-              <br />
-              <Link component="button" variant="inherit" underline="hover" onClick={handleOpen}>
-                {`+${orders.length - 1} produk lainnya`}
-              </Link>
-            </>
+            <Link component="button" variant="inherit" underline="hover" onClick={handleOpen}>
+              {`+${orders.length - 1} produk lainnya`}
+            </Link>
           )}
         </TableCell>
 
