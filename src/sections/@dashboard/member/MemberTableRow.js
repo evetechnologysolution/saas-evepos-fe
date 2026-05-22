@@ -42,6 +42,48 @@ export default function MemberTableRow({ row, onDetailRow, onEditRow, onDeleteRo
       img.src = src;
     });
 
+  // =========================
+  // WAVE BACKGROUND
+  // =========================
+  const drawWave = (ctx, canvas) => {
+    ctx.fillStyle = "#f5f8fc";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const cardBottom = canvas.height - 40; // 🔥 dekat bottom card
+
+    // =========================
+    // WAVE LAYER 1
+    // =========================
+    ctx.fillStyle = "rgba(58,129,190,0.08)";
+    ctx.beginPath();
+    ctx.moveTo(0, cardBottom - 80);
+
+    ctx.bezierCurveTo(250, cardBottom - 140, 450, cardBottom - 40, 700, cardBottom - 80);
+
+    ctx.bezierCurveTo(850, cardBottom - 110, 950, cardBottom - 60, canvas.width, cardBottom - 90);
+
+    ctx.lineTo(canvas.width, canvas.height);
+    ctx.lineTo(0, canvas.height);
+    ctx.closePath();
+    ctx.fill();
+
+    // =========================
+    // WAVE LAYER 2
+    // =========================
+    ctx.fillStyle = "rgba(58,129,190,0.05)";
+    ctx.beginPath();
+    ctx.moveTo(0, cardBottom - 160);
+
+    ctx.bezierCurveTo(300, cardBottom - 220, 500, cardBottom - 100, 800, cardBottom - 160);
+
+    ctx.bezierCurveTo(900, cardBottom - 180, 980, cardBottom - 120, canvas.width, cardBottom - 150);
+
+    ctx.lineTo(canvas.width, canvas.height);
+    ctx.lineTo(0, canvas.height);
+    ctx.closePath();
+    ctx.fill();
+  };
+
   const handleDownloadQrCard = async () => {
     if (!memberId) return;
 
@@ -65,24 +107,29 @@ export default function MemberTableRow({ row, onDetailRow, onEditRow, onDeleteRo
       canvas.width = 1010;
       canvas.height = 638;
 
-      // =========================
-      // BACKGROUND (soft gray tone)
-      // =========================
-      ctx.fillStyle = "#f5f8fc";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // // =========================
+      // // BACKGROUND (soft gray tone)
+      // // =========================
+      // ctx.fillStyle = "#f5f8fc";
+      // ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // // =========================
+      // // MAIN CARD
+      // // =========================
+      // ctx.fillStyle = "#ffffff";
+      // ctx.beginPath();
+      // ctx.roundRect(20, 20, canvas.width - 40, canvas.height - 40, 30);
+      // ctx.fill();
+
+      // // shadow effect (manual)
+      // ctx.strokeStyle = "rgba(58,129,190,0.25)";
+      // ctx.lineWidth = 3;
+      // ctx.stroke();
 
       // =========================
-      // MAIN CARD
+      // BACKGROUND (wafe)
       // =========================
-      ctx.fillStyle = "#ffffff";
-      ctx.beginPath();
-      ctx.roundRect(20, 20, canvas.width - 40, canvas.height - 40, 30);
-      ctx.fill();
-
-      // shadow effect (manual)
-      ctx.strokeStyle = "rgba(58,129,190,0.25)";
-      ctx.lineWidth = 3;
-      ctx.stroke();
+      drawWave(ctx, canvas);
 
       // =========================
       // HEADER AREA
