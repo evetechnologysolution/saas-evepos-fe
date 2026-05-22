@@ -467,11 +467,11 @@ Terima kasih telah menggunakan layanan kami 🙏`;
               {orders.length > 0 ? (
                 <>
                   {orders[0].qty === 0 && orders[0]?.category?.toLowerCase() === 'kiloan' ? (
-                    <span>
+                    <p>
                       {orders[0].name} <em style={{ color: 'red' }}>{'(Belum ditimbang)'}</em>
-                    </span>
+                    </p>
                   ) : (
-                    `x ${orders[0].qty}${orders[0]?.category?.toLowerCase() === 'kiloan' ? 'kg' : ''} ${orders[0].name}`
+                    <p>{`x ${orders[0].qty}${orders[0]?.category?.toLowerCase() === 'kiloan' ? 'kg' : ''} ${orders[0].name}`}</p>
                   )}
                   {orders[0].variant.length > 0 &&
                     orders[0].variant.map((item, i) => (
