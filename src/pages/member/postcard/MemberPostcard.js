@@ -76,7 +76,7 @@ export default function MemberPostcard() {
         page: controller.page + 1,
         perPage: controller.rowsPerPage,
         voucherType: "3",
-        sortBy: "date",
+        sortBy: "createdAt",
         bazaar: "no",
         search: controller.search || "",
       },

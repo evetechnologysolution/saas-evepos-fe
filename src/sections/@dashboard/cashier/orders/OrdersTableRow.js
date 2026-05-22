@@ -662,7 +662,13 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                   </MenuItem>
                   {['owner', 'admin']?.includes(user?.role?.toLowerCase()) && (
                     <MenuItem
-                      disabled={status?.toLowerCase() === 'paid' && isScan !== true ? Boolean(false) : Boolean(true)}
+                      disabled={
+                        !(
+                          status?.toLowerCase() === 'paid' &&
+                          isScan === false &&
+                          orderType?.toLowerCase() === 'onsite'
+                        )
+                      }
                       onClick={() => {
                         setOpenGenerate(true);
                         handleCloseAction();

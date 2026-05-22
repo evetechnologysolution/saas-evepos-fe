@@ -145,7 +145,7 @@ export default function LogVoucherTableRow({ row }) {
       text: {
         x: 80,
         y: 160,
-        texts: [`Full Name : ${memberRef?.name}`, `Evewash ID : ${memberRef?.memberId}`],
+        texts: [`Full Name : ${memberRef?.name || "-"}`, `Evewash ID : ${memberRef?.memberId || "-"}`],
       },
       qr: { x: 900, y: 500 },
     },
@@ -154,7 +154,7 @@ export default function LogVoucherTableRow({ row }) {
       text: {
         x: 110,
         y: 210,
-        texts: [`Full Name : ${memberRef?.name}`, `Evewash ID : ${memberRef?.memberId}`],
+        texts: [`Full Name : ${memberRef?.name || "-"}`, `Evewash ID : ${memberRef?.memberId || "-"}`],
       },
       qr: { x: 910, y: 490 },
     },
@@ -164,7 +164,7 @@ export default function LogVoucherTableRow({ row }) {
         x: 590,
         y: 230,
         color: '#000',
-        texts: [`Full Name : ${memberRef?.name}`, `Evewash ID : ${memberRef?.memberId}`],
+        texts: [`Full Name : ${memberRef?.name || "-"}`, `Evewash ID : ${memberRef?.memberId || "-"}`],
       },
       qr: { x: 80, y: 500 },
     },
@@ -176,7 +176,7 @@ export default function LogVoucherTableRow({ row }) {
         color: '#192C60',
         center: true,
         font: 'bold 28px Poppins',
-        texts: [`Full Name : ${memberRef?.name}`, `Evewash ID : ${memberRef?.memberId}`],
+        texts: [`Full Name : ${memberRef?.name || "-"}`, `Evewash ID : ${memberRef?.memberId || "-"}`],
       },
       qr: { x: 920, y: 530 },
     },
@@ -195,7 +195,7 @@ export default function LogVoucherTableRow({ row }) {
   });
 
   const generateLayout = (ctx, width, option, qr) => {
-    const layout = getLayout(width)[option];
+    const layout = getLayout(width)[option] || getLayout(width)['opsi 1'];
 
     if (!layout) return;
 
