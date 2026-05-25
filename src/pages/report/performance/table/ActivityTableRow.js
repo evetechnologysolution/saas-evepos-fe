@@ -45,7 +45,7 @@ export default function ActivityTableRow({ row }) {
       <TableCell>{row?.staffRef?.fullname || '-'}</TableCell>
 
       <TableCell align="left">
-        {user?.role === 'Super Admin' ? (
+        {user?.role === 'owner' ? (
           <Link
             component="button"
             variant="subtitle2"

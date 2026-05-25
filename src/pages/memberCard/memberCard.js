@@ -180,9 +180,9 @@ export default function CashierOrders() {
             mx={1}
           >
             <Typography variant="h6">Member Cards</Typography>
-            {/* <Stack flexDirection={{ sm: "row" }} alignItems={{ sm: "center" }} minWidth={user?.role === "Super Admin" ? "50%" : "40%"}> */}
+            {/* <Stack flexDirection={{ sm: "row" }} alignItems={{ sm: "center" }} minWidth={user?.role === "owner" ? "50%" : "40%"}> */}
             <Stack flexDirection={{ sm: 'row' }} alignItems={{ sm: 'center' }} minWidth="50%">
-              {/* {user?.role === "Super Admin" && ( */}
+              {/* {user?.role === "owner" && ( */}
               <Stack
                 flexDirection="row"
                 gap={1}
