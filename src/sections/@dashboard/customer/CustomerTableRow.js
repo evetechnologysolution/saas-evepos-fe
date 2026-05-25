@@ -51,7 +51,7 @@ export default function CustomerTableRow({ row, onDetailRow, onEditRow, onDelete
           }}>
             <Iconify icon="eva:edit-outline" sx={{ width: 24, height: 24 }} />
           </Button>
-          {user.role === "Super Admin" && (
+          {user.role === "owner" && (
             <Button title="Delete" variant="contained" color="error" sx={{ p: 0, minWidth: 35, height: 35 }} onClick={() => {
               onDeleteRow();
             }}>

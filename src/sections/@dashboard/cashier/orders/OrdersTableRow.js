@@ -569,7 +569,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
             status?.toLowerCase() === 'refund' ||
             status?.toLowerCase() === 'cancel' ? (
             <div>
-              {/* {user?.role === "Super Admin" ? (
+              {/* {user?.role === "owner" ? (
                 <Link component="button" variant="body2" underline="hover" onClick={() => setOpenPayment(true)}>
                   {payment}
                 </Link>

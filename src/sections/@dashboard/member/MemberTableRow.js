@@ -1,11 +1,16 @@
 import PropTypes from 'prop-types';
+import { useState } from 'react';
 import QRCode from 'qrcode';
-import { styled, Stack, TableRow, TableCell, Button, Link, Typography } from '@mui/material';
-// hooks
-import useAuth from '../../../hooks/useAuth';
+import {
+  styled, Stack, TableRow, TableCell, Link, Typography, MenuItem,
+  // Button,
+} from '@mui/material';
 // components
+import { TableMoreMenu } from '../../../components/table';
 import Iconify from '../../../components/Iconify';
 import Label from '../../../components/Label';
+// hooks
+import useAuth from '../../../hooks/useAuth';
 // utils
 import { formatDate2, numberWithCommas } from '../../../utils/getData';
 import { maskedPhone } from '../../../utils/masked';
@@ -32,6 +37,16 @@ export default function MemberTableRow({ row, onDetailRow, onEditRow, onDeleteRo
   const { createdAt, memberId, name, phone, email, addresses, point, isActive } = row;
 
   const mainAddress = Array.isArray(addresses) ? addresses?.find((item) => item?.isDefault) : null;
+
+  const [openAction, setOpenAction] = useState(null);
+
+  const handleOpenAction = (event) => {
+    setOpenAction(event.currentTarget);
+  };
+
+  const handleCloseAction = () => {
+    setOpenAction(null);
+  };
 
   const loadImage = (src) =>
     new Promise((resolve, reject) => {
@@ -224,6 +239,18 @@ export default function MemberTableRow({ row, onDetailRow, onEditRow, onDeleteRo
     }
   };
 
+  const sendWa = (data) => {
+    if (!data || !data.phone) {
+      console.error('Data tidak valid');
+      return;
+    }
+
+    const bodyMsg = `berikut kami kirimkan member QR`;
+
+    const url = `https://api.whatsapp.com/send?phone=${data?.phone}&text=${encodeURIComponent(bodyMsg)}`;
+    window.open(url, '_blank');
+  };
+
   return (
     <CustomTableRow hover>
       <TableCell align="center">{formatDate2(createdAt)}</TableCell>
@@ -265,16 +292,7 @@ export default function MemberTableRow({ row, onDetailRow, onEditRow, onDeleteRo
 
       <TableCell align="center">
         <Stack direction="row" justifyContent="center" gap={1}>
-          <Button
-            title="Download QR Member"
-            variant="contained"
-            color="primary"
-            sx={{ p: 0, minWidth: 35, height: 35 }}
-            onClick={handleDownloadQrCard}
-          >
-            <Iconify icon="eva:download-fill" sx={{ width: 24, height: 24 }} />
-          </Button>
-          <Button
+          {/* <Button
             title="Edit"
             variant="contained"
             sx={{ p: 0, minWidth: 35, height: 35 }}
@@ -284,7 +302,7 @@ export default function MemberTableRow({ row, onDetailRow, onEditRow, onDeleteRo
           >
             <Iconify icon="eva:edit-outline" sx={{ width: 24, height: 24 }} />
           </Button>
-          {user.role === 'Super Admin' && (
+          {user.role === 'owner' && (
             <Button
               title="Delete"
               variant="contained"
@@ -296,7 +314,60 @@ export default function MemberTableRow({ row, onDetailRow, onEditRow, onDeleteRo
             >
               <Iconify icon="eva:trash-2-outline" sx={{ width: 24, height: 24 }} />
             </Button>
-          )}
+          )} */}
+          <TableMoreMenu
+            open={openAction}
+            onOpen={handleOpenAction}
+            onClose={handleCloseAction}
+            actions={
+              <>
+                <MenuItem
+                  onClick={() => {
+                    onEditRow();
+                    handleCloseAction();
+                  }}
+                >
+                  <Iconify icon="eva:edit-outline" sx={{ width: 24, height: 24 }} />
+                  Edit
+                </MenuItem>
+                {user?.tenantRef?.isEvewash && (
+                  <>
+                    <MenuItem
+                      onClick={() => {
+                        handleDownloadQrCard();
+                        handleCloseAction();
+                      }}
+                    >
+                      <Iconify icon="eva:download-fill" sx={{ width: 24, height: 24 }} />
+                      QR Member
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        sendWa();
+                        handleCloseAction(row);
+                      }}
+                      disabled={!!phone?.includes('EM') || !phone}
+                    >
+                      <Iconify icon="fa6-brands:whatsapp" sx={{ width: 24, height: 24 }} />
+                      Send WA
+                    </MenuItem>
+                  </>
+                )}
+                {['admin', 'owner'].includes(user?.role?.toLowerCase()) && (
+                  <MenuItem
+                    sx={{ color: 'red' }}
+                    onClick={() => {
+                      onDeleteRow();
+                      handleCloseAction();
+                    }}
+                  >
+                    <Iconify icon="eva:trash-2-outline" sx={{ width: 24, height: 24 }} />
+                    Delete
+                  </MenuItem>
+                )}
+              </>
+            }
+          />
         </Stack>
       </TableCell>
     </CustomTableRow>

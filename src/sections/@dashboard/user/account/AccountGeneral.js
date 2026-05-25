@@ -103,7 +103,7 @@ export default function AccountGeneral() {
     };
     try {
       await ctx.updatePersonalInformation(generalInformation, user._id);
-      if (user.role === 'Super Admin') {
+      if (user.role === 'owner') {
         await ctx.updateBusinessInformation(businessInformation);
       }
       enqueueSnackbar('Update success!');
@@ -228,7 +228,7 @@ export default function AccountGeneral() {
               <RHFTextField name="city" label="City" />
               <RHFTextField name="zipCode" label="Zip/Code" /> */}
               </Box>
-              {user.role !== 'Super Admin' ? (
+              {user.role !== 'owner' ? (
                 <Stack spacing={3} alignItems="flex-end" sx={{ mt: 6 }}>
                   {/* <RHFTextField name="about" multiline rows={4} label="About" /> */}
 
@@ -245,7 +245,7 @@ export default function AccountGeneral() {
               </LoadingButton>
             </Stack> */}
             </Card>
-            {user.role === 'Super Admin' ? (
+            {user.role === 'owner' ? (
               <Card sx={{ p: 3, marginTop: '2rem' }}>
                 <Typography variant="h4" sx={{ paddingBottom: '1rem' }}>
                   Business Informations
