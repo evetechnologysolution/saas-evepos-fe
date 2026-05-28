@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery } from 'react-query';
+import { useSnackbar } from 'notistack';
 // @mui
 import {
   Box,
@@ -14,7 +14,6 @@ import {
   FormControlLabel,
   Typography,
 } from '@mui/material';
-import axios from '../../utils/axios';
 // hooks
 import useSettings from '../../hooks/useSettings';
 import useTable from '../../hooks/useTable';
@@ -22,6 +21,7 @@ import useTable from '../../hooks/useTable';
 import Page from '../../components/Page';
 import Scrollbar from '../../components/Scrollbar';
 import { TableHeadCustom, TableLoading, TableNoData } from '../../components/table';
+import ConfirmDelete from '../../components/ConfirmDelete';
 // sections
 import { OrdersTableToolbar, OrdersTableRow } from '../../sections/@dashboard/cashier/delivery';
 import useDelivery from './service/useDelivery';
@@ -46,10 +46,14 @@ export default function CashierDelivery() {
   const { dense, onChangeDense } = useTable();
 
   const { themeStretch } = useSettings();
+  const { enqueueSnackbar } = useSnackbar();
 
   const [search, setSearch] = useState('');
 
-  const { list } = useDelivery();
+  const { list, remove } = useDelivery();
+
+  const [selectedId, setSelectedId] = useState('');
+  const [open, setOpen] = useState(false);
 
   const [controller, setController] = useState({
     page: 0,
@@ -104,6 +108,25 @@ export default function CashierDelivery() {
     }
   };
 
+  const handleDialog = (id) => {
+    setSelectedId(id);
+    setOpen(!open);
+  };
+
+  const handleDelete = () => {
+    if (!selectedId) return;
+
+    remove.mutate(selectedId, {
+      onSuccess: () => {
+        enqueueSnackbar('Order deleted!', { variant: 'success' });
+        setOpen(false);
+      },
+      onError: (err) => {
+        enqueueSnackbar(err?.message || 'Failed to delete', { variant: 'error' });
+      },
+    });
+  };
+
   return (
     <Page title="Delivery Orders">
       <Container maxWidth={themeStretch ? false : 'xl'}>
@@ -130,7 +153,7 @@ export default function CashierDelivery() {
                   {!isLoading ? (
                     <>
                       {tableData?.docs?.map((row) => (
-                        <OrdersTableRow key={row._id} row={row} />
+                        <OrdersTableRow key={row._id} row={row} onDeleteRow={() => handleDialog(row._id)} />
                       ))}
 
                       <TableNoData isNotFound={tableData?.docs?.length === 0} />
@@ -162,6 +185,8 @@ export default function CashierDelivery() {
           </Box>
         </Card>
       </Container>
+
+      <ConfirmDelete open={open} onClose={handleDialog} onDelete={handleDelete} isLoading={remove.isLoading} />
     </Page>
   );
 }

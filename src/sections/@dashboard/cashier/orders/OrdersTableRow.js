@@ -411,7 +411,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
               )} */}
             </Stack>
             <Stack flexDirection="row" gap={0.5}>
-              {user?.role?.toLowerCase() === 'admin' || user?.role?.toLowerCase() === 'owner' && (
+              {['owner', 'admin']?.includes(user?.role?.toLowerCase()) && (
                 <ButtonBase
                   type="button"
                   title="Copy ID"
@@ -428,7 +428,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                 </ButtonBase>
               )}
 
-              {user?.role?.toLowerCase() === 'admin' || user?.role?.toLowerCase() === 'owner' ? (
+              {['owner']?.includes(user?.role?.toLowerCase()) ? (
                 <Link
                   component="button"
                   variant="subtitle2"
@@ -720,7 +720,7 @@ Terima kasih telah menggunakan layanan kami 🙏`;
                     <Iconify icon="fluent:calendar-cancel-24-regular" sx={{ width: 24, height: 24 }} />
                     Cancel Order
                   </MenuItem>
-                  {(user?.role?.toLowerCase() === 'admin' || user?.role?.toLowerCase() === 'owner') && (
+                  {['owner'].includes(user?.role?.toLowerCase()) && (
                     <MenuItem
                       sx={{ color: 'red' }}
                       onClick={() => {

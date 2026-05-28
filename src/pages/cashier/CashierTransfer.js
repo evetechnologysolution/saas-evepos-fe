@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSnackbar } from 'notistack';
 // @mui
 import {
   Box,
@@ -23,6 +24,7 @@ import Page from '../../components/Page';
 import Scrollbar from '../../components/Scrollbar';
 import Iconify from '../../components/Iconify';
 import { TableHeadCustom, TableLoading, TableNoData } from '../../components/table';
+import ConfirmDelete from '../../components/ConfirmDelete';
 // utils
 import { formatQDate } from '../../utils/getData';
 // sections
@@ -52,13 +54,17 @@ const TABLE_HEAD = [
 export default function CashierTransfer() {
   const { dense, onChangeDense } = useTable();
   const { themeStretch } = useSettings();
+  const { enqueueSnackbar } = useSnackbar();
   // const { user } = useAuth();
-  const { list } = useTransfer();
+  const { list, remove } = useTransfer();
 
   const [filterStatus, setFilterStatus] = useState('All');
   const [search, setSearch] = useState('');
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+
+  const [selectedId, setSelectedId] = useState('');
+  const [open, setOpen] = useState(false);
 
   const [controller, setController] = useState({
     page: 0,
@@ -159,6 +165,25 @@ export default function CashierTransfer() {
     });
   };
 
+  const handleDialog = (id) => {
+    setSelectedId(id);
+    setOpen(!open);
+  };
+
+  const handleDelete = () => {
+    if (!selectedId) return;
+
+    remove.mutate(selectedId, {
+      onSuccess: () => {
+        enqueueSnackbar('Order deleted!', { variant: 'success' });
+        setOpen(false);
+      },
+      onError: (err) => {
+        enqueueSnackbar(err?.message || 'Failed to delete', { variant: 'error' });
+      },
+    });
+  };
+
   return (
     <Page title="Orders">
       <Container maxWidth={themeStretch ? false : 'xl'}>
@@ -216,7 +241,7 @@ export default function CashierTransfer() {
                   {!isLoading ? (
                     <>
                       {tableData?.docs?.map((row) => (
-                        <TransferTableRow key={row._id} row={row} />
+                        <TransferTableRow key={row._id} row={row} onDeleteRow={() => handleDialog(row._id)} />
                       ))}
 
                       <TableNoData isNotFound={tableData?.docs?.length === 0} />
@@ -248,6 +273,8 @@ export default function CashierTransfer() {
           </Box>
         </Card>
       </Container>
+
+      <ConfirmDelete open={open} onClose={handleDialog} onDelete={handleDelete} isLoading={remove.isLoading} />
     </Page>
   );
 }

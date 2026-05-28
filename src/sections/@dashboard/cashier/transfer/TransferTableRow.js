@@ -41,6 +41,7 @@ import { mainContext } from '../../../../contexts/MainContext';
 
 TransferTableRow.propTypes = {
   row: PropTypes.object,
+  onDeleteRow: PropTypes.func,
 };
 
 const CustomTableRow = styled(TableRow)(() => ({
@@ -88,7 +89,7 @@ BootstrapDialogTitle.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default function TransferTableRow({ row }) {
+export default function TransferTableRow({ row, onDeleteRow }) {
   const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
@@ -236,7 +237,7 @@ export default function TransferTableRow({ row }) {
               </ButtonBase>
             )}
 
-            {user?.role?.toLowerCase() === 'admin' || user?.role?.toLowerCase() === 'owner' ? (
+            {['owner']?.includes(user?.role?.toLowerCase()) ? (
               <Link
                 component="button"
                 variant="subtitle2"
@@ -272,11 +273,11 @@ export default function TransferTableRow({ row }) {
           {orders.length > 0 ? (
             <>
               {orders[0].qty === 0 && orders[0]?.category?.toLowerCase() === 'kiloan' ? (
-                <span>
+                <p>
                   {orders[0].name} <em style={{ color: 'red' }}>{'(Belum ditimbang)'}</em>
-                </span>
+                </p>
               ) : (
-                `x ${orders[0].qty}${orders[0]?.category?.toLowerCase() === 'kiloan' ? 'kg' : ''} ${orders[0].name}`
+                <p>{`x ${orders[0].qty}${orders[0]?.category?.toLowerCase() === 'kiloan' ? 'kg' : ''} ${orders[0].name}`}</p>
               )}
               {orders[0].variant.length > 0 &&
                 orders[0].variant.map((item, i) => (
@@ -432,6 +433,19 @@ export default function TransferTableRow({ row }) {
                   <Iconify icon="solar:printer-outline" sx={{ width: 24, height: 24 }} />
                   Print Laundry
                 </MenuItem>
+
+                {['owner'].includes(user?.role?.toLowerCase()) && (
+                  <MenuItem
+                    sx={{ color: 'red' }}
+                    onClick={() => {
+                      onDeleteRow();
+                      handleCloseAction();
+                    }}
+                  >
+                    <Iconify icon="eva:trash-2-outline" sx={{ width: 24, height: 24 }} />
+                    Delete Order
+                  </MenuItem>
+                )}
               </>
             }
           />

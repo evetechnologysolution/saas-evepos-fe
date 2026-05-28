@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogContent,
   Button,
+  Stack
 } from '@mui/material';
 // hooks
 import useAuth from '../../../../hooks/useAuth';
@@ -29,6 +30,7 @@ import { PATH_DASHBOARD } from '../../../../routes/paths';
 
 OrdersTableRow.propTypes = {
   row: PropTypes.object,
+  onDeleteRow: PropTypes.func,
 };
 
 const CustomTableRow = styled(TableRow)(() => ({
@@ -76,7 +78,7 @@ BootstrapDialogTitle.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default function OrdersTableRow({ row }) {
+export default function OrdersTableRow({ row, onDeleteRow }) {
   const { user } = useAuth();
 
   const navigate = useNavigate();
@@ -264,14 +266,30 @@ export default function OrdersTableRow({ row }) {
         </TableCell> */}
 
         <TableCell align="center">
-          <Button
-            title="Detail"
-            variant="contained"
-            sx={{ p: 0, minWidth: 35, height: 35 }}
-            onClick={() => navigate(PATH_DASHBOARD.cashier.deliveryEdit(paramCase(_id)))}
-          >
-            <Iconify icon="fluent:slide-search-32-regular" width={24} height={24} />
-          </Button>
+          <Stack direction="row" justifyContent="center" gap={1}>
+            <Button
+              title="Detail"
+              variant="contained"
+              sx={{ p: 0, minWidth: 35, height: 35 }}
+              onClick={() => navigate(PATH_DASHBOARD.cashier.deliveryEdit(paramCase(_id)))}
+            >
+              <Iconify icon="fluent:slide-search-32-regular" width={24} height={24} />
+            </Button>
+
+            {['owner'].includes(user?.role?.toLowerCase()) && (
+              <Button
+                title="Delete"
+                variant="contained"
+                color="error"
+                sx={{ p: 0, minWidth: 35, height: 35 }}
+                onClick={() => {
+                  onDeleteRow();
+                }}
+              >
+                <Iconify icon="eva:trash-2-outline" sx={{ width: 24, height: 24 }} />
+              </Button>
+            )}
+          </Stack>
         </TableCell>
       </CustomTableRow>
 
