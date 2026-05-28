@@ -19,6 +19,7 @@ export default function useTransfer() {
           params: {
             outletRef: ctm?.selectedOutlet,
             isTransfer: "yes",
+            showAllTransfer: "yes",
             ...params,
           },
         });

@@ -18,6 +18,7 @@ import {
   DialogTitle,
   DialogContent,
   MenuItem,
+  Typography
 } from '@mui/material';
 // hooks
 import useAuth from '../../../../hooks/useAuth';
@@ -187,10 +188,10 @@ export default function TransferTableRow({ row, onDeleteRow }) {
 
   const labelTransfer = transferStatusLabel[transfer?.status] || "Transfer Order";
 
-  const { actionCode, isDisabled } = useMemo(() => {
-    const transferStatus = transfer?.status;
-    const isTargetOutlet = transfer?.toOutletRef?._id === ctm?.selectedOutlet;
+  const transferStatus = transfer?.status;
+  const isTargetOutlet = transfer?.toOutletRef?._id === ctm?.selectedOutlet;
 
+  const { actionCode, isDisabled } = useMemo(() => {
     let actionCode = 0;
     let isDisabled = true;
 
@@ -206,7 +207,7 @@ export default function TransferTableRow({ row, onDeleteRow }) {
     }
 
     return { actionCode, isDisabled };
-  }, [transfer?.status, transfer?.toOutletRef, ctm?.selectedOutlet]);
+  }, [transferStatus, isTargetOutlet]);
 
   return (
     <>
@@ -364,7 +365,13 @@ export default function TransferTableRow({ row, onDeleteRow }) {
 
         <TableCell>
           <Stack flexDirection="column" gap={0.5}>
-            <p>{transfer?.toOutletRef?.name}</p>
+            <Typography
+              color={isTargetOutlet ? "error" : "inherit"}
+              fontWeight={isTargetOutlet ? "bold" : "normal"}
+              variant="title2"
+            >
+              {transfer?.toOutletRef?.name}
+            </Typography>
             <div>
               <p>Transfer Date :</p>
               <p>{transfer?.createdAt ? formatDate2(transfer?.createdAt) : "-"}</p>
@@ -502,9 +509,9 @@ export default function TransferTableRow({ row, onDeleteRow }) {
                     </td>
                     <td align="center">
                       {item?.qty === 0 && item?.category?.toLowerCase() === 'kiloan' ? (
-                        <em style={{ color: 'red' }}>{'(Belum ditimbang)'}</em>
+                        <p><em style={{ color: 'red' }}>{'(Belum ditimbang)'}</em></p>
                       ) : (
-                        `x ${item?.qty}${item?.category?.toLowerCase() === 'kiloan' ? 'kg' : ''}`
+                        <p>{`x ${item?.qty}${item?.category?.toLowerCase() === 'kiloan' ? 'kg' : ''}`}</p>
                       )}
                     </td>
                     <td align="right">

@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 // components
 import Iconify from '../../../../components/Iconify';
-import { formatDate2 } from '../../../../utils/getData';
+import { formatDate3 } from '../../../../utils/getData';
 
 // ----------------------------------------------------------------------
 
@@ -76,26 +76,25 @@ export default function ModalTransferLog(props) {
           Transfer Log
         </BootstrapDialogTitle>
         <DialogContent dividers>
-          <table style={{ width: '100%' }}>
+          <table style={{ width: '100%' }} className='mini-table'>
             <thead style={{ color: '#6c757d!important', fontSize: '0.9rem' }}>
               <tr>
-                <th align="left">Date</th>
+                <th align="left" width={80}>Date</th>
                 <th align="left">Log</th>
                 <th>Staff</th>
-                <th> </th>
               </tr>
             </thead>
             <tbody style={{ fontSize: '0.85rem' }}>
               {data?.transfer?.log?.slice()?.reverse()?.map((item, i) => {
                 return (
                   <tr key={i}>
-                    <td align="left" style={{ padding: '0.2rem 0' }}>
-                      {item?.createdAt ? formatDate2(item?.createdAt) : "-"}
+                    <td align="left" valign="top">
+                      {item?.createdAt ? formatDate3(item?.createdAt) : "-"}
                     </td>
-                    <td>
+                    <td valign="top">
                       {item?.notes || "-"}
                     </td>
-                    <td align="center">
+                    <td align="center" valign="top">
                       {item?.staff || "-"}
                     </td>
                   </tr>

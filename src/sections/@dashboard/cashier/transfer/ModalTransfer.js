@@ -159,6 +159,7 @@ export default function ModalTransfer(props) {
                 fullWidth
                 value={staff}
                 onChange={(e) => setStaff(e.target.value)}
+                autoComplete="off"
                 required
               />
               <Stack alignItems="center">

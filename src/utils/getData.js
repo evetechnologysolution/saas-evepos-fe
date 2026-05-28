@@ -138,6 +138,16 @@ export const formatDate2 = (x) => (
     })
 );
 
+export const formatDate3 = (x) => (
+    new Date(x).toLocaleDateString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+        year: "2-digit",
+        month: "2-digit",
+        day: "2-digit",
+    })
+);
+
 export const combinedDateTime = (d) => {
     const currentTime = new Date();
     const selectedDate = new Date(d);
