@@ -167,6 +167,7 @@ export default function useTransfer() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(queryKeyNotif);
     },
   });
 

@@ -8,7 +8,8 @@ import { mainContext } from '../../../contexts/MainContext';
 export default function useOrder() {
   const ctm = useContext(mainContext);
   const queryClient = useQueryClient();
-  const queryKey = ['delivery-orders'];
+  const queryKey = ['deliveryOrders'];
+  const queryKeyNotif = ['allNotif'];
 
   const list = (params = {}) =>
     useQuery({
@@ -112,6 +113,7 @@ export default function useOrder() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(queryKeyNotif);
     },
   });
 
