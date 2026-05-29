@@ -103,8 +103,6 @@ const PrintLaundryFromOrders = React.forwardRef(({ data }, ref) => {
 
   return (
     <div ref={ref} className="no-break">
-      <br />
-      <br />
       <Divider />
 
       {/* ================= WITH SPK ================= */}
