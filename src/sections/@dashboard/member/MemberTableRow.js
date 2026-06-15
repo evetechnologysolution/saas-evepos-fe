@@ -383,7 +383,16 @@ export default function MemberTableRow({ row, onDetailRow, onEditRow, onDeleteRo
       return;
     }
 
-    const bodyMsg = `berikut kami kirimkan member QR`;
+    const bodyMsg = `🎉 Halo kak, kami dari Evewash Laundry!
+Berikut kami kirimkan QR Member Anda.
+
+📌 Tunjukkan QR ini setiap kali bertransaksi di Evewash.
+🎁 Dapatkan Evewash Point dari setiap transaksi.
+🏆 Tukarkan point Anda dengan berbagai reward menarik, termasuk cuci gratis, di Evewash.com.
+
+Semakin sering laundry, semakin banyak point yang Anda kumpulkan.
+Simpan QR Member ini dengan baik dan gunakan setiap kali bertransaksi.
+Terima kasih telah mempercayakan kebutuhan laundry Anda kepada Evewash. 💙`;
 
     const url = `https://api.whatsapp.com/send?phone=${data?.phone}&text=${encodeURIComponent(bodyMsg)}`;
     window.open(url, '_blank');
@@ -481,8 +490,8 @@ export default function MemberTableRow({ row, onDetailRow, onEditRow, onDeleteRo
                     </MenuItem>
                     <MenuItem
                       onClick={() => {
-                        sendWa();
-                        handleCloseAction(row);
+                        sendWa(row);
+                        handleCloseAction();
                       }}
                       disabled={!!phone?.includes('EM') || !phone}
                     >
