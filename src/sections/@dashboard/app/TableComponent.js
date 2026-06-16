@@ -197,7 +197,7 @@ export default function TableComponent() {
 
     handleSearch();
 
-    let url = `/order/export?satus=paid`;
+    let url = "/order/export";
     const params = new URLSearchParams();
     params.append("status", "paid");
 
