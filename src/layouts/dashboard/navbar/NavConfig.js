@@ -85,6 +85,12 @@ export const useNavConfig = () => {
           roles: ['owner', 'admin', 'cashier'],
         },
         {
+          title: 'Transaction Log',
+          path: PATH_DASHBOARD.transactionLog.root,
+          icon: ICONS.history,
+          roles: ['owner', 'admin', 'cashier'],
+        },
+        {
           title: 'Cash Log',
           path: PATH_DASHBOARD.cashLog.root,
           icon: ICONS.history,

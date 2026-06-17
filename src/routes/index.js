@@ -186,6 +186,22 @@ export default function Router() {
               ),
             },
             {
+              path: 'transaction-log',
+              element: (
+                <RoleBasedGuard hasContent roles={['owner', 'admin', 'cashier']}>
+                  <TransactionLog />
+                </RoleBasedGuard>
+              ),
+            },
+            {
+              path: 'transaction-log/:id/detail',
+              element: (
+                <RoleBasedGuard hasContent roles={['owner', 'admin', 'cashier']}>
+                  <TransactionLogDetail />
+                </RoleBasedGuard>
+              ),
+            },
+            {
               path: 'cash-log',
               element: (
                 <RoleBasedGuard hasContent roles={['owner', 'admin', 'cashier']}>
@@ -1101,6 +1117,10 @@ const Subscription = Loadable(lazy(() => import('../pages/subscription/Subscript
 const Checkout = Loadable(lazy(() => import('../pages/subscription/Checkout')));
 const PaymentSuccess = Loadable(lazy(() => import('../pages/subscription/Success')));
 const PaymentFailed = Loadable(lazy(() => import('../pages/subscription/Failed')));
+
+// TRANSACTION LOG
+const TransactionLog = Loadable(lazy(() => import('../pages/transaction-log/TransactionLog')));
+const TransactionLogDetail = Loadable(lazy(() => import('../pages/transaction-log/TransactionLogDetail')));
 
 // CASH
 const CashLog = Loadable(lazy(() => import('../pages/cash-log/CashLog')));

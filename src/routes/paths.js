@@ -38,6 +38,10 @@ export const PATH_DASHBOARD = {
   pickup: {
     root: path(ROOTS_DASHBOARD, '/pickup'),
   },
+  transactionLog: {
+    root: path(ROOTS_DASHBOARD, '/transaction-log'),
+    detail: (id) => path(ROOTS_DASHBOARD, `/transaction-log/${id}/detail`),
+  },
   cashLog: {
     root: path(ROOTS_DASHBOARD, '/cash-log'),
   },
