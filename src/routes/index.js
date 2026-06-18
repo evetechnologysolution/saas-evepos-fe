@@ -188,7 +188,7 @@ export default function Router() {
             {
               path: 'transaction-log',
               element: (
-                <RoleBasedGuard hasContent roles={['owner', 'admin', 'cashier']}>
+                <RoleBasedGuard hasContent roles={['owner']}>
                   <TransactionLog />
                 </RoleBasedGuard>
               ),
