@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { LoadingButton } from '@mui/lab';
-import { Card, Grid, Stack, Button, CircularProgress, Typography } from '@mui/material';
+import { Box, Card, Stack, Button, CircularProgress, Typography } from '@mui/material';
 // routes
 import { PATH_DASHBOARD } from '../../../routes/paths';
 import { FormProvider, RHFTextField, RHFSwitch } from '../../../components/hook-form';
@@ -36,8 +36,10 @@ export default function MemberForm({ isEdit, currentData, isLoading }) {
     memberId: Yup.string(),
     firstName: Yup.string().required('First Name is required'),
     lastName: Yup.string().required('Last Name is required'),
-    phone: Yup.string().required('Phone is required'),
-    email: Yup.string().email(),
+    phone: Yup.string()
+      .required('Nomor WhatsApp wajib diisi')
+      .matches(/^[0-9+]+$/, 'Nomor WhatsApp hanya boleh berisi angka'),
+    email: Yup.string().email('Format email tidak valid').notRequired(),
     password: isEdit
       ? Yup.string()
         .test('is-password-present', 'Must be at least 6 characters', (value) => {
@@ -108,57 +110,87 @@ export default function MemberForm({ isEdit, currentData, isLoading }) {
       {isLoading ? (
         <CircularProgress />
       ) : (
-        <Card sx={{ p: 3 }}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <Stack spacing={3}>
-                {isEdit && (
-                  <>
-                    {/* <RHFTextField name="id" label="ID" disabled /> */}
-                    <RHFTextField name="memberId" label="Member ID" disabled />
-                  </>
-                )}
-                <Stack gap={3} flexDirection="row">
-                  <RHFTextField name="firstName" label="First Name" autoComplete="off" />
-                  <RHFTextField name="lastName" label="Last Name" autoComplete="off" />
-                </Stack>
-                <RHFTextField name="phone" label="Phone" autoComplete="off" />
-              </Stack>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Stack spacing={3}>
-                <RHFTextField name="email" label="Email" type="email" autoComplete="off" />
+        <Card sx={{ p: { xs: 2, sm: 3 }, maxWidth: 720, mx: 'auto' }}>
+          <Stack spacing={1} sx={{ mb: 3 }}>
+            <Typography variant="h6">{isEdit ? 'Edit Member' : 'Informasi Member'}</Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              Kolom bertanda <Box component="span" sx={{ color: 'error.main' }}>*</Box> wajib diisi.
+            </Typography>
+          </Stack>
+
+          <Stack spacing={3}>
+            {isEdit && <RHFTextField name="memberId" label="Member ID" disabled />}
+
+            <Stack spacing={3} direction={{ xs: 'column', sm: 'row' }}>
+              <RHFTextField name="firstName" label="First Name" required autoComplete="off" />
+              <RHFTextField name="lastName" label="Last Name" required autoComplete="off" />
+            </Stack>
+
+            <RHFTextField
+              name="phone"
+              label="Nomor WhatsApp"
+              required
+              placeholder="081........."
+              autoComplete="off"
+              inputMode="tel"
+            />
+
+            <RHFTextField
+              name="email"
+              label="Email (Opsional)"
+              type="email"
+              placeholder="nama@email.com"
+              autoComplete="off"
+            />
+
+            {isEdit && (
+              <>
                 <RHFTextField
                   name="password"
-                  label={`Password ${isEdit ? '(Biarkan kosong jika tidak diganti)' : ''}`}
+                  label="Password (Biarkan kosong jika tidak diganti)"
                   type="password"
                   autoComplete="new-password"
                 />
-                {isEdit && (
-                  <RHFSwitch
-                    name="isActive"
-                    labelPlacement="start"
-                    label={
-                      <>
-                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                          Active
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                          Disable this for inactive members
-                        </Typography>
-                      </>
-                    }
-                    sx={{ mx: 0, width: 1, justifyContent: 'space-between' }}
-                  />
-                )}
-              </Stack>
-            </Grid>
-          </Grid>
-          <Stack direction="row" justifyContent="flex-end" sx={{ mt: 3 }} gap={1}>
-            <Button variant="outlined" onClick={() => navigate(PATH_DASHBOARD.member.list)}>
+                <RHFSwitch
+                  name="isActive"
+                  labelPlacement="start"
+                  label={
+                    <>
+                      <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                        Active
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                        Disable this for inactive members
+                      </Typography>
+                    </>
+                  }
+                  sx={{ mx: 0, width: 1, justifyContent: 'space-between' }}
+                />
+              </>
+            )}
+          </Stack>
+
+          <Stack
+            direction={{ xs: 'column-reverse', sm: 'row' }}
+            justifyContent="flex-end"
+            sx={{ mt: 4 }}
+            gap={1.5}
+          >
+            <Button
+              fullWidth
+              variant="outlined"
+              onClick={() => navigate(PATH_DASHBOARD.member.list)}
+              sx={{ width: { sm: 'auto' } }}
+            >
               Back
             </Button>
-            <LoadingButton type="submit" variant="contained" loading={loading}>
+            <LoadingButton
+              fullWidth
+              type="submit"
+              variant="contained"
+              loading={loading}
+              sx={{ width: { sm: 'auto' } }}
+            >
               {!isEdit ? 'New Member' : 'Save Changes'}
             </LoadingButton>
           </Stack>
