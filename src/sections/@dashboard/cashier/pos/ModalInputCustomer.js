@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 import debounce from 'lodash.debounce';
 
 // MUI
@@ -27,8 +28,10 @@ import AsyncSelect from 'react-select/async';
 import axios from '../../../../utils/axios';
 import useAuth from '../../../../hooks/useAuth';
 import Iconify from '../../../../components/Iconify';
-import CustomSwitch from '../../../../components/CustomSwitch';
 import { maskedPhone } from '../../../../utils/masked';
+
+// routes
+import { PATH_DASHBOARD } from '../../../../routes/paths';
 
 // context
 import { cashierContext } from '../../../../contexts/CashierContext';
@@ -71,6 +74,7 @@ export default function ModalInputCustomer(props) {
   const { user } = useAuth();
   const ctx = useContext(cashierContext);
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const [date, setDate] = useState(null);
   const [isNew, setIsNew] = useState(false);
@@ -170,16 +174,6 @@ export default function ModalInputCustomer(props) {
     handleReset();
   };
 
-  const handleSwitch = () => {
-    setFullName('');
-    setFirstName('');
-    setLastName('');
-    setPhone('');
-    setPoint(0);
-    setIsNew(!isNew);
-    setAlert(false);
-  };
-
   const handleSubmit = () => {
     if ((isNew && (!firstName || !lastName)) || (!isNew && !fullName) || !phone) {
       setAlert(true);
@@ -207,15 +201,12 @@ export default function ModalInputCustomer(props) {
       </BootstrapDialogTitle>
 
       <DialogContent dividers>
-        <Stack gap={2}>
-
-          {isNew && (
-            <Alert severity="warning">
-              Jika <b>No. WA</b> belum ada, bisa diisi <b>62</b>
-            </Alert>
-          )}
-
-          <Stack direction="row" gap={2} alignItems="center">
+        <Stack gap={2.5}>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            gap={2}
+            alignItems={{ xs: 'stretch', sm: 'flex-start' }}
+          >
             {isNew ? (
               <>
                 <TextField
@@ -342,14 +333,27 @@ export default function ModalInputCustomer(props) {
               </div>
             )}
 
-            <CustomSwitch
-              label="New"
-              checked={isNew}
-              onChange={handleSwitch}
-            />
+            <Button
+              variant="outlined"
+              startIcon={<Iconify icon="eva:plus-fill" />}
+              onClick={() => navigate(PATH_DASHBOARD.member.create)}
+              sx={{
+                flexShrink: 0,
+                height: 56,
+                whiteSpace: 'nowrap',
+                width: { xs: '100%', sm: 'auto' },
+                px: { sm: 3 },
+              }}
+            >
+              New
+            </Button>
           </Stack>
 
-          <Stack direction="row" gap={2}>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            gap={2}
+            alignItems={{ xs: 'stretch', sm: 'flex-start' }}
+          >
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <MobileDateTimePicker
                 label="Order Date"
@@ -391,11 +395,19 @@ export default function ModalInputCustomer(props) {
               disabled={!isNew}
             />
 
-            <Stack justifyContent="center">
-              <Button variant="contained" onClick={handleSubmit}>
-                Save
-              </Button>
-            </Stack>
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              startIcon={<Iconify icon="eva:save-fill" />}
+              sx={{
+                flexShrink: 0,
+                height: 56,
+                width: { xs: '100%', sm: 'auto' },
+                px: { sm: 4 },
+              }}
+            >
+              Save
+            </Button>
           </Stack>
 
         </Stack>

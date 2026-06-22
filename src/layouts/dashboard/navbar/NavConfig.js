@@ -12,6 +12,7 @@ const getIcon = (name) => <SvgIconStyle src={`/assets/icons/sidebar/${name}.svg`
 const ICONS = {
   dashboard: getIcon('ic_dashboard'),
   pos: getIcon('ic_pos'),
+  member: getIcon('ic_member'),
   order: getIcon('ic_order'),
   transfer: getIcon('ic_transfer'),
   delivery: getIcon('ic_delivery'),
@@ -19,7 +20,6 @@ const ICONS = {
   scan: getIcon('ic_scan'),
   history: getIcon('ic_history'),
   customer: getIcon('ic_customer'),
-  member: getIcon('ic_member'),
   cashier: getIcon('ic_cash_cashier'),
   cart: getIcon('ic_cart'),
   printCount: getIcon('ic_print_count'),
@@ -57,6 +57,17 @@ export const useNavConfig = () => {
           path: PATH_DASHBOARD.cashier.pos,
           icon: ICONS.pos,
           roles: ['owner', 'admin', 'cashier'],
+        },
+        {
+          title: 'Member',
+          path: PATH_DASHBOARD.member.root,
+          icon: ICONS.member,
+          roles: ['owner', 'admin', 'cashier'],
+          children: [
+            { title: 'list member', path: PATH_DASHBOARD.member.list },
+            // { title: 'member card', path: PATH_DASHBOARD.member.memberCard },
+            ...(user?.tenantRef?.isEvewash ? [{ title: 'log voucher', path: PATH_DASHBOARD.member.logVoucher }] : []),
+          ],
         },
         {
           title: 'Orders',
@@ -140,17 +151,6 @@ export const useNavConfig = () => {
         //   roles: ['owner', 'admin', 'cashier'],
         //   roles: ['forbidden'],
         // },
-        {
-          title: 'Member',
-          path: PATH_DASHBOARD.member.root,
-          icon: ICONS.member,
-          roles: ['owner', 'admin', 'cashier'],
-          children: [
-            { title: 'list member', path: PATH_DASHBOARD.member.list },
-            // { title: 'member card', path: PATH_DASHBOARD.member.memberCard },
-            ...(user?.tenantRef?.isEvewash ? [{ title: 'log voucher', path: PATH_DASHBOARD.member.logVoucher }] : []),
-          ],
-        },
         {
           title: 'Postcard',
           path: PATH_DASHBOARD.postCard.root,
