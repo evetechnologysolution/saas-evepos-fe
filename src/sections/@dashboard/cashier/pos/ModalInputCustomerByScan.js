@@ -81,7 +81,6 @@ export default function ModalScanCustomer(props) {
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState(false);
   const [notFound, setNotFound] = useState(false);
-  const [notVerified, setNotVerified] = useState(false);
   const [memberId, setMemberId] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -199,10 +198,9 @@ export default function ModalScanCustomer(props) {
         const res = await axios.get(`/member/track?search=${memberId}`);
         if (res?.data) {
           setNotFound(false);
-          setNotVerified(!res?.data?.isVerified);
-          setName(res?.data?.isVerified ? res?.data?.name : "");
-          setPhone(res?.data?.isVerified ? res?.data?.phone : "");
-          setPoint(res?.data?.isVerified ? res?.data?.point : 0);
+          setName(res?.data?.name || '');
+          setPhone(res?.data?.phone || '');
+          setPoint(res?.data?.point || 0);
         }
       } catch (error) {
         console.error('Error fetching members:', error);
@@ -232,7 +230,6 @@ export default function ModalScanCustomer(props) {
       setPoint(0);
       setAlert(false);
       setNotFound(false);
-      setNotVerified(false);
     }, 100);
   };
 
@@ -325,7 +322,6 @@ export default function ModalScanCustomer(props) {
             </LoadingButton>
           </Stack>
           {notFound && <Alert severity="warning">Data member tidak ditemukan</Alert>}
-          {notVerified && <Alert severity="error">Belum terdaftar sebagai member.</Alert>}
           <Stack flexDirection="row" alignItems="center" gap={2}>
             <TextField
               name="customerName"
